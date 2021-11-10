@@ -1,0 +1,72 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{FCD3C8D9-07A4-4189-8820-E8DB97386B5D}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="CollectionDemo\CollectionDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ReadWriteDemo\SimpleHIDWrite.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="UsagesDemo\UsagesDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="BasicDemo\BasicDemo.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CollectionDemo">
+        <MSBuild Projects="CollectionDemo\CollectionDemo.dproj"/>
+    </Target>
+    <Target Name="CollectionDemo:Clean">
+        <MSBuild Projects="CollectionDemo\CollectionDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CollectionDemo:Make">
+        <MSBuild Projects="CollectionDemo\CollectionDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SimpleHIDWrite">
+        <MSBuild Projects="ReadWriteDemo\SimpleHIDWrite.dproj"/>
+    </Target>
+    <Target Name="SimpleHIDWrite:Clean">
+        <MSBuild Projects="ReadWriteDemo\SimpleHIDWrite.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SimpleHIDWrite:Make">
+        <MSBuild Projects="ReadWriteDemo\SimpleHIDWrite.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="UsagesDemo">
+        <MSBuild Projects="UsagesDemo\UsagesDemo.dproj"/>
+    </Target>
+    <Target Name="UsagesDemo:Clean">
+        <MSBuild Projects="UsagesDemo\UsagesDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="UsagesDemo:Make">
+        <MSBuild Projects="UsagesDemo\UsagesDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="BasicDemo">
+        <MSBuild Projects="BasicDemo\BasicDemo.dproj"/>
+    </Target>
+    <Target Name="BasicDemo:Clean">
+        <MSBuild Projects="BasicDemo\BasicDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="BasicDemo:Make">
+        <MSBuild Projects="BasicDemo\BasicDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CollectionDemo;SimpleHIDWrite;UsagesDemo;BasicDemo"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CollectionDemo:Clean;SimpleHIDWrite:Clean;UsagesDemo:Clean;BasicDemo:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CollectionDemo:Make;SimpleHIDWrite:Make;UsagesDemo:Make;BasicDemo:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
