@@ -128,7 +128,7 @@ object SplitViewForm: TSplitViewForm
               object Label10: TLabel
                 Left = 5
                 Top = 13
-                Width = 60
+                Width = 64
                 Height = 17
                 Caption = #25509#25910#26684#24335
                 Font.Charset = DEFAULT_CHARSET
@@ -181,7 +181,7 @@ object SplitViewForm: TSplitViewForm
               object Label2: TLabel
                 Left = 5
                 Top = 15
-                Width = 60
+                Width = 64
                 Height = 17
                 Caption = #27874#29305#29575#25968
                 Font.Charset = DEFAULT_CHARSET
@@ -194,7 +194,7 @@ object SplitViewForm: TSplitViewForm
               object Label5: TLabel
                 Left = 5
                 Top = 108
-                Width = 60
+                Width = 64
                 Height = 17
                 Caption = #26657#39564#20301#25968
                 Font.Charset = DEFAULT_CHARSET
@@ -207,7 +207,7 @@ object SplitViewForm: TSplitViewForm
               object Label9: TLabel
                 Left = 5
                 Top = 77
-                Width = 60
+                Width = 64
                 Height = 17
                 Caption = #20572#27490#20301#25968
                 Font.Charset = DEFAULT_CHARSET
@@ -220,7 +220,7 @@ object SplitViewForm: TSplitViewForm
               object Label12: TLabel
                 Left = 5
                 Top = 46
-                Width = 60
+                Width = 64
                 Height = 17
                 Caption = #25968#25454#20301#25968
                 Font.Charset = DEFAULT_CHARSET
@@ -233,7 +233,7 @@ object SplitViewForm: TSplitViewForm
               object Label13: TLabel
                 Left = 5
                 Top = 171
-                Width = 60
+                Width = 64
                 Height = 17
                 Hint = #21457#36865#25968#25454#30340#26684#24335'ASCI'#20026#23383#31526'HEX'#20026#21313#20845#36827#21046'CMD'#20026#25191#34892#26412#22320'Shell'#21629#20196
                 Caption = #21457#36865#26684#24335
@@ -249,7 +249,7 @@ object SplitViewForm: TSplitViewForm
               object Label15: TLabel
                 Left = 5
                 Top = 139
-                Width = 60
+                Width = 64
                 Height = 17
                 Caption = #27969#25511#21046#31526
                 Font.Charset = DEFAULT_CHARSET
@@ -468,7 +468,7 @@ object SplitViewForm: TSplitViewForm
             object Label1: TLabel
               Left = 3
               Top = 36
-              Width = 168
+              Width = 179
               Height = 17
               Caption = #31383#21475#36879#26126#24230','#20540#36234#23567#36234#28165#29245
               Font.Charset = DEFAULT_CHARSET
@@ -481,7 +481,7 @@ object SplitViewForm: TSplitViewForm
             object Label3: TLabel
               Left = 3
               Top = 98
-              Width = 165
+              Width = 176
               Height = 17
               Caption = #20445#23384#21040#25991#20214#30340#26102#38388#38388#38548#31186
               Font.Charset = DEFAULT_CHARSET
@@ -2110,28 +2110,28 @@ object SplitViewForm: TSplitViewForm
             object Label18: TLabel
               Left = 3
               Top = 102
-              Width = 60
+              Width = 64
               Height = 17
               Caption = #25805#20316#31867#22411
             end
             object Label11: TLabel
               Left = 3
               Top = 72
-              Width = 60
+              Width = 64
               Height = 17
               Caption = #35835#23383#33410#25968
             end
             object Label8: TLabel
               Left = 3
               Top = 42
-              Width = 60
+              Width = 64
               Height = 17
               Caption = #22120#20214#22320#22336
             end
             object Label7: TLabel
               Left = 3
               Top = 13
-              Width = 60
+              Width = 64
               Height = 17
               Caption = #36890#35759#21327#35758
             end

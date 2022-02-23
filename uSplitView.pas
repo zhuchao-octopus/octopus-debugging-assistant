@@ -1648,8 +1648,8 @@ var
 begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj = nil then
-    exit;
-
+    exit;                    //OctopusCfgDir_LogFileName + '_' +
+  SaveDialog1.FileName:= GetSystemDateTimeStampStr+'_'+OcComPortObj.Port + '.log';
   if (SaveDialog1.Execute) and (SaveDialog1.FileName <> '') then
   begin
     if TabSet2.TabIndex = 0 then
