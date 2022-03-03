@@ -1,25 +1,25 @@
-{-----------------------------------------------------------------------------
-The contents of this file are subject to the Mozilla Public License
-Version 1.1 (the "License"); you may not use this file except in compliance
-with the License. You may obtain a copy of the License at
-http://www.mozilla.org/MPL/MPL-1.1.html
+{ -----------------------------------------------------------------------------
+  The contents of this file are subject to the Mozilla Public License
+  Version 1.1 (the "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+  http://www.mozilla.org/MPL/MPL-1.1.html
 
-Software distributed under the License is distributed on an "AS IS" basis,
-WITHOUT WARRANTY OF ANY KIND, either expressed or implied. See the License for
-the specific language governing rights and limitations under the License.
+  Software distributed under the License is distributed on an "AS IS" basis,
+  WITHOUT WARRANTY OF ANY KIND, either expressed or implied. See the License for
+  the specific language governing rights and limitations under the License.
 
-The Original Code is: JvConst.PAS, released on 2002-07-04.
+  The Original Code is: JvConst.PAS, released on 2002-07-04.
 
-The Initial Developers of the Original Code are: Fedor Koshevnikov, Igor Pavluk and Serge Korolev
-Copyright (c) 1997, 1998 Fedor Koshevnikov, Igor Pavluk and Serge Korolev
-Copyright (c) 2001,2002 SGB Software
-All Rights Reserved.
+  The Initial Developers of the Original Code are: Fedor Koshevnikov, Igor Pavluk and Serge Korolev
+  Copyright (c) 1997, 1998 Fedor Koshevnikov, Igor Pavluk and Serge Korolev
+  Copyright (c) 2001,2002 SGB Software
+  All Rights Reserved.
 
-You may retrieve the latest version of this file at the Project JEDI's JVCL home page,
-located at http://jvcl.delphi-jedi.org
+  You may retrieve the latest version of this file at the Project JEDI's JVCL home page,
+  located at http://jvcl.delphi-jedi.org
 
-Known Issues:
------------------------------------------------------------------------------}
+  Known Issues:
+  ----------------------------------------------------------------------------- }
 // $Id: JvConsts.pas 13102 2011-09-07 05:46:34Z obones $
 
 unit JvConsts;
@@ -29,60 +29,62 @@ unit JvConsts;
 interface
 
 uses
-  {$IFDEF UNITVERSIONING}
+{$IFDEF UNITVERSIONING}
   JclUnitVersioning,
-  {$ENDIF UNITVERSIONING}
+{$ENDIF UNITVERSIONING}
   SysUtils, Classes, Forms, Controls, Graphics, Windows, TypInfo;
 
 const
   { JvEditor }
-  JvEditorCompletionChars = #8'0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm';
+  JvEditorCompletionChars =
+    #8'0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm';
 
   { Various units }
-  DigitSymbols = ['0'..'9'];
+  DigitSymbols = ['0' .. '9'];
   SignSymbols = ['+', '-'];
-  IdentifierUppercaseLetters = ['A'..'Z'];
-  IdentifierLowercaseLetters = ['a'..'z'];
-  HexadecimalUppercaseLetters = ['A'..'F'];
-  HexadecimalLowercaseLetters = ['a'..'f'];
+  IdentifierUppercaseLetters = ['A' .. 'Z'];
+  IdentifierLowercaseLetters = ['a' .. 'z'];
+  HexadecimalUppercaseLetters = ['A' .. 'F'];
+  HexadecimalLowercaseLetters = ['a' .. 'f'];
   IdentifierLetters = IdentifierUppercaseLetters + IdentifierLowercaseLetters;
   IdentifierFirstSymbols = ['_'] + IdentifierLetters;
   IdentifierSymbols = IdentifierFirstSymbols + DigitSymbols;
-  HexadecimalSymbols = DigitSymbols + HexadecimalUppercaseLetters + HexadecimalLowercaseLetters;
+  HexadecimalSymbols = DigitSymbols + HexadecimalUppercaseLetters +
+    HexadecimalLowercaseLetters;
 
-  {$IFDEF DELPHI6}
+{$IFDEF DELPHI6}
   SDelphiKey = 'Software\Borland\Delphi\6.0';
-  {$ENDIF DELPHI6}
-  {$IFDEF BCB6}
+{$ENDIF DELPHI6}
+{$IFDEF BCB6}
   SDelphiKey = 'Software\Borland\C++Builder\6.0';
-  {$ENDIF BCB6}
-  {$IFDEF DELPHI7}
+{$ENDIF BCB6}
+{$IFDEF DELPHI7}
   SDelphiKey = 'Software\Borland\Delphi\7.0';
-  {$ENDIF DELPHI7}
-  {$IFDEF DELPHI8}
+{$ENDIF DELPHI7}
+{$IFDEF DELPHI8}
   SDelphiKey = 'Software\Borland\BDS\2.0';
-  {$ENDIF DELPHI8}
-  {$IFDEF DELPHI9}
+{$ENDIF DELPHI8}
+{$IFDEF DELPHI9}
   SDelphiKey = 'Software\Borland\BDS\3.0';
-  {$ENDIF DELPHI9}
-  {$IFDEF DELPHI10}
+{$ENDIF DELPHI9}
+{$IFDEF DELPHI10}
   SDelphiKey = 'Software\Borland\BDS\4.0';
-  {$ENDIF DELPHI10}
-  {$IFDEF DELPHI11}
+{$ENDIF DELPHI10}
+{$IFDEF DELPHI11}
   SDelphiKey = 'Software\Borland\BDS\5.0';
-  {$ENDIF DELPHI11}
-  {$IFDEF DELPHI12}
+{$ENDIF DELPHI11}
+{$IFDEF DELPHI12}
   SDelphiKey = 'Software\CodeGear\BDS\6.0';
-  {$ENDIF DELPHI12}
-  {$IFDEF DELPHI14}
+{$ENDIF DELPHI12}
+{$IFDEF DELPHI14}
   SDelphiKey = 'Software\CodeGear\BDS\7.0';
-  {$ENDIF DELPHI14}
-  {$IFDEF DELPHI15}
+{$ENDIF DELPHI14}
+{$IFDEF DELPHI15}
   SDelphiKey = 'Software\Embarcadero\BDS\8.0';
-  {$ENDIF DELPHI15}
-  {$IFDEF DELPHI16}
+{$ENDIF DELPHI15}
+{$IFDEF DELPHI16}
   SDelphiKey = 'Software\Embarcadero\BDS\9.0';
-  {$ENDIF DELPHI16}
+{$ENDIF DELPHI16}
   { JvDataProvider constants }
   { Consumer attributes }
   DPA_RenderDisabledAsGrayed = 1;
@@ -95,16 +97,15 @@ const
   CM_JVBASE = CM_BASE + $0200;
 
   { Define command message that did not exist in earlier VCL versions }
-  {$IFNDEF COMPILER9_UP}
+{$IFNDEF COMPILER9_UP}
   CM_INVALIDATEDOCKHOST = CM_BASE + 70;
-  {$ENDIF !COMPILER9_UP}
-
+{$ENDIF !COMPILER9_UP}
   { Command message for JvSpeedbar editor }
   CM_SPEEDBARCHANGED = CM_JVBASE + $000;
   { Command message for TJvSpeedButton }
   CM_JVBUTTONPRESSED = CM_JVBASE + $001;
   { Command messages for TJvBackground }
-  CM_RECREATEWINDOW  = CM_JVBASE + $002;
+  CM_RECREATEWINDOW = CM_JVBASE + $002;
   CM_RELEASECLIENTLINK = CM_JVBASE + $003;
   { Command message used in JvProgressComponent }
   CM_SHOWEVENT = CM_JVBASE + $004;
@@ -133,22 +134,21 @@ const
   CM_MOVEDRAGLINE = CM_JVBASE + $013;
 
   { Values for WParam for CM_SPEEDBARCHANGED message }
-  SBR_CHANGED        = 0; { change buttons properties  }
-  SBR_DESTROYED      = 1; { destroy SpeedBar           }
-  SBR_BTNSELECT      = 2; { select button in SpeedBar  }
-  SBR_BTNSIZECHANGED = 3; { button size changed        }
+  SBR_CHANGED = 0; { change buttons properties }
+  SBR_DESTROYED = 1; { destroy SpeedBar }
+  SBR_BTNSELECT = 2; { select button in SpeedBar }
+  SBR_BTNSIZECHANGED = 3; { button size changed }
 
   { TBitmap.GetTransparentColor from GRAPHICS.PAS use this value }
   PaletteMask = $02000000;
 
   // (outchy) now used
-  {$IFDEF COMPILER7_UP}
+{$IFDEF COMPILER7_UP}
   // (outchy) it was defined as $000000FF
-  DEFAULT_SYSCOLOR_MASK = clSystemColor;  // $FF000000
-  {$ELSE}
+  DEFAULT_SYSCOLOR_MASK = clSystemColor; // $FF000000
+{$ELSE}
   DEFAULT_SYSCOLOR_MASK = $80000000;
-  {$ENDIF COMPILER7_UP}
-
+{$ENDIF COMPILER7_UP}
   sLineBreakStr = string(sLineBreak); // "native string" line break constant
   sLineBreakLen = Length(sLineBreak);
 
@@ -166,24 +166,24 @@ const
   CtrlM = ^M;
   CtrlV = ^V;
   CtrlX = ^X;
-  {$IFDEF MSWINDOWS}
+{$IFDEF MSWINDOWS}
   RegPathDelim = '\';
   PathDelim = '\';
   DriveDelim = ':';
   PathSep = ';';
   AllFilePattern = '*.*';
-  {$ENDIF MSWINDOWS}
-  {$IFDEF UNIX}
+{$ENDIF MSWINDOWS}
+{$IFDEF UNIX}
   RegPathDelim = '_';
   PathDelim = '/';
   AllFilePattern = '*';
-  {$ENDIF UNIX}
+{$ENDIF UNIX}
+  { const Separators is used in GetWordOnPos, JvUtils.ReplaceStrings and SubWord }
+  Separators: TSysCharSet = [#00, ' ', '-', #13, #10, '.', ',', '/', '\', '#',
+    '"', '''', ':', '+', '%', '*', '(', ')', ';', '=', '{', '}', '[', ']', '{',
+    '}', '<', '>'];
 
-  {const Separators is used in GetWordOnPos, JvUtils.ReplaceStrings and SubWord}
-  Separators: TSysCharSet = [#00, ' ', '-', #13, #10, '.', ',', '/', '\', '#', '"', '''',
-    ':', '+', '%', '*', '(', ')', ';', '=', '{', '}', '[', ']', '{', '}', '<', '>'];
-
-  DigitChars = ['0'..'9'];
+  DigitChars = ['0' .. '9'];
 
 var
   crJVCLFirst: TCursor = 368;
@@ -210,35 +210,38 @@ const
   FOURCC_fram = 'fram';
   FOURCC_icon = 'icon';
   FOURCC_rate = 'rate';
-  FOURCC_seq  = 'seq ';
+  FOURCC_seq = 'seq ';
 
-  AF_ICON     = $00000001;
+  AF_ICON = $00000001;
   AF_SEQUENCE = $00000002;
 
 const
   KeyboardShiftStates = [ssShift, ssAlt, ssCtrl];
   MouseShiftStates = [ssLeft, ssRight, ssMiddle, ssDouble];
-  tkStrings: set of TTypeKind = [tkString, tkLString, {$IFDEF UNICODE} tkUString, {$ENDIF} tkWString];
+  tkStrings: set of TTypeKind = [tkString, tkLString,
+  {$IFDEF UNICODE} tkUString, {$ENDIF} tkWString];
 
 {$IFDEF UNITVERSIONING}
+
 const
-  UnitVersioning: TUnitVersionInfo = (
-    RCSfile: '$URL: https://jvcl.svn.sourceforge.net/svnroot/jvcl/tags/JVCL3_45/run/JvConsts.pas $';
+  UnitVersioning: TUnitVersionInfo = (RCSfile
+    : '$URL: https://jvcl.svn.sourceforge.net/svnroot/jvcl/tags/JVCL3_45/run/JvConsts.pas $';
     Revision: '$Revision: 13102 $';
     Date: '$Date: 2011-09-07 07:46:34 +0200 (mer., 07 sept. 2011) $';
-    LogPath: 'JVCL\run'
-  );
+    LogPath: 'JVCL\run');
 {$ENDIF UNITVERSIONING}
 
 implementation
 
 {$IFDEF UNITVERSIONING}
+
 initialization
-  RegisterUnitVersion(HInstance, UnitVersioning);
+
+RegisterUnitVersion(HInstance, UnitVersioning);
 
 finalization
-  UnregisterUnitVersion(HInstance);
+
+UnregisterUnitVersion(HInstance);
 {$ENDIF UNITVERSIONING}
 
 end.
-

@@ -88,7 +88,7 @@ type
     function CreatePack(Id: byte): TOcComPack;
     function ParserPack(buff: PByte; Len: integer): integer;
     function GetPackByIndex(i: integer): TOcComPack;
-    function  GetBytesValue(i: integer):Int64;
+    function GetBytesValue(i: integer): Int64;
     procedure ClearPacks();
     function CheckPack1(p: POcComPack; Len: integer): Boolean;
     function CheckPack2(p: POcComPack; Len: integer): Boolean;
@@ -297,18 +297,18 @@ begin
   Result := FPackList_RB[i];
 end;
 
-function  TOcComProtocal.getBytesValue(i: integer):Int64;
+function TOcComProtocal.GetBytesValue(i: integer): Int64;
 var
- j:Integer;
- //b:byte;
+  j: integer;
+  // b:byte;
 begin
-    Result:=0;
-    //b:=
-     for j := 0 to self.GetPackByIndex(i).Length -  SizeOf(TOcComPack2) - 1 do
-    begin
-      //str := str + Format('%.02x ', [self.FOcComProtocal.GetPackByIndex(i).data[j]]);
-      result := (result shl 8) +   GetPackByIndex(i).data[j];
-    end;
+  Result := 0;
+  // b:=
+  for j := 0 to self.GetPackByIndex(i).Length - SizeOf(TOcComPack2) - 1 do
+  begin
+    // str := str + Format('%.02x ', [self.FOcComProtocal.GetPackByIndex(i).data[j]]);
+    Result := (Result shl 8) + GetPackByIndex(i).data[j];
+  end;
 
 end;
 

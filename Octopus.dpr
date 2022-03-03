@@ -17,10 +17,8 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   OcComPortObj in 'OcComPortObj.pas',
-  CPort in 'ComPort\CPort.pas',
   CPortCtl in 'ComPort\CPortCtl.pas',
   CPortEsc in 'ComPort\CPortEsc.pas',
-  CPortSetup in 'ComPort\CPortSetup.pas',
   CPortTrmSet in 'ComPort\CPortTrmSet.pas',
   OcProtocol in 'OcProtocol.pas',
   DBT in 'HID\DBT.pas',
@@ -40,7 +38,9 @@ uses
   OcDecrypt in 'OcDecrypt.pas',
   UnitCmdShell in 'UnitCmdShell.pas',
   OcFindAnd in 'OcFindAnd.pas' {OcFindAndFrm},
-  JvSetupApi in 'HID\JvSetupApi.pas';
+  JvSetupApi in 'HID\JvSetupApi.pas',
+  CPort in 'ComPort\CPort.pas',
+  CPortSetup in 'ComPort\CPortSetup.pas' {ComSetupFrm};
 
 {$R *.res}
 

@@ -1,7 +1,6 @@
 object SplitViewForm: TSplitViewForm
   Left = 0
   Top = 0
-  AlphaBlend = True
   AlphaBlendValue = 238
   Caption = 'OCTOPUS '#31456#40060#20018#21475#32456#31471
   ClientHeight = 682
@@ -62,22 +61,19 @@ object SplitViewForm: TSplitViewForm
           Height = 632
           Align = alClient
           BevelOuter = bvNone
-          ParentColor = True
           TabOrder = 0
           object Panel3: TPanel
             Left = 0
             Top = 0
             Width = 320
-            Height = 509
+            Height = 409
             Align = alTop
             BevelOuter = bvNone
-            ParentBackground = False
-            ParentColor = True
             TabOrder = 0
             object Button2: TButton
-              Left = 80
+              Left = 82
               Top = 35
-              Width = 234
+              Width = 232
               Height = 34
               Caption = #25171#24320#20018#21475
               ImageAlignment = iaRight
@@ -138,28 +134,13 @@ object SplitViewForm: TSplitViewForm
                 Font.Style = []
                 ParentFont = False
               end
-              object ComboBox7: TComboBox
-                Left = 74
-                Top = 9
-                Width = 227
-                Height = 25
-                Style = csDropDownList
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clWindowText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-                TabOrder = 0
-                OnChange = ComboBox7Change
-              end
               object Button10: TButton
                 Left = 3
                 Top = 43
                 Width = 298
                 Height = 34
                 Caption = #12304#28165#38500#25968#25454#12305#24403#21069#35774#22791#25509#25910#21040#30340#25968#25454
-                TabOrder = 1
+                TabOrder = 0
                 OnClick = Button10Click
               end
               object Button26: TButton
@@ -167,9 +148,19 @@ object SplitViewForm: TSplitViewForm
                 Top = 80
                 Width = 298
                 Height = 34
-                Caption = #12304#20445#23384#25968#25454#12305#24403#21069#35774#22791#25509#25910#21040#30340#25968#25454
-                TabOrder = 2
+                Caption = #12304#21478#23384#25968#25454#12305#24403#21069#35774#22791#25509#25910#21040#30340#25968#25454
+                TabOrder = 1
                 OnClick = Button26Click
+              end
+              object ComboBox7: TComboBox
+                Left = 76
+                Top = 10
+                Width = 224
+                Height = 25
+                Style = csDropDownList
+                ParentColor = True
+                TabOrder = 2
+                OnChange = ComboBox7Change
               end
             end
             object GroupBox2: TGroupBox
@@ -260,107 +251,75 @@ object SplitViewForm: TSplitViewForm
                 ParentFont = False
               end
               object ComboBox1: TComboBox
-                Left = 74
+                Left = 76
                 Top = 7
-                Width = 227
+                Width = 224
                 Height = 25
-                Hint = #36873#25321' Custom '#21487#20197#33258#23450#20041#27874#29305#29575
                 Style = csDropDownList
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clWindowText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-                ParentShowHint = False
-                ShowHint = True
+                DropDownCount = 16
+                ParentColor = True
                 TabOrder = 0
                 OnChange = ComboBox1Change
-                Items.Strings = (
-                  #33258#23450#20041)
               end
               object ComboBox2: TComboBox
-                Left = 74
-                Top = 38
-                Width = 227
+                Left = 76
+                Top = 43
+                Width = 224
                 Height = 25
                 Style = csDropDownList
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clWindowText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
+                ParentColor = True
                 TabOrder = 1
               end
               object ComboBox3: TComboBox
-                Left = 74
-                Top = 69
-                Width = 227
+                Left = 76
+                Top = 74
+                Width = 224
                 Height = 25
                 Style = csDropDownList
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clWindowText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
+                ParentColor = True
                 TabOrder = 2
               end
               object ComboBox4: TComboBox
-                Left = 74
-                Top = 100
-                Width = 227
+                Left = 76
+                Top = 105
+                Width = 224
                 Height = 25
                 Style = csDropDownList
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clWindowText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
+                ParentColor = True
                 TabOrder = 3
               end
               object ComboBox5: TComboBox
-                Left = 74
-                Top = 131
-                Width = 227
+                Left = 76
+                Top = 136
+                Width = 224
                 Height = 25
                 Style = csDropDownList
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clWindowText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
+                ParentColor = True
                 TabOrder = 4
               end
               object ComboBox6: TComboBox
-                Left = 74
-                Top = 163
-                Width = 227
+                Left = 75
+                Top = 167
+                Width = 224
                 Height = 25
                 Style = csDropDownList
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clWindowText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
+                ItemIndex = 0
+                ParentColor = True
                 TabOrder = 5
+                Text = 'ASCII Format            '#23383#31526#20018
                 OnChange = ComboBox6Change
                 Items.Strings = (
-                  'ASCII Format           { '#23383#31526#20018' }'
-                  'Hexadecimal Format{ '#21313#20845#36827#21046' }'
-                  'Octopus Protocol    { '#21327#35758' }')
+                  'ASCII Format            '#23383#31526#20018
+                  'Hexadecimal Format '#21313#20845#36827#21046' '
+                  'Octopus Protocol')
               end
             end
           end
           object Panel14: TPanel
             Left = 0
-            Top = 509
+            Top = 409
             Width = 320
-            Height = 123
+            Height = 223
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 1
@@ -388,7 +347,7 @@ object SplitViewForm: TSplitViewForm
                 Top = 39
                 Width = 232
                 Height = 34
-                Caption = #12304#21457#36865#25991#20214#12305#21521#35774#22791#21457#36865#21333#20010#25991#20214
+                Caption = #12304#21457#36865#25991#20214#12305#21521#35774#22791#21457#36865#25991#20214
                 TabOrder = 1
                 OnClick = Button24Click
               end
@@ -397,7 +356,7 @@ object SplitViewForm: TSplitViewForm
                 Top = 74
                 Width = 235
                 Height = 34
-                Caption = #12304#33258#21160#20445#23384#12305#24403#21069#20018#21475#25910#21040#30340#25968#25454
+                Caption = #12304#33258#21160#20445#23384#12305#20018#21475#25910#21040#30340#25968#25454
                 TabOrder = 2
                 OnClick = Button13Click
               end
@@ -427,7 +386,7 @@ object SplitViewForm: TSplitViewForm
                 Top = 4
                 Width = 232
                 Height = 34
-                Caption = #12304#32972#26223#39068#33394#12305#25991#26412#23383#20307#30340#32972#26223#39068#33394
+                Caption = #12304#32972#26223#39068#33394#12305#25991#26412#30340#32972#26223#39068#33394
                 TabOrder = 5
                 OnClick = Button17Click
               end
@@ -601,14 +560,12 @@ object SplitViewForm: TSplitViewForm
               Width = 263
               Height = 25
               Caption = #31243#24207#31383#21475#32972#26223#21551#29992#36879#26126#25928#26524
-              Checked = True
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -13
               Font.Name = 'Segoe UI'
               Font.Style = []
               ParentFont = False
-              State = cbChecked
               TabOrder = 7
               OnClick = CheckBox7Click
             end
@@ -738,8 +695,10 @@ object SplitViewForm: TSplitViewForm
               Height = 17
               Hint = #21246#19978#65292#25903#25345#20013#25991#31561#22810#22269#35821#35328#30340#25509#25910
               Caption = #23383#31526#25509#25910#20351#29992' UNICODE '#23383#31526#38598#32534#30721
+              Checked = True
               ParentShowHint = False
               ShowHint = True
+              State = cbChecked
               TabOrder = 2
               OnClick = CheckBox12Click
             end
@@ -805,7 +764,6 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 632
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0

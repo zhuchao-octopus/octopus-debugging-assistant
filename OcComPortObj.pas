@@ -33,9 +33,9 @@ const
 
 const
   RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string =
-    ('ASCII Format           { 字符串 }', 'Hexadecimal Format{ 十六进制 }',
-    'Graphic                  { 图形 }', 'Octopus Protocol    { 协议图形 }',
-    'File                         { 文件 }');
+    ('ASCII Format            字符串 ', 'Hexadecimal Format 十六进制 ',
+    'Graphic                   图形 ', 'Octopus Protocol     协议图形 ',
+    'File                          文件 ');
 
 type
   TCallBackFun = Procedure(Count: Integer = 0) of object;
@@ -133,7 +133,7 @@ type
       j: TMemo; k, l, m, N, o: Boolean);
 
     procedure SaveLog(FullLogFilePath: String);
-    procedure Log(const Msg: string;w:boolean=false);
+    procedure Log(const Msg: string; w: Boolean = false);
     procedure LogBuff(flag: String; const Buff: Array of Byte; Len: Integer);
     procedure ClearLog();
     procedure ClearInternalBuff(id: Integer = 100);
@@ -171,11 +171,11 @@ type
       write FFastLineSeries;
 
     property ReceiveFormat: Integer read FReceiveFormat write FReceiveFormat;
-    property SendFormat: Integer read FSendFormat write FSendFormat;
+    property SendFormat: Integer read FSendFormat write FSendFormat default 0;
 
     property CompatibleUnicode: Boolean read FCompatibleUnicode
-      write FCompatibleUnicode;
-    property NeedCRC16: Boolean read FNeedCRC16 write FNeedCRC16 default False;
+      write FCompatibleUnicode default True;
+    property NeedCRC16: Boolean read FNeedCRC16 write FNeedCRC16 default false;
     property ShowSendedLog: Boolean read FShowSendedLog write FShowSendedLog;
     property ShowLineNumber: Boolean read FShowLineNumber write FShowLineNumber;
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode
@@ -416,7 +416,7 @@ var
 begin
   // j:=0;
   s := '';
-  while (self.Terminated = False) do
+  while (self.Terminated = false) do
   begin
     if (self.FOcComProtocal.GetLastPackHead.TypeID = OCCOMPROTOCAL_DATA2) then
     begin
@@ -477,7 +477,7 @@ var
 begin
   j := 0;
   s := '';
-  while (self.Terminated = False) do
+  while (self.Terminated = false) do
   begin
     // ReStart:
     if FOcComPortObj.FComHandleThread_Wait then
@@ -651,7 +651,7 @@ begin
   self.StringInternalMemo.ScrollBars := ssBoth;
   self.StringInternalMemo.ReadOnly := True;
   self.StringInternalMemo.DoubleBuffered := True;
-  self.StringInternalMemo.Visible := False;
+  self.StringInternalMemo.Visible := false;
 
   self.Buffer.InputSize := INPUT_OUTPUT_BUFFER_SIZE;
   self.Buffer.OutputSize := INPUT_OUTPUT_BUFFER_SIZE;
@@ -671,16 +671,17 @@ begin
   FFileStream := nil;
 
   FProtocalData := 1;
-  FCompatibleUnicode := False;
+  FCompatibleUnicode := false;
   FExcelAppRows := 0;
-  FShowLineNumber := False;
+  FShowLineNumber := false;
   FCommadLineStr := '';
   FLastLineStr := '';
-  FNeedNewLine := False;
+  FNeedNewLine := false;
   // LogMemo.ReadOnly:=false;
   FCommandHistory := TStringList.Create;
   FCommandHistoryIndex := 0;
   FLogScrollMode := True;
+  FSendFormat := 0;
 end;
 
 // destroy component
@@ -871,15 +872,15 @@ begin
   Log(flag + str);
 end;
 
-procedure TOcComPortObj.Log(const Msg: string;w:boolean=false);
+procedure TOcComPortObj.Log(const Msg: string; w: Boolean = false);
 var
   i, PreLogLinesCount: Int64;
   str: String;
 begin
   if (LogMemo = nil) or (LogMemo.Parent = nil) then
   begin
-    //MessageBox(Application.Handle, Pchar(FComportFullName + ', ' + Msg),
-    //  Pchar(FComportFullName), MB_ICONINFORMATION + MB_OK);
+    // MessageBox(Application.Handle, Pchar(FComportFullName + ', ' + Msg),
+    // Pchar(FComportFullName), MB_ICONINFORMATION + MB_OK);
     Exit;
   end;
 
@@ -940,16 +941,16 @@ begin
     if self.connected then
     begin
 
-    if self.FReceiveFormat = 1 then
-       Log('> ' + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
-    else
-       Log('> ' + str); // new ling in memo for receive data 发送字符串,后面自带换行
+      if self.FReceiveFormat = 1 then
+        Log('> ' + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
+      else
+        Log('> ' + str); // new ling in memo for receive data 发送字符串,后面自带换行
 
       try
         self.writestr(str);
         FComSentCount := FComSentCount + Length(str);
       except
-        Result := False;
+        Result := false;
         Log('Sorry Write to device fail!!');
         Exit;
       end;
@@ -989,7 +990,7 @@ begin
   begin
     s := FormatHexStrToByte(Trim(str), buf);
     Len := (Length(str) + 2) div 3;
-    self.SendProtocolData(buf, Len, OCCOMPROTOCAL_DATA1, False);
+    self.SendProtocolData(buf, Len, OCCOMPROTOCAL_DATA1, false);
   end;
 end;
 
@@ -1016,7 +1017,7 @@ begin
 
         FComSentCount := FComSentCount + Length(str);
       except
-        Result := False;
+        Result := false;
         Log('Sorry Write to device fail!!');
         Exit;
       end;
@@ -1052,7 +1053,7 @@ begin
   begin
     s := FormatHexStrToByte(Trim(str), buf);
     Len := (Length(str) + 2) div 3;
-    self.SendProtocolData(buf, Len, OCCOMPROTOCAL_DATA1, False);
+    self.SendProtocolData(buf, Len, OCCOMPROTOCAL_DATA1, false);
   end;
 end;
 
@@ -1076,7 +1077,7 @@ begin
         self.writestr(str);
         FComSentCount := FComSentCount + Length(str);
       except
-        Result := False;
+        Result := false;
         Log('Sorry Write to device fail!!');
         Exit;
       end;
@@ -1116,7 +1117,7 @@ begin
   begin
     s := FormatHexStrToByte(Trim(str), buf);
     Len := (Length(str) + 2) div 3;
-    self.SendProtocolData(buf, Len, OCCOMPROTOCAL_DATA1, False);
+    self.SendProtocolData(buf, Len, OCCOMPROTOCAL_DATA1, false);
   end;
 end;
 
@@ -1218,16 +1219,16 @@ begin
         StringInternalMemo.Lines.Strings[StringInternalMemo.Lines.Count - 1] +
         FComReceiveString;
       StringInternalMemo.Lines.EndUpdate;
-      self.FComHandleThread_Wait := False;
+      self.FComHandleThread_Wait := false;
       LeaveCriticalSection(Critical);
       if StringInternalMemo.Lines.Count >= FBackGroundProcessRecordCount then
       // FComHandleThread_AsynCount //should be 1
       begin
         if FComUIHandleThread.Suspended then
-          FComUIHandleThread.Suspended := False; // 启动后台线程
+          FComUIHandleThread.Suspended := false; // 启动后台线程
         Exit;
       end;
-      if (FComUIHandleThread.Suspended = False) then // 后台正在处理数据
+      if (FComUIHandleThread.Suspended = false) then // 后台正在处理数据
         Exit; // 数据转入后台处理，等待后台线程处理完成
       if (FComUIHandleThread.Suspended) then // 无需后台处理数据，或者后台数据处理完成，事情做完了就挂起
       begin
@@ -1269,7 +1270,7 @@ begin
           (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
           FNeedNewLine := True
         else
-          FNeedNewLine := False;
+          FNeedNewLine := false;
 
         FComReceiveString := TrimRight(FComReceiveString);
         LogMemo.Lines.Add(FComReceiveString);
@@ -1282,7 +1283,7 @@ begin
           (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
           FNeedNewLine := True
         else
-          FNeedNewLine := False;
+          FNeedNewLine := false;
 
         FComReceiveString := TrimRight(FComReceiveString);
         LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings
@@ -1319,10 +1320,10 @@ begin
 
     // LeaveCriticalSection(Critical);
 
-    self.FComHandleThread_Wait := False;
+    self.FComHandleThread_Wait := false;
     if FComUIHandleThread.Suspended then
     begin
-      FComUIHandleThread.Suspended := False; // 启动UI工作线程
+      FComUIHandleThread.Suspended := false; // 启动UI工作线程
     end;
 
   end
@@ -1344,10 +1345,10 @@ begin
     CopyMemory(@FComReceiveInternalBuffer[Length(FComReceiveInternalBuffer) -
       Count], @FComReceiveBuffer, Count);
     LeaveCriticalSection(Critical);
-    self.FComHandleThread_Wait := False;
+    self.FComHandleThread_Wait := false;
     if FComUIHandleThread.Suspended then
     begin
-      FComUIHandleThread.Suspended := False; // 启动UI工作线程 绘制图形
+      FComUIHandleThread.Suspended := false; // 启动UI工作线程 绘制图形
     end;
   end
   else if FReceiveFormat = Ord(OctopusProtocol) then
@@ -1371,10 +1372,10 @@ begin
     CopyMemory(@FComReceiveInternalBuffer[Length(FComReceiveInternalBuffer) -
       Count], @FComReceiveBuffer, Count);
     LeaveCriticalSection(Critical);
-    self.FComHandleThread_Wait := False;
+    self.FComHandleThread_Wait := false;
     if (FComPackParserThread.Suspended) { and (FProtocalData > 0) } then
     begin
-      FComPackParserThread.Suspended := False; // 启动协议解析线程
+      FComPackParserThread.Suspended := false; // 启动协议解析线程
     end;
   end
   else if FReceiveFormat = Ord(SaveToFile) then // for File save to file
@@ -1419,21 +1420,24 @@ begin
   end;
 
   if FLogScrollMode then
+  begin
     LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+    LogMemo.SelStart := 1;
+  end;
 end;
 
 procedure TOcComPortObj.RequestProtocolConnection;
 var
   b: array of Byte;
 begin
-  SendProtocolData(b, 0, OCCOMPROTOCAL_START, False);
+  SendProtocolData(b, 0, OCCOMPROTOCAL_START, false);
 end;
 
 procedure TOcComPortObj.SendProtocolACK();
 var
   b: array of Byte;
 begin
-  SendProtocolData(b, 0, OCCOMPROTOCAL_ACK, False);
+  SendProtocolData(b, 0, OCCOMPROTOCAL_ACK, false);
 end;
 
 function TOcComPortObj.SendProtocolData(Buffer: Array Of Byte; Count: Integer;
@@ -1521,7 +1525,7 @@ begin
           begin
             CopyMemory(@OcComPack2, @OcComPack, SizeOf(TOcComPack2));
             Result := self.FOcComProtocal.WaitingForACK(OcComPack2, 5000);
-            if Result = False then
+            if Result = false then
               Exit;
           end;
         end; // for
@@ -1651,7 +1655,7 @@ var
   cmd: String;
   LastStr: String;
 begin
-  if self.connected = False then
+  if self.connected = false then
   begin
     Exit;
   end;
@@ -1662,7 +1666,7 @@ begin
 
     if LogMemo.ReadOnly or (Trim(FCommadLineStr) = '') then
     begin
-      LogMemo.ReadOnly := False;
+      LogMemo.ReadOnly := false;
       self.FalconComSendData_Terminal(' ', self.FSendFormat);
       // LogMemo.Text := Trim(LogMemo.Text);
       FCommadLineStr := '';

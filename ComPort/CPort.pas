@@ -2267,7 +2267,8 @@ begin
     IniFile.WriteString(Name, 'StopBits', StopBitsToStr(StopBits));
     IniFile.WriteString(Name, 'DataBits', DataBitsToStr(DataBits));
     IniFile.WriteString(Name, 'Parity', ParityToStr(Parity.Bits));
-    IniFile.WriteString(Name, 'FlowControl',  FlowControlToStr(FlowControl.FlowControl));
+    IniFile.WriteString(Name, 'FlowControl',
+      FlowControlToStr(FlowControl.FlowControl));
   end;
   if spOthers in FStoredProps then
   begin
@@ -2278,7 +2279,8 @@ begin
   begin
     IniFile.WriteString(Name, 'Parity.Check', BoolToStr(Parity.Check));
     IniFile.WriteString(Name, 'Parity.Replace', BoolToStr(Parity.Replace));
-    IniFile.WriteString(Name, 'Parity.ReplaceChar',  CharToStr(Parity.ReplaceChar));
+    IniFile.WriteString(Name, 'Parity.ReplaceChar',
+      CharToStr(Parity.ReplaceChar));
   end;
   if spBuffer in FStoredProps then
   begin
@@ -2288,23 +2290,37 @@ begin
   if spTimeouts in FStoredProps then
   begin
     IniFile.WriteInteger(Name, 'Timeouts.ReadInterval', Timeouts.ReadInterval);
-    IniFile.WriteInteger(Name, 'Timeouts.ReadTotalConstant', Timeouts.ReadTotalConstant);
-    IniFile.WriteInteger(Name, 'Timeouts.ReadTotalMultiplier',Timeouts.ReadTotalMultiplier);
-    IniFile.WriteInteger(Name, 'Timeouts.WriteTotalConstant', Timeouts.WriteTotalConstant);
-    IniFile.WriteInteger(Name, 'Timeouts.WriteTotalMultiplier',Timeouts.WriteTotalMultiplier);
+    IniFile.WriteInteger(Name, 'Timeouts.ReadTotalConstant',
+      Timeouts.ReadTotalConstant);
+    IniFile.WriteInteger(Name, 'Timeouts.ReadTotalMultiplier',
+      Timeouts.ReadTotalMultiplier);
+    IniFile.WriteInteger(Name, 'Timeouts.WriteTotalConstant',
+      Timeouts.WriteTotalConstant);
+    IniFile.WriteInteger(Name, 'Timeouts.WriteTotalMultiplier',
+      Timeouts.WriteTotalMultiplier);
   end;
   if spFlowControl in FStoredProps then
   begin
-    IniFile.WriteString(Name, 'FlowControl.ControlRTS', RTSToStr(FlowControl.ControlRTS));
-    IniFile.WriteString(Name, 'FlowControl.ControlDTR', DTRToStr(FlowControl.ControlDTR));
-    IniFile.WriteString(Name, 'FlowControl.DSRSensitivity', BoolToStr(FlowControl.DSRSensitivity));
-    IniFile.WriteString(Name, 'FlowControl.OutCTSFlow', BoolToStr(FlowControl.OutCTSFlow));
-    IniFile.WriteString(Name, 'FlowControl.OutDSRFlow', BoolToStr(FlowControl.OutDSRFlow));
-    IniFile.WriteString(Name, 'FlowControl.TxContinueOnXoff', BoolToStr(FlowControl.TxContinueOnXoff));
-    IniFile.WriteString(Name, 'FlowControl.XonXoffIn',  BoolToStr(FlowControl.XonXoffIn));
-    IniFile.WriteString(Name, 'FlowControl.XonXoffOut', BoolToStr(FlowControl.XonXoffOut));
-    IniFile.WriteString(Name, 'FlowControl.XoffChar',  CharToStr(FlowControl.XoffChar));
-    IniFile.WriteString(Name, 'FlowControl.XonChar',  CharToStr(FlowControl.XonChar));
+    IniFile.WriteString(Name, 'FlowControl.ControlRTS',
+      RTSToStr(FlowControl.ControlRTS));
+    IniFile.WriteString(Name, 'FlowControl.ControlDTR',
+      DTRToStr(FlowControl.ControlDTR));
+    IniFile.WriteString(Name, 'FlowControl.DSRSensitivity',
+      BoolToStr(FlowControl.DSRSensitivity));
+    IniFile.WriteString(Name, 'FlowControl.OutCTSFlow',
+      BoolToStr(FlowControl.OutCTSFlow));
+    IniFile.WriteString(Name, 'FlowControl.OutDSRFlow',
+      BoolToStr(FlowControl.OutDSRFlow));
+    IniFile.WriteString(Name, 'FlowControl.TxContinueOnXoff',
+      BoolToStr(FlowControl.TxContinueOnXoff));
+    IniFile.WriteString(Name, 'FlowControl.XonXoffIn',
+      BoolToStr(FlowControl.XonXoffIn));
+    IniFile.WriteString(Name, 'FlowControl.XonXoffOut',
+      BoolToStr(FlowControl.XonXoffOut));
+    IniFile.WriteString(Name, 'FlowControl.XoffChar',
+      CharToStr(FlowControl.XoffChar));
+    IniFile.WriteString(Name, 'FlowControl.XonChar',
+      CharToStr(FlowControl.XonChar));
   end;
 end;
 

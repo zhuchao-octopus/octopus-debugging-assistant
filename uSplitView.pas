@@ -75,7 +75,6 @@ type
     Panel2: TPanel;
     GroupBox1: TGroupBox;
     Label10: TLabel;
-    ComboBox7: TComboBox;
     GroupBox2: TGroupBox;
     Label2: TLabel;
     Label5: TLabel;
@@ -83,12 +82,6 @@ type
     Label12: TLabel;
     Label13: TLabel;
     Label15: TLabel;
-    ComboBox1: TComboBox;
-    ComboBox2: TComboBox;
-    ComboBox3: TComboBox;
-    ComboBox4: TComboBox;
-    ComboBox5: TComboBox;
-    ComboBox6: TComboBox;
     Panel6: TPanel;
     cbxVclStyles: TComboBox;
     GroupBox3: TGroupBox;
@@ -182,6 +175,13 @@ type
     Combobox_CodePage: TComboBox;
     Button26: TButton;
     FindDialog1: TFindDialog;
+    ComboBox1: TComboBox;
+    ComboBox2: TComboBox;
+    ComboBox3: TComboBox;
+    ComboBox4: TComboBox;
+    ComboBox5: TComboBox;
+    ComboBox6: TComboBox;
+    ComboBox7: TComboBox;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -1648,8 +1648,9 @@ var
 begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj = nil then
-    exit;                    //OctopusCfgDir_LogFileName + '_' +
-  SaveDialog1.FileName:= GetSystemDateTimeStampStr+'_'+OcComPortObj.Port + '.log';
+    exit; // OctopusCfgDir_LogFileName + '_' +
+  SaveDialog1.FileName := GetSystemDateTimeStampStr + '_' +
+    OcComPortObj.Port + '.log';
   if (SaveDialog1.Execute) and (SaveDialog1.FileName <> '') then
   begin
     if TabSet2.TabIndex = 0 then
@@ -1717,6 +1718,7 @@ begin
   end;
 
   MultiComportProcess(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  // Self.Update;
 end;
 
 procedure TSplitViewForm.Button3Click(Sender: TObject);
@@ -1788,16 +1790,16 @@ begin
   // self.CheckHID(self.GetCurrentDeviceName);
   if (OcComPortObj = nil) and (JvHidDevice = nil) then
   begin
-    //Log0('No device is found,please open a device.');
+    // Log0('No device is found,please open a device.');
     MessageBox(Application.Handle, 'No device is found,please open a device.',
-    Pchar(application.Title), MB_ICONINFORMATION + MB_OK);
+      PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
   if (not OcComPortObj.Connected) then
   begin
-    //Log0('No device is found,please open a device.');
+    // Log0('No device is found,please open a device.');
     MessageBox(Application.Handle, 'No device is found,please open a device.',
-    Pchar(application.Title), MB_ICONINFORMATION + MB_OK);
+      PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
@@ -2303,7 +2305,7 @@ end;
 procedure TSplitViewForm.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   FileName: String;
-  ShotCutName: String;
+  // ShotCutName: String;
 begin
   try
     ProjectSave(True);
@@ -2312,18 +2314,18 @@ begin
     if CheckBox1.Checked then
     begin
       CreateShortcut(Application.Exename, ApplicatonShortcutName);
-      if (ApplicatonShortcutName = ApplicatonShortcutName64) then
-      begin
+      { if (ApplicatonShortcutName = ApplicatonShortcutName64) then
+        begin
         FileName := ExtractFileDir(Application.Exename) + '\OctopusWin32.exe';
         ShotCutName := ApplicatonShortcutName32;
-      end
-      else
-      begin
+        end
+        else
+        begin
         FileName := ExtractFileDir(Application.Exename) + '\OctopusWin64.exe';
         ShotCutName := ApplicatonShortcutName64;
-      end;
-      if FileExists(FileName) then
-        CreateShortcut(FileName, ShotCutName);
+        end;
+        if FileExists(FileName) then
+        CreateShortcut(FileName, ShotCutName); }
     end;
   Finally
   end;
@@ -2408,7 +2410,7 @@ var
   j: TRECEIVE_FORMAT;
   GridRect: TGridRect;
   StyleName: String;
-  ComComboBox1: TComComboBox;
+  ComComboBox: TComComboBox;
   OcComPortObj: TOcComPortObj;
 begin
   FJvHidDeviceController1 := TJvHidDeviceController.Create(nil);
@@ -2418,9 +2420,9 @@ begin
   CurrentDevicesJvHidDevice := nil;
   CurrentDevices := nil;
   Application.OnMessage := MyAppMsg;
-  ComComboBox1 := TComComboBox.Create(self);
-  ComComboBox1.Parent := self;
-  ComComboBox1.Visible := False;
+  ComComboBox := TComComboBox.Create(self);
+  ComComboBox.Parent := self;
+  ComComboBox.Visible := False;
   FCheck := TBitmap.Create;
   FNoCheck := TBitmap.Create;
   bmp := TBitmap.Create;
@@ -2473,34 +2475,47 @@ begin
   StringGrid1.Selection := GridRect;
   // StringGrid1.ColWidths[0]:= StringGrid1.Canvas.TextWidth('发送发');
 
-  ComComboBox1.ComProperty := cpBaudRate;
-  ComComboBox1.Refresh;
-  ComboBox1.Items := ComComboBox1.Items;
+  ComComboBox.ComProperty := cpBaudRate;
+  ComComboBox.Refresh;
+  ComboBox1.Items := ComComboBox.Items;
   // if ComboBox1.Items.Count >= 13 then
   // ComboBox1.ItemIndex := 13
   // else
   // ComboBox1.ItemIndex := 0; // Ord(OctopusComPort1.BaudRate);
 
-  ComComboBox1.ComProperty := cpDataBits;
-  ComComboBox1.Refresh;
-  ComboBox2.Items := ComComboBox1.Items;
+  ComComboBox.ComProperty := cpDataBits;
+  ComComboBox.Refresh;
+  ComboBox2.Items := ComComboBox.Items;
   // ComboBox2.ItemIndex := 3; // Ord(OctopusComPort1.DataBits);
 
-  ComComboBox1.ComProperty := cpStopBits;
-  ComComboBox1.Refresh;
-  ComboBox3.Items := ComComboBox1.Items;
+  ComComboBox.ComProperty := cpStopBits;
+  ComComboBox.Refresh;
+  ComboBox3.Items := ComComboBox.Items;
   // ComboBox3.ItemIndex := 0; // Ord(OctopusComPort1.StopBits);
 
-  ComComboBox1.ComProperty := cpParity;
-  ComComboBox1.Refresh;
-  ComboBox4.Items := ComComboBox1.Items;
+  ComComboBox.ComProperty := cpParity;
+  ComComboBox.Refresh;
+  ComboBox4.Items := ComComboBox.Items;
   // ComboBox4.ItemIndex := 0; // Ord(OctopusComPort1.Parity.Bits);
 
-  ComComboBox1.ComProperty := cpFlowControl;
-  ComComboBox1.Refresh;
-  ComboBox5.Items := ComComboBox1.Items;
+  ComComboBox.ComProperty := cpFlowControl;
+  ComComboBox.Refresh;
+  ComboBox5.Items := ComComboBox.Items;
   // ComboBox5.ItemIndex := 2; // Ord(OctopusComPort1.FlowControl.FlowControl);
-  ComboBox6.ItemIndex := 0;
+  // 'ASCII Format
+  // '#23383#31526#20018' }'
+  // 'Hexadecimal Format{ '#21313#20845#36827#21046' }'
+  // 'Octopus Protocol    { '#21327#35758' }')}
+  // ComboBox6.Clear;
+  // ComboBox6.Items.Add('ASCII Format            字符串');
+  // ComboBox6.Items.Add('Hexadecimal Format 十六进制 ');
+  // ComboBox6.Items.Add('Octopus Protocol');
+  // ComboBox6.ItemIndex := 0;
+
+  ComboBox7.Clear;
+  for j := Low(RECEIVE_FORMAT_String) to High(RECEIVE_FORMAT_String) do
+    ComboBox7.Items.Add(RECEIVE_FORMAT_String[j]);
+  ComboBox7.ItemIndex := 0;
 
   for StyleName in TStyleManager.StyleNames do // 初始化主题风格
     cbxVclStyles.Items.Add(StyleName);
@@ -2520,10 +2535,11 @@ begin
   // Log('Web Site:' + WEB_SITE);
   // Log('#############################################################');
   OctopusCfgDir := ExtractFilePath(Application.Exename) + '\';
-  //OctopusCfgDir :=  GetSpecialFolderDir(35) + '\My Octopus\';
+  // OctopusCfgDir :=  GetSpecialFolderDir(35) + '\My Octopus\';
 
   SetCurrentDir(OctopusCfgDir);
-  OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR +  GetSystemDateTimeStampStr;
+  OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR +
+    GetSystemDateTimeStampStr;
   if not DirectoryExists(OctopusCfgDir) then
     CreateDir(OctopusCfgDir);
   if not DirectoryExists(OctopusCfgDir + CONFIGURATION_DIR) then
@@ -2574,10 +2590,6 @@ begin
   TabSetChange(TabSet2, 0);
   TabSetChange(TabSet3, 0);
 
-  ComboBox7.Clear;
-  for j := Low(RECEIVE_FORMAT_String) to High(RECEIVE_FORMAT_String) do
-    ComboBox7.Items.Add(RECEIVE_FORMAT_String[j]);
-  ComboBox7.ItemIndex := 0;
   StatusBar1.Panels.Items[0].Width := StatusBar1.Canvas.TextWidth
     ('操作说明： ESC、F1、F2 123456');
   StatusBar1.Panels.Items[1].Width := StatusBar1.Canvas.TextWidth
@@ -3389,8 +3401,7 @@ begin
       CheckBox5.Checked);
     CheckBox6.Checked := Octopusini.ReadBool('MyPreference', 'CK6',
       CheckBox6.Checked);
-    CheckBox12.Checked := Octopusini.ReadBool('MyPreference', 'CK12',
-      CheckBox12.Checked);
+    CheckBox12.Checked := Octopusini.ReadBool('MyPreference', 'CK12', True);
 
   finally
     Octopusini.Free;
@@ -4059,7 +4070,7 @@ begin
   ComboBox3.ItemIndex := OcComPortObj.OcComPortObjPara.StopBits;
   ComboBox4.ItemIndex := OcComPortObj.OcComPortObjPara.ParityBits;
   ComboBox5.ItemIndex := OcComPortObj.OcComPortObjPara.FlowControl;
-  ComboBox6.ItemIndex := OcComPortObj.OcComPortObjPara.SendFormat;
+  // ComboBox6.ItemIndex := OcComPortObj.OcComPortObjPara.SendFormat;
   ComboBox7.ItemIndex := OcComPortObj.OcComPortObjPara.ReceiveFormat;
 
   CheckBox3.Checked := OcComPortObj.OcComPortObjPara.ShowDate;

@@ -11,18 +11,16 @@ uses
 
 Const
 {$IFDEF CPU64BITS}
-  VERSIONNAME = 'Version :4.2.7 64bit'; // for 64 bit;
+  VERSIONNAME = 'Version :4.2.8 64bit'; // for 64 bit;
 {$ELSE}
-  VERSIONNAME = 'Version :4.2.7 32bit'; // for 32 bit;
+  VERSIONNAME = 'Version :4.2.8 32bit'; // for 32 bit;
 {$ENDIF}
-  THEVERSIONNUMBER = 427;
+  THEVERSIONNUMBER = 428;
 {$IFDEF CPU64BITS}
-  APPLICATION_TITLE = 'OCTOPUS开发调试助手 (八爪鱼串口终端64bit 4.2.7 )'; // for 64 bit;
+  APPLICATION_TITLE = '八爪鱼串口终端开发调试助手64bit 4.2.8 '; // for 64 bit;
 {$ELSE}
-  APPLICATION_TITLE = 'OCTOPUS开发调试助手 (八爪鱼串口终端32bit 4.2.7 )'; // for 32 bit;
+  APPLICATION_TITLE = '八爪鱼串口终端开发调试助手32bit 4.2.8'; // for 32 bit;
 {$ENDIF}
-
-
   ISUPDATEUI = true;
   E_MAIL = 'Octopus@1234998.cn';
   WEB_SITE = 'http://www.1234998.cn';
@@ -33,12 +31,12 @@ Const
   DEFAULT_WEBSITE_ADDRESS = 'http://www.1234998.top';
 
 {$IFDEF CPU64BITS}
-  ApplicatonShortcutName = 'Octopus64 串口终端'; // for 64 bit;
+  ApplicatonShortcutName = '八爪鱼串口终端'; // for 64 bit;
 {$ELSE}
-  ApplicatonShortcutName = 'Octopus32 串口终端'; // for 32 bit;
+  ApplicatonShortcutName = '八爪鱼串口终端'; // for 32 bit;
 {$ENDIF}
-  ApplicatonShortcutName64 = 'Octopus64 串口终端'; // for 64 bit;
-  ApplicatonShortcutName32 = 'Octopus32 串口终端'; // for 32 bit;
+  ApplicatonShortcutName64 = '八爪鱼串口终端'; // for 64 bit;
+  ApplicatonShortcutName32 = '八爪鱼串口终端'; // for 32 bit;
 
   DEFAULT_ADDRESSMAP_COLS = 32;
   DEFAULT_FIXED_COLS = 2;

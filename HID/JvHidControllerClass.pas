@@ -471,18 +471,18 @@ type
     function CheckOutByIndex(var HidDev: TJvHidDevice;
       const Idx: Integer): Boolean;
     function CheckOutByProductName(var HidDev: TJvHidDevice; const ProductName:
-      {$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Boolean; overload;
+{$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Boolean; overload;
     function CheckOutByVendorName(var HidDev: TJvHidDevice; const VendorName:
-      {$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Boolean; overload;
+{$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Boolean; overload;
     function CheckOutByCallback(var HidDev: TJvHidDevice;
       Check: TJvHidCheckCallback): Boolean;
     // methods to count HID device objects
     function CountByClass(const ClassName: string): Integer;
     function CountByID(const Vid, Pid: Integer): Integer;
     function CountByProductName(const ProductName:
-      {$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Integer;
+{$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Integer;
     function CountByVendorName(const VendorName:
-      {$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Integer;
+{$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Integer;
     function CountByCallback(Check: TJvHidCheckCallback): Integer;
     // iterate over the HID devices
     function Enumerate: Integer;
@@ -597,7 +597,8 @@ begin
       // read data
       SleepRet := WAIT_IO_COMPLETION;
       FillChar(Report[0], Device.Caps.InputReportByteLength, #0);
-      if Device.ReadFileEx(Report[0], Device.Caps.InputReportByteLength, @DummyReadCompletion) then
+      if Device.ReadFileEx(Report[0], Device.Caps.InputReportByteLength,
+        @DummyReadCompletion) then
       begin
         // wait for read to complete
         repeat
@@ -2440,7 +2441,7 @@ begin
 end;
 
 function TJvHidDeviceController.CountByProductName(const ProductName:
-  {$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Integer;
+{$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Integer;
 var
   I: Integer;
 begin
@@ -2452,7 +2453,7 @@ begin
 end;
 
 function TJvHidDeviceController.CountByVendorName(const VendorName:
-  {$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Integer;
+{$IFDEF UNICODE}string{$ELSE}WideString{$ENDIF}): Integer;
 var
   I: Integer;
 begin
