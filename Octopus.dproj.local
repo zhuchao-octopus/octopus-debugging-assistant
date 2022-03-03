@@ -40,10 +40,10 @@
     <Transaction>2018/12/15 18:05:06.000.357,D:\DelphiProjects\OCTOPUS\OCTOPUS_20181212_4210\HID\SetupApi.pas=</Transaction>
     <Transaction>2018/12/15 18:06:07.000.610,D:\DelphiProjects\OCTOPUS\OCTOPUS_20181212_4210\LIBFT260.PAS=</Transaction>
     <Transaction>2018/12/15 18:06:34.000.641,=D:\DelphiProjects\OCTOPUS\OCTOPUS_20181212_4210\HID\JvSetupApi.pas</Transaction>
-    <Transaction>2022/03/03 20:52:04.967,F:\DelphiProjects\OCTOPUS\ComPort\CPortSetup.pas=</Transaction>
-    <Transaction>2022/03/03 20:52:29.337,F:\DelphiProjects\OCTOPUS\ComPort\CPort.pas=</Transaction>
-    <Transaction>2022/03/03 20:53:48.340,=F:\DelphiProjects\OCTOPUS\ComPort\CPort.pas</Transaction>
-    <Transaction>2022/03/03 20:53:48.387,=F:\DelphiProjects\OCTOPUS\ComPort\CPortSetup.pas</Transaction>
+    <Transaction>2022/03/03 20:52:04.000.967,F:\DelphiProjects\OCTOPUS\ComPort\CPortSetup.pas=</Transaction>
+    <Transaction>2022/03/03 20:52:29.000.337,F:\DelphiProjects\OCTOPUS\ComPort\CPort.pas=</Transaction>
+    <Transaction>2022/03/03 20:53:48.000.387,=F:\DelphiProjects\OCTOPUS\ComPort\CPortSetup.pas</Transaction>
+    <Transaction>2022/03/03 20:53:48.000.340,=F:\DelphiProjects\OCTOPUS\ComPort\CPort.pas</Transaction>
   </Transactions>
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="ComPort"/>

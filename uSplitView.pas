@@ -73,15 +73,6 @@ type
     TabSet3: TTabSet;
     Notebook3: TNotebook;
     Panel2: TPanel;
-    GroupBox1: TGroupBox;
-    Label10: TLabel;
-    GroupBox2: TGroupBox;
-    Label2: TLabel;
-    Label5: TLabel;
-    Label9: TLabel;
-    Label12: TLabel;
-    Label13: TLabel;
-    Label15: TLabel;
     Panel6: TPanel;
     cbxVclStyles: TComboBox;
     GroupBox3: TGroupBox;
@@ -100,19 +91,11 @@ type
     CheckBox25: TCheckBox;
     CheckBox3: TCheckBox;
     CheckBox4: TCheckBox;
-    Button10: TButton;
-    GroupBox5: TGroupBox;
-    CheckBox5: TCheckBox;
     Timer3: TTimer;
-    GroupBox8: TGroupBox;
-    CheckBox6: TCheckBox;
     W1234998: TWebBrowser;
-    CheckBox9: TCheckBox;
-    ComboBox8: TComboBox;
     PopupMenu1: TPopupMenu;
     CloseTheDevice1: TMenuItem;
     SaveDialog1: TSaveDialog;
-    CheckBox1: TCheckBox;
     TrayIcon1: TTrayIcon;
     Chart1: TChart;
     Panel9: TPanel;
@@ -145,17 +128,11 @@ type
     Button9: TButton;
     Button11: TButton;
     Panel14: TPanel;
-    Panel11: TPanel;
-    Button23: TButton;
-    Button24: TButton;
-    Button13: TButton;
-    Button14: TButton;
     Panel15: TPanel;
     Label16: TLabel;
     Label17: TLabel;
     Panel16: TPanel;
     Button16: TButton;
-    CheckBox12: TCheckBox;
     Panel18: TPanel;
     Label18: TLabel;
     ComboBox12: TComboBox;
@@ -167,21 +144,40 @@ type
     ComboBox11: TComboBox;
     FontDialog1: TFontDialog;
     ColorDialog1: TColorDialog;
-    Button12: TButton;
-    Button17: TButton;
     Series1: TFastLineSeries;
     Splitter1: TSplitter;
     Button25: TButton;
-    Combobox_CodePage: TComboBox;
-    Button26: TButton;
     FindDialog1: TFindDialog;
-    ComboBox1: TComboBox;
-    ComboBox2: TComboBox;
-    ComboBox3: TComboBox;
-    ComboBox4: TComboBox;
-    ComboBox5: TComboBox;
+    Panel19: TPanel;
     ComboBox6: TComboBox;
+    Label13: TLabel;
+    ComboBox5: TComboBox;
+    Label15: TLabel;
+    ComboBox4: TComboBox;
+    Label5: TLabel;
+    ComboBox3: TComboBox;
+    Label9: TLabel;
+    ComboBox2: TComboBox;
+    Label12: TLabel;
+    ComboBox1: TComboBox;
+    Label2: TLabel;
+    Panel20: TPanel;
+    Button10: TButton;
+    Button26: TButton;
+    Button17: TButton;
+    Button12: TButton;
+    Button24: TButton;
+    Button23: TButton;
     ComboBox7: TComboBox;
+    Label10: TLabel;
+    Panel11: TPanel;
+    CheckBox6: TCheckBox;
+    CheckBox1: TCheckBox;
+    CheckBox12: TCheckBox;
+    Combobox_CodePage: TComboBox;
+    CheckBox5: TCheckBox;
+    CheckBox9: TCheckBox;
+    ComboBox8: TComboBox;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -270,7 +266,7 @@ type
     procedure Button12Click(Sender: TObject);
     procedure Button17Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
-    procedure Button14Click(Sender: TObject);
+
     procedure Splitter1Moved(Sender: TObject);
     procedure ComboBox10KeyPress(Sender: TObject; var Key: Char);
     procedure ComboBox11KeyPress(Sender: TObject; var Key: Char);
@@ -356,6 +352,8 @@ type
     procedure CharSeriesSetColor(Index: Integer; Color: TColor);
     function SaveToTheExcelFile(ExcelApp: Variant; Buff: array of byte;
       Length: Integer; Rows: Integer): Integer;
+
+    procedure StopReceiveFile(OcComPortObj: TOcComPortObj);
   end;
 
 var
@@ -1332,37 +1330,30 @@ begin
   ComboBox7.OnChange(self);
 end;
 
-procedure TSplitViewForm.Button14Click(Sender: TObject);
-var
-  OcComPortObj: TOcComPortObj;
+procedure TSplitViewForm.StopReceiveFile(OcComPortObj: TOcComPortObj);
 begin
-  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj = nil then
   begin
     exit;
   end;
-  ComboBox7.ItemIndex := 0;
-  ComboBox7.OnChange(self);
-  if (CompareText(ExtractFileExt(SaveDialog1.FileName), '.xls') = 0) or
-    (CompareText(ExtractFileExt(SaveDialog1.FileName), '.xlsx') = 0) then
-  begin
-    try
-      // OcComPortObj.ExcelApp.SaveAs(OcComPortObj.FileStreamName);
-      // OcComPortObj.ExcelApp.WorkBooks.Close;
-      // OcComPortObj.ExcelApp.Quit;
-      // OcComPortObj.ExcelApp:=Unassigned;//ÊÍ·Åexcel½ø³Ì
-      OcComPortObj.FileStreamName := '';
-    except
-    end;
-  end // File Stream file free in OcComPortObj
-  else
-  begin
-    OcComPortObj.FileStreamName := '';
-    if OcComPortObj <> nil then
+  try
+    if (CompareText(ExtractFileExt(SaveDialog1.FileName), '.xls') = 0) or
+      (CompareText(ExtractFileExt(SaveDialog1.FileName), '.xlsx') = 0) then
     begin
-      OcComPortObj.FileStream.Free;
-      OcComPortObj.FileStream := nil;
+
+      OcComPortObj.FileStreamName := '';
+
+    end // File Stream file free in OcComPortObj
+    else
+    begin
+      OcComPortObj.FileStreamName := '';
+      if OcComPortObj <> nil then
+      begin
+        OcComPortObj.FileStream.Free;
+        OcComPortObj.FileStream := nil;
+      end;
     end;
+  except
   end;
 end;
 
@@ -1540,12 +1531,10 @@ begin
       OcComPortObj.Log(' ');
       OcComPortObj.Log('File Name: ' + FullFileNameLoaded);
       OcComPortObj.Log('File Size: ' + inttostr(FileStream.Size) + ' Bytes');
-      OcComPortObj.Log
-        ('This file have been loaded,press the left-bottom button to start sending');
+      //OcComPortObj.Log('This file have been loaded,press the left-bottom button to start sending');
       if (FileStream.Size > 1024 * 1024 * 5) then
       begin
-        OcComPortObj.Log
-          ('This file size is too biger,only support less then 5M size file.');
+        OcComPortObj.Log('This file size is too biger,only support less then 5M size file.');
         FileStream.Free;
         FileStream := nil;
         FullFileNameLoaded := '';
@@ -1987,7 +1976,6 @@ begin
   if (ComboBox7.ItemIndex = Ord(SaveToFile)) and (OcComPortObj.FileStream = nil)
   then
   begin
-    // SaveDialog1.Title:=
     if (SaveDialog1.Execute) and (SaveDialog1.FileName <> '') then
     begin
       if (CompareText(ExtractFileExt(SaveDialog1.FileName), '.xls') = 0) or
@@ -2021,7 +2009,10 @@ begin
     begin
       ComboBox7.ItemIndex := Ord(ASCIIFormat);
     end;
-  end;
+  end
+  else
+    StopReceiveFile(OcComPortObj);
+
   if (ComboBox7.ItemIndex = Ord(Graphic)) then
     OcComPortObj.FastLineSeries := self.CharInitSeries(True);
 
@@ -2558,7 +2549,7 @@ begin
 
   end;
 
-  SV_L.Width := GroupBox1.Width + 10;
+  SV_L.Width := Panel20.Width + 10;
   SV_R.Width := Button9.Width + 10;
   Splitter1.Left := SV_R.Left;
   Splitter1.Parent := SplitViewForm;

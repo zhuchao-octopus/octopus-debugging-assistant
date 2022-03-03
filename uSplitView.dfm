@@ -63,17 +63,15 @@ object SplitViewForm: TSplitViewForm
           BevelOuter = bvNone
           TabOrder = 0
           object Panel3: TPanel
-            Left = 0
-            Top = 0
-            Width = 320
-            Height = 409
-            Align = alTop
-            BevelOuter = bvNone
+            Left = 5
+            Top = 3
+            Width = 310
+            Height = 73
             TabOrder = 0
             object Button2: TButton
-              Left = 82
+              Left = 76
               Top = 35
-              Width = 232
+              Width = 224
               Height = 34
               Caption = #25171#24320#20018#21475
               ImageAlignment = iaRight
@@ -82,9 +80,9 @@ object SplitViewForm: TSplitViewForm
               OnClick = Button2Click
             end
             object ComboBoxEx1: TComboBoxEx
-              Left = 6
+              Left = 5
               Top = 3
-              Width = 308
+              Width = 295
               Height = 26
               ItemsEx = <>
               Style = csExDropDownList
@@ -103,9 +101,9 @@ object SplitViewForm: TSplitViewForm
             object Button4: TButton
               Left = 5
               Top = 35
-              Width = 74
+              Width = 63
               Height = 34
-              Caption = #21047#26032#35774#22791
+              Caption = #26032#35774#22791
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clMenuText
               Font.Height = -13
@@ -115,281 +113,247 @@ object SplitViewForm: TSplitViewForm
               TabOrder = 1
               OnClick = Button4Click
             end
-            object GroupBox1: TGroupBox
-              Left = 6
-              Top = 282
-              Width = 308
-              Height = 121
-              TabOrder = 3
-              object Label10: TLabel
-                Left = 5
-                Top = 13
-                Width = 64
-                Height = 17
-                Caption = #25509#25910#26684#24335
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clMenuText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-              end
-              object Button10: TButton
-                Left = 3
-                Top = 43
-                Width = 298
-                Height = 34
-                Caption = #12304#28165#38500#25968#25454#12305#24403#21069#35774#22791#25509#25910#21040#30340#25968#25454
-                TabOrder = 0
-                OnClick = Button10Click
-              end
-              object Button26: TButton
-                Left = 3
-                Top = 80
-                Width = 298
-                Height = 34
-                Caption = #12304#21478#23384#25968#25454#12305#24403#21069#35774#22791#25509#25910#21040#30340#25968#25454
-                TabOrder = 1
-                OnClick = Button26Click
-              end
-              object ComboBox7: TComboBox
-                Left = 76
-                Top = 10
-                Width = 224
-                Height = 25
-                Style = csDropDownList
-                ParentColor = True
-                TabOrder = 2
-                OnChange = ComboBox7Change
-              end
-            end
-            object GroupBox2: TGroupBox
-              Left = 6
-              Top = 75
-              Width = 308
-              Height = 201
-              TabOrder = 4
-              object Label2: TLabel
-                Left = 5
-                Top = 15
-                Width = 64
-                Height = 17
-                Caption = #27874#29305#29575#25968
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clMenuText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-              end
-              object Label5: TLabel
-                Left = 5
-                Top = 108
-                Width = 64
-                Height = 17
-                Caption = #26657#39564#20301#25968
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clMenuText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-              end
-              object Label9: TLabel
-                Left = 5
-                Top = 77
-                Width = 64
-                Height = 17
-                Caption = #20572#27490#20301#25968
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clMenuText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-              end
-              object Label12: TLabel
-                Left = 5
-                Top = 46
-                Width = 64
-                Height = 17
-                Caption = #25968#25454#20301#25968
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clMenuText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-              end
-              object Label13: TLabel
-                Left = 5
-                Top = 171
-                Width = 64
-                Height = 17
-                Hint = #21457#36865#25968#25454#30340#26684#24335'ASCI'#20026#23383#31526'HEX'#20026#21313#20845#36827#21046'CMD'#20026#25191#34892#26412#22320'Shell'#21629#20196
-                Caption = #21457#36865#26684#24335
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clMenuText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-                ParentShowHint = False
-                ShowHint = True
-              end
-              object Label15: TLabel
-                Left = 5
-                Top = 139
-                Width = 64
-                Height = 17
-                Caption = #27969#25511#21046#31526
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clMenuText
-                Font.Height = -13
-                Font.Name = 'Segoe UI'
-                Font.Style = []
-                ParentFont = False
-              end
-              object ComboBox1: TComboBox
-                Left = 76
-                Top = 7
-                Width = 224
-                Height = 25
-                Style = csDropDownList
-                DropDownCount = 16
-                ParentColor = True
-                TabOrder = 0
-                OnChange = ComboBox1Change
-              end
-              object ComboBox2: TComboBox
-                Left = 76
-                Top = 43
-                Width = 224
-                Height = 25
-                Style = csDropDownList
-                ParentColor = True
-                TabOrder = 1
-              end
-              object ComboBox3: TComboBox
-                Left = 76
-                Top = 74
-                Width = 224
-                Height = 25
-                Style = csDropDownList
-                ParentColor = True
-                TabOrder = 2
-              end
-              object ComboBox4: TComboBox
-                Left = 76
-                Top = 105
-                Width = 224
-                Height = 25
-                Style = csDropDownList
-                ParentColor = True
-                TabOrder = 3
-              end
-              object ComboBox5: TComboBox
-                Left = 76
-                Top = 136
-                Width = 224
-                Height = 25
-                Style = csDropDownList
-                ParentColor = True
-                TabOrder = 4
-              end
-              object ComboBox6: TComboBox
-                Left = 75
-                Top = 167
-                Width = 224
-                Height = 25
-                Style = csDropDownList
-                ItemIndex = 0
-                ParentColor = True
-                TabOrder = 5
-                Text = 'ASCII Format            '#23383#31526#20018
-                OnChange = ComboBox6Change
-                Items.Strings = (
-                  'ASCII Format            '#23383#31526#20018
-                  'Hexadecimal Format '#21313#20845#36827#21046' '
-                  'Octopus Protocol')
-              end
-            end
           end
           object Panel14: TPanel
-            Left = 0
-            Top = 409
-            Width = 320
-            Height = 223
-            Align = alClient
-            BevelOuter = bvNone
+            Left = 5
+            Top = 402
+            Width = 310
+            Height = 87
             TabOrder = 1
-            object Panel11: TPanel
-              Left = 0
-              Top = 0
-              Width = 320
-              Height = 111
-              Align = alTop
-              BevelOuter = bvNone
-              ParentBackground = False
+            object Button17: TButton
+              Left = 83
+              Top = 5
+              Width = 217
+              Height = 34
+              Caption = #12304#32972#26223#39068#33394#12305#25991#26412#30340#32972#26223#39068#33394
+              TabOrder = 0
+              OnClick = Button17Click
+            end
+            object Button12: TButton
+              Left = 5
+              Top = 5
+              Width = 77
+              Height = 34
+              Caption = #23383#20307#35774#32622
+              TabOrder = 1
+              OnClick = Button12Click
+            end
+            object Button24: TButton
+              Left = 83
+              Top = 38
+              Width = 217
+              Height = 34
+              Caption = #12304#21457#36865#25991#20214#12305#21521#35774#22791#21457#36865#25991#20214
+              TabOrder = 2
+              OnClick = Button24Click
+            end
+            object Button23: TButton
+              Left = 5
+              Top = 38
+              Width = 77
+              Height = 34
+              Caption = #36733#20837#25991#20214
+              TabOrder = 3
+              OnClick = Button23Click
+            end
+          end
+          object Panel19: TPanel
+            Left = 5
+            Top = 79
+            Width = 310
+            Height = 234
+            TabOrder = 2
+            object Label13: TLabel
+              Left = 5
+              Top = 171
+              Width = 64
+              Height = 17
+              Hint = #21457#36865#25968#25454#30340#26684#24335'ASCI'#20026#23383#31526'HEX'#20026#21313#20845#36827#21046'CMD'#20026#25191#34892#26412#22320'Shell'#21629#20196
+              Caption = #21457#36865#26684#24335
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clMenuText
+              Font.Height = -13
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+              ParentShowHint = False
+              ShowHint = True
+            end
+            object Label15: TLabel
+              Left = 5
+              Top = 139
+              Width = 64
+              Height = 17
+              Caption = #27969#25511#21046#31526
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clMenuText
+              Font.Height = -13
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label5: TLabel
+              Left = 5
+              Top = 108
+              Width = 64
+              Height = 17
+              Caption = #26657#39564#20301#25968
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clMenuText
+              Font.Height = -13
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label9: TLabel
+              Left = 5
+              Top = 77
+              Width = 64
+              Height = 17
+              Caption = #20572#27490#20301#25968
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clMenuText
+              Font.Height = -13
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label12: TLabel
+              Left = 5
+              Top = 46
+              Width = 64
+              Height = 17
+              Caption = #25968#25454#20301#25968
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clMenuText
+              Font.Height = -13
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label2: TLabel
+              Left = 5
+              Top = 15
+              Width = 64
+              Height = 17
+              Caption = #27874#29305#29575#25968
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clMenuText
+              Font.Height = -13
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label10: TLabel
+              Left = 5
+              Top = 201
+              Width = 64
+              Height = 17
+              Caption = #25509#25910#26684#24335
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clMenuText
+              Font.Height = -13
+              Font.Name = 'Segoe UI'
+              Font.Style = []
+              ParentFont = False
+            end
+            object ComboBox6: TComboBox
+              Left = 76
+              Top = 167
+              Width = 224
+              Height = 25
+              Style = csDropDownList
+              ItemIndex = 0
               ParentColor = True
               TabOrder = 0
-              object Button23: TButton
-                Left = 4
-                Top = 39
-                Width = 77
-                Height = 34
-                Caption = #36733#20837#25991#20214
-                TabOrder = 0
-                OnClick = Button23Click
-              end
-              object Button24: TButton
-                Left = 82
-                Top = 39
-                Width = 232
-                Height = 34
-                Caption = #12304#21457#36865#25991#20214#12305#21521#35774#22791#21457#36865#25991#20214
-                TabOrder = 1
-                OnClick = Button24Click
-              end
-              object Button13: TButton
-                Left = 4
-                Top = 74
-                Width = 235
-                Height = 34
-                Caption = #12304#33258#21160#20445#23384#12305#20018#21475#25910#21040#30340#25968#25454
-                TabOrder = 2
-                OnClick = Button13Click
-              end
-              object Button14: TButton
-                Left = 240
-                Top = 74
-                Width = 74
-                Height = 34
-                Hint = 'Stop auto saving'
-                Caption = #20572#27490#33258#21160
-                ParentShowHint = False
-                ShowHint = True
-                TabOrder = 3
-                OnClick = Button14Click
-              end
-              object Button12: TButton
-                Left = 4
-                Top = 4
-                Width = 77
-                Height = 34
-                Caption = #23383#20307#35774#32622
-                TabOrder = 4
-                OnClick = Button12Click
-              end
-              object Button17: TButton
-                Left = 82
-                Top = 4
-                Width = 232
-                Height = 34
-                Caption = #12304#32972#26223#39068#33394#12305#25991#26412#30340#32972#26223#39068#33394
-                TabOrder = 5
-                OnClick = Button17Click
-              end
+              Text = 'ASCII Format            '#23383#31526#20018
+              OnChange = ComboBox6Change
+              Items.Strings = (
+                'ASCII Format            '#23383#31526#20018
+                'Hexadecimal Format '#21313#20845#36827#21046' '
+                'Octopus Protocol')
+            end
+            object ComboBox5: TComboBox
+              Left = 76
+              Top = 136
+              Width = 224
+              Height = 25
+              Style = csDropDownList
+              ParentColor = True
+              TabOrder = 1
+            end
+            object ComboBox4: TComboBox
+              Left = 76
+              Top = 105
+              Width = 224
+              Height = 25
+              Style = csDropDownList
+              ParentColor = True
+              TabOrder = 2
+            end
+            object ComboBox3: TComboBox
+              Left = 76
+              Top = 74
+              Width = 224
+              Height = 25
+              Style = csDropDownList
+              ParentColor = True
+              TabOrder = 3
+            end
+            object ComboBox2: TComboBox
+              Left = 76
+              Top = 43
+              Width = 224
+              Height = 25
+              Style = csDropDownList
+              ParentColor = True
+              TabOrder = 4
+            end
+            object ComboBox1: TComboBox
+              Left = 76
+              Top = 7
+              Width = 224
+              Height = 25
+              Style = csDropDownList
+              DropDownCount = 16
+              ParentColor = True
+              TabOrder = 5
+              OnChange = ComboBox1Change
+            end
+            object ComboBox7: TComboBox
+              Left = 76
+              Top = 198
+              Width = 224
+              Height = 25
+              Style = csDropDownList
+              ParentColor = True
+              TabOrder = 6
+              OnChange = ComboBox7Change
+            end
+          end
+          object Panel20: TPanel
+            Left = 5
+            Top = 317
+            Width = 310
+            Height = 82
+            TabOrder = 3
+            object Button10: TButton
+              Left = 5
+              Top = 6
+              Width = 295
+              Height = 34
+              Caption = #12304#28165#38500#25968#25454#12305#24403#21069#35774#22791#25509#25910#21040#30340#25968#25454
+              TabOrder = 0
+              OnClick = Button10Click
+            end
+            object Button26: TButton
+              Left = 5
+              Top = 45
+              Width = 295
+              Height = 34
+              Caption = #12304#21478#23384#25968#25454#12305#24403#21069#35774#22791#25509#25910#21040#30340#25968#25454
+              TabOrder = 1
+              OnClick = Button26Click
             end
           end
         end
@@ -414,7 +378,7 @@ object SplitViewForm: TSplitViewForm
             Width = 308
             Height = 25
             Style = csDropDownList
-            DropDownCount = 18
+            DropDownCount = 30
             TabOrder = 0
             OnChange = cbxVclStylesChange
           end
@@ -619,59 +583,15 @@ object SplitViewForm: TSplitViewForm
               OnClick = CheckBox4Click
             end
           end
-          object GroupBox5: TGroupBox
+          object Panel11: TPanel
             Left = 6
-            Top = 364
-            Width = 307
-            Height = 104
+            Top = 363
+            Width = 308
+            Height = 229
             TabOrder = 3
-            object CheckBox5: TCheckBox
-              Left = 8
-              Top = 8
-              Width = 249
-              Height = 25
-              Caption = #26174#31034#20018#21475#27491#22312#21457#36865#30340#25968#25454
-              Checked = True
-              State = cbChecked
-              TabOrder = 0
-              OnClick = CheckBox5Click
-            end
-            object CheckBox9: TCheckBox
-              Left = 8
-              Top = 33
-              Width = 280
-              Height = 25
-              Caption = #21313#20845#36827#21046#26684#24335#25509#25910#38468#21152#23383#31526#35299#26512
-              Checked = True
-              State = cbChecked
-              TabOrder = 1
-              OnClick = CheckBox9Click
-            end
-            object ComboBox8: TComboBox
-              Left = 8
-              Top = 64
-              Width = 293
-              Height = 25
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 2
-              Text = 'Hexadecimal 16Bytes Align'
-              OnChange = ComboBox8Change
-              Items.Strings = (
-                'Hexadecimal 16Bytes Align'
-                'Hexadecimal 32Bytes Align'
-                'None')
-            end
-          end
-          object GroupBox8: TGroupBox
-            Left = 6
-            Top = 474
-            Width = 307
-            Height = 134
-            TabOrder = 4
             object CheckBox6: TCheckBox
               Left = 8
-              Top = 8
+              Top = 3
               Width = 258
               Height = 25
               Caption = 'Switch To English Language'
@@ -680,7 +600,7 @@ object SplitViewForm: TSplitViewForm
             end
             object CheckBox1: TCheckBox
               Left = 8
-              Top = 40
+              Top = 29
               Width = 209
               Height = 25
               Caption = #22312#26700#38754#21019#24314#24555#25463#26041#24335
@@ -690,11 +610,11 @@ object SplitViewForm: TSplitViewForm
             end
             object CheckBox12: TCheckBox
               Left = 8
-              Top = 72
+              Top = 55
               Width = 258
               Height = 17
               Hint = #21246#19978#65292#25903#25345#20013#25991#31561#22810#22269#35821#35328#30340#25509#25910
-              Caption = #23383#31526#25509#25910#20351#29992' UNICODE '#23383#31526#38598#32534#30721
+              Caption = #25509#25910#20351#29992' UNICODE '#23383#31526#38598#32534#30721
               Checked = True
               ParentShowHint = False
               ShowHint = True
@@ -704,7 +624,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Combobox_CodePage: TComboBox
               Left = 8
-              Top = 95
+              Top = 82
               Width = 293
               Height = 25
               Style = csDropDownList
@@ -719,6 +639,43 @@ object SplitViewForm: TSplitViewForm
                 ' CP_SYMBOL          { SYMBOL translations }'
                 ' CP_UTF7               { UTF-7 translation }'
                 ' CP_UTF8               { UTF-8 translation }')
+            end
+            object CheckBox5: TCheckBox
+              Left = 8
+              Top = 126
+              Width = 249
+              Height = 25
+              Caption = #26174#31034#20018#21475#27491#22312#21457#36865#30340#25968#25454
+              Checked = True
+              State = cbChecked
+              TabOrder = 4
+              OnClick = CheckBox5Click
+            end
+            object CheckBox9: TCheckBox
+              Left = 8
+              Top = 151
+              Width = 280
+              Height = 25
+              Caption = #21313#20845#36827#21046#26684#24335#25509#25910#38468#21152#23383#31526#35299#26512
+              Checked = True
+              State = cbChecked
+              TabOrder = 5
+              OnClick = CheckBox9Click
+            end
+            object ComboBox8: TComboBox
+              Left = 8
+              Top = 182
+              Width = 293
+              Height = 25
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 6
+              Text = 'Hexadecimal 16Bytes Align'
+              OnChange = ComboBox8Change
+              Items.Strings = (
+                'Hexadecimal 16Bytes Align'
+                'Hexadecimal 32Bytes Align'
+                'None')
             end
           end
         end
@@ -764,6 +721,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 632
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
