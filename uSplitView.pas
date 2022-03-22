@@ -2469,6 +2469,7 @@ begin
   ComComboBox.ComProperty := cpBaudRate;
   ComComboBox.Refresh;
   ComboBox1.Items := ComComboBox.Items;
+  ComboBox1.Items.Add('1500000');
   // if ComboBox1.Items.Count >= 13 then
   // ComboBox1.ItemIndex := 13
   // else
@@ -3934,7 +3935,7 @@ begin
     exit;
   end;
   CurrentLine := Memo1.CaretPos.Y; // 光标所在的行
-  // if CurrentLine <> Memo1.Lines.Count - 1 then
+  //if CurrentLine <> Memo1.Lines.Count - 1 then
   begin
     Memo1.SelStart := Length(Memo1.Text);
     Memo1.Perform(WM_VSCROLL, SB_BOTTOM, 0);
@@ -3957,8 +3958,6 @@ end;
 
 procedure TSplitViewForm.Memo1KeyPress(Sender: TObject; var Key: Char);
 var
-  // CurrentLine: Integer;
-  // rCode: String;
   str, cmdstr: String;
   i: Integer;
 begin
@@ -3966,12 +3965,6 @@ begin
   begin
     exit;
   end;
-  // CurrentLine := Memo1.CaretPos.Y; // 光标所在的行
-  // if CurrentLine <> Memo1.Lines.Count - 1 then
-  // begin
-  // Memo1.SelStart := Length(Memo1.Text);
-  // Memo1.Perform(WM_VSCROLL, SB_BOTTOM, 0);
-  // end;
 
   if (Key = #13) then
   begin
@@ -4012,12 +4005,9 @@ begin
       str := LastCMDLineStr + DirList.Strings[CommandIndex];
 
     Memo1.Lines.Strings[Memo1.Lines.Count - 1] := Trim(str);
-    // Memo1.Text:=Trim(Memo1.Text);
-    // Memo1.SelStart:=Length(Memo1.Text);
     INC(CommandIndex);
   end;
-  // Memo1.SelStart := Length(Memo1.Text);
-  // Memo1.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+
 end;
 
 procedure TSplitViewForm.MultiComportProcess(DeviceName: string); // 更行当前设备UI
@@ -4163,18 +4153,8 @@ procedure TSplitViewForm.RunWindosShellCmd(str: String; Memo: TMemo);
 var
   thid: dword;
   ResultStr, s: String;
-  // MyParam: TMyParam;
-  // pPMyParam:PMyParam;
   i: Integer;
-
 begin
-  // s := ExtractFileDir(Application.ExeName);
-  // ShowMessage('本级目录：' + s + #13#10 + #13#10
-  // +'上一级目录: ' + ExtractFilePath(s + '..'));
-  // CommadLineStr :=
-  // MyParam.CommadLineStr:= 'cmd /c ' + str;
-  // MyParam.LogMemo:=Memo1;
-  // pPMyParam:= @MyParam;
   i := Pos('cd', str);
   if str = '' then
   begin
@@ -4256,16 +4236,6 @@ begin
       Memo.SelStart := Length(Memo.Text);
       Memo.Text := Trim(Memo.Text);
     end;
-    // ResultStr:= RunDosCommand(CmdShellCommadLineStr);
-    { Memo.Lines.Add(ResultStr);
-      Memo.Text:=Trim(Memo.Text);
-      Memo.Lines.Add(' ');
-      LastCMDLineStr:= GetCurrentDir()+'>';
-      Memo.Lines.Add(LastCMDLineStr);
-      Memo.SelStart:=Length(Memo.Text);
-      Memo.Text:=Trim(Memo.Text); }
-    // CreateThread(nil, 0, @RunDosCommand, @ResultStr, 0, thid);
-    // if(ResultStr <> '') then Memo1.Lines.Add(ResultStr);
   except
   end;
 end;
@@ -4277,9 +4247,7 @@ begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj = nil then
     exit;
-
   OcComPortObj.LogScrollMode := False;
-
 end;
 
 Initialization

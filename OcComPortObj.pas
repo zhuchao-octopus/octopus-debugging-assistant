@@ -533,7 +533,7 @@ begin
         EnterCriticalSection(Critical);
         FOcComPortObj.ClearInternalBuff();
         LeaveCriticalSection(Critical);
-        // FOcComPortObj.LogMemo.SelStart:=Length(FOcComPortObj.LogMemo.text);
+
         FOcComPortObj.FLastLineStr := FOcComPortObj.LogMemo.Lines.Strings
           [FOcComPortObj.LogMemo.Lines.Count - 1];
         self.Suspended := True; // 忙完了挂起
@@ -1250,10 +1250,8 @@ begin
           LogMemo.Lines.Strings[i] := GetLineNumberDateTimeStamp(i) +
             LogMemo.Lines.Strings[i];
         end;
-        // LogMemo.Text := Trim(LogMemo.Text);
-        // LogMemo.SelStart := Length(LogMemo.Text) + 1;
-        LogMemo.Lines.EndUpdate;
 
+        LogMemo.Lines.EndUpdate;
         FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
         FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
 
@@ -1289,10 +1287,6 @@ begin
         LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings
           [LogMemo.Lines.Count - 1] + FComReceiveString;
       end;
-      // LogMemo.Text := Trim(LogMemo.Text);
-      // LogMemo.SelStart := Length(LogMemo.Text) + 1; // put the Guangbiao at the last
-      // LogMemo.Update;
-      // LogMemo.Lines.EndUpdate;
 
       FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
       FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
@@ -1422,7 +1416,8 @@ begin
   if FLogScrollMode then
   begin
     LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
-    LogMemo.SelStart := 1;
+    LogMemo.Perform(WM_HSCROLL, SB_LEFT, 0);
+    //LogMemo.SelStart := 1;
   end;
 end;
 
@@ -1663,29 +1658,20 @@ begin
 
   if (Key = #13) then
   begin
-
     if LogMemo.ReadOnly or (Trim(FCommadLineStr) = '') then
     begin
       LogMemo.ReadOnly := false;
-      self.FalconComSendData_Terminal(' ', self.FSendFormat);
-      // LogMemo.Text := Trim(LogMemo.Text);
+      FalconComSendData_Terminal(' ', self.FSendFormat);
       FCommadLineStr := '';
       Key := #0;
       Exit;
     end;
-    { CurrentLine:=LogMemo.CaretPos.y;
-      LastStr:=  LogMemo.Lines.Strings[CurrentLine];
-      i:=pos(FCommadLineStr,LastStr);
-      if(i > 0) then
-      delete(LastStr,i,Length(FCommadLineStr));
-      LogMemo.Lines.Strings[CurrentLine]:= LastStr; }
 
     CurrentLine := LogMemo.CaretPos.y;
     LastStr := Trim(LogMemo.Lines.Strings[CurrentLine]);
     cmd := Trim(FCommadLineStr); // Trim(copy(LastStr,j+3,Length(LastStr)-j+2));
     if cmd <> '' then
     begin
-      // LogMemo.Lines.Add(' ');
       self.FNeedNewLine := True;
       self.FalconComSendData_Terminal(cmd, self.FSendFormat);
     end;
@@ -1705,17 +1691,11 @@ begin
   if (Key = #9) then
   begin
     LastStr := LogMemo.Lines.Strings[CurrentLine];
-    { i := pos(FCommadLineStr, LastStr);
-      if (i > 0) then
-      delete(LastStr, i, Length(FCommadLineStr));
-      LogMemo.Lines.Strings[CurrentLine] := LastStr; }
-
     cmd := Trim(FCommadLineStr) + Key;
     if cmd = Key then
       Exit; // 只有tab
 
-    // Trim(copy(LastStr,j+3,Length(LastStr)-j+2));
-    self.FalconComSendData_Terminal(cmd, self.FSendFormat);
+    FalconComSendData_Terminal(cmd, self.FSendFormat);
     FPreCommadLineStr := FCommadLineStr;
     FCommadLineStr := '';
     Key := #0;
@@ -1729,7 +1709,6 @@ begin
     Len := Length(Trim(FLastLineStr));
     i := Pos(Trim(FCommadLineStr), LastStr);
     j := Pos(Trim(FPreCommadLineStr), LastStr);
-    // LogMemo.SelStart := Length(Trim(LogMemo.Text)) + 1;
     if (Trim(FCommadLineStr) = Trim(LastStr)) then // 光标最后的空行
     begin
       delete(FCommadLineStr, Length(FCommadLineStr), Length(FCommadLineStr));
@@ -1742,11 +1721,8 @@ begin
     if (j > 0) then // 最后一行有回显
     begin
       LastStr := LogMemo.Lines.Strings[CurrentLine];
-      // LogMemo.Lines.Strings[CurrentLine] := Trim(LastStr);
       delete(FPreCommadLineStr, Length(FPreCommadLineStr),
         Length(FPreCommadLineStr));
-      // if(j<= len) then
-      // key:=#0;
     end
     // 当前输入
     else if (i > 0) and (Length(FCommadLineStr) > 0) then
@@ -1764,26 +1740,12 @@ begin
 
   if ((Key <> #13) and (Key <> #8) and (Key <> #0)) then
   begin
-    { if FCommadLineStr = '' then
-      begin
-      CurrentLine := LogMemo.CaretPos.y;
-      LastStr := Trim(LogMemo.Lines.Strings[CurrentLine]);
-      LogMemo.Lines.Strings[CurrentLine] := LastStr;
-      end; }
-    // LogMemo.SelStart := Length(LogMemo.Text);
-    // make sure input at the last line
     FCommadLineStr := FCommadLineStr + Key;
   end;
 
   if ((Key = #38) OR (Key = #40)) then
   begin
   end;
-  { CurrentLine:=LogMemo.CaretPos.y; //光标所在的行
-    if CurrentLine <> LogMemo.Lines.Count -1 then
-    begin
-    LogMemo.SelStart:=Length(LogMemo.text);
-    LogMemo.Perform(WM_VSCROLL,SB_BOTTOM,0);
-    end; }
 end;
 
 procedure TOcComPortObj.KeyDown(Sender: TObject; var Key: Word;
@@ -1795,17 +1757,10 @@ var
   i, j: Integer;
   LastStr: String;
 begin
-
   if (Key <> VK_RETURN) then
   begin
-    // CurrentLine := LogMemo.Lines.Count - 1; // LogMemo.CaretPos.y;
-    // LastStr := Trim(LogMemo.Lines.Strings[CurrentLine]);
-    // FLogMemo.Lines.BeginUpdate;
-    // if (FCommadLineStr = '') and ((LastStr[Length(LastStr)]='#') or (LastStr[Length(LastStr)]='$'))then
-    // FLogMemo.Text:=Trim(FLogMemo.Text);
     FLogMemo.SelStart := Length(LogMemo.Text);
     FLogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
-    // FLogMemo.Lines.EndUpdate;
   end;
 
   if (Key = VK_LEFT) or (Key = 38) OR (Key = 39) OR (Key = 40) then // 方向键回溯历史
@@ -1860,12 +1815,6 @@ begin
   begin
     if (Key = $43) then // Control+VK_C
     begin
-      { if not self.LogMemo.ReadOnly then
-        begin
-        //self.LogMemo.ReadOnly:=true;
-        //self.Log('');
-        //exit;
-        end; }
       cmdbuf[0] := $03;
       if self.connected then
         self.FalconComSendBuffer(cmdbuf, 1)
@@ -1883,11 +1832,7 @@ begin
   begin
     if not self.LogMemo.ReadOnly then
       FLogMemo.ReadOnly := True;
-    // cmdbuf[0]:=$1B;
-    // if self.Connected then
-    // self.FalconComSendBuffer(cmdbuf,1)
   end;
-
 end;
 
 procedure TOcComPortObj.RunWindosShellCmd(str: string);
