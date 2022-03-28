@@ -2469,7 +2469,9 @@ begin
   ComComboBox.ComProperty := cpBaudRate;
   ComComboBox.Refresh;
   ComboBox1.Items := ComComboBox.Items;
+  ComboBox1.Items.Add('1000000');
   ComboBox1.Items.Add('1500000');
+  ComboBox1.Items.Add('2000000');
   // if ComboBox1.Items.Count >= 13 then
   // ComboBox1.ItemIndex := 13
   // else
@@ -2918,11 +2920,8 @@ var
   Count: Integer;
   BytesWritten: Cardinal;
 begin
-
-  // OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   OcComPortObj := GetDeciceByFullName(Notebook2.ActivePage);
   JvHidDevice := nil; // CurrentDevicesJvHidDevice;
-  // self.CheckHID(self.GetCurrentDeviceName);
   if ARow > 0 then
   begin
     StringGrid1.Row := ARow;

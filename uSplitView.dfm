@@ -49,6 +49,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 632
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -362,8 +363,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #39640#32423
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel6: TPanel
           Left = 0
           Top = 0
@@ -602,7 +601,7 @@ object SplitViewForm: TSplitViewForm
             end
             object CheckBox1: TCheckBox
               Left = 8
-              Top = 29
+              Top = 31
               Width = 209
               Height = 25
               Caption = #22312#26700#38754#21019#24314#24555#25463#26041#24335
@@ -612,7 +611,7 @@ object SplitViewForm: TSplitViewForm
             end
             object CheckBox12: TCheckBox
               Left = 8
-              Top = 55
+              Top = 97
               Width = 258
               Height = 17
               Hint = #21246#19978#65292#25903#25345#20013#25991#31561#22810#22269#35821#35328#30340#25509#25910
@@ -626,7 +625,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Combobox_CodePage: TComboBox
               Left = 8
-              Top = 82
+              Top = 122
               Width = 293
               Height = 25
               Style = csDropDownList
@@ -644,7 +643,7 @@ object SplitViewForm: TSplitViewForm
             end
             object CheckBox5: TCheckBox
               Left = 8
-              Top = 126
+              Top = 61
               Width = 249
               Height = 25
               Caption = #26174#31034#20018#21475#27491#22312#21457#36865#30340#25968#25454
@@ -655,7 +654,7 @@ object SplitViewForm: TSplitViewForm
             end
             object CheckBox9: TCheckBox
               Left = 8
-              Top = 151
+              Top = 153
               Width = 280
               Height = 25
               Caption = #21313#20845#36827#21046#26684#24335#25509#25910#38468#21152#23383#31526#35299#26512
@@ -723,15 +722,12 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 632
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
         Top = 0
         HelpContext = 1
         Caption = #22359#21457#36865
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel2: TPanel
           AlignWithMargins = True
           Left = 3
@@ -1952,8 +1948,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2076,7 +2070,7 @@ object SplitViewForm: TSplitViewForm
               Left = 74
               Top = 3
               Width = 237
-              Height = 118
+              Height = 25
               Align = alRight
               Style = csDropDownList
               ItemIndex = 0
@@ -2119,8 +2113,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2398,8 +2390,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #27874#24418
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
@@ -2463,8 +2453,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3

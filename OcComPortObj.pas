@@ -78,7 +78,7 @@ type
     FShowDate: Boolean;
     FShowTime: Boolean;
     FShowLineNumber: Boolean;
-    FShowSendedLog: Boolean;
+    FShowSendingLog: Boolean;
     FHexModeWithString: Boolean; // o
     FHexModeFormatCount: Integer;
 
@@ -133,7 +133,7 @@ type
       j: TMemo; k, l, m, N, o: Boolean);
 
     procedure SaveLog(FullLogFilePath: String);
-    procedure Log(const Msg: string; w: Boolean = false);
+    procedure Log(const Msg: string);
     procedure LogBuff(flag: String; const Buff: Array of Byte; Len: Integer);
     procedure ClearLog();
     procedure ClearInternalBuff(id: Integer = 100);
@@ -161,7 +161,7 @@ type
       read FBackGroundProcessRecordCount write FBackGroundProcessRecordCount
       default 50;
     property HexModeFormatCount: Integer read FHexModeFormatCount
-      write FHexModeFormatCount default 0;
+      write FHexModeFormatCount default 16;
     property FileStream: TFileStream read FFileStream write FFileStream
       default nil;
     property FileStreamName: String read FFileStreamName write FFileStreamName;
@@ -176,7 +176,7 @@ type
     property CompatibleUnicode: Boolean read FCompatibleUnicode
       write FCompatibleUnicode default True;
     property NeedCRC16: Boolean read FNeedCRC16 write FNeedCRC16 default false;
-    property ShowSendedLog: Boolean read FShowSendedLog write FShowSendedLog;
+    property ShowSendedLog: Boolean read FShowSendingLog write FShowSendingLog;
     property ShowLineNumber: Boolean read FShowLineNumber write FShowLineNumber;
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode
       default True;
@@ -371,12 +371,9 @@ end;
 function ByteToWideString2(Buff: pbyte; Len: Integer): String; // 不要回车换行#13#10
 var
   str: AnsiString;
-  // buffer:array of byte;
 begin
   try
-    // SetLength(buffer, len);
     SetLength(str, Len + 1);
-    // CopyMemory(buffer,buff,len);
     CopyMemory(@str[1], Buff, Len);
     str := StringReplace(str, chr(13) + chr(10), '', [rfReplaceAll]); // 删除回车
     Result := Trim(str);
@@ -545,8 +542,7 @@ begin
     begin
       if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
       begin // 有数据处理数据
-        s := s + Format('%.02x ',
-          [FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]]);
+        s := s + Format('%.02x ',[FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]]);
         INC(FOcComPortObj.FComProcessedCount);
         if FOcComPortObj.FHexModeFormatCount > 0 then
         begin
@@ -555,9 +551,8 @@ begin
           begin
             j := FUIStartIndex + 1;
             if FOcComPortObj.FHexModeWithString then
-              s := Trim(s) + '   ' + ByteToWideString2
-                (@FOcComPortObj.FComReceiveInternalBuffer
-                [FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1],
+              s := Trim(s) + '            ' +
+              ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1],
                 FOcComPortObj.FHexModeFormatCount);
             FOcComPortObj.Log(s);
             s := ''; // 这时J 的值无意义
@@ -574,15 +569,11 @@ begin
           begin
             if FOcComPortObj.FHexModeFormatCount > 0 then
             begin
-              s := Format('%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3)
-                + 's', [s]);
-              s := s + '   ' + ByteToWideString2
-                (@FOcComPortObj.FComReceiveInternalBuffer[j],
-                FOcComPortObj.FHexModeFormatCount);
+              s := Format('%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3) + 's', [s]);
+              s := s + '           ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j],FOcComPortObj.FHexModeFormatCount);
             end
             else
-              s := Trim(s) + '   ' + ByteToWideString2
-                (@FOcComPortObj.FComReceiveInternalBuffer[j],
+              s := Trim(s) + '            ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j],
                 Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
           end;
           FOcComPortObj.Log(s);
@@ -671,7 +662,7 @@ begin
   FFileStream := nil;
 
   FProtocalData := 1;
-  FCompatibleUnicode := false;
+  FCompatibleUnicode := true;
   FExcelAppRows := 0;
   FShowLineNumber := false;
   FCommadLineStr := '';
@@ -715,7 +706,7 @@ begin
   FOcComPortObjPara.ShowDate := self.FShowDate;
   FOcComPortObjPara.ShowTime := self.FShowTime;
   FOcComPortObjPara.ShowLineNumber := self.FShowLineNumber;
-  FOcComPortObjPara.ShowSendedLog := self.FShowSendedLog;
+  FOcComPortObjPara.ShowSendedLog := self.FShowSendingLog;
   FOcComPortObjPara.HexModeWithString := self.FHexModeWithString;
   Result := FOcComPortObjPara;
 end;
@@ -786,7 +777,7 @@ begin
   self.FShowDate := k;
   self.FShowTime := l;
   self.FShowLineNumber := m;
-  self.FShowSendedLog := N;
+  self.FShowSendingLog := N;
   self.FHexModeWithString := o;
 
   LogMemo.OnKeyDown := self.KeyDown;
@@ -872,30 +863,28 @@ begin
   Log(flag + str);
 end;
 
-procedure TOcComPortObj.Log(const Msg: string; w: Boolean = false);
+procedure TOcComPortObj.Log(const Msg: string);
 var
   i, PreLogLinesCount: Int64;
   str: String;
 begin
   if (LogMemo = nil) or (LogMemo.Parent = nil) then
   begin
-    // MessageBox(Application.Handle, Pchar(FComportFullName + ', ' + Msg),
-    // Pchar(FComportFullName), MB_ICONINFORMATION + MB_OK);
     Exit;
   end;
 
-  if FShowSendedLog or w then
+  PreLogLinesCount := LogMemo.Lines.Count;
+  LogMemo.Lines.BeginUpdate;
+  LogMemo.Lines.Append(Msg);
+  if FShowLineNumber or FShowDate or FShowTime then
   begin
-    PreLogLinesCount := LogMemo.Lines.Count;
-    LogMemo.Lines.BeginUpdate;
-    LogMemo.Lines.Append(Msg);
     for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do
     begin
       str := GetLineNumberDateTimeStamp(i) + LogMemo.Lines.Strings[i];
       LogMemo.Lines.Strings[i] := str;
     end;
-    LogMemo.Lines.EndUpdate;
   end;
+  LogMemo.Lines.EndUpdate;
 
   if FLogScrollMode then
     LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
@@ -940,11 +929,13 @@ begin
     str := str + #13#10;
     if self.connected then
     begin
-
-      if self.FReceiveFormat = 1 then
-        Log('> ' + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
-      else
-        Log('> ' + str); // new ling in memo for receive data 发送字符串,后面自带换行
+      if FShowSendingLog then
+      begin
+        if FReceiveFormat = 1 then
+          Log('> ' + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
+        else
+          Log('> ' + str); // new ling in memo for receive data 发送字符串,后面自带换行
+      end;
 
       try
         self.writestr(str);
@@ -968,9 +959,11 @@ begin
     begin
       s := FormatHexStrToByte(Trim(str), buf);
       Len := (Length(str) + 2) div 3;
-
-      Log('> ' + s);
-      Log(''); // new line prepare to receive
+      if FShowSendingLog then
+      begin
+        Log('> ' + s);
+        Log(''); // new line prepare to receive
+      end;
 
       try
         self.Write(buf, Len);
@@ -990,7 +983,7 @@ begin
   begin
     s := FormatHexStrToByte(Trim(str), buf);
     Len := (Length(str) + 2) div 3;
-    self.SendProtocolData(buf, Len, OCCOMPROTOCAL_DATA1, false);
+    SendProtocolData(buf, Len, OCCOMPROTOCAL_DATA1, false);
   end;
 end;
 
@@ -1013,7 +1006,7 @@ begin
         end
         else
           str := str + #13;
-        self.writestr(str);
+        writestr(str);
 
         FComSentCount := FComSentCount + Length(str);
       except
@@ -1071,7 +1064,8 @@ begin
     str := str + #13#10;
     if self.connected then
     begin
-      Log('> ' + str);
+      if FShowSendingLog then
+        Log('> ' + str);
 
       try
         self.writestr(str);
@@ -1095,8 +1089,8 @@ begin
     begin
       s := FormatHexStrToByte(Trim(str), buf);
       Len := (Length(str) + 2) div 3;
-
-      Log('> ' + s);
+      if FShowSendingLog then
+        Log('> ' + s);
 
       try
         self.Write(buf, Len);
@@ -1180,12 +1174,10 @@ var
   s, ln: String;
   Buff: array of Byte;
   f: Text;
-
 begin
   FComReceiveString := '';
   s := '';
   ln := '';
-
   FComReceiveCount := FComReceiveCount + Count;
   FComReceiveString := '';
 
@@ -1193,14 +1185,10 @@ begin
   begin
     try
       if FCompatibleUnicode then
-        self.ReadUnicodeString(FComReceiveString, Count) // 可以读中文
+        ReadUnicodeString(FComReceiveString, Count) // 可以读中文
       else
-        self.ReadStr(FComReceiveString, Count);
-    Except
-    end;
+        ReadStr(FComReceiveString, Count);
 
-    if FShowLineNumber or FShowDate or FShowTime then
-    begin
       // 兼容 \R
       if (Pos(#13#10, FComReceiveString) <= 0) and (Count <= 2048) then
       begin
@@ -1211,8 +1199,12 @@ begin
           FComReceiveString := StringReplace(FComReceiveString, #$D, #13#10,
             [rfReplaceAll]);
       end;
+    Except
+    end;
 
-      self.FComHandleThread_Wait := True;
+    if FShowLineNumber or FShowDate or FShowTime then
+    begin
+      FComHandleThread_Wait := True;
       EnterCriticalSection(Critical);
       StringInternalMemo.Lines.BeginUpdate;
       StringInternalMemo.Lines.Strings[StringInternalMemo.Lines.Count - 1] :=
@@ -1222,7 +1214,6 @@ begin
       self.FComHandleThread_Wait := false;
       LeaveCriticalSection(Critical);
       if StringInternalMemo.Lines.Count >= FBackGroundProcessRecordCount then
-      // FComHandleThread_AsynCount //should be 1
       begin
         if FComUIHandleThread.Suspended then
           FComUIHandleThread.Suspended := false; // 启动后台线程
@@ -1233,9 +1224,8 @@ begin
       if (FComUIHandleThread.Suspended) then // 无需后台处理数据，或者后台数据处理完成，事情做完了就挂起
       begin
         ClearInternalBuff(); // 不能少，清楚后台BUFFER ，转入前台处理
-        // if Trim(LogMemo.Lines.Strings[LogMemo.Lines.Count - 1]) = '' then
-        // LogMemo.Lines.Delete(LogMemo.Lines.Count -1);
         PreLogLinesCount := LogMemo.Lines.Count;
+
         LogMemo.Lines.BeginUpdate;
         if (FComReceiveString[1] = #13) or (FComReceiveString[1] = #10) then
           // #13#10,分开发送导致无法正确的换行
@@ -1244,13 +1234,11 @@ begin
           LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] :=
             LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + FComReceiveString;
         // 自动分行
-
         for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do
         begin
           LogMemo.Lines.Strings[i] := GetLineNumberDateTimeStamp(i) +
             LogMemo.Lines.Strings[i];
         end;
-
         LogMemo.Lines.EndUpdate;
         FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
         FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
@@ -1261,7 +1249,6 @@ begin
     end
     else
     begin // 无需特殊处理
-      // LogMemo.Lines.BeginUpdate; // good
       if FNeedNewLine then
       begin
         if (FComReceiveString[Length(FComReceiveString)] = #13) or
@@ -1272,11 +1259,9 @@ begin
 
         FComReceiveString := TrimRight(FComReceiveString);
         LogMemo.Lines.Add(FComReceiveString);
-
       end
       else
       begin
-
         if (FComReceiveString[Length(FComReceiveString)] = #13) or
           (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
           FNeedNewLine := True
@@ -1297,29 +1282,24 @@ begin
   else if FReceiveFormat = Ord(HexadecimalFormat) then // receive as hex format
   begin
     // ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
-    self.FComHandleThread_Wait := True;
+    FComHandleThread_Wait := True;
     try
-      self.Read(FComReceiveBuffer, Count);
+      Read(FComReceiveBuffer, Count);
     Except
     end;
-
     // EnterCriticalSection(Critical);
     if Length(FComReceiveInternalBuffer) = 0 then
-      self.ClearInternalBuff;
-
+      ClearInternalBuff;
     SetLength(FComReceiveInternalBuffer,
       Length(FComReceiveInternalBuffer) + Count);
     CopyMemory(@FComReceiveInternalBuffer[Length(FComReceiveInternalBuffer) -
       Count], @FComReceiveBuffer, Count);
-
     // LeaveCriticalSection(Critical);
-
-    self.FComHandleThread_Wait := false;
+    FComHandleThread_Wait := false;
     if FComUIHandleThread.Suspended then
     begin
       FComUIHandleThread.Suspended := false; // 启动UI工作线程
     end;
-
   end
   /// ////hex format
   else if FReceiveFormat = Ord(Graphic) then // receive as Graphic
@@ -1339,7 +1319,7 @@ begin
     CopyMemory(@FComReceiveInternalBuffer[Length(FComReceiveInternalBuffer) -
       Count], @FComReceiveBuffer, Count);
     LeaveCriticalSection(Critical);
-    self.FComHandleThread_Wait := false;
+    FComHandleThread_Wait := false;
     if FComUIHandleThread.Suspended then
     begin
       FComUIHandleThread.Suspended := false; // 启动UI工作线程 绘制图形
@@ -1349,7 +1329,7 @@ begin
   // receive as OctopusProtocol pack
   begin
     ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
-    self.FComHandleThread_Wait := True;
+    FComHandleThread_Wait := True;
     try
       FComProcessedCount := FComProcessedCount + self.
         Read(FComReceiveBuffer, Count);
@@ -1357,7 +1337,7 @@ begin
     Except
     end;
 
-    self.FComHandleThread_Wait := True;
+    FComHandleThread_Wait := True;
     EnterCriticalSection(Critical);
     if Length(FComReceiveInternalBuffer) = 0 then
       self.ClearInternalBuff;
@@ -1399,7 +1379,7 @@ begin
     else
     begin
       ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
-      self.Read(FComReceiveBuffer, Count);
+      Read(FComReceiveBuffer, Count);
       if FileStream <> nil then
       begin
         SetLength(Buff, Count);
@@ -1413,11 +1393,13 @@ begin
     end;
   end;
 
-  if FLogScrollMode then
+  if FReceiveFormat = Ord(ASCIIFormat) then
   begin
-    LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
-    LogMemo.Perform(WM_HSCROLL, SB_LEFT, 0);
-    //LogMemo.SelStart := 1;
+    if (FLogScrollMode) and (Length(FComReceiveString) > 0) then
+    begin
+      LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+      LogMemo.Perform(WM_HSCROLL, SB_LEFT, 0);
+    end;
   end;
 end;
 
@@ -1459,7 +1441,7 @@ begin
         OcComPack.Total := 1;
         p := @OcComPack;
         self.FalconComSendBuffer(p^, OcComPack.Length);
-        if FShowSendedLog then
+        if FShowSendingLog then
           LogBuff('> ', p^, OcComPack.Length);
       end;
     OCCOMPROTOCAL_I2C_READ, OCCOMPROTOCAL_I2C_WRITE, OCCOMPROTOCAL_SPI_READ,
@@ -1513,7 +1495,7 @@ begin
 
           p := @OcComPack;
           self.FalconComSendBuffer(p^, po.Length); // 发送
-          if FShowSendedLog then
+          if FShowSendingLog then
             self.PrintSendProtocolPack(OcComPack);
           // LogBuff('>',p^,po.Length);
           if NeedACK then
@@ -1693,8 +1675,11 @@ begin
     LastStr := LogMemo.Lines.Strings[CurrentLine];
     cmd := Trim(FCommadLineStr) + Key;
     if cmd = Key then
+    begin
+      Key := #0;
       Exit; // 只有tab
-
+    end;
+    Log('');
     FalconComSendData_Terminal(cmd, self.FSendFormat);
     FPreCommadLineStr := FCommadLineStr;
     FCommadLineStr := '';
