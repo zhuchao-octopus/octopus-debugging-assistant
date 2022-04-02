@@ -1627,7 +1627,7 @@ end;
 procedure TOcComPortObj.KeyPress(Sender: TObject; var Key: Char);
 var
   CurrentLine: Integer;
-  thid: Dword;
+  //thid: Dword;
   i, j, Len: Integer;
   cmd: String;
   LastStr: String;
@@ -1741,8 +1741,13 @@ var
   thid: Dword;
   i, j: Integer;
   LastStr: String;
+  MaskedKeyState : TShiftState;
 begin
-  if (Key <> VK_RETURN) then
+  MaskedKeyState:= Shift * [ssShift, ssAlt,ssCtrl,ssLeft, ssRight, ssMiddle, ssDouble, ssTouch, ssPen, ssCommand];
+  if (Key <> VK_RETURN) and (Key <> VK_PRIOR) and (Key <> VK_NEXT) and
+     (Key <> VK_HOME) and
+     (Key <> VK_END) and
+     (MaskedKeyState = [] ) then
   begin
     FLogMemo.SelStart := Length(LogMemo.Text);
     FLogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);

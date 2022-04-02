@@ -171,13 +171,13 @@ type
     ComboBox7: TComboBox;
     Label10: TLabel;
     Panel11: TPanel;
-    CheckBox6: TCheckBox;
-    CheckBox1: TCheckBox;
     CheckBox12: TCheckBox;
     Combobox_CodePage: TComboBox;
-    CheckBox5: TCheckBox;
     CheckBox9: TCheckBox;
     ComboBox8: TComboBox;
+    CheckBox5: TCheckBox;
+    CheckBox6: TCheckBox;
+    CheckBox1: TCheckBox;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -1948,11 +1948,11 @@ begin
   end;
 
   if (ComboBox1.ItemIndex <= 15) then // High(TBaudRate))
-  begin
+  begin //内置波特率
     OcComPortObj.BaudRate := TBaudRate(ComboBox1.ItemIndex);
   end
   else
-  begin
+  begin //自定义波特率
     OcComPortObj.BaudRate := TBaudRate(0);
     OcComPortObj.CustomBaudRate := StrToInt(ComboBox1.Text);
   end;
@@ -3281,20 +3281,15 @@ begin
       Octopusini := TIniFile.Create(s);
       for i := 1 to StringGrid1.RowCount - 1 do
       begin
-        Octopusini.WriteString('MyCustData', inttostr(i) + '_2',
-          SplitViewForm.StringGrid1.Cells[2, i]);
-        Octopusini.WriteString('MyCustData', inttostr(i) + '_5',
-          SplitViewForm.StringGrid1.Cells[5, i]);
+        Octopusini.WriteString('MyCustData', inttostr(i) + '_2',SplitViewForm.StringGrid1.Cells[2, i]);
+        Octopusini.WriteString('MyCustData', inttostr(i) + '_5',SplitViewForm.StringGrid1.Cells[5, i]);
       end;
       Octopusini.WriteInteger('MyPreference', 'Theme', cbxVclStyles.ItemIndex);
       Octopusini.WriteInteger('MyPreference', 'SV_R_WIDTH', SV_R.Width);
-      Octopusini.WriteInteger('MyPreference', 'MainFormWidth',
-        SplitViewForm.Width);
-      Octopusini.WriteInteger('MyPreference', 'MainFormHeight',
-        SplitViewForm.Height);
+      Octopusini.WriteInteger('MyPreference', 'MainFormWidth',SplitViewForm.Width);
+      Octopusini.WriteInteger('MyPreference', 'MainFormHeight',SplitViewForm.Height);
 
-      Octopusini.WriteBool('MyPreference', 'EnglishLanguage',
-        CheckBox6.Checked);
+      Octopusini.WriteBool('MyPreference', 'EnglishLanguage',CheckBox6.Checked);
       Octopusini.WriteBool('MyPreference', 'DESKTOPSHOTCUT', CheckBox1.Checked);
       Octopusini.WriteBool('MyPreference', 'SHOWLINENUMBER', CheckBox4.Checked);
       Octopusini.WriteBool('MyPreference', 'ALPHABLEND', CheckBox7.Checked);
@@ -3317,8 +3312,7 @@ begin
       Octopusini.WriteInteger('MyPreference', 'FONTCOLOR', Memo1.Font.Color);
       Octopusini.WriteInteger('MyPreference', 'BACKGROUNDCOLOR', Memo1.Color);
 
-      Octopusini.WriteInteger('SystemConfiguration', 'VERSIONNUMBER',
-        THEVERSIONNUMBER);
+      Octopusini.WriteInteger('SystemConfiguration', 'VERSIONNUMBER',THEVERSIONNUMBER);
 
     finally
       Octopusini.Free;
@@ -3344,20 +3338,14 @@ begin
     Octopusini := TIniFile.Create(s);
     for i := 1 to StringGrid1.RowCount - 1 do
     begin
-      StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData',
-        inttostr(i) + '_2', '');
-      StringGrid1.Cells[5, i] := Octopusini.ReadString('MyCustData',
-        inttostr(i) + '_5', '');
+      StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData', inttostr(i) + '_2', '');
+      StringGrid1.Cells[5, i] := Octopusini.ReadString('MyCustData', inttostr(i) + '_5', '');
     end;
 
-    cbxVclStyles.ItemIndex := Octopusini.ReadInteger('MyPreference',
-      'Theme', 0);
-    SV_R.Width := Octopusini.ReadInteger('MyPreference', 'SV_R_WIDTH',
-      SV_R.Width);
-    SplitViewForm.Width := Octopusini.ReadInteger('MyPreference',
-      'MainFormWidth', 1228);
-    SplitViewForm.Height := Octopusini.ReadInteger('MyPreference',
-      'MainFormHeight', 664);
+    cbxVclStyles.ItemIndex := Octopusini.ReadInteger('MyPreference', 'Theme', 0);
+    SV_R.Width := Octopusini.ReadInteger('MyPreference', 'SV_R_WIDTH', SV_R.Width);
+    SplitViewForm.Width := Octopusini.ReadInteger('MyPreference', 'MainFormWidth', 1228);
+    SplitViewForm.Height := Octopusini.ReadInteger('MyPreference','MainFormHeight', 664);
 
     SV_L.Opened := Octopusini.ReadBool('MyPreference', 'SV_LOPEN', False);
     SV_R.Opened := Octopusini.ReadBool('MyPreference', 'SV_ROPEN', False);
@@ -3365,33 +3353,20 @@ begin
 
     Memo1.Font.Name := Octopusini.ReadString('MyPreference', 'FONTNAME', '新宋体');
     Memo1.Font.Size := Octopusini.ReadInteger('MyPreference', 'FONTSIZE', 14);
-    Memo1.Font.Color := Octopusini.ReadInteger('MyPreference', 'FONTCOLOR',
-      clSilver);
-    Memo1.Color := Octopusini.ReadInteger('MyPreference', 'BACKGROUNDCOLOR',
-      clWindowText);
-    VersionNumber := Octopusini.ReadInteger('SystemConfiguration',
-      'VERSIONNUMBER', 0);
+    Memo1.Font.Color := Octopusini.ReadInteger('MyPreference', 'FONTCOLOR',clSilver);
+    Memo1.Color := Octopusini.ReadInteger('MyPreference', 'BACKGROUNDCOLOR',clWindowText);
+    VersionNumber := Octopusini.ReadInteger('SystemConfiguration','VERSIONNUMBER', 0);
 
-    CheckBox4.Checked := Octopusini.ReadBool('MyPreference',
-      'SHOWLINENUMBER', False);
-    CheckBox1.Checked := Octopusini.ReadBool('MyPreference',
-      'DESKTOPSHOTCUT', True);
-    CheckBox7.Checked := Octopusini.ReadBool('MyPreference',
-      'ALPHABLEND', False);
-    CheckBox8.Checked := Octopusini.ReadBool('MyPreference', 'CK8',
-      CheckBox8.Checked);
-    CheckBox2.Checked := Octopusini.ReadBool('MyPreference', 'CK2',
-      CheckBox2.Checked);
-    CheckBox3.Checked := Octopusini.ReadBool('MyPreference', 'CK3',
-      CheckBox3.Checked);
-    CheckBox25.Checked := Octopusini.ReadBool('MyPreference', 'CK25',
-      CheckBox25.Checked);
-    CheckBox9.Checked := Octopusini.ReadBool('MyPreference', 'CK9',
-      CheckBox9.Checked);
-    CheckBox5.Checked := Octopusini.ReadBool('MyPreference', 'CK5',
-      CheckBox5.Checked);
-    CheckBox6.Checked := Octopusini.ReadBool('MyPreference', 'CK6',
-      CheckBox6.Checked);
+    CheckBox4.Checked := Octopusini.ReadBool('MyPreference', 'SHOWLINENUMBER', False);
+    CheckBox1.Checked := Octopusini.ReadBool('MyPreference', 'DESKTOPSHOTCUT', True);
+    CheckBox7.Checked := Octopusini.ReadBool('MyPreference', 'ALPHABLEND', False);
+    CheckBox8.Checked := Octopusini.ReadBool('MyPreference', 'CK8', CheckBox8.Checked);
+    CheckBox2.Checked := Octopusini.ReadBool('MyPreference', 'CK2', CheckBox2.Checked);
+    CheckBox3.Checked := Octopusini.ReadBool('MyPreference', 'CK3', CheckBox3.Checked);
+    CheckBox25.Checked := Octopusini.ReadBool('MyPreference', 'CK25',CheckBox25.Checked);
+    CheckBox9.Checked := Octopusini.ReadBool('MyPreference', 'CK9',  CheckBox9.Checked);
+    CheckBox5.Checked := Octopusini.ReadBool('MyPreference', 'CK5', CheckBox5.Checked);
+    CheckBox6.Checked := Octopusini.ReadBool('MyPreference', 'CK6', CheckBox6.Checked);
     CheckBox12.Checked := Octopusini.ReadBool('MyPreference', 'CK12', True);
 
   finally
@@ -3408,7 +3383,6 @@ begin
     exit;
 
   OcComPortObj.LogScrollMode := True;
-
 end;
 
 procedure TSplitViewForm.FindDialog1Find(Sender: TObject);
@@ -4038,10 +4012,9 @@ begin
       ComboBox1.Items.Add(inttostr(OcComPortObj.CustomBaudRate));
       ComboBox1.Items.EndUpdate;
     end;
-    ComboBox1.ItemIndex := ComboBox1.Items.IndexOf
-      (inttostr(OcComPortObj.CustomBaudRate));
+    ComboBox1.ItemIndex := ComboBox1.Items.IndexOf(inttostr(OcComPortObj.CustomBaudRate));
   end
-  else if (OcComPortObj.OcComPortObjPara.BaudRate > 15) then
+  else if (OcComPortObj.OcComPortObjPara.BaudRate >= ComboBox1.Items.Count) then
     ComboBox1.ItemIndex := 13
   else
     ComboBox1.ItemIndex := OcComPortObj.OcComPortObjPara.BaudRate;
