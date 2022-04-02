@@ -3558,7 +3558,7 @@ begin
     Notebook1.Pages[1] := '高级';
 
     if Memo1.Tag = 0 then // 设备关闭状态
-      Notebook2.Pages[0] := 'Octopus 串口终端 ';
+      Notebook2.Pages[0] := '本地文件目录 ';
 
     Notebook2.Pages[Notebook2.Pages.Count - 1] := ' 帮助 ';
     Notebook2.Pages[Notebook2.Pages.Count - 2] := ' 图形 ';

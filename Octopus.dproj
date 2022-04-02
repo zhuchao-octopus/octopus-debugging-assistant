@@ -6,7 +6,7 @@
         <MainSource>Octopus.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
@@ -135,10 +135,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.265;InternalName=OCTOPUS ;LegalCopyright= 2008-2028;LegalTrademarks=;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.266;InternalName=OCTOPUS ;LegalCopyright= 2008-2028;LegalTrademarks=;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>Octopus_Icon4.ico</Icon_MainIcon>
         <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_Build>265</VerInfo_Build>
+        <VerInfo_Build>266</VerInfo_Build>
         <UWP_DelphiLogo44>79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo150>
         <VerInfo_Release>8</VerInfo_Release>
@@ -147,9 +147,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.271;InternalName=OCTOPUS ;LegalCopyright=2008-2028;LegalTrademarks=;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.274;InternalName=OCTOPUS ;LegalCopyright=2008-2028;LegalTrademarks=;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>Octopus_Icon3.ico</Icon_MainIcon>
-        <VerInfo_Build>271</VerInfo_Build>
+        <VerInfo_Build>274</VerInfo_Build>
         <UWP_DelphiLogo44>79c25bc8359f51a4_white.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>79c25bc8359f51a4_white.png</UWP_DelphiLogo150>
         <VerInfo_Release>8</VerInfo_Release>
