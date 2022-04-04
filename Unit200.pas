@@ -10,18 +10,18 @@ uses
   Vcl.WinXCtrls, Vcl.Menus, IniFiles, Vcl.Themes, unit100;
 
 Const
+//{$IFDEF CPU64BITS}
+//  VERSIONNAME = 'Version :4.2.8 64bit'; // for 64 bit;
+//{$ELSE}
+//  VERSIONNAME = 'Version :4.2.8 32bit'; // for 32 bit;
+//{$ENDIF}
+//  THEVERSIONNUMBER = 428;
 {$IFDEF CPU64BITS}
-  VERSIONNAME = 'Version :4.2.8 64bit'; // for 64 bit;
+  APPLICATION_TITLE = '八爪鱼串口调试助手 64bit '; // for 64 bit;
 {$ELSE}
-  VERSIONNAME = 'Version :4.2.8 32bit'; // for 32 bit;
+  APPLICATION_TITLE = '八爪鱼串口调试助手 32bit '; // for 32 bit;
 {$ENDIF}
-  THEVERSIONNUMBER = 428;
-{$IFDEF CPU64BITS}
-  APPLICATION_TITLE = '八爪鱼串口终端开发调试助手64bit 4.2.8 '; // for 64 bit;
-{$ELSE}
-  APPLICATION_TITLE = '八爪鱼串口终端开发调试助手32bit 4.2.8'; // for 32 bit;
-{$ENDIF}
-  ISUPDATEUI = true;
+  //ISUPDATEUI = true;
   E_MAIL = 'Octopus@1234998.cn';
   WEB_SITE = 'http://www.1234998.cn';
   RELEASE_MOD = '0';
@@ -183,8 +183,38 @@ procedure SetButtonCaptionLeftAlign(btn: TButton);
 function FormatHexStrToByte(hs: string; var buf: array of byte): string;
 function FormatHexStrToByte2(hs: string; var buf: array of byte): Integer;
 function SpaceCompress(s: string): string;
+function GetBuildInfo(FileName: string): String;
 
 implementation
+
+
+function GetBuildInfo(FileName: string): String;
+var
+  VerInfoSize, VerValueSize, Dummy: DWORD;
+  VerInfo: Pointer;
+  VerValue: PVSFixedFileInfo;
+  V1, V2, V3, V4: Word;
+begin
+  Result := '';
+  if not FileExists(FileName) then
+    Exit;
+  VerInfoSize := GetFileVersionInfoSize(PChar(FileName), Dummy);
+  if VerInfoSize = 0 then
+    Exit;
+  GetMem(VerInfo, VerInfoSize);
+  if not GetFileVersionInfo(PChar(FileName), 0, VerInfoSize, VerInfo) then
+    Exit;
+  VerQueryValue(VerInfo, '\', Pointer(VerValue), VerValueSize);
+  with VerValue^ do
+  begin
+    V1 := dwFileVersionMS shr 16;
+    V2 := dwFileVersionMS and $FFFF;
+    V3 := dwFileVersionLS shr 16;
+    V4 := dwFileVersionLS and $FFFF;
+    Result := IntToStr(V1) + '.' + IntToStr(V2) + '.' + IntToStr(V3) + '.' + IntToStr(V4);
+  end;
+  FreeMem(VerInfo, VerInfoSize);
+end;
 
 function CharToDigit(c: Char): byte; // 字符表示的数，而不是对应的ASCII 值
 begin
@@ -369,7 +399,7 @@ begin
   AppendMenu(GetSysteMmenu(handle, false), MF_SEPARATOR, 1024, nil);
   AppendMenu(GetSysteMmenu(handle, false), MF_UNCHECKED, 1025,
     pchar('Keep At The Top Always '));
-  AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1026, pchar(VERSIONNAME));
+  //AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1026, pchar(VERSIONNAME));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1027, pchar('English'));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1028,  pchar('Chinese'));
   AppendMenu(GetSysteMmenu(handle, false), MF_SEPARATOR, 1027, nil);

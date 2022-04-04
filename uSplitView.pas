@@ -362,7 +362,7 @@ var
 
   CurrentDevices: TOcComPortObj;
   CurrentDevicesJvHidDevice: TJvHidDevice;
-  VersionNumber: Integer;
+  VersionNumberStr: String;
   Commandhread: TCommandhread;
   CommandIndex: Integer;
 procedure ShowStartComments(Lang: String);
@@ -1055,9 +1055,9 @@ begin
   // Log(inttostr(Msg.IDItem));
   // str:=GetStyle(Msg.IDItem-1);
   // Log(str);
-  if Msg.IDItem = 1026 then
-    Showmessage(Application.Title + '  ' + VERSIONNAME)
-  else if Msg.IDItem = 1025 then
+  //if Msg.IDItem = 1026 then
+  //  Showmessage(Application.Title + '  ' + VERSIONNAME)
+  if Msg.IDItem = 1025 then
   begin
     SetWindowPos(SplitViewForm.Handle, HWND_TOPMOST, SplitViewForm.Left,
       SplitViewForm.Top, SplitViewForm.Width, SplitViewForm.Height, 0);
@@ -1738,6 +1738,11 @@ begin
   end;
   OcComPortObj.ClearLog;
   OcComPortObj.ClearInternalBuff; // 高级清楚内部缓存
+
+  IF FileExists(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini') then
+     DeleteFile(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini');
+  IF FileExists(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini') then
+     DeleteFile(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini');
 end;
 
 procedure TSplitViewForm.Button6Click(Sender: TObject);
@@ -2520,20 +2525,11 @@ begin
   CharInit(False);
 
   OcHIDDeviceList := TStringList.Create;
-  // SetButtonCaptionLeftAlign(Button18);
-  // SetButtonCaptionLeftAlign(Button19);
-  // Log('#############################################################');
-  // Log('Octopus 章鱼串口助手');
-  // Log(VERSIONNAME); // 'Version  :2.00'
-  // Log('E  Mail :' + E_MAIL + ' //BUG报告、定制功能');
-  // Log('Web Site:' + WEB_SITE);
-  // Log('#############################################################');
   OctopusCfgDir := ExtractFilePath(Application.Exename) + '\';
   // OctopusCfgDir :=  GetSpecialFolderDir(35) + '\My Octopus\';
 
   SetCurrentDir(OctopusCfgDir);
-  OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR +
-    GetSystemDateTimeStampStr;
+  OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR +  GetSystemDateTimeStampStr;
   if not DirectoryExists(OctopusCfgDir) then
     CreateDir(OctopusCfgDir);
   if not DirectoryExists(OctopusCfgDir + CONFIGURATION_DIR) then
@@ -2542,22 +2538,13 @@ begin
     CreateDir(OctopusCfgDir + LOG_DIR);
 
   InitFlashAdressMapping(10, DEFAULT_ADDRESSMAP_COLS);
-
-  if (THEVERSIONNUMBER > VersionNumber) and ISUPDATEUI then
-  begin
-    IF FileExists(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini') then
-      DeleteFile(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini');
-    IF FileExists(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini') then
-      DeleteFile(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini');
-
-  end;
-
   SV_L.Width := Panel20.Width + 10;
   SV_R.Width := Button9.Width + 10;
   Splitter1.Left := SV_R.Left;
   Splitter1.Parent := SplitViewForm;
   Splitter1.Visible := SV_R.Opened;
 
+  VersionNumberStr:= GetBuildInfo(Application.Exename);
   if GetSystemDefaultLangID() = 2052 then
   BEGIN
     UILanguage := 'CN';
@@ -3312,7 +3299,7 @@ begin
       Octopusini.WriteInteger('MyPreference', 'FONTCOLOR', Memo1.Font.Color);
       Octopusini.WriteInteger('MyPreference', 'BACKGROUNDCOLOR', Memo1.Color);
 
-      Octopusini.WriteInteger('SystemConfiguration', 'VERSIONNUMBER',THEVERSIONNUMBER);
+      //Octopusini.WriteInteger('SystemConfiguration', 'VERSIONNUMBER',THEVERSIONNUMBER);
 
     finally
       Octopusini.Free;
@@ -3355,7 +3342,7 @@ begin
     Memo1.Font.Size := Octopusini.ReadInteger('MyPreference', 'FONTSIZE', 14);
     Memo1.Font.Color := Octopusini.ReadInteger('MyPreference', 'FONTCOLOR',clSilver);
     Memo1.Color := Octopusini.ReadInteger('MyPreference', 'BACKGROUNDCOLOR',clWindowText);
-    VersionNumber := Octopusini.ReadInteger('SystemConfiguration','VERSIONNUMBER', 0);
+    //VersionNumber := Octopusini.ReadInteger('SystemConfiguration','VERSIONNUMBER', 0);
 
     CheckBox4.Checked := Octopusini.ReadBool('MyPreference', 'SHOWLINENUMBER', False);
     CheckBox1.Checked := Octopusini.ReadBool('MyPreference', 'DESKTOPSHOTCUT', True);
@@ -3552,8 +3539,8 @@ begin
       LoadDefaultLaunguage(SplitViewForm, 'CN');
     LoadLaunguageFromFile(SplitViewForm, OctopusCfgDir + CONFIGURATION_DIR +
       'Lang_CN.ini');
-    Application.Title := APPLICATION_TITLE;
-    SplitViewForm.Caption := APPLICATION_TITLE;
+    Application.Title := APPLICATION_TITLE + VersionNumberStr;
+    SplitViewForm.Caption := Application.Title;
     Notebook1.Pages[0] := 'Octopus 串口设置 F1';
     Notebook1.Pages[1] := '高级';
 
@@ -3592,7 +3579,7 @@ begin
   if Lang = 'EN' then
   begin
     Log0('#############################################################');
-    Log0('Octopus Serial Port Tool');
+    Log0('Octopus Serial Port Tool '+VersionNumberStr);
     // Log0(VERSIONNAME); // 'Version  :2.00'
     Log0('Home Page :' + WEB_SITE + ' ');
     Log0('Function  :' + 'ESC、F1、F2、F3');
@@ -3606,12 +3593,13 @@ begin
   else
   begin
     Log0('#############################################################');
-    Log0('' + APPLICATION_TITLE);
+    Log0('' + APPLICATION_TITLE +VersionNumberStr);
     // Log0('' + VERSIONNAME); // 'Version  :2.00'
     Log0('Home Page :' + WEB_SITE + ' ');
     Log0('Function  :' + 'ESC、F1、F2、F3');
     Log0('#############################################################');
     LastCMDLineStr := GetCurrentDir() + '>';
+    Log0('' + LastCMDLineStr);
     Log0('' + LastCMDLineStr);
   end;
   SplitViewForm.Memo1.Text := Trim(SplitViewForm.Memo1.Text);
@@ -3625,7 +3613,7 @@ begin
   begin
     OcComPortObj.Log
       ('#############################################################');
-    OcComPortObj.Log('Octopus Serial Port Tool');
+    OcComPortObj.Log('Octopus Serial Port Tool '+VersionNumberStr);
     // OcComPortObj.Log(VERSIONNAME); // 'Version  :2.00'
     OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
     OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
@@ -3637,14 +3625,12 @@ begin
   end
   else
   begin
-    OcComPortObj.Log
-      ('#############################################################');
-    OcComPortObj.Log(APPLICATION_TITLE);
+    OcComPortObj.Log('#############################################################');
+    OcComPortObj.Log(APPLICATION_TITLE +VersionNumberStr);
     // OcComPortObj.Log(VERSIONNAME); // 'Version  :2.00'
     OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
     OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
-    OcComPortObj.Log
-      ('#############################################################');
+    OcComPortObj.Log('#############################################################');
   end;
 end;
 
