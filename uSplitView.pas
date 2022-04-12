@@ -1116,12 +1116,19 @@ begin
   begin
     if TabSet2.TabIndex = 0 then
       Memo1.Clear;
+      StatusBar1.Panels.Items[2].Text := '';
     exit;
   end;
   if not OcComPortObj.Connected then
   begin
     if TabSet2.TabIndex = 0 then
       Memo1.Clear;
+      StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: 0' +
+     ' Bytes | ' + 'Received: 0' +
+     ' Bytes | ' + 'Processed: 0' +
+     ' Bytes | ' + 'Total: 0' +
+     ' Bytes | ' + 'Lines: 0' +
+     ' | Packs: 0';
     exit;
   end;
   OcComPortObj.ClearLog;
@@ -3807,7 +3814,7 @@ begin
     exit;
   end;
   OcComPortObj.Log('Device ' + OcComPortObj.OcComPortObjPara.ComportFullName +
-    ' is opened.');
+    ' was opened.');
 
   // OcComPortObj.Log(' ');
   OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port +
