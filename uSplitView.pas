@@ -3373,10 +3373,9 @@ var
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
-  if OcComPortObj = nil then
-    exit;
-
-  OcComPortObj.LogScrollMode := True;
+  if OcComPortObj <> nil then
+     OcComPortObj.LogScrollMode := True;
+  self.Show;
 end;
 
 procedure TSplitViewForm.FindDialog1Find(Sender: TObject);
@@ -3390,7 +3389,6 @@ begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   with Sender as TFindDialog do
   begin
-
     FindStr := FindText;
     if (OcComPortObj = nil) or (OcComPortObj.LogMemo = nil) or
       (OcComPortObj.LogMemo.Parent = nil) then

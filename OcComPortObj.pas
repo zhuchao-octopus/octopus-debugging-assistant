@@ -29,7 +29,7 @@ const
   COM_PROTOCOL_KEEP_MAX_BUFFER_SIZE = 524288; // 1048576;
 
 const
-  OCTOPUS_BACKGROUD_STRING_TRIGGERLINE = 50;
+  OCTOPUS_BACKGROUD_STRING_TRIGGERLINE = 80;
 
 const
   RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string =
@@ -139,9 +139,11 @@ type
     procedure ClearInternalBuff(id: Integer = 100);
     procedure PrintReceivedProtocolData(Index: Integer);
     procedure PrintSendProtocolPack(OcComPack: TOcComPack);
+    function IsLogBottom(): Boolean;
+    procedure LogBottomMod(const Msg: string; appendMod: Boolean;
+      bottomMod: Boolean);
 
     procedure RequestProtocolConnection(); // 发送连接请求
-    // procedure RequestProtocolACK();// 获得ACK
     procedure SendProtocolACK(); // 发送ACK
     function SendProtocolData(Buffer: Array Of Byte; Count: Integer;
       TypeID: Word; NeedACK: Boolean): Boolean;
@@ -159,7 +161,7 @@ type
     property ComSentCount: Int64 read FComSentCount;
     property ComHandleThread_AsynCount: Integer
       read FBackGroundProcessRecordCount write FBackGroundProcessRecordCount
-      default 50;
+      default OCTOPUS_BACKGROUD_STRING_TRIGGERLINE;
     property HexModeFormatCount: Integer read FHexModeFormatCount
       write FHexModeFormatCount default 16;
     property FileStream: TFileStream read FFileStream write FFileStream
@@ -495,32 +497,28 @@ begin
           [FOcComPortObj.LogMemo.Lines.Count - 1]) = '' then
         begin
           // FOcComPortObj.LogMemo.Lines.Delete(FOcComPortObj.LogMemo.Lines.Count-1);
-          s := FOcComPortObj.GetLineNumberDateTimeStamp
-            (FOcComPortObj.LogMemo.Lines.Count - 1) +
-            Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
-          FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count
-            - 1] := s;
+          s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count - 1) +Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+
+          FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] := s;
         end
         else if (Length(s) > 0) and (s[1] = #10) then // #13#10,分开发送导致无法正确的换行
           FOcComPortObj.LogMemo.Lines.Add(s)
         else
-          FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count
-            - 1] := FOcComPortObj.LogMemo.Lines.Strings
-            [FOcComPortObj.LogMemo.Lines.Count - 1] +
-            Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+          FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] := FOcComPortObj.LogMemo.Lines.Strings
+            [FOcComPortObj.LogMemo.Lines.Count - 1] + Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
       end
       else
       begin
-        s := FOcComPortObj.GetLineNumberDateTimeStamp
-          (FOcComPortObj.LogMemo.Lines.Count) +
-          Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count) + Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
         FOcComPortObj.LogMemo.Lines.Add(s);
       end;
-      FOcComPortObj.FComProcessedCount := FOcComPortObj.FComProcessedCount +
-        Length(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+
+      FOcComPortObj.FComProcessedCount := FOcComPortObj.FComProcessedCount + Length(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+
       if Assigned(FOcComPortObj.FCallBackFun) then
         FOcComPortObj.FCallBackFun();
       INC(FUIStartIndex);
+
       if FUIStartIndex >= FOcComPortObj.StringInternalMemo.Lines.Count then
       begin
         if FOcComPortObj.FComHandleThread_Wait then
@@ -531,8 +529,7 @@ begin
         FOcComPortObj.ClearInternalBuff();
         LeaveCriticalSection(Critical);
 
-        FOcComPortObj.FLastLineStr := FOcComPortObj.LogMemo.Lines.Strings
-          [FOcComPortObj.LogMemo.Lines.Count - 1];
+        FOcComPortObj.FLastLineStr := FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1];
         self.Suspended := True; // 忙完了挂起
         Continue;
       end;
@@ -542,7 +539,8 @@ begin
     begin
       if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
       begin // 有数据处理数据
-        s := s + Format('%.02x ',[FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]]);
+        s := s + Format('%.02x ',
+          [FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]]);
         INC(FOcComPortObj.FComProcessedCount);
         if FOcComPortObj.FHexModeFormatCount > 0 then
         begin
@@ -551,8 +549,9 @@ begin
           begin
             j := FUIStartIndex + 1;
             if FOcComPortObj.FHexModeWithString then
-              s := Trim(s) + '            ' +
-              ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1],
+              s := Trim(s) + '            ' + ByteToWideString2
+                (@FOcComPortObj.FComReceiveInternalBuffer
+                [FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1],
                 FOcComPortObj.FHexModeFormatCount);
             FOcComPortObj.Log(s);
             s := ''; // 这时J 的值无意义
@@ -569,11 +568,15 @@ begin
           begin
             if FOcComPortObj.FHexModeFormatCount > 0 then
             begin
-              s := Format('%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3) + 's', [s]);
-              s := s + '           ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j],FOcComPortObj.FHexModeFormatCount);
+              s := Format('%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3)
+                + 's', [s]);
+              s := s + '           ' + ByteToWideString2
+                (@FOcComPortObj.FComReceiveInternalBuffer[j],
+                FOcComPortObj.FHexModeFormatCount);
             end
             else
-              s := Trim(s) + '            ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j],
+              s := Trim(s) + '            ' + ByteToWideString2
+                (@FOcComPortObj.FComReceiveInternalBuffer[j],
                 Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
           end;
           FOcComPortObj.Log(s);
@@ -662,7 +665,7 @@ begin
   FFileStream := nil;
 
   FProtocalData := 1;
-  FCompatibleUnicode := true;
+  FCompatibleUnicode := True;
   FExcelAppRows := 0;
   FShowLineNumber := false;
   FCommadLineStr := '';
@@ -782,7 +785,7 @@ begin
 
   LogMemo.OnKeyDown := self.KeyDown;
   LogMemo.OnKeyPress := self.KeyPress;
-  self.FNeedNewLine := True;
+  FNeedNewLine := True;
 end;
 
 {
@@ -867,12 +870,13 @@ procedure TOcComPortObj.Log(const Msg: string);
 var
   i, PreLogLinesCount: Int64;
   str: String;
+  isBottom:boolean;
 begin
   if (LogMemo = nil) or (LogMemo.Parent = nil) then
   begin
     Exit;
   end;
-
+  isBottom := IsLogBottom();
   PreLogLinesCount := LogMemo.Lines.Count;
   LogMemo.Lines.BeginUpdate;
   LogMemo.Lines.Append(Msg);
@@ -886,7 +890,7 @@ begin
   end;
   LogMemo.Lines.EndUpdate;
 
-  if FLogScrollMode then
+  if FLogScrollMode and isBottom then
     LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
   if Assigned(FCallBackFun) then
     FCallBackFun();
@@ -911,6 +915,63 @@ begin
   begin
     Log('Device was closed,please open a device.');
     Exit;
+  end;
+end;
+
+procedure TOcComPortObj.LogBottomMod(const Msg: string; appendMod: Boolean;
+  bottomMod: Boolean);
+var
+  i, PreLogLinesCount: Int64;
+  str: String;
+begin
+  if (LogMemo = nil) or (LogMemo.Parent = nil) then
+  begin
+    Exit;
+  end;
+  if appendMod then
+  begin
+    if (not bottomMod) then
+    begin
+      LogMemo.Lines.BeginUpdate;
+      LogMemo.Lines.Add(Msg);
+      LogMemo.Lines.EndUpdate;
+    end
+    else
+    begin //bottomMod 底部跟踪模式
+      LogMemo.Lines.Add(Msg);
+    end;
+  end
+  else
+  begin
+    if (not bottomMod) then
+    begin
+      LogMemo.Lines.BeginUpdate;
+      LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings
+        [LogMemo.Lines.Count - 1] + Msg;
+      LogMemo.Lines.EndUpdate;
+    end
+    else
+    begin //bottomMod 底部跟踪模式
+      LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings
+        [LogMemo.Lines.Count - 1] + Msg;
+    end;
+  end;
+end;
+
+function TOcComPortObj.IsLogBottom(): Boolean;
+var
+  SF: TScrollInfo;
+  currentPos: Integer;
+begin
+  SF.fMask := SIF_ALL;
+  SF.cbSize := SizeOf(SF);
+  GetScrollInfo(LogMemo.Handle, SB_VERT, SF);
+  currentPos := SF.nPos + SF.nPage;
+  Result := false;
+  if currentPos >= SF.nMax - 20 then
+  begin
+    // '滚动条到达底部'
+    Result := True;
   end;
 end;
 
@@ -1174,12 +1235,14 @@ var
   s, ln: String;
   Buff: array of Byte;
   f: Text;
+  isBottom: Boolean;
 begin
   FComReceiveString := '';
   s := '';
   ln := '';
   FComReceiveCount := FComReceiveCount + Count;
   FComReceiveString := '';
+  isBottom := IsLogBottom();
 
   if FReceiveFormat = Ord(ASCIIFormat) then // receive as string
   begin
@@ -1227,28 +1290,33 @@ begin
         PreLogLinesCount := LogMemo.Lines.Count;
 
         LogMemo.Lines.BeginUpdate;
+
         if (FComReceiveString[1] = #13) or (FComReceiveString[1] = #10) then
           // #13#10,分开发送导致无法正确的换行
-          LogMemo.Lines.Add(FComReceiveString)
-        else
-          LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] :=
-            LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + FComReceiveString;
-        // 自动分行
+          //LogMemo.Lines.Add(FComReceiveString)
+          LogBottomMod(FComReceiveString, True, isBottom)
+        else //自动分行
+           LogBottomMod(FComReceiveString, false, isBottom);
+          //LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + FComReceiveString;
+
+        ////////////////////////////////////////////////////////////////////////
+        //显示行号
         for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do
         begin
           LogMemo.Lines.Strings[i] := GetLineNumberDateTimeStamp(i) +
             LogMemo.Lines.Strings[i];
         end;
+
         LogMemo.Lines.EndUpdate;
+
         FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
         FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
-
         if Assigned(FCallBackFun) then
           FCallBackFun();
       end;
     end
     else
-    begin // 无需特殊处理
+    begin // 无需特殊处理，不额外显示日期日期信息
       if FNeedNewLine then
       begin
         if (FComReceiveString[Length(FComReceiveString)] = #13) or
@@ -1258,7 +1326,11 @@ begin
           FNeedNewLine := false;
 
         FComReceiveString := TrimRight(FComReceiveString);
-        LogMemo.Lines.Add(FComReceiveString);
+
+        // LogMemo.Lines.BeginUpdate;
+        // LogMemo.Lines.Add(FComReceiveString);
+        // LogMemo.Lines.EndUpdate;
+        LogBottomMod(FComReceiveString, True, isBottom);
       end
       else
       begin
@@ -1269,8 +1341,11 @@ begin
           FNeedNewLine := false;
 
         FComReceiveString := TrimRight(FComReceiveString);
-        LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings
-          [LogMemo.Lines.Count - 1] + FComReceiveString;
+        LogBottomMod(FComReceiveString, false, isBottom);
+        // LogMemo.Lines.BeginUpdate;
+        // LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings
+        // [LogMemo.Lines.Count - 1] + FComReceiveString;
+        // LogMemo.Lines.EndUpdate;
       end;
 
       FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
@@ -1395,7 +1470,7 @@ begin
 
   if FReceiveFormat = Ord(ASCIIFormat) then
   begin
-    if (FLogScrollMode) and (Length(FComReceiveString) > 0) then
+    if (FLogScrollMode) and (Length(FComReceiveString) > 0) and isBottom then
     begin
       LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
       LogMemo.Perform(WM_HSCROLL, SB_LEFT, 0);
@@ -1578,6 +1653,7 @@ begin
     i := self.FOcComProtocal.PackList_RB_Top
   else
     i := Index;
+
   // for i := Low(self.FOcComProtocal.FPackList) to High(self.FOcComProtocal.FPackList) do
   begin
     str := str + Format('%.04x ', [self.FOcComProtocal.GetPackByIndex(i).Head]);
@@ -1627,7 +1703,7 @@ end;
 procedure TOcComPortObj.KeyPress(Sender: TObject; var Key: Char);
 var
   CurrentLine: Integer;
-  //thid: Dword;
+  // thid: Dword;
   i, j, Len: Integer;
   cmd: String;
   LastStr: String;
@@ -1741,13 +1817,12 @@ var
   thid: Dword;
   i, j: Integer;
   LastStr: String;
-  MaskedKeyState : TShiftState;
+  MaskedKeyState: TShiftState;
 begin
-  MaskedKeyState:= Shift * [ssShift, ssAlt,ssCtrl,ssLeft, ssRight, ssMiddle, ssDouble, ssTouch, ssPen, ssCommand];
+  MaskedKeyState := Shift * [ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle,
+    ssDouble, ssTouch, ssPen, ssCommand];
   if (Key <> VK_RETURN) and (Key <> VK_PRIOR) and (Key <> VK_NEXT) and
-     (Key <> VK_HOME) and
-     (Key <> VK_END) and
-     (MaskedKeyState = [] ) then
+    (Key <> VK_HOME) and (Key <> VK_END) and (MaskedKeyState = []) then
   begin
     FLogMemo.SelStart := Length(LogMemo.Text);
     FLogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
