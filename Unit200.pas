@@ -17,9 +17,9 @@ Const
 //{$ENDIF}
 //  THEVERSIONNUMBER = 428;
 {$IFDEF CPU64BITS}
-  APPLICATION_TITLE = '八爪鱼串口调试助手 64bit '; // for 64 bit;
+  APPLICATION_TITLE = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
 {$ELSE}
-  APPLICATION_TITLE = '八爪鱼串口调试助手 32bit '; // for 32 bit;
+  APPLICATION_TITLE = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
 {$ENDIF}
   //ISUPDATEUI = true;
   E_MAIL = 'Octopus@1234998.cn';

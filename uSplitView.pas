@@ -178,6 +178,13 @@ type
     CheckBox5: TCheckBox;
     CheckBox6: TCheckBox;
     CheckBox1: TCheckBox;
+    N1: TMenuItem;
+    N2: TMenuItem;
+    N3: TMenuItem;
+    N4: TMenuItem;
+    N5: TMenuItem;
+    N6: TMenuItem;
+    N7: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -284,6 +291,11 @@ type
     procedure FindDialog1Show(Sender: TObject);
     procedure FindDialog1Close(Sender: TObject);
     procedure StringGrid1KeyPress(Sender: TObject; var Key: Char);
+    procedure N1Click(Sender: TObject);
+    procedure N3Click(Sender: TObject);
+    procedure N5Click(Sender: TObject);
+    procedure N6Click(Sender: TObject);
+    procedure N7Click(Sender: TObject);
   private
     // ComReceiveCount: Integer;
     // ComReceiveBuffer: array [0 .. 1048576] of Byte;
@@ -1110,7 +1122,6 @@ procedure TSplitViewForm.Button10Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
-  // Memo1.Clear;
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj = nil then
   begin
@@ -1644,13 +1655,13 @@ var
 begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj = nil then
-    exit; // OctopusCfgDir_LogFileName + '_' +
-  SaveDialog1.FileName := GetSystemDateTimeStampStr + '_' +
-    OcComPortObj.Port + '.log';
+    exit;
+  SaveDialog1.FileName := GetSystemDateTimeStampStr + '_' + OcComPortObj.Port + '.log';
+
   if (SaveDialog1.Execute) and (SaveDialog1.FileName <> '') then
   begin
     if TabSet2.TabIndex = 0 then
-      Memo1.Lines.SaveToFile(SaveDialog1.FileName)
+       Memo1.Lines.SaveToFile(SaveDialog1.FileName)
     else if (OcComPortObj.LogMemo <> nil) then
       OcComPortObj.LogMemo.Lines.SaveToFile(SaveDialog1.FileName)
     else
@@ -2355,9 +2366,9 @@ begin
     begin
       ComboBoxEx1.ItemIndex := i;
       MultiComportProcess(self.GetCurrentDeviceName);
-      // change devices configuration
-      TabSet3.TabIndex := 0;
-      Notebook3.PageIndex := 0;
+      //change devices configuration
+      //TabSet3.TabIndex := 0;
+      //Notebook3.PageIndex := 0;
       exit;
     end;
     if SplitViewForm.Notebook2.PageIndex = SplitViewForm.Notebook2.Pages.Count - 1
@@ -2366,16 +2377,15 @@ begin
     begin
       self.GetOctopusHelpFile();
     end
-    else if SplitViewForm.Notebook2.PageIndex = SplitViewForm.Notebook2.Pages.
-      Count - 2 then // 图形
+    else if SplitViewForm.Notebook2.PageIndex = SplitViewForm.Notebook2.Pages.Count - 2 then // 图形
     begin
       SplitViewForm.TabSet3.TabIndex := SplitViewForm.TabSet3.Tabs.Count - 1;
       Notebook3.PageIndex := Notebook3.Pages.Count - 1;
     end
     else
     begin
-      TabSet3.TabIndex := 0;
-      Notebook3.PageIndex := 0;
+      //TabSet3.TabIndex := 0;
+      //Notebook3.PageIndex := 0;
     end;
   end;
 
@@ -2574,9 +2584,12 @@ begin
   TabSet1.Tabs := Notebook1.Pages;
   TabSet2.Tabs := Notebook2.Pages;
   TabSet3.Tabs := Notebook3.Pages;
+
+  TabSet3.TabIndex:=1;
+
   TabSetChange(TabSet1, 0);
   TabSetChange(TabSet2, 0);
-  TabSetChange(TabSet3, 0);
+  TabSetChange(TabSet3, 1);
 
   StatusBar1.Panels.Items[0].Width := StatusBar1.Canvas.TextWidth
     ('操作说明： ESC、F1、F2 123456');
@@ -2584,7 +2597,7 @@ begin
     (DEFAULT_WEBSITE_ADDRESS + ' 123456');
   StatusBar1.Panels.Items[1].Text := DEFAULT_WEBSITE_ADDRESS;
 {$IFDEF CPU64BITS}
-  TabSet2.SelectedColor := clHighlight; // for 64 bit;
+  TabSet2.SelectedColor := clYellow;// clHighlight; // for 64 bit;
 {$ELSE}
   TabSet2.SelectedColor := clRed; // for 32 bit;
 {$ENDIF}
@@ -2753,6 +2766,61 @@ begin
         end;
       end;
   end; // case   msg.message   of
+end;
+
+procedure TSplitViewForm.N1Click(Sender: TObject);
+begin
+Button10.OnClick(Sender);
+end;
+
+procedure TSplitViewForm.N3Click(Sender: TObject);
+begin
+Button26.OnClick(Sender);
+end;
+
+procedure TSplitViewForm.N5Click(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
+begin
+  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
+  if OcComPortObj <> nil then
+  begin
+    if(OcComPortObj.LogMemo <> nil)then
+    begin
+      OcComPortObj.LogMemo.CopyToClipboard;
+    end;
+  end;
+end;
+
+procedure TSplitViewForm.N6Click(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
+begin
+  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
+  if OcComPortObj <> nil then
+  begin
+    if(OcComPortObj.LogMemo <> nil)then
+    begin
+      n6.Enabled := not OcComPortObj.LogMemo.ReadOnly;
+      if(n6.Enabled) then
+         OcComPortObj.LogMemo.PasteFromClipboard;
+    end;
+  end;
+end;
+
+procedure TSplitViewForm.N7Click(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
+begin
+  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
+  if (OcComPortObj <> nil) and (OcComPortObj.LogMemo <> nil) then
+  begin
+      OcComPortObj.LogMemo.SelectAll;
+  end
+  else if(Memo1.Tag = 0) and (TabSet2.TabIndex = 0) then
+  begin
+      Memo1.SelectAll;
+  end;
 end;
 
 procedure TSplitViewForm.UpDown2Changing(Sender: TObject;
@@ -2944,7 +3012,7 @@ begin
     else
     begin
       MessageBox(Application.Handle,
-        PChar('No device to operate! you should to press F1 to open a device.'),
+        PChar('No device!! You need to turn on a device,please use F1 to see how to do that'),
         PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     end;
 
@@ -3520,8 +3588,8 @@ begin
 
     Notebook2.Pages[Notebook2.Pages.Count - 1] := ' Help ';
     Notebook2.Pages[Notebook2.Pages.Count - 2] := ' Graphic ';
-    Notebook3.Pages[0] := 'Custom Data F2 ';
-    Notebook3.Pages[1] := 'Normal Send';
+    Notebook3.Pages[0] := 'Send Data ';
+    Notebook3.Pages[1] := 'Custom Send';
     Notebook3.Pages[2] := ' Protocol ';
     Notebook3.Pages[3] := ' Graphic ';
 
@@ -3556,15 +3624,15 @@ begin
     Notebook2.Pages[Notebook2.Pages.Count - 2] := ' 图形 ';
 
     Notebook3.Pages[0] := '数据发送';
-    Notebook3.Pages[1] := '数据发送 ';
+    Notebook3.Pages[1] := '批量发送 ';
     Notebook3.Pages[2] := '协议转换 ';
     Notebook3.Pages[3] := '图形 ';
 
     for i := 0 to 2 do
     begin
       StringGrid1.Cells[0, 0] := '发送';
-      StringGrid1.Cells[1, 0] := '选';
-      StringGrid1.Cells[2, 0] := '待发送的单条数据记录';
+      StringGrid1.Cells[1, 0] := ' ';
+      StringGrid1.Cells[2, 0] := '数据内容';
       StringGrid1.Cells[3, 0] := '次数';
       StringGrid1.Cells[4, 0] := '间隔';
       StringGrid1.Cells[5, 0] := '备注';
@@ -3759,10 +3827,9 @@ begin
         CheckBox3.Checked, CheckBox25.Checked, CheckBox4.Checked,
         CheckBox5.Checked, CheckBox9.Checked);
 
-      self.Notebook2.Pages.Insert(Notebook2.Pages.Count - DEFAULT_FIXED_COLS,
+      Notebook2.Pages.Insert(Notebook2.Pages.Count - DEFAULT_FIXED_COLS,
         OcComPortObj.OcComPortObjPara.ComportFullName);
-      i := Notebook2.Pages.IndexOf
-        (OcComPortObj.OcComPortObjPara.ComportFullName);
+      i := Notebook2.Pages.IndexOf(OcComPortObj.OcComPortObjPara.ComportFullName);
       Page := TPage(self.Notebook2.Pages.Objects[i]);
       Memo := OcComPortObj.LogMemo;
       Memo.Parent := Page;
@@ -3792,8 +3859,9 @@ begin
   end;
 
   OcComPortObj.StringInternalMemo.Parent := self; // 设置大量极限数据的缓冲MEMO
-
   OcComPortObj.CallBackFun := OcComPortObjCallBack;
+  OcComPortObj.LogMemo.PopupMenu:=Self.PopupMenu1;
+
   if (OcComPortObj.ReceiveFormat = Ord(Graphic)) and
     (OcComPortObj.FastLineSeries = nil) then
     OcComPortObj.FastLineSeries := self.CharInitSeries(True);
@@ -3801,27 +3869,22 @@ begin
   try
     OcComPortObj.Open;
   Except
-    OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.
-      ComportFullName);
+    OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
     exit;
   end;
   if not OcComPortObj.Connected then
   begin
-    OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.
-      ComportFullName);
+    OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
     exit;
   end;
-  OcComPortObj.Log('Device ' + OcComPortObj.OcComPortObjPara.ComportFullName +
-    ' was opened.');
+  OcComPortObj.Log('Device ' + OcComPortObj.OcComPortObjPara.ComportFullName +' was opened.');
 
   // OcComPortObj.Log(' ');
-  OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port +
-    '.log'); // 打开的时候创建日志文件
+  OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port +'.log'); // 打开的时候创建日志文件
   i := Notebook2.Pages.IndexOf(DeviceFullName);
   if (i >= 0) then
     TabSet2.TabIndex := i;
   OcComPortObj.LogMemo.ReadOnly := True;
-
 end;
 
 function TSplitViewForm.GetDeciceByFullName(DeviceName: string): TOcComPortObj;
