@@ -2507,8 +2507,13 @@ begin
   ComComboBox.Refresh;
   ComboBox1.Items := ComComboBox.Items;
   ComboBox1.Items.Add('1000000');
+  ComboBox1.Items.Add('1152000');
   ComboBox1.Items.Add('1500000');
   ComboBox1.Items.Add('2000000');
+  ComboBox1.Items.Add('2500000');
+  ComboBox1.Items.Add('3000000');
+  ComboBox1.Items.Add('3500000');
+  ComboBox1.Items.Add('4000000');
 
   ComComboBox.ComProperty := cpDataBits;
   ComComboBox.Refresh;

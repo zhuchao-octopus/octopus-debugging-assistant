@@ -49,7 +49,6 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -316,7 +315,7 @@ object SplitViewForm: TSplitViewForm
               Width = 224
               Height = 25
               Style = csDropDownList
-              DropDownCount = 16
+              DropDownCount = 20
               ParentColor = True
               TabOrder = 5
               OnChange = ComboBox1Change
