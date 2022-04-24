@@ -334,7 +334,7 @@ type
     procedure ProjectSave(SavePrivate: Boolean);
     procedure FalconLoadCfg();
     procedure UpdateUiLaunguage(Lang: String);
-    procedure MultiComportProcess(DeviceName: String);
+    procedure MultiCOMPort_UI_Update(DeviceName: String);
     function GetDeciceByFullName(DeviceName: string): TOcComPortObj;
     function GetDeciceByPort(Port: string): TOcComPortObj;
     procedure MultiComPortSaveLog();
@@ -1099,22 +1099,37 @@ procedure TSplitViewForm.StatusBarPrintFileSize();
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
-  if OcComPortObj = nil then
+  OcComPortObj := GetDeciceByFullName(GetCurrentDeviceName());
+  if (OcComPortObj = nil) then
   begin
     exit;
   end;
+  if (OcComPortObj.LogMemo <> nil) and (OcComPortObj.Connected) then
+  begin
   // StatusBar1.Panels.BeginUpdate;
+    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' +
+    inttostr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' +
+    inttostr(OcComPortObj.ComReceiveCount) + ' Bytes | ' + 'Processed: ' +
+    inttostr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' +
+    inttostr(Length(OcComPortObj.LogMemo.Text)) + ' Bytes | ' + 'Line: ' +
+    inttostr(OcComPortObj.LogMemo.CaretPos.Y) +   ' | ' + 'Lines: ' +
+    inttostr(OcComPortObj.LogMemo.Lines.Count) +  ' | Packs: ' +
+    inttostr(OcComPortObj.GetPacks);
+  // StatusBar1.Panels.EndUpdate;
+  end
+  else
+  begin
   StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' +
     inttostr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' +
     inttostr(OcComPortObj.ComReceiveCount) + ' Bytes | ' + 'Processed: ' +
     inttostr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' +
-    inttostr(Length(OcComPortObj.LogMemo.Text)) + ' Bytes | ' + 'Lines: ' +
-    inttostr(OcComPortObj.LogMemo.Lines.Count) + ' | Packs: ' +
+    inttostr(Length(Memo1.Text)) + ' Bytes | ' + 'Line: ' +
+    inttostr(Memo1.CaretPos.Y) +   ' | ' + 'Lines: ' +
+    inttostr(Memo1.Lines.Count) +  ' | Packs: ' +
     inttostr(OcComPortObj.GetPacks);
-  // StatusBar1.Panels.EndUpdate;
-  StatusBar1.Update;
+  end;
 
+  StatusBar1.Update;
   Application.ProcessMessages;
 end;
 
@@ -1138,7 +1153,8 @@ begin
      ' Bytes | ' + 'Received: 0' +
      ' Bytes | ' + 'Processed: 0' +
      ' Bytes | ' + 'Total: 0' +
-     ' Bytes | ' + 'Lines: 0' +
+     ' Bytes | ' + 'Line: 0' +
+     ' | ' + 'Lines: 0' +
      ' | Packs: 0';
     exit;
   end;
@@ -1398,7 +1414,7 @@ begin
 
   if not OcComPortObj.Connected then
   begin
-    OcComPortObj.Log('The device was closed,please open a device.');
+    //OcComPortObj.Log('The device was closed,please open a device.');
     exit;
   end;
 
@@ -1533,7 +1549,7 @@ begin
   end;
   if not OcComPortObj.Connected then
   begin
-    OcComPortObj.Log('Device was closed,please open a device.    ');
+    //OcComPortObj.Log('Device was closed,please open a device.    ');
     MessageBox(SplitViewForm.Handle,
       PChar('     Device was closed,please open a device.     '),
       PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
@@ -1724,7 +1740,7 @@ begin
       CloseDevice2(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   end;
 
-  MultiComportProcess(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  MultiCOMPort_UI_Update(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   // Self.Update;
 end;
 
@@ -1737,6 +1753,7 @@ end;
 procedure TSplitViewForm.Button4Click(Sender: TObject);
 begin
   UIUpdateDeviceHandleProcess();
+  ComboBoxEx1Change(self);
 end;
 
 procedure TSplitViewForm.Button5Click(Sender: TObject);
@@ -1970,7 +1987,7 @@ begin
     end;
   end;
 
-  if (ComboBox1.ItemIndex <= 15) then // High(TBaudRate))
+  if (ComboBox1.ItemIndex <= MAX_BAUDRATE_INDEX) then // High(TBaudRate))
   begin //内置波特率
     OcComPortObj.BaudRate := TBaudRate(ComboBox1.ItemIndex);
   end
@@ -2077,7 +2094,7 @@ begin
     TabSet2.TabIndex := i; // goto tab show
   end;
 
-  MultiComportProcess(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  MultiCOMPort_UI_Update(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
 end;
 
 procedure TSplitViewForm.Combobox_CodePageChange(Sender: TObject);
@@ -2293,7 +2310,6 @@ begin
     ComboBoxEx1.ItemsEx.EndUpdate;
     OcComPortList.EndUpdate;
     // ComboBoxEx1.Perform(CB_SHOWDROPDOWN, 1, 0);
-    ComboBoxEx1Change(self);
   finally
     DevideNameList.Free;
   end;
@@ -2365,7 +2381,7 @@ begin
     if i >= 0 then // goto device
     begin
       ComboBoxEx1.ItemIndex := i;
-      MultiComportProcess(self.GetCurrentDeviceName);
+      MultiCOMPort_UI_Update(self.GetCurrentDeviceName);
       //change devices configuration
       //TabSet3.TabIndex := 0;
       //Notebook3.PageIndex := 0;
@@ -2486,7 +2502,6 @@ begin
     Right := 2;
   end;
   StringGrid1.Selection := GridRect;
-  // StringGrid1.ColWidths[0]:= StringGrid1.Canvas.TextWidth('发送发');
 
   ComComboBox.ComProperty := cpBaudRate;
   ComComboBox.Refresh;
@@ -2494,10 +2509,6 @@ begin
   ComboBox1.Items.Add('1000000');
   ComboBox1.Items.Add('1500000');
   ComboBox1.Items.Add('2000000');
-  // if ComboBox1.Items.Count >= 13 then
-  // ComboBox1.ItemIndex := 13
-  // else
-  // ComboBox1.ItemIndex := 0; // Ord(OctopusComPort1.BaudRate);
 
   ComComboBox.ComProperty := cpDataBits;
   ComComboBox.Refresh;
@@ -2517,16 +2528,6 @@ begin
   ComComboBox.ComProperty := cpFlowControl;
   ComComboBox.Refresh;
   ComboBox5.Items := ComComboBox.Items;
-  // ComboBox5.ItemIndex := 2; // Ord(OctopusComPort1.FlowControl.FlowControl);
-  // 'ASCII Format
-  // '#23383#31526#20018' }'
-  // 'Hexadecimal Format{ '#21313#20845#36827#21046' }'
-  // 'Octopus Protocol    { '#21327#35758' }')}
-  // ComboBox6.Clear;
-  // ComboBox6.Items.Add('ASCII Format            字符串');
-  // ComboBox6.Items.Add('Hexadecimal Format 十六进制 ');
-  // ComboBox6.Items.Add('Octopus Protocol');
-  // ComboBox6.ItemIndex := 0;
 
   ComboBox7.Clear;
   for j := Low(RECEIVE_FORMAT_String) to High(RECEIVE_FORMAT_String) do
@@ -2609,7 +2610,7 @@ begin
     OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
     if (OcComPortObj <> nil) then
     begin
-      OcComPortObj.OcComPortObjInit2('', '', -1, -1, -1, -1, -1, -1, -1, nil,
+      OcComPortObj.OcComPortObjInit2('', '', 13, -1, -1, -1, -1, -1, -1, nil,
         CheckBox3.Checked, CheckBox25.Checked, CheckBox4.Checked,
         CheckBox5.Checked, CheckBox9.Checked);
 
@@ -2625,6 +2626,7 @@ begin
       end;
     end;
   end;
+   ComboBoxEx1Change(self); //刷新到默认串口设置界面
 end;
 
 function TSplitViewForm.FormHelp(Command: Word; Data: NativeInt;
@@ -3154,7 +3156,7 @@ begin
   if i >= 0 then
   begin
     ComboBoxEx1.ItemIndex := i;
-    MultiComportProcess(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+    MultiCOMPort_UI_Update(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   end;
 end;
 
@@ -3350,6 +3352,10 @@ begin
       Octopusini.WriteInteger('MyPreference', 'SV_R_WIDTH', SV_R.Width);
       Octopusini.WriteInteger('MyPreference', 'MainFormWidth',SplitViewForm.Width);
       Octopusini.WriteInteger('MyPreference', 'MainFormHeight',SplitViewForm.Height);
+      Octopusini.WriteString('MyPreference', 'FONTNAME', Memo1.Font.Name);
+      Octopusini.WriteInteger('MyPreference', 'FONTSIZE', Memo1.Font.Size);
+      Octopusini.WriteInteger('MyPreference', 'FONTCOLOR', Memo1.Font.Color);
+      Octopusini.WriteInteger('MyPreference', 'BACKGROUNDCOLOR', Memo1.Color);
 
       Octopusini.WriteBool('MyPreference', 'EnglishLanguage',CheckBox6.Checked);
       Octopusini.WriteBool('MyPreference', 'DESKTOPSHOTCUT', CheckBox1.Checked);
@@ -3367,15 +3373,8 @@ begin
       Octopusini.WriteBool('MyPreference', 'SV_LOPEN', SV_L.Opened);
       Octopusini.WriteBool('MyPreference', 'SV_ROPEN', SV_R.Opened);
 
-      // Octopusini.WriteInteger('MyPreference', 'LOOPCOUNT', UpDown3.Position);
-
-      Octopusini.WriteString('MyPreference', 'FONTNAME', Memo1.Font.Name);
-      Octopusini.WriteInteger('MyPreference', 'FONTSIZE', Memo1.Font.Size);
-      Octopusini.WriteInteger('MyPreference', 'FONTCOLOR', Memo1.Font.Color);
-      Octopusini.WriteInteger('MyPreference', 'BACKGROUNDCOLOR', Memo1.Color);
-
-      //Octopusini.WriteInteger('SystemConfiguration', 'VERSIONNUMBER',THEVERSIONNUMBER);
-
+      Octopusini.WriteInteger('MyPreference', 'CB8', Combobox8.ItemIndex);
+      Octopusini.WriteInteger('MyPreference', 'CB_CODE', Combobox_CodePage.ItemIndex);
     finally
       Octopusini.Free;
       // LeaveCriticalSection(Critical);
@@ -3417,9 +3416,8 @@ begin
     Memo1.Font.Size := Octopusini.ReadInteger('MyPreference', 'FONTSIZE', 14);
     Memo1.Font.Color := Octopusini.ReadInteger('MyPreference', 'FONTCOLOR',clSilver);
     Memo1.Color := Octopusini.ReadInteger('MyPreference', 'BACKGROUNDCOLOR',clWindowText);
-    //VersionNumber := Octopusini.ReadInteger('SystemConfiguration','VERSIONNUMBER', 0);
 
-    CheckBox4.Checked := Octopusini.ReadBool('MyPreference', 'SHOWLINENUMBER', False);
+    //CheckBox4.Checked := Octopusini.ReadBool('MyPreference', 'SHOWLINENUMBER', False);
     CheckBox1.Checked := Octopusini.ReadBool('MyPreference', 'DESKTOPSHOTCUT', True);
     CheckBox7.Checked := Octopusini.ReadBool('MyPreference', 'ALPHABLEND', False);
     CheckBox8.Checked := Octopusini.ReadBool('MyPreference', 'CK8', CheckBox8.Checked);
@@ -3431,6 +3429,8 @@ begin
     CheckBox6.Checked := Octopusini.ReadBool('MyPreference', 'CK6', CheckBox6.Checked);
     CheckBox12.Checked := Octopusini.ReadBool('MyPreference', 'CK12', True);
 
+    Combobox8.ItemIndex:= Octopusini.ReadInteger('MyPreference', 'CB8', 0);
+    Combobox_CodePage.ItemIndex:= Octopusini.ReadInteger('MyPreference', 'CB_CODE', 0);
   finally
     Octopusini.Free;
   end;
@@ -3560,7 +3560,7 @@ begin
   begin
     UpdateUiLaunguage('CN');
   end;
-  MultiComportProcess(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  MultiCOMPort_UI_Update(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
 end;
 
 procedure TSplitViewForm.UpdateUiLaunguage(Lang: String);
@@ -3651,12 +3651,12 @@ procedure ShowStartComments(Lang: String);
 begin
   if Lang = 'EN' then
   begin
-    Log0('#############################################################');
+    Log0('################################################');
     Log0('Octopus Serial Port Tool '+VersionNumberStr);
     // Log0(VERSIONNAME); // 'Version  :2.00'
     Log0('Home Page :' + WEB_SITE + ' ');
     Log0('Function  :' + 'ESC、F1、F2、F3');
-    Log0('#############################################################');
+    Log0('################################################');
     LastCMDLineStr := GetCurrentDir() + '>';
     Log0('' + LastCMDLineStr);
     // SplitViewForm.Memo2.Clear;
@@ -3665,12 +3665,12 @@ begin
   end
   else
   begin
-    Log0('#############################################################');
+    Log0('################################################');
     Log0('' + APPLICATION_TITLE +VersionNumberStr);
     // Log0('' + VERSIONNAME); // 'Version  :2.00'
     Log0('Home Page :' + WEB_SITE + ' ');
     Log0('Function  :' + 'ESC、F1、F2、F3');
-    Log0('#############################################################');
+    Log0('################################################');
     LastCMDLineStr := GetCurrentDir() + '>';
     Log0('' + LastCMDLineStr);
     Log0('' + LastCMDLineStr);
@@ -3684,26 +3684,24 @@ procedure ShowStartComments2(OcComPortObj: TOcComPortObj);
 begin
   if SplitViewForm.UILanguage = 'EN' then
   begin
-    OcComPortObj.Log
-      ('#############################################################');
+    OcComPortObj.Log('################################################');
     OcComPortObj.Log('Octopus Serial Port Tool '+VersionNumberStr);
     // OcComPortObj.Log(VERSIONNAME); // 'Version  :2.00'
     OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
     OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
-    OcComPortObj.Log
-      ('#############################################################');
+    OcComPortObj.Log('################################################');
     SplitViewForm.Memo2.Clear;
     // SplitViewForm.Memo2.Lines.Add('//You can send any string and file to device at here.');
     // SplitViewForm.Memo2.Lines.Add('//Note:Hex data format like this: 0xal,5e 3f');
   end
   else
   begin
-    OcComPortObj.Log('#############################################################');
+    OcComPortObj.Log('################################################');
     OcComPortObj.Log(APPLICATION_TITLE +VersionNumberStr);
     // OcComPortObj.Log(VERSIONNAME); // 'Version  :2.00'
     OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
     OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
-    OcComPortObj.Log('#############################################################');
+    OcComPortObj.Log('################################################');
   end;
 end;
 
@@ -3756,8 +3754,9 @@ begin
       end;
       if OcComPortObj.LogMemo = Memo1 then // 最后接触关联
       begin
-        OcComPortObj.Log('Device ' + OcComPortObj.Port + ' closed.');
-        OcComPortObj.LogMemo := nil;
+         OcComPortObj.Log(OcComPortObj.OcComPortObjPara.ComportFullName +' Closed');
+         OcComPortObj.Log(' ');
+         OcComPortObj.LogMemo := nil;
       end;
     end;
   except
@@ -3785,7 +3784,8 @@ var
 begin
   str := TabSet2.Tabs[TabSet2.TabIndex];
   CloseDevice2(str);
-  MultiComportProcess(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+   TabSetChange(TabSet2, 0);
+  MultiCOMPort_UI_Update(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
 end;
 
 procedure TSplitViewForm.OpenDevice2(DeviceFullName: String);
@@ -3877,9 +3877,9 @@ begin
     OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
     exit;
   end;
-  OcComPortObj.Log('Device ' + OcComPortObj.OcComPortObjPara.ComportFullName +' was opened.');
+  OcComPortObj.Log(OcComPortObj.OcComPortObjPara.ComportFullName +' ---------->');
+  OcComPortObj.Log('');
 
-  // OcComPortObj.Log(' ');
   OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port +'.log'); // 打开的时候创建日志文件
   i := Notebook2.Pages.IndexOf(DeviceFullName);
   if (i >= 0) then
@@ -3933,6 +3933,10 @@ begin
     exit;
   end;
 
+  //if(CheckBox4.Checked <> OcComPortObj.ShowLineNumber)then
+  //begin
+     //Button10.OnClick(nil);//显示行号开关改变后，清楚所有日志，重新记录
+  //end;
   OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex,
     ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex,
     ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil,
@@ -4037,7 +4041,7 @@ begin
 
 end;
 
-procedure TSplitViewForm.MultiComportProcess(DeviceName: string); // 更行当前设备UI
+procedure TSplitViewForm.MultiCOMPort_UI_Update(DeviceName: string); // 更行当前设备UI
 var
   OcComPortObj: TOcComPortObj;
   i: Integer;
@@ -4108,7 +4112,6 @@ begin
     Button2.Caption := GetDefaultLauguageStrByName('OPRATION_OPEN', UILanguage)
       + '【' + OcComPortObj.Port + '】';
   end;
-
 end;
 
 procedure TSplitViewForm.ShowTrayIcon(TrayIcon1: TTrayIcon);

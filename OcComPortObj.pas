@@ -3,6 +3,9 @@ unit OcComPortObj;
 interface
 
 uses
+  Vcl.StdCtrls,
+  Vcl.forms,
+  Vcl.Controls,
   Winapi.Windows,
   Winapi.Messages,
   System.SysUtils,
@@ -10,8 +13,6 @@ uses
   System.Classes,
   System.ImageList,
   System.Actions,
-  Vcl.StdCtrls,
-  Vcl.forms,
   CPort,
   OcProtocol,
   VCLTee.Series,
@@ -36,6 +37,8 @@ const
     ('ASCII Format            字符串 ', 'Hexadecimal Format 十六进制 ',
     'Graphic                   图形 ', 'Octopus Protocol     协议图形 ',
     'File                          文件 ');
+
+  MAX_BAUDRATE_INDEX:integer = 15;
 
 type
   TCallBackFun = Procedure(Count: Integer = 0) of object;
@@ -121,6 +124,7 @@ type
     function SaveToTheExcelFile(Length: Integer; Rows: Integer): Integer;
     procedure KeyPress(Sender: TObject; var Key: Char);
     procedure KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure MouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
     procedure RunWindosShellCmd(str: string);
     function GetConfiguration(): TOcComPortObjPara;
   public
@@ -729,7 +733,7 @@ begin
     self.FComportFullName := a;
   if b <> '' then
     self.Port := b;
-  if (c > 15) or (c < 0) then
+  if (c > MAX_BAUDRATE_INDEX) or (c < 0) then
     self.BaudRate := TBaudRate(0)
   else
     self.BaudRate := TBaudRate(c);
@@ -785,6 +789,7 @@ begin
 
   LogMemo.OnKeyDown := self.KeyDown;
   LogMemo.OnKeyPress := self.KeyPress;
+  LogMemo.OnMouseDown:=Self.MouseDown;
   FNeedNewLine := True;
 end;
 
@@ -1881,7 +1886,7 @@ begin
     if (Key = $43) then // Control+VK_C
     begin
       cmdbuf[0] := $03;
-      if self.connected then
+      if (self.connected) and (Trim(LogMemo.SelText) = '') then
         self.FalconComSendBuffer(cmdbuf, 1)
     end
     else if (Key = 70) then // Control+VK_F
@@ -1898,6 +1903,16 @@ begin
     if not self.LogMemo.ReadOnly then
       FLogMemo.ReadOnly := True;
   end;
+end;
+
+procedure TOcComPortObj.MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+ if (Self.LogMemo <> nil) and (LogMemo.Parent <> nil) then
+ begin
+ if Assigned(FCallBackFun) then
+    FCallBackFun();
+ end;
 end;
 
 procedure TOcComPortObj.RunWindosShellCmd(str: string);
