@@ -49,6 +49,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -616,7 +617,7 @@ object SplitViewForm: TSplitViewForm
             Left = 6
             Top = 431
             Width = 308
-            Height = 147
+            Height = 193
             TabOrder = 3
             object CheckBox12: TCheckBox
               Left = 8
@@ -676,6 +677,29 @@ object SplitViewForm: TSplitViewForm
                 'Hexadecimal 32Bytes Align'
                 'None')
             end
+            object LabeledEdit1: TLabeledEdit
+              Left = 8
+              Top = 156
+              Width = 169
+              Height = 25
+              Color = clWhite
+              EditLabel.Width = 128
+              EditLabel.Height = 17
+              EditLabel.Caption = #25509#25910#24310#36831#65288#27627#31186#65289
+              EditLabel.Color = clBtnHighlight
+              EditLabel.ParentColor = False
+              NumbersOnly = True
+              TabOrder = 4
+            end
+            object Button14: TButton
+              Left = 200
+              Top = 147
+              Width = 101
+              Height = 34
+              Caption = #24212#29992
+              TabOrder = 5
+              OnClick = Button14Click
+            end
           end
         end
       end
@@ -720,7 +744,6 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -740,9 +763,9 @@ object SplitViewForm: TSplitViewForm
           TabOrder = 0
           object Panel5: TPanel
             Left = 0
-            Top = 200
+            Top = 232
             Width = 314
-            Height = 443
+            Height = 411
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
@@ -751,7 +774,7 @@ object SplitViewForm: TSplitViewForm
               Left = 0
               Top = 0
               Width = 314
-              Height = 372
+              Height = 340
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
@@ -761,7 +784,7 @@ object SplitViewForm: TSplitViewForm
                 Left = 3
                 Top = 3
                 Width = 308
-                Height = 366
+                Height = 334
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -778,7 +801,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Panel8: TPanel
               Left = 0
-              Top = 372
+              Top = 340
               Width = 314
               Height = 71
               Align = alBottom
@@ -822,7 +845,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 200
+            Height = 232
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 1
@@ -851,12 +874,21 @@ object SplitViewForm: TSplitViewForm
             end
             object Button11: TButton
               Left = 2
-              Top = 165
+              Top = 163
               Width = 311
               Height = 34
               Caption = #23558#19979#38754#30340#21313#20845#36827#21046#23383#33410#30721#36716#25442#25104#23383#31526#20018
               TabOrder = 2
               OnClick = Button11Click
+            end
+            object Button13: TButton
+              Left = 2
+              Top = 198
+              Width = 311
+              Height = 34
+              Caption = #20135#29983#31616#21333#32047#21152#21644#26657#39564#23383#33410#24182#20197'7E'#32467#26463
+              TabOrder = 3
+              OnClick = Button13Click
             end
           end
         end

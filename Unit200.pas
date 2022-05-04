@@ -10,18 +10,11 @@ uses
   Vcl.WinXCtrls, Vcl.Menus, IniFiles, Vcl.Themes, unit100;
 
 Const
-//{$IFDEF CPU64BITS}
-//  VERSIONNAME = 'Version :4.2.8 64bit'; // for 64 bit;
-//{$ELSE}
-//  VERSIONNAME = 'Version :4.2.8 32bit'; // for 32 bit;
-//{$ENDIF}
-//  THEVERSIONNUMBER = 428;
 {$IFDEF CPU64BITS}
   APPLICATION_TITLE = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
 {$ELSE}
   APPLICATION_TITLE = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
 {$ENDIF}
-  //ISUPDATEUI = true;
   E_MAIL = 'Octopus@1234998.cn';
   WEB_SITE = 'http://www.1234998.cn';
   RELEASE_MOD = '0';
@@ -41,9 +34,6 @@ Const
   DEFAULT_ADDRESSMAP_COLS = 32;
   DEFAULT_FIXED_COLS = 2;
   DEFAULT_MAX_CHART_POINTS = 30;
-
-  OCCOMPROTOCAL_HEAD = $D5C2; // $55AA;
-  OCCOMPROTOCAL_END = $D3E3; // $AA55;
 
   OCCOMPROTOCAL_START = 10; // 连接，要求对方回复 状态是否可以连接
   OCCOMPROTOCAL_ACK = 11; // 一般相应，要求对方相应当前状态
@@ -180,13 +170,12 @@ function ByteToWideString2(buff: pbyte; len: Integer): String; // 不要回车换行#1
 procedure WideStringToByte(str: String; var buff: array of byte);
 function GetDefaultLauguageStrByName(Name: String; Lang: String): String;
 procedure SetButtonCaptionLeftAlign(btn: TButton);
-function FormatHexStrToByte(hs: string; var buf: array of byte): string;
-function FormatHexStrToByte2(hs: string; var buf: array of byte): Integer;
+function FormatHexStrToByte(sStr: string; var buf: array of byte): string;
+function FormatHexStrToByte2(sStr: string; var buf: array of byte): Integer;
 function SpaceCompress(s: string): string;
 function GetBuildInfo(FileName: string): String;
 
 implementation
-
 
 function GetBuildInfo(FileName: string): String;
 var
@@ -211,7 +200,8 @@ begin
     V2 := dwFileVersionMS and $FFFF;
     V3 := dwFileVersionLS shr 16;
     V4 := dwFileVersionLS and $FFFF;
-    Result := IntToStr(V1) + '.' + IntToStr(V2) + '.' + IntToStr(V3) + '.' + IntToStr(V4);
+    Result := IntToStr(V1) + '.' + IntToStr(V2) + '.' + IntToStr(V3) + '.' +
+      IntToStr(V4);
   end;
   FreeMem(VerInfo, VerInfoSize);
 end;
@@ -230,71 +220,72 @@ begin
   end;
 end;
 
-function CharToByte(c1, c2: Char): byte;
+function CharToByte(a, b: Char): byte;
 begin
-  Result := CharToDigit(c1) * 16 + CharToDigit(c2);
+  Result := CharToDigit(a) * 16 + CharToDigit(b);
 end;
 
-function FormatHexStrToByte(hs: string; var buf: array of byte): string;
+function FormatHexStrToByte(sStr: string; var buf: array of byte): string;
 var
-  i, len, bLen: Word;
+  i, Count, bLen: Word;
+  a,b:char;
 begin
-  Result := '';
-  hs := StringReplace(hs, '0x', ' ', [rfReplaceAll]); // 替换0x
-  hs := StringReplace(hs, '0X', ' ', [rfReplaceAll]); // 替换0X
-  hs := StringReplace(hs, ',', ' ', [rfReplaceAll]); // 替换 ,号
-  hs := StringReplace(hs, '，', ' ', [rfReplaceAll]); // 替换 ,号
-  hs := StringReplace(hs, ' ', ' ', [rfReplaceAll]); // 替换 tab
-  // hs:=StringReplace(hs, '  ', ' ', [rfReplaceAll]);//删除'  '
+  sStr := sStr.UpperCase(Trim(sStr));
+  //去掉中间可能的格式字符
+  //sStr := StringReplace(sStr, '0x', ' ', [rfReplaceAll]); // 替换0x
+  sStr := StringReplace(sStr, '0X', ' ', [rfReplaceAll]); // 替换0X
+  sStr := StringReplace(sStr, ',', ' ', [rfReplaceAll]); // 替换 ,号
+  sStr := StringReplace(sStr, '，', ' ', [rfReplaceAll]); // 替换 ,号
+  sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
 
-  hs := SpaceCompress(hs); // 压缩空格，就是把多个空格替换成一个
+  //压缩中间空格,就是把多个空格替换成一个,并去掉两头的空格
+  Result := Trim(SpaceCompress(sStr));
 
-  len := (length(hs) + 2) div 3;
+  Count := (length(Result) + 2) div 3;
   bLen := length(buf);
   ZeroMemory(@buf, bLen);
 
-  for i := 1 to len do
+  for i := 1 to Count do
   begin
-    buf[i - 1] := CharToByte(hs[i * 3 - 2], hs[i * 3 - 1]);
+    a:= Result[i * 3 - 2];
+    b:= Result[i * 3 - 1];
+    buf[i - 1] := CharToByte(a,b);
   end;
-
-  for i := 1 to len do
+  Result :='';
+  for i := 1 to Count do
   begin
     Result := Result + Format('%.02x ', [buf[i - 1]]);
   end;
 end;
 
-function FormatHexStrToByte2(hs: string; var buf: array of byte): Integer;
+function FormatHexStrToByte2(sStr: string; var buf: array of byte): Integer;
 var
-  i, len, bLen: Word;
-  str: String;
+  i, Count, bLen: Word;
+  a,b:char;
+  strStr:String;
 begin
-  hs := StringReplace(hs, '0x', '', [rfReplaceAll]); // 删除0x
-  hs := StringReplace(hs, '0X', '', [rfReplaceAll]); // 删除0X
+  sStr := sStr.UpperCase(Trim(sStr));
+  //去掉中间可能的格式字符
+  //sStr := StringReplace(sStr, '0x', ' ', [rfReplaceAll]); // 替换0x
+  sStr := StringReplace(sStr, '0X', ' ', [rfReplaceAll]); // 替换0X
+  sStr := StringReplace(sStr, ',', ' ', [rfReplaceAll]); // 替换 ,号
+  sStr := StringReplace(sStr, '，', ' ', [rfReplaceAll]); // 替换 ,号
+  sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
 
-  hs := SpaceCompress(hs);
-  { Str:='';
-    for I := 1 to Length(hs)-2 do
-    begin
-    if (hs[i]=' ')and(hs[i+1]=' ') then
-    if hs[i+2]=' ' then
-    continue
-    else
-    Str:=Str+hs[i]+' '
-    else
-    Str:=Str+hs[i];
-    end;
-    hs:=trim(Str); }
-  len := (length(hs) + 2) div 3;
+  //压缩中间空格,就是把多个空格替换成一个,并去掉两头的空格
+  strStr := Trim(SpaceCompress(sStr));
+
+  Count := (length(strStr) + 2) div 3;
   bLen := length(buf);
   ZeroMemory(@buf, bLen);
 
-  for i := 1 to len do
+  for i := 1 to Count do
   begin
-    buf[i - 1] := CharToByte(hs[i * 3 - 2], hs[i * 3 - 1]);
+    a:= strStr[i * 3 - 2];
+    b:= strStr[i * 3 - 1];
+    buf[i - 1] := CharToByte(a,b);
   end;
-
-  Result := len;
+  Result := Count;
 end;
 
 function SpaceCompress(s: string): string;
@@ -393,18 +384,18 @@ begin
   AppendMenu(Menu, MF_SEPARATOR, 1023, 0);
   SystemMainMenu.Items.Caption := 'Theme';
   AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, SystemMainMenu.handle,
-    pchar(SystemMainMenu.Items.Caption));
+    PChar(SystemMainMenu.Items.Caption));
   // for i := Low(TStyleManager.StyleNames) to High(TStyleManager.StyleNames) do
   // AppendMenu(Menu,MF_POPUP,100+i,pchar(TStyleManager.StyleNames[i]));
   AppendMenu(GetSysteMmenu(handle, false), MF_SEPARATOR, 1024, nil);
   AppendMenu(GetSysteMmenu(handle, false), MF_UNCHECKED, 1025,
-    pchar('Keep At The Top Always '));
-  //AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1026, pchar(VERSIONNAME));
+    PChar('Keep At The Top Always '));
+  // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1026, pchar(VERSIONNAME));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1027, pchar('English'));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1028,  pchar('Chinese'));
   AppendMenu(GetSysteMmenu(handle, false), MF_SEPARATOR, 1027, nil);
   AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1028,
-    pchar('Help Support'));
+    PChar('Help Support'));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1029, pchar(WEB_SITE));
 end;
 
@@ -539,7 +530,7 @@ begin
   begin
     if DefaultLauguageStr[i].Name = Name then
     begin
-      Result := 'MESSAGE_' + INTTOSTR(i);
+      Result := 'MESSAGE_' + IntToStr(i);
       break;
     end;
   end;

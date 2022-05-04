@@ -32,11 +32,14 @@ const
 const
   OCTOPUS_BACKGROUD_STRING_TRIGGERLINE = 80;
 
+const SEND_FLAG = '--> ';
 const
   RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string =
-    ('ASCII Format            字符串 ', 'Hexadecimal Format 十六进制 ',
-    'Graphic                   图形 ', 'Octopus Protocol     协议图形 ',
-    'File                          文件 ');
+    ('ASCII Format            字符串 ',
+     'Hexadecimal Format 十六进制 ',
+     'Graphic                   图形 ',
+     'Octopus Protocol     协议 ',
+     'File                          文件 ');
 
   MAX_BAUDRATE_INDEX:integer = 15;
 
@@ -228,7 +231,7 @@ var
 
 implementation
 
-// uses unit100;
+ uses Unit200;
 
 function readFileToStream(FileName: String): TFileStream;
 var
@@ -263,11 +266,6 @@ var
   match: TMatch;
 begin
   str := Trim(str);
-  // match:=TRegEx.Match(str,pattern);
-  // if match.Success then
-  // ss:=match.Value;
-
-  // pStr := StrRScan(Pchar(str), '(');
   pStr := StrRScan(Pchar(str), 'C');
   if (Pos('COM', pStr) > 0) then
   begin
@@ -284,43 +282,6 @@ begin
     ss := '';
 
   Result := ss;
-end;
-
-function CharToDigit(c: Char): Byte; // 字符表示的数，而不是对应的ASCII 值
-begin
-  case c of
-    '0' .. '9':
-      Result := Ord(c) - 48;
-    'A' .. 'F':
-      Result := Ord(c) - Ord('A') + 10;
-    'a' .. 'f':
-      Result := Ord(c) - Ord('a') + 10;
-  else
-    Result := 0;
-  end;
-end;
-
-function CharToByte(c1, c2: Char): Byte;
-begin
-  Result := CharToDigit(c1) * 16 + CharToDigit(c2);
-end;
-
-function FormatHexStrToByte(hs: string; var buf: array of Byte): string;
-var
-  i, Len: Word;
-begin
-  Result := '';
-  Len := (Length(hs) + 2) div 3;
-  ZeroMemory(@buf, Len * 2);
-
-  for i := 1 to Len do
-  begin
-    buf[i - 1] := CharToByte(hs[i * 3 - 2], hs[i * 3 - 1]);
-  end;
-  for i := 1 to Len do
-  begin
-    Result := Result + Format('%.02x ', [buf[i - 1]]);
-  end;
 end;
 
 function GetSystemDateTimeStampStr2(types: Integer): string;
@@ -998,9 +959,9 @@ begin
       if FShowSendingLog then
       begin
         if FReceiveFormat = 1 then
-          Log('> ' + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
+          Log(SEND_FLAG + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
         else
-          Log('> ' + str); // new ling in memo for receive data 发送字符串,后面自带换行
+          Log(SEND_FLAG + str); // new ling in memo for receive data 发送字符串,后面自带换行
       end;
 
       try
@@ -1027,7 +988,7 @@ begin
       Len := (Length(str) + 2) div 3;
       if FShowSendingLog then
       begin
-        Log('> ' + s);
+        Log(SEND_FLAG + s);
         Log(''); // new line prepare to receive
       end;
 
@@ -1131,7 +1092,7 @@ begin
     if self.connected then
     begin
       if FShowSendingLog then
-        Log('> ' + str);
+        Log(SEND_FLAG + str);
 
       try
         self.writestr(str);
@@ -1156,7 +1117,7 @@ begin
       s := FormatHexStrToByte(Trim(str), buf);
       Len := (Length(str) + 2) div 3;
       if FShowSendingLog then
-        Log('> ' + s);
+        Log(SEND_FLAG + s);
 
       try
         self.Write(buf, Len);
@@ -1522,7 +1483,7 @@ begin
         p := @OcComPack;
         self.FalconComSendBuffer(p^, OcComPack.Length);
         if FShowSendingLog then
-          LogBuff('> ', p^, OcComPack.Length);
+          LogBuff(SEND_FLAG, p^, OcComPack.Length);
       end;
     OCCOMPROTOCAL_I2C_READ, OCCOMPROTOCAL_I2C_WRITE, OCCOMPROTOCAL_SPI_READ,
       OCCOMPROTOCAL_SPI_WRITE, OCCOMPROTOCAL_DATA1:
@@ -1634,7 +1595,7 @@ var
   j: Integer;
   str: String;
 begin
-  str := '> ';
+  str := SEND_FLAG;
   str := str + Format('%.04x ', [OcComPack.Head]);
   str := str + Format('%.04x ', [OcComPack.TypeID]);
   str := str + Format('%.04x ', [OcComPack.Index]);
