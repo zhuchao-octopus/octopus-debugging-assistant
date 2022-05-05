@@ -122,7 +122,7 @@ type
     FNeedNewLine: Boolean;
     FLogScrollMode: Boolean;
     procedure OcComPortObjRxChar(Sender: TObject; Count: Integer);
-    procedure OcComPortObjRxProtocol(OcComPack2: TOcComPack2);
+    procedure OcComPortObjRxProtocol(OcComPack2: TOcComPack);
     function GetLineNumberDateTimeStamp(N: Int64): String;
     function SaveToTheExcelFile(Length: Integer; Rows: Integer): Integer;
     procedure KeyPress(Sender: TObject; var Key: Char);
@@ -382,7 +382,7 @@ begin
   s := '';
   while (self.Terminated = false) do
   begin
-    if (self.FOcComProtocal.GetLastPackHead.TypeID = OCCOMPROTOCAL_DATA2) then
+    if (self.FOcComProtocal.GetLastPackHead.PID = OCCOMPROTOCAL_DATA2) then
     begin
       // 非标准超大数据包处理
       if (Length(FOcComPortObj.FComReceiveInternalBuffer) - FStartIndex <
@@ -394,11 +394,11 @@ begin
     end;
 
     try
-      if Length(FOcComPortObj.FComReceiveInternalBuffer) >= SizeOf(TOcComPack2)
+      if Length(FOcComPortObj.FComReceiveInternalBuffer) >= SizeOf(TOcComPackHead)
       then
       begin
-        j := self.FOcComProtocal.ParserPack
-          (@FOcComPortObj.FComReceiveInternalBuffer[FStartIndex],
+        j := self.FOcComProtocal.ParserPack(
+          @FOcComPortObj.FComReceiveInternalBuffer[FStartIndex],
           Length(FOcComPortObj.FComReceiveInternalBuffer) - FStartIndex);
         FStartIndex := FStartIndex + j;
       end
@@ -410,9 +410,10 @@ begin
     end;
 
     // if FStartIndex > Length(FOcComPortObj.FComReceiveInternalBuffer)-SizeOf(TOcComPack2) then //解析完毕
-    if self.FOcComProtocal.
-      IsParserComplete { and (Length(FOcComPortObj.FComReceiveInternalBuffer) > 0) }
-    then // 解析任务完毕，清缓存
+    //if FOcComProtocal.IsParserComplete { and (Length(FOcComPortObj.FComReceiveInternalBuffer) > 0) }
+
+    if FStartIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer)-1 then //解析完毕 then
+    // 解析任务完毕，清缓存
     begin
       // EnterCriticalSection(Critical);
       FOcComPortObj.ClearInternalBuff();
@@ -566,7 +567,7 @@ begin
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////Graphic
     else if self.FOcComPortObj.FReceiveFormat = Ord(Graphic) then
     begin
-      if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
+      {if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
       begin // 有数据处理数据
         self.FOcComPortObj.FastLineSeries.AddY
           (FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]);
@@ -587,7 +588,7 @@ begin
         LeaveCriticalSection(Critical);
         self.Suspended := True; // 忙完了挂起
         Continue;
-      end;
+      end;}
     end; // ord(Graphic)
 
   end; // while(not Self.Terminated) do
@@ -641,6 +642,8 @@ begin
   FCommandHistoryIndex := 0;
   FLogScrollMode := True;
   FSendFormat := 0;
+
+  Timeouts.ReadInterval :=10;
 end;
 
 // destroy component
@@ -753,27 +756,6 @@ begin
   LogMemo.OnMouseDown:=Self.MouseDown;
   FNeedNewLine := True;
 end;
-
-{
-  procedure TOcComPortObj.OcComPortObjInit(OcComPortObjPara: TOcComPortObjPara);
-  begin
-  self.OnRxChar := OcComPortObjRxChar;
-  self.FComportFullName := OcComPortObjPara.ComportFullName;
-  self.FReceiveFormat := OcComPortObjPara.ReceiveFormat;
-  self.FSendFormat := OcComPortObjPara.SendFormat;
-  self.LogMemo := OcComPortObjPara.LogMemo;
-  self.FShowDate := OcComPortObjPara.ShowDate;
-  self.FShowTime := OcComPortObjPara.ShowTime;
-  self.FShowLineNumber := OcComPortObjPara.ShowLineNumber;
-  self.FShowSendedLog := OcComPortObjPara.ShowSendedLog;
-  self.FHexModeWithString := OcComPortObjPara.HexModeWithString;
-  self.Port := OcComPortObjPara.Port;
-  self.BaudRate := TBaudRate(OcComPortObjPara.BaudRate);
-  self.DataBits := TDataBits(OcComPortObjPara.DataBits);
-  self.StopBits := TStopBits(OcComPortObjPara.StopBits);
-  self.Parity.Bits := TParityBits(OcComPortObjPara.ParityBits);
-  self.FlowControl.FlowControl := TFlowControl(OcComPortObjPara.FlowControl);
-  end; }
 
 procedure TOcComPortObj.ClearInternalBuff(id: Integer = 100);
 // ClearInternelLogBuff(); //不随便清楚内部缓存
@@ -1345,7 +1327,7 @@ begin
   /// ////hex format
   else if FReceiveFormat = Ord(Graphic) then // receive as Graphic
   begin
-    ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
+    {ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
     self.FComHandleThread_Wait := True;
     try
       self.Read(FComReceiveBuffer, Count);
@@ -1364,7 +1346,7 @@ begin
     if FComUIHandleThread.Suspended then
     begin
       FComUIHandleThread.Suspended := false; // 启动UI工作线程 绘制图形
-    end;
+    end;}
   end
   else if FReceiveFormat = Ord(OctopusProtocol) then
   // receive as OctopusProtocol pack
@@ -1463,7 +1445,7 @@ function TOcComPortObj.SendProtocolData(Buffer: Array Of Byte; Count: Integer;
 var
   p: pbyte;
   OcComPack: TOcComPack;
-  OcComPack2: TOcComPack2;
+  OcComPack2: TOcComPackHead;
   po: POcComPack;
   Len: Integer;
   // b:Array of Byte;
@@ -1473,13 +1455,13 @@ begin
   OcComPack := self.FOcComProtocal.CreatePack(TypeID);
   Result := True;
   PaLoad_Length := OCCOMPROTOCAL_PACK_PACKPAYLOAD_HIGHT + 1;
-  case OcComPack.TypeID of
+  case OcComPack.PID of
     OCCOMPROTOCAL_START, OCCOMPROTOCAL_OVER, OCCOMPROTOCAL_ACK:
       begin
-        psize := SizeOf(TOcComPack2); // 包头长度 + 有效符合+ CRC
+        psize := SizeOf(TOcComPackHead); // 包头长度 + 有效符合+ CRC
         OcComPack.Length := psize;
         OcComPack.Index := 0;
-        OcComPack.Total := 1;
+        //OcComPack.Total := 1;
         p := @OcComPack;
         self.FalconComSendBuffer(p^, OcComPack.Length);
         if FShowSendingLog then
@@ -1511,28 +1493,28 @@ begin
 
           if NeedACK then
           begin
-            po.TypeID := OCCOMPROTOCAL_ACK;
-            po.TypeID := (po.TypeID shl 8) + TypeID;
+            po.PID := OCCOMPROTOCAL_ACK;
+            po.PID := (po.PID shl 8) + TypeID;
           end
           else
-            po.TypeID := TypeID;
+            po.PID := TypeID;
 
           po.Index := i;
-          po.Total := packs;
+          //po.Total := packs;
           po.Length := SizeOf(TOcComPack);
 
           if i = packs - 1 then
           begin
             PaLoad_Length := Len - j;
-            po.Length := SizeOf(TOcComPack2) + PaLoad_Length + 2;
+            po.Length := SizeOf(TOcComPackHead) + PaLoad_Length + 2;
             // 包头长度 + 有效符合+ CRC
           end;
           CopyMemory(@po.data[0], @Buffer[j], PaLoad_Length);
 
-          if FNeedCRC16 then
-            po.CRC := self.FOcComProtocal.CalCRC16(po.data, PaLoad_Length)
-          else
-            po.CRC := OCCOMPROTOCAL_END;
+          //if FNeedCRC16 then
+          //  po.CRC := self.FOcComProtocal.CalCRC16(po.data, PaLoad_Length)
+          //else
+          //  po.CRC := OCCOMPROTOCAL_END;
 
           p := @OcComPack;
           self.FalconComSendBuffer(p^, po.Length); // 发送
@@ -1541,7 +1523,7 @@ begin
           // LogBuff('>',p^,po.Length);
           if NeedACK then
           begin
-            CopyMemory(@OcComPack2, @OcComPack, SizeOf(TOcComPack2));
+            CopyMemory(@OcComPack2, @OcComPack, SizeOf(TOcComPackHead));
             Result := self.FOcComProtocal.WaitingForACK(OcComPack2, 5000);
             if Result = false then
               Exit;
@@ -1552,9 +1534,9 @@ begin
   end; // case
 end;
 
-procedure TOcComPortObj.OcComPortObjRxProtocol(OcComPack2: TOcComPack2);
+procedure TOcComPortObj.OcComPortObjRxProtocol(OcComPack2: TOcComPack);
 begin
-  case OcComPack2.TypeID of
+  case OcComPack2.PID of
     OCCOMPROTOCAL_ACK: // 客户端简单应答，表示可以连接 //收到应答
       begin
 
@@ -1584,10 +1566,11 @@ begin
 
     end;
   end;
-  // FComProcessedCount:=FComProcessedCount+OcComPack2.Length;
-  if Assigned(FCallBackFun) then
-    FCallBackFun();
-  PrintReceivedProtocolData(-1); // 输出最新收到的包 ，非保准超大数据包没有保存，
+   FComProcessedCount:=FComProcessedCount+OcComPack2.Length + SizeOf(TOcComPackHead)+2;
+   PrintSendProtocolPack(OcComPack2);
+  //if Assigned(FCallBackFun) then
+  //  FCallBackFun();
+  //PrintReceivedProtocolData(-1); // 输出最新收到的包 ，非保准超大数据包没有保存，
 end;
 
 procedure TOcComPortObj.PrintSendProtocolPack(OcComPack: TOcComPack);
@@ -1595,18 +1578,18 @@ var
   j: Integer;
   str: String;
 begin
-  str := SEND_FLAG;
+  str := '';
   str := str + Format('%.04x ', [OcComPack.Head]);
-  str := str + Format('%.04x ', [OcComPack.TypeID]);
-  str := str + Format('%.04x ', [OcComPack.Index]);
-  str := str + Format('%.04x ', [OcComPack.Total]);
-  str := str + Format('%.04x, ', [OcComPack.Length]);
-  for j := 0 to OcComPack.Length - SizeOf(TOcComPack2) - 1 - 2 do
+  str := str + Format('%.04x ', [OcComPack.PID]);
+  str := str + Format('%.02x ', [OcComPack.Index]);
+  //str := str + Format('%.04x ', [OcComPack.Total]);
+  str := str + Format('%.04x ', [OcComPack.Length]);
+  for j := 0 to OcComPack.Length + 1 do
   begin
     str := str + Format('%.02x ', [OcComPack.data[j]]);
   end;
-  str := str + Format('%.04x ', [OcComPack.CRC]);
-  self.Log(str + #13#10);
+  //str := str + Format('%.04x ', [OcComPack.CRC]);
+  Log(str);
 end;
 
 procedure TOcComPortObj.PrintReceivedProtocolData(Index: Integer);
@@ -1624,28 +1607,28 @@ begin
   begin
     str := str + Format('%.04x ', [self.FOcComProtocal.GetPackByIndex(i).Head]);
     str := str + Format('%.04x ',
-      [self.FOcComProtocal.GetPackByIndex(i).TypeID]);
+      [self.FOcComProtocal.GetPackByIndex(i).PID]);
     str := str + Format('%.04x ',
       [self.FOcComProtocal.GetPackByIndex(i).Index]);
-    str := str + Format('%.04x ',
-      [self.FOcComProtocal.GetPackByIndex(i).Total]);
+    //str := str + Format('%.04x ',
+    //  [self.FOcComProtocal.GetPackByIndex(i).Total]);
     // str:=str+Format('%.02x ', [self.FOcComProtocal.FPackList[i].CRC]);
     str := str + Format('%.04x, ',
       [self.FOcComProtocal.GetPackByIndex(i).Length]);
     for j := 0 to self.FOcComProtocal.GetPackByIndex(i).Length -
-      SizeOf(TOcComPack2) - 1 do
+      SizeOf(TOcComPackHead) - 1 do
     begin
       str := str + Format('%.02x ',
         [self.FOcComProtocal.GetPackByIndex(i).data[j]]);
     end;
     self.Log(str);
 
-    v := FOcComProtocal.GetBytesValue(i);
+    {v := FOcComProtocal.GetBytesValue(i);
     if (v > 65525) then
       v := 65535;
 
     FastLineSeries.AddY(v);
-    str := '';
+    str := '';}
   end;
 
 end;

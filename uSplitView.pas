@@ -1737,7 +1737,7 @@ begin
     CurrentDevicesJvHidDevice := CheckHID(GetCurrentDeviceName());
     if (CurrentDevicesJvHidDevice <> nil) then
     begin
-{$IFDEF CPU32BITS}
+      {$IFDEF CPU32BITS}
       Idx := GetHID_IDX(GetCurrentDeviceName());
       CurrentDevicesJvHidDevice := nil;
       // FJvHidDeviceController1.CheckOutByID(CurrentDevicesJvHidDevice,CurrentDevicesJvHidDevice.Attributes.VendorID,CurrentDevicesJvHidDevice.Attributes.ProductID);
@@ -1747,7 +1747,7 @@ begin
       Button2.Caption := GetDefaultLauguageStrByName('OPRATION_CLOSE',
         UILanguage) + ' ' + FalconGetComPort(GetCurrentDeviceName());
       Log0('Open device ' + CurrentDevicesJvHidDevice.PnPInfo.DevicePath);
-{$ENDIF}
+      {$ENDIF}
     end
     else
       OpenDevice2(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
@@ -1756,7 +1756,7 @@ begin
   begin
     if (CurrentDevicesJvHidDevice <> nil) then
     begin
-{$IFDEF CPU32BITS}
+     {$IFDEF CPU32BITS}
       // Idx:=GetHID_IDX(GetCurrentDeviceName());
       if (CurrentDevicesJvHidDevice <> nil) then
         FJvHidDeviceController1.CheckIn(CurrentDevicesJvHidDevice);
@@ -1764,7 +1764,7 @@ begin
       // FT260_Close(@CurrentDevicesJvHidDevicePFT260_HANDLE);
       Button2.Caption := GetDefaultLauguageStrByName('OPRATION_OPEN2',
         UILanguage) + ' ' + FalconGetComPort(GetCurrentDeviceName());
-{$ENDIF}
+     {$ENDIF}
     end
     else
       CloseDevice2(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
