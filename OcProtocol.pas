@@ -82,13 +82,13 @@ type
 
     Constructor Create();
     destructor Destroy;
-    function AddPackToPackList(OcComPack: POcComPack;pPayload: PByte):Integer;
+    function AddPackToPackList(OcComPack: POcComPack):Integer;
     function CreatePack(Id: byte): TOcComPack;
     function ParserPack(buff: PByte; Len: integer): integer;
     function GetPackByIndex(i: integer): TOcComPack;
     function GetBytesValue(i: integer): Int64;
     procedure ClearPacks();
-    function CheckPackHeadLength(p: POcComPack; Len: integer): Boolean;
+    function CheckPackMinLength(p: POcComPack; Len: integer): Boolean;
     function CheckPackLength(p: POcComPack; Len: integer): Boolean;
     function CheckPackCRC(p: POcComPack; Len: integer): Boolean;
     function IsParserComplete(): Boolean;
@@ -173,8 +173,7 @@ begin
   end;
 end;
 
-function TOcComProtocal.AddPackToPackList(OcComPack: POcComPack;
-  pPayload: PByte):Integer;
+function TOcComProtocal.AddPackToPackList(OcComPack: POcComPack):Integer;
   var PackSize:Integer;
 begin
   PackSize := SizeOf(TOcComPackHead) + OcComPack.Length + 2;//包的实际有效长度
@@ -196,10 +195,10 @@ begin
   Result := OcComPack;
 end;
 
-function TOcComProtocal.CheckPackHeadLength(p: POcComPack; Len: integer): Boolean;
+function TOcComProtocal.CheckPackMinLength(p: POcComPack; Len: integer): Boolean;
 begin
   Result := True;
-  if Len < SizeOf(TOcComPackHead) then // 长度不够，小于最小包长度
+  if Len < (SizeOf(TOcComPackHead) + 2) then // 长度不够，小于最小包长度
     Result := false;
 end;
 
@@ -238,7 +237,8 @@ begin
     if CRC1 <> CRC2 then // CRC 不对
       Result := false;
   end;}
-  if(p.Length >= len) then
+
+  if((p.Length + SizeOf(TOcComPackHead)) >= len) then
    Exit;
 
   CRC1 := p.data[p.Length];
@@ -252,40 +252,39 @@ var
   i: integer;
   p: POcComPack;
   //p2: TOcComPackHead;
-  pw: PByte;
+  //pw: PByte;
 begin
   i := 0;
+  if Len < SizeOf(TOcComPackHead) then // 数据包最小长度验证 ，数据不够，继续等等新的数据
+  begin
+     Exit;
+  end;
   while (True) do
   begin
     Result := i;
     p := @buff[i];
-    pw := @buff[i];
 
-    if CheckPackHeadLength(p, Len - i) = false then // 数据包最小长度验证 ，数据不够，继续等等新的数据
+    if(CheckPackMinLength(p,Len - i) = false) then
     begin
-      break;
+      break;//数据不够，继续等等新的数据
     end;
-    if p^.Head = OCCOMPROTOCAL_HEAD then
+
+    if p^.Head = OCCOMPROTOCAL_HEAD then //对包头
     begin
       //if CheckPackLength(p, Len) = false then // 数据包合法长度描述有问题，负载不全 继续等待新的数据
       //begin
       //  break; // 负载不全，等待更多数据
       //end;
-      if CheckPackCRC(p, Len) then //找到包围
+      if CheckPackCRC(p, Len - i) then //找包围 Len - i剩余长度
       begin
-        i:= i+ AddPackToPackList(p, pw);
+        i:= i+ AddPackToPackList(p);
         if Assigned(FCallBackFun) then
         begin
-          //CopyMemory(@p2, p, SizeOf(TOcComPackHead));
           FCallBackFun(GetLastPack());
         end;
-        if p.PID = OCCOMPROTOCAL_DATA2 then
-          break;
       end
       else
       begin
-        //INC(i);
-        //Continue;
         break; // 负载不全，等待更多数据
       end;
     end

@@ -375,31 +375,28 @@ end;
 
 procedure TComPackParserHandleThread.Execute;
 var
-  j: Int64;
-  s: String;
+ j:Int64;
 begin
-  // j:=0;
-  s := '';
   while (self.Terminated = false) do
   begin
-    if (self.FOcComProtocal.GetLastPackHead.PID = OCCOMPROTOCAL_DATA2) then
+    {if (self.FOcComProtocal.GetLastPackHead.PID = OCCOMPROTOCAL_DATA2) then
     begin
       // 非标准超大数据包处理
       if (Length(FOcComPortObj.FComReceiveInternalBuffer) - FStartIndex <
         self.FOcComProtocal.GetLastPackHead.Length) then
         Continue; // 没有完成继续处理
-
       FStartIndex := FStartIndex + self.FOcComProtocal.GetLastPackHead.Length;
       // 超大数据包处理完毕，跳过
-    end;
+    end;}
 
     try
-      if Length(FOcComPortObj.FComReceiveInternalBuffer) >= SizeOf(TOcComPackHead)
+      if Length(FOcComPortObj.FComReceiveInternalBuffer) > SizeOf(TOcComPackHead)
       then
       begin
         j := self.FOcComProtocal.ParserPack(
           @FOcComPortObj.FComReceiveInternalBuffer[FStartIndex],
           Length(FOcComPortObj.FComReceiveInternalBuffer) - FStartIndex);
+
         FStartIndex := FStartIndex + j;
       end
       else
@@ -1566,7 +1563,7 @@ begin
 
     end;
   end;
-   FComProcessedCount:=FComProcessedCount+OcComPack2.Length + SizeOf(TOcComPackHead)+2;
+   //FComProcessedCount:=FComProcessedCount+OcComPack2.Length + SizeOf(TOcComPackHead)+2;
    PrintSendProtocolPack(OcComPack2);
   //if Assigned(FCallBackFun) then
   //  FCallBackFun();
