@@ -1256,8 +1256,8 @@ begin
 
         FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
         FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
-        if Assigned(FCallBackFun) then
-          FCallBackFun();
+        //if Assigned(FCallBackFun) then
+        //  FCallBackFun();
       end;
     end
     else
@@ -1295,10 +1295,11 @@ begin
 
       FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
       FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
-      if Assigned(FCallBackFun) then
-        FCallBackFun();
+      //if Assigned(FCallBackFun) then
+      //  FCallBackFun();
     end;
   end
+  //////////////////////////////////////////////////////////////////////////////
   else if FReceiveFormat = Ord(HexadecimalFormat) then // receive as hex format
   begin
     // ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
@@ -1310,8 +1311,7 @@ begin
     // EnterCriticalSection(Critical);
     if Length(FComReceiveInternalBuffer) = 0 then
       ClearInternalBuff;
-    SetLength(FComReceiveInternalBuffer,
-      Length(FComReceiveInternalBuffer) + Count);
+    SetLength(FComReceiveInternalBuffer,Length(FComReceiveInternalBuffer) + Count);
     CopyMemory(@FComReceiveInternalBuffer[Length(FComReceiveInternalBuffer) -
       Count], @FComReceiveBuffer, Count);
     // LeaveCriticalSection(Critical);
@@ -1321,7 +1321,7 @@ begin
       FComUIHandleThread.Suspended := false; // 启动UI工作线程
     end;
   end
-  /// ////hex format
+  /// //////////////////////////////////////////////////////////////////////////
   else if FReceiveFormat = Ord(Graphic) then // receive as Graphic
   begin
     {ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
@@ -1345,6 +1345,7 @@ begin
       FComUIHandleThread.Suspended := false; // 启动UI工作线程 绘制图形
     end;}
   end
+  //////////////////////////////////////////////////////////////////////////////
   else if FReceiveFormat = Ord(OctopusProtocol) then
   // receive as OctopusProtocol pack
   begin
@@ -1353,7 +1354,6 @@ begin
     try
       FComProcessedCount := FComProcessedCount + self.
         Read(FComReceiveBuffer, Count);
-      // self.Read(FComReceiveBuffer, Count);
     Except
     end;
 
@@ -1372,6 +1372,7 @@ begin
       FComPackParserThread.Suspended := false; // 启动协议解析线程
     end;
   end
+  //////////////////////////////////////////////////////////////////////////////
   else if FReceiveFormat = Ord(SaveToFile) then // for File save to file
   begin
     if (CompareText(ExtractFileExt(self.FileStreamName), '.txt') = 0) or
@@ -1386,8 +1387,8 @@ begin
       Writeln(f, FComReceiveString);
       CloseFile(f);
       FComProcessedCount := FComProcessedCount + Count;
-      if Assigned(FCallBackFun) then
-        FCallBackFun();
+      //if Assigned(FCallBackFun) then
+      //  FCallBackFun();
     end
     else if (CompareText(ExtractFileExt(self.FileStreamName), '.xls') = 0) or
       (CompareText(ExtractFileExt(self.FileStreamName), '.xlsx') = 0) then
@@ -1407,12 +1408,16 @@ begin
         FComProcessedCount := FComProcessedCount + FileStream.
           Write(Buff, Count);
 
-        if Assigned(FCallBackFun) then
-          FCallBackFun();
+        //if Assigned(FCallBackFun) then
+        //  FCallBackFun();
       end
     end;
   end;
 
+
+  //////////////////////////////////////////////////////////////////////////////
+  if Assigned(FCallBackFun) then
+          FCallBackFun();
   if FReceiveFormat = Ord(ASCIIFormat) then
   begin
     if (FLogScrollMode) and (Length(FComReceiveString) > 0) and isBottom then
