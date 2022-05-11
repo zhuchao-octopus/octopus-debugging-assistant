@@ -372,6 +372,7 @@ type
       Length: Integer; Rows: Integer): Integer;
 
     procedure StopReceiveFile(OcComPortObj: TOcComPortObj);
+    function getDeviceTabIndex(deviceName:String):Integer;
   end;
 
 var
@@ -396,6 +397,11 @@ uses
 
 type
   TFastAccess = class(TFastLineSeries);
+
+function TSplitViewForm.getDeviceTabIndex(deviceName:String):Integer;
+begin
+  Result:= Notebook2.Pages.IndexOf(deviceName);
+end;
 
 procedure Printf_crc_tab();
 var
@@ -2705,6 +2711,7 @@ procedure TSplitViewForm.MyAppMsg(var Msg: TMsg; var Handled: Boolean);
 var
   OcComPortObj: TOcComPortObj;
   keyState: TKeyBoardState;
+  i:Integer;
 begin
   case Msg.message of
     WM_KEYDOWN:
@@ -2722,10 +2729,14 @@ begin
         end;
         if (Msg.wParam = VK_ESCAPE) then
         begin
-          OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
-          if (OcComPortObj <> nil) and (OcComPortObj.LogMemo <> nil) and
-            (OcComPortObj.LogMemo.Parent <> nil) then
+          OcComPortObj := GetDeciceByFullName(GetCurrentDeviceName);
+          i:= getDeviceTabIndex(GetCurrentDeviceName);
+          if (OcComPortObj <> nil) and
+             (OcComPortObj.LogMemo <> nil) and
+             (OcComPortObj.LogMemo.Parent <> nil)
+              then
           begin
+           if(Tabset2.TabIndex = i )then
             OcComPortObj.LogMemo.SetFocus;
             OcComPortObj.LogMemo.ReadOnly := True;
           end;
@@ -3170,24 +3181,28 @@ end;
 procedure TSplitViewForm.SV_LClosed(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
+  i:Integer;
 begin
-  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
+  OcComPortObj := GetDeciceByFullName(GetCurrentDeviceName);
+  i:= getDeviceTabIndex(GetCurrentDeviceName);
   if OcComPortObj <> nil then
   begin
-    if OcComPortObj.Connected then
-      OcComPortObj.LogMemo.SetFocus;
+    if (OcComPortObj.Connected)and(Tabset2.TabIndex = i) then
+       OcComPortObj.LogMemo.SetFocus;
   end;
 end;
 
 procedure TSplitViewForm.SV_RClosed(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
+  i:Integer;
 begin
-  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
+  OcComPortObj := GetDeciceByFullName(GetCurrentDeviceName);
+  i:= getDeviceTabIndex(GetCurrentDeviceName);
   if OcComPortObj <> nil then
   begin
-    if OcComPortObj.Connected then
-      OcComPortObj.LogMemo.SetFocus;
+    if OcComPortObj.Connected and (Tabset2.TabIndex = i) then
+       OcComPortObj.LogMemo.SetFocus;
   end;
   Splitter1.Visible := False;
 end;
