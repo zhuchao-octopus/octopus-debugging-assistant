@@ -2827,6 +2827,10 @@ begin
     if (OcComPortObj.LogMemo <> nil) then
     begin
       OcComPortObj.LogMemo.CopyToClipboard;
+    end
+    else
+    begin
+      Memo1.CopyToClipboard;
     end;
   end;
 end;
@@ -4047,18 +4051,23 @@ begin
   end;
   OcComPortObj.CompatibleUnicode := CheckBox12.Checked;
 end;
-
+//功能键进入这里
 procedure TSplitViewForm.Memo1KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var
   CurrentLine: Integer;
+  MaskedKeyState: TShiftState;
 begin
   if Memo1.Tag <> 0 then
   begin
     exit;
   end;
   CurrentLine := Memo1.CaretPos.Y; // 光标所在的行
-  // if CurrentLine <> Memo1.Lines.Count - 1 then
+
+  MaskedKeyState := Shift * [ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle,
+    ssDouble, ssTouch, ssPen, ssCommand];
+  if (Key <> VK_RETURN) and (Key <> VK_PRIOR) and (Key <> VK_NEXT) and
+    (Key <> VK_HOME) and (Key <> VK_END) and (MaskedKeyState = []) then
   begin
     Memo1.SelStart := Length(Memo1.Text);
     Memo1.Perform(WM_VSCROLL, SB_BOTTOM, 0);
