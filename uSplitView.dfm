@@ -12,7 +12,6 @@ object SplitViewForm: TSplitViewForm
   Font.Height = -13
   Font.Name = 'Segoe UI'
   Font.Style = []
-  OldCreateOrder = False
   Position = poDesktopCenter
   OnClose = FormClose
   OnCreate = FormCreate
@@ -618,6 +617,13 @@ object SplitViewForm: TSplitViewForm
             Width = 308
             Height = 193
             TabOrder = 3
+            object Label4: TLabel
+              Left = 8
+              Top = 80
+              Width = 140
+              Height = 17
+              Caption = #21313#20845#36827#21046#23545#40784#26041#24335'   '
+            end
             object CheckBox12: TCheckBox
               Left = 8
               Top = 17
@@ -650,17 +656,6 @@ object SplitViewForm: TSplitViewForm
                 ' CP_UTF7               { UTF-7 translation }'
                 ' CP_UTF8               { UTF-8 translation }')
             end
-            object CheckBox9: TCheckBox
-              Left = 8
-              Top = 73
-              Width = 280
-              Height = 25
-              Caption = #21313#20845#36827#21046#26684#24335#25509#25910#38468#21152#23383#31526#35299#26512
-              Checked = True
-              State = cbChecked
-              TabOrder = 2
-              OnClick = CheckBox9Click
-            end
             object ComboBox8: TComboBox
               Left = 8
               Top = 102
@@ -668,7 +663,7 @@ object SplitViewForm: TSplitViewForm
               Height = 25
               Style = csDropDownList
               ItemIndex = 0
-              TabOrder = 3
+              TabOrder = 2
               Text = 'Hexadecimal 16Bytes Align'
               OnChange = ComboBox8Change
               Items.Strings = (
@@ -688,15 +683,16 @@ object SplitViewForm: TSplitViewForm
               EditLabel.Color = clBtnHighlight
               EditLabel.ParentColor = False
               NumbersOnly = True
-              TabOrder = 4
+              TabOrder = 3
+              Text = ''
             end
             object Button14: TButton
               Left = 200
-              Top = 147
+              Top = 148
               Width = 101
-              Height = 34
+              Height = 33
               Caption = #24212#29992
-              TabOrder = 5
+              TabOrder = 4
               OnClick = Button14Click
             end
           end
@@ -1479,6 +1475,7 @@ object SplitViewForm: TSplitViewForm
             8)
           ColorPaletteIndex = 19
           object Series1: TFastLineSeries
+            HoverElement = []
             LinePen.Color = 15054131
             XValues.Name = 'X'
             XValues.Order = loAscending

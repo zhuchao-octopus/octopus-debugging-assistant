@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{3A641B72-3BED-4F5E-9822-B594FF4EBCDC}</ProjectGuid>
-        <ProjectVersion>19.0</ProjectVersion>
+        <ProjectVersion>19.3</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <MainSource>Octopus.dpr</MainSource>
         <Base>True</Base>
@@ -110,8 +110,8 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=$(MSBuildProjectName);FileVersion=3.0.0.1331;InternalName=Octopus;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.0.0.0;Comments=1234998.CN</VerInfo_Keys>
-        <VerInfo_Build>1331</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=$(MSBuildProjectName);FileVersion=3.0.0.1333;InternalName=Octopus;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.0.0.0;Comments=1234998.CN</VerInfo_Keys>
+        <VerInfo_Build>1333</VerInfo_Build>
         <VerInfo_MajorVer>3</VerInfo_MajorVer>
         <Icon_MainIcon>Octopus_Icon3.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
@@ -135,10 +135,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.324;InternalName=OCTOPUS ;LegalCopyright= 2008-2028;LegalTrademarks=;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.330;InternalName=OCTOPUS ;LegalCopyright= 2008-2028;LegalTrademarks=;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>Octopus_Icon4.ico</Icon_MainIcon>
         <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_Build>324</VerInfo_Build>
+        <VerInfo_Build>330</VerInfo_Build>
         <UWP_DelphiLogo44>79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo150>
         <VerInfo_Release>8</VerInfo_Release>
@@ -147,9 +147,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.347;InternalName=OCTOPUS ;LegalCopyright=2008-2028;LegalTrademarks=;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.354;InternalName=OCTOPUS ;LegalCopyright=2008-2028;LegalTrademarks=;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>Octopus_Icon3.ico</Icon_MainIcon>
-        <VerInfo_Build>347</VerInfo_Build>
+        <VerInfo_Build>354</VerInfo_Build>
         <UWP_DelphiLogo44>79c25bc8359f51a4_white.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>79c25bc8359f51a4_white.png</UWP_DelphiLogo150>
         <VerInfo_Release>8</VerInfo_Release>
@@ -192,15 +192,15 @@ $(PostBuildEvent)]]></PostBuildEvent>
             <Form>ComSetupFrm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <BuildConfiguration Include="Release">
-            <Key>Cfg_2</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
     </ItemGroup>
@@ -218,30 +218,17 @@ $(PostBuildEvent)]]></PostBuildEvent>
                 </Source>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="79c25bc8359f51a4_white.png" Configuration="Release" Class="UWP_DelphiLogo150">
-                    <Platform Name="Win64">
-                        <RemoteDir>Assets\</RemoteDir>
-                        <RemoteName>Logo150x150.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="79c25bc8359f51a4_white.png" Configuration="Release" Class="UWP_DelphiLogo150">
-                    <Platform Name="Win32">
-                        <RemoteDir>Assets\</RemoteDir>
-                        <RemoteName>Logo150x150.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\19.0\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png" Configuration="Debug" Class="UWP_DelphiLogo44">
-                    <Platform Name="Win32">
+                    <Platform Name="Win64">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo44x44.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win64\Release\Octopus.exe" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName="79c25bc8359f51a4_white.png" Configuration="Release" Class="UWP_DelphiLogo150">
                     <Platform Name="Win64">
-                        <RemoteName>Octopus.exe</RemoteName>
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo150x150.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -251,18 +238,23 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\SplitView.exe" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="..\79c25bc8359f51a4_white.png" Configuration="Release" Class="UWP_DelphiLogo150">
+                <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\19.0\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png" Configuration="Debug" Class="UWP_DelphiLogo150">
                     <Platform Name="Win64">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo150x150.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\19.0\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png" Configuration="Debug" Class="UWP_DelphiLogo44">
+                <DeployFile LocalName="Win32\Debug\SplitView.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="LIBFT260.PAS" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win64">
-                        <RemoteDir>Assets\</RemoteDir>
-                        <RemoteName>Logo44x44.png</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Release\Octopus.exe" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>Octopus.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -272,8 +264,28 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\19.0\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png" Configuration="Debug" Class="UWP_DelphiLogo150">
+                <DeployFile LocalName="..\79c25bc8359f51a4_white.png" Configuration="Release" Class="UWP_DelphiLogo150">
                     <Platform Name="Win64">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo150x150.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="LIBFT260.PAS" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="79c25bc8359f51a4_white.png" Configuration="Release" Class="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo150x150.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\19.0\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png" Configuration="Debug" Class="UWP_DelphiLogo150">
+                    <Platform Name="Win32">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo150x150.png</RemoteName>
                         <Overwrite>true</Overwrite>
@@ -286,9 +298,16 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="LIBFT260.PAS" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="Win64\Release\Octopus.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win64">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>Octopus.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\19.0\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png" Configuration="Debug" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -296,25 +315,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     <Platform Name="Win32">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo150x150.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="c:\program files (x86)\embarcadero\studio\19.0\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png" Configuration="Debug" Class="UWP_DelphiLogo150">
-                    <Platform Name="Win32">
-                        <RemoteDir>Assets\</RemoteDir>
-                        <RemoteName>Logo150x150.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Win32\Release\Octopus.exe" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>Octopus.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="LIBFT260.PAS" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -328,6 +328,16 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="AndroidClasses">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>64</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>64</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidClassesDexFile">
@@ -455,6 +465,16 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     </Platform>
                     <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon192">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -621,6 +641,11 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Operation>1</Operation>
                         <Extensions>.framework</Extensions>
                     </Platform>
+                    <Platform Name="OSXARM64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
                     </Platform>
@@ -644,6 +669,11 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSXARM64">
                         <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
@@ -672,6 +702,11 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSXARM64">
                         <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
@@ -705,8 +740,38 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
                         <Operation>0</Operation>
                     </Platform>
+                    <Platform Name="OSXARM64">
+                        <RemoteDir>Contents\Resources\StartUp\</RemoteDir>
+                        <Operation>0</Operation>
+                    </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iOS_AppStore1024">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_AppIcon152">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_AppIcon167">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="iPad_Launch1024">
@@ -880,6 +945,56 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     </Platform>
                     <Platform Name="iOSSimulator">
                         <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_SpotLight80">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_AppIcon120">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_AppIcon180">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -1077,6 +1192,66 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="iPhone_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Notification60">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Setting87">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Spotlight120">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Spotlight80">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="ProjectAndroidManifest">
                     <Platform Name="Android">
                         <Operation>1</Operation>
@@ -1150,6 +1325,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="OSXARM64">
+                        <RemoteDir>..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXEntitlements">
                     <Platform Name="OSX32">
@@ -1157,6 +1336,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="OSX64">
+                        <RemoteDir>..\</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSXARM64">
                         <RemoteDir>..\</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -1170,6 +1353,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <RemoteDir>Contents</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="OSXARM64">
+                        <RemoteDir>Contents</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
                     <Platform Name="OSX32">
@@ -1177,6 +1364,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="OSX64">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSXARM64">
                         <RemoteDir>Contents\Resources</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -1207,6 +1398,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="OSX64">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSXARM64">
                         <RemoteDir>Contents\MacOS</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -1248,16 +1443,17 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
                 <Platform value="Win32">True</Platform>
