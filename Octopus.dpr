@@ -40,7 +40,8 @@ uses
   OcFindAnd in 'OcFindAnd.pas' {OcFindAndFrm},
   JvSetupApi in 'HID\JvSetupApi.pas',
   CPort in 'ComPort\CPort.pas',
-  CPortSetup in 'ComPort\CPortSetup.pas' {ComSetupFrm};
+  CPortSetup in 'ComPort\CPortSetup.pas' {ComSetupFrm},
+  CRC in 'CRC.pas';
 
 {$R *.res}
 

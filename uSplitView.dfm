@@ -48,6 +48,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -269,8 +270,7 @@ object SplitViewForm: TSplitViewForm
               OnChange = ComboBox6Change
               Items.Strings = (
                 'ASCII Format            '#23383#31526#20018
-                'Hexadecimal Format '#21313#20845#36827#21046' '
-                'Octopus Protocol')
+                'Hexadecimal Format '#21313#20845#36827#21046' ')
             end
             object ComboBox5: TComboBox
               Left = 76
@@ -578,7 +578,6 @@ object SplitViewForm: TSplitViewForm
               Width = 258
               Height = 25
               Caption = #25968#25454#35760#24405#21069#38754#26174#31034#34892#21495
-              Enabled = False
               TabOrder = 3
               OnClick = CheckBox4Click
             end

@@ -50,8 +50,8 @@ Const
   OCCOMPROTOCAL_UART_READ = 56;
   OCCOMPROTOCAL_UART_WRITE = 57;
 
-  OCCOMPROTOCAL_DATA1 = 101; // 标准协议数据 最大负载是512字节
-  OCCOMPROTOCAL_DATA2 = 102; // 非标准协议表示数据是连续的，没有分包，或者说只有一个包
+  OCCOMPROTOCAL_DATA1 = $FC; // 标准协议数据 最大负载是512字节
+  OCCOMPROTOCAL_DATA2 = $FD; // 非标准协议表示数据是连续的，没有分包，或者说只有一个包
 
   OCCOMPROTOCAL_ERROR = $FFFF;
   OCCOMPROTOCAL_NONE = $0000;
@@ -71,71 +71,32 @@ var
   SystemMainMenu: TMainMenu;
   DefaultLauguageStr: array [0 .. 59] of TLang = (
     (
-      Name: 'OPRATION_OPEN'; Caption1: '打开串口设备'; Caption2: 'Open The Device'),
-    (Name: 'OPRATION_OPEN2'; Caption1: '打开 HID 设备';
-    Caption2: 'Open The HID Device'), (Name: 'OPRATION_CLOSE'; Caption1: '关闭设备';
-    Caption2: 'Close The Device'), (Name: 'Button4'; Caption1: '';
-    Caption2: 'Get Ports'),
+      Name: 'OPRATION_OPEN'; Caption1: '打开串口设备'; Caption2: 'Open The Device'), (Name: 'OPRATION_OPEN2'; Caption1: '打开 HID 设备'; Caption2: 'Open The HID Device'), (Name: 'OPRATION_CLOSE';
+    Caption1: '关闭设备'; Caption2: 'Close The Device'), (Name: 'Button4'; Caption1: ''; Caption2: 'Get Ports'),
 
-    (Name: 'Label2'; Caption1: ''; Caption2: 'Baud Rate'), (Name: 'Label5';
-    Caption1: ''; Caption2: 'Parity'), (Name: 'Label9'; Caption1: '';
-    Caption2: 'Stop Bits'), (Name: 'Label12'; Caption1: '';
-    Caption2: 'Data Bits'), (Name: 'Label13'; Caption1: '';
-    Caption2: 'SendFormat'), (Name: 'Label15'; Caption1: '';
-    Caption2: 'FlowControl'), (Name: 'Button7'; Caption1: '';
-    Caption2: 'Clear Above'), (Name: 'Button8'; Caption1: '';
-    Caption2: 'Send Block Content Above'),
+    (Name: 'Label2'; Caption1: ''; Caption2: 'Baud Rate'), (Name: 'Label5'; Caption1: ''; Caption2: 'Parity'), (Name: 'Label9'; Caption1: ''; Caption2: 'Stop Bits'), (Name: 'Label12'; Caption1: '';
+    Caption2: 'Data Bits'), (Name: 'Label13'; Caption1: ''; Caption2: 'SendFormat'), (Name: 'Label15'; Caption1: ''; Caption2: 'FlowControl'), (Name: 'Button7'; Caption1: ''; Caption2: 'Clear Above'),
+    (Name: 'Button8'; Caption1: ''; Caption2: 'Send Block Content Above'),
 
-    (Name: 'CheckBox8'; Caption1: '';
-    Caption2: 'Enable Auto Save The Log To File'), (Name: 'Button6';
-    Caption1: ''; Caption2: 'Open The Log File Position'), (Name: 'Button5';
-    Caption1: ''; Caption2: 'Clear Data Logs'), (Name: 'CheckBox7';
-    Caption1: ''; Caption2: 'Enable Alpha Blend'), (Name: 'CheckBox2';
-    Caption1: ''; Caption2: 'Always Stay At The Top'), (Name: 'CheckBox25';
-    Caption1: ''; Caption2: 'Show The Time Stamp '), (Name: 'CheckBox3';
-    Caption1: ''; Caption2: 'Show The Date Stamp'), (Name: 'CheckBox4';
-    Caption1: ''; Caption2: 'Show Line Number For Log'), (Name: 'CheckBox5';
-    Caption1: ''; Caption2: 'Show The Data You Are Sending'), (Name: 'Button1';
-    Caption1: ''; Caption2: 'Start Loop For Sending Data'), (Name: 'Button3';
-    Caption1: ''; Caption2: 'StopSend'), (Name: 'Label14'; Caption1: '';
-    Caption2: 'The Loop Times You Want  '), (Name: 'Label4'; Caption1: '';
-    Caption2: 'The Loop Interval'), (Name: 'CheckBox19'; Caption1: '';
-    Caption2: 'Enable The Loop Funtion'), (Name: 'Label6'; Caption1: '';
-    Caption2: 'Main Style'), (Name: 'Label7'; Caption1: '';
-    Caption2: 'Protocol'), (Name: 'Label8'; Caption1: '';
-    Caption2: 'DevAdress'), (Name: 'Button9'; Caption1: '';
-    Caption2: 'Start Converting To Hexade'), (Name: 'Label10'; Caption1: '';
-    Caption2: 'ReceiveFormat'), (Name: 'Label11'; Caption1: '';
-    Caption2: 'ReadCount'), (Name: 'Label1'; Caption1: '';
-    Caption2: 'Main Form AlphaBlend Value'), (Name: 'Label3'; Caption1: '';
-    Caption2: 'Second Interval For Auto Saving'), (Name: 'Button11';
-    Caption1: ''; Caption2: 'Start Converting To String'), (Name: 'Button10';
-    Caption1: ''; Caption2: 'Clear Received Data Logs'), (Name: 'CheckBox6';
-    Caption1: ''; Caption2: 'Switch To English Language'), (Name: 'CheckBox9';
-    Caption1: ''; Caption2: 'Parse As String When Hexadecimal'),
-    (Name: 'Button13'; Caption1: ''; Caption2: 'Data Received Direct to File'),
-    (Name: 'Button14'; Caption1: ''; Caption2: 'FileFinished'),
-    (Name: 'CheckBox1'; Caption1: ''; Caption2: 'Create Desktop Shortcut'),
-    (Name: 'Button15'; Caption1: ''; Caption2: 'Show All Point'),
-    (Name: 'Button16'; Caption1: ''; Caption2: 'Do The Operation'),
-    (Name: 'Button26'; Caption1: ''; Caption2: 'Save Log As ...'),
+    (Name: 'CheckBox8'; Caption1: ''; Caption2: 'Enable Auto Save The Log To File'), (Name: 'Button6'; Caption1: ''; Caption2: 'Open The Log File Position'), (Name: 'Button5'; Caption1: '';
+    Caption2: 'Clear Data Logs'), (Name: 'CheckBox7'; Caption1: ''; Caption2: 'Enable Alpha Blend'), (Name: 'CheckBox2'; Caption1: ''; Caption2: 'Always Stay At The Top'), (Name: 'CheckBox25';
+    Caption1: ''; Caption2: 'Show The Time Stamp '), (Name: 'CheckBox3'; Caption1: ''; Caption2: 'Show The Date Stamp'), (Name: 'CheckBox4'; Caption1: ''; Caption2: 'Show Line Number For Log'),
+    (Name: 'CheckBox5'; Caption1: ''; Caption2: 'Show The Data You Are Sending'), (Name: 'Button1'; Caption1: ''; Caption2: 'Start Loop For Sending Data'), (Name: 'Button3'; Caption1: '';
+    Caption2: 'StopSend'), (Name: 'Label14'; Caption1: ''; Caption2: 'The Loop Times You Want  '), (Name: 'Label4'; Caption1: ''; Caption2: 'The Loop Interval'), (Name: 'CheckBox19'; Caption1: '';
+    Caption2: 'Enable The Loop Funtion'), (Name: 'Label6'; Caption1: ''; Caption2: 'Main Style'), (Name: 'Label7'; Caption1: ''; Caption2: 'Protocol'), (Name: 'Label8'; Caption1: '';
+    Caption2: 'DevAdress'), (Name: 'Button9'; Caption1: ''; Caption2: 'Start Converting To Hexade'), (Name: 'Label10'; Caption1: ''; Caption2: 'ReceiveFormat'), (Name: 'Label11'; Caption1: '';
+    Caption2: 'ReadCount'), (Name: 'Label1'; Caption1: ''; Caption2: 'Main Form AlphaBlend Value'), (Name: 'Label3'; Caption1: ''; Caption2: 'Second Interval For Auto Saving'), (Name: 'Button11';
+    Caption1: ''; Caption2: 'Start Converting To String'), (Name: 'Button10'; Caption1: ''; Caption2: 'Clear Received Data Logs'), (Name: 'CheckBox6'; Caption1: '';
+    Caption2: 'Switch To English Language'), (Name: 'CheckBox9'; Caption1: ''; Caption2: 'Parse As String When Hexadecimal'), (Name: 'Button13'; Caption1: '';
+    Caption2: 'Data Received Direct to File'), (Name: 'Button14'; Caption1: ''; Caption2: 'FileFinished'), (Name: 'CheckBox1'; Caption1: ''; Caption2: 'Create Desktop Shortcut'), (Name: 'Button15';
+    Caption1: ''; Caption2: 'Show All Point'), (Name: 'Button16'; Caption1: ''; Caption2: 'Do The Operation'), (Name: 'Button26'; Caption1: ''; Caption2: 'Save Log As ...'),
 
-    (Name: 'Button18'; Caption1: ''; Caption2: 'Zoom Out'), (Name: 'Button19';
-    Caption1: ''; Caption2: 'Zoom In'), (Name: 'ButtonColor1'; Caption1: '';
-    Caption2: 'Graphic One Color'), (Name: 'ButtonColor2'; Caption1: '';
-    Caption2: 'Graphic Two Color'), (Name: 'Button20'; Caption1: '';
-    Caption2: 'Export Data To Excel'), (Name: 'Button21'; Caption1: '';
-    Caption2: 'Clear Graphic Data'), (Name: 'Button22'; Caption1: '';
-    Caption2: 'Save Graphic to BMP'), (Name: 'Button23'; Caption1: '';
-    Caption2: 'Load File'), (Name: 'Button24'; Caption1: '';
-    Caption2: 'Send The File You Loaded'), (Name: 'CheckBox10'; Caption1: '';
-    Caption2: 'Show All Data'), (Name: 'CheckBox11'; Caption1: '';
-    Caption2: 'Overlap Graphics'), (Name: 'Label18'; Caption1: '';
-    Caption2: 'Operation'), (Name: 'CheckBox12'; Caption1: '';
-    Caption2: 'Compatible To Unicode'), (Name: 'Button12'; Caption1: '';
-    Caption2: 'Font'), (Name: 'Button17'; Caption1: '';
-    Caption2: 'Background Color For Message Log'), (Name: 'Button25';
-    Caption1: ''; Caption2: 'Format To Hexade'));
+    (Name: 'Button18'; Caption1: ''; Caption2: 'Zoom Out'), (Name: 'Button19'; Caption1: ''; Caption2: 'Zoom In'), (Name: 'ButtonColor1'; Caption1: ''; Caption2: 'Graphic One Color'),
+    (Name: 'ButtonColor2'; Caption1: ''; Caption2: 'Graphic Two Color'), (Name: 'Button20'; Caption1: ''; Caption2: 'Export Data To Excel'), (Name: 'Button21'; Caption1: '';
+    Caption2: 'Clear Graphic Data'), (Name: 'Button22'; Caption1: ''; Caption2: 'Save Graphic to BMP'), (Name: 'Button23'; Caption1: ''; Caption2: 'Load File'), (Name: 'Button24'; Caption1: '';
+    Caption2: 'Send The File You Loaded'), (Name: 'CheckBox10'; Caption1: ''; Caption2: 'Show All Data'), (Name: 'CheckBox11'; Caption1: ''; Caption2: 'Overlap Graphics'), (Name: 'Label18';
+    Caption1: ''; Caption2: 'Operation'), (Name: 'CheckBox12'; Caption1: ''; Caption2: 'Compatible To Unicode'), (Name: 'Button12'; Caption1: ''; Caption2: 'Font'), (Name: 'Button17'; Caption1: '';
+    Caption2: 'Background Color For Message Log'), (Name: 'Button25'; Caption1: ''; Caption2: 'Format To Hexade'));
 
   testbuff: Array [0 .. 17] of byte = (
     $68,
@@ -170,21 +131,73 @@ function ByteToWideString2(buff: pbyte; len: Integer): String; // 不要回车换行#1
 procedure WideStringToByte(str: String; var buff: array of byte);
 function GetDefaultLauguageStrByName(Name: String; Lang: String): String;
 procedure SetButtonCaptionLeftAlign(btn: TButton);
-function FormatHexStrToByte(sStr: string; var buf: array of byte): string;
+function FormatHexStrToByte(sStr: string; var buf: array of byte;out bCount:Integer): string;
 function FormatHexStrToByte2(sStr: string; var buf: array of byte): Integer;
+function FormatHexStrToBuffer(sStr: string; var buf: array of byte;out bCount:Integer): string;
+
 function SpaceCompress(s: string): string;
 function GetBuildInfo(FileName: string): String;
+function IsImageFile(const fn: string): Boolean;
+function IsMovieFile(const fn: string): Boolean;
+function IsTxtFile(const fn: string): Boolean;
+function IsHexFile(const fn: string): Boolean;
+function MakeWord(b2: byte; b1: byte): Word;
+function MakeDWord(w2: Word; w1: Word): DWord;
 
 implementation
 
+function MakeWord(b2: byte; b1: byte): Word;
+begin
+  result := b2;
+  result := result shl 8 + b1;
+end;
+
+function MakeDWord(w2: Word; w1: Word): DWord;
+begin
+  result := w2;
+  result := result shl 16 + w1;
+end;
+
+function IsImageFile(const fn: string): Boolean;
+var
+  extfn: String;
+begin
+  extfn := LowerCase(ExtractFileExt(fn));
+  result := (extfn = '.jpg') or (extfn = '.jpeg') or (extfn = '.gif') or (extfn = '.png') or (extfn = '.bmp');
+end;
+
+function IsMovieFile(const fn: string): Boolean;
+var
+  extfn: String;
+begin
+  extfn := LowerCase(ExtractFileExt(fn));
+  result := (extfn = '.rmvb') or (extfn = '.rm') or (extfn = '.mov') or (extfn = '.mkv') or (extfn = '.avi') or (extfn = '.flv');
+end;
+
+function IsTxtFile(const fn: string): Boolean;
+var
+  extfn: String;
+begin
+  extfn := LowerCase(ExtractFileExt(fn));
+  result := (extfn = '.txt') or (extfn = '.csv') or (extfn = '.cvs') or (extfn = '.scv');
+end;
+
+function IsHexFile(const fn: string): Boolean;
+var
+  extfn: String;
+begin
+  extfn := LowerCase(ExtractFileExt(fn));
+  result := (extfn = '.hex');
+end;
+
 function GetBuildInfo(FileName: string): String;
 var
-  VerInfoSize, VerValueSize, Dummy: DWORD;
+  VerInfoSize, VerValueSize, Dummy: DWord;
   VerInfo: Pointer;
   VerValue: PVSFixedFileInfo;
   V1, V2, V3, V4: Word;
 begin
-  Result := '';
+  result := '';
   if not FileExists(FileName) then
     Exit;
   VerInfoSize := GetFileVersionInfoSize(PChar(FileName), Dummy);
@@ -200,8 +213,7 @@ begin
     V2 := dwFileVersionMS and $FFFF;
     V3 := dwFileVersionLS shr 16;
     V4 := dwFileVersionLS and $FFFF;
-    Result := IntToStr(V1) + '.' + IntToStr(V2) + '.' + IntToStr(V3) + '.' +
-      IntToStr(V4);
+    result := IntToStr(V1) + '.' + IntToStr(V2) + '.' + IntToStr(V3) + '.' + IntToStr(V4);
   end;
   FreeMem(VerInfo, VerInfoSize);
 end;
@@ -210,69 +222,72 @@ function CharToDigit(c: Char): byte; // 字符表示的数，而不是对应的ASCII 值
 begin
   case c of
     '0' .. '9':
-      Result := Ord(c) - 48;
+      result := Ord(c) - 48;
     'A' .. 'F':
-      Result := Ord(c) - Ord('A') + 10;
+      result := Ord(c) - Ord('A') + 10;
     'a' .. 'f':
-      Result := Ord(c) - Ord('a') + 10;
+      result := Ord(c) - Ord('a') + 10;
   else
-    Result := 0;
+    result := 0;
   end;
 end;
 
 function CharToByte(a, b: Char): byte;
 begin
-  Result := CharToDigit(a) * 16 + CharToDigit(b);
+  result := CharToDigit(a) * 16 + CharToDigit(b);
 end;
 
-function FormatHexStrToByte(sStr: string; var buf: array of byte): string;
+function FormatHexStrToByte(sStr: string; var buf: array of byte;out bCount:Integer): string;
 var
   i, Count, bLen: Word;
-  a,b:char;
+  a, b: Char;
 begin
   sStr := sStr.UpperCase(Trim(sStr));
-  //去掉中间可能的格式字符
-  //sStr := StringReplace(sStr, '0x', ' ', [rfReplaceAll]); // 替换0x
+  // 去掉中间可能的格式字符
+  sStr := StringReplace(sStr, '0x', ' ', [rfReplaceAll]); // 替换0x
   sStr := StringReplace(sStr, '0X', ' ', [rfReplaceAll]); // 替换0X
   sStr := StringReplace(sStr, ',', ' ', [rfReplaceAll]); // 替换 ,号
   sStr := StringReplace(sStr, '，', ' ', [rfReplaceAll]); // 替换 ,号
   sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
 
-  //压缩中间空格,就是把多个空格替换成一个,并去掉两头的空格
-  Result := Trim(SpaceCompress(sStr));
+  // 压缩中间空格,就是把多个空格替换成一个,并去掉两头的空格
+  result := Trim(SpaceCompress(sStr));
 
-  Count := (length(Result) + 2) div 3;
+  Count := (length(result) + 2) div 3;
+  bCount:= Count;
+
   bLen := length(buf);
   ZeroMemory(@buf, bLen);
 
   for i := 1 to Count do
   begin
-    a:= Result[i * 3 - 2];
-    b:= Result[i * 3 - 1];
-    buf[i - 1] := CharToByte(a,b);
+    a := result[i * 3 - 2];
+    b := result[i * 3 - 1];
+    buf[i - 1] := CharToByte(a, b);
   end;
-  Result :='';
+
+  result := '';
   for i := 1 to Count do
   begin
-    Result := Result + Format('%.02x ', [buf[i - 1]]);
+    result := result + Format('%.02x ', [buf[i - 1]]);
   end;
 end;
 
 function FormatHexStrToByte2(sStr: string; var buf: array of byte): Integer;
 var
   i, Count, bLen: Word;
-  a,b:char;
-  strStr:String;
+  a, b: Char;
+  strStr: String;
 begin
   sStr := sStr.UpperCase(Trim(sStr));
-  //去掉中间可能的格式字符
-  //sStr := StringReplace(sStr, '0x', ' ', [rfReplaceAll]); // 替换0x
+  // 去掉中间可能的格式字符
+  // sStr := StringReplace(sStr, '0x', ' ', [rfReplaceAll]); // 替换0x
   sStr := StringReplace(sStr, '0X', ' ', [rfReplaceAll]); // 替换0X
   sStr := StringReplace(sStr, ',', ' ', [rfReplaceAll]); // 替换 ,号
   sStr := StringReplace(sStr, '，', ' ', [rfReplaceAll]); // 替换 ,号
   sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
 
-  //压缩中间空格,就是把多个空格替换成一个,并去掉两头的空格
+  // 压缩中间空格,就是把多个空格替换成一个,并去掉两头的空格
   strStr := Trim(SpaceCompress(sStr));
 
   Count := (length(strStr) + 2) div 3;
@@ -281,11 +296,44 @@ begin
 
   for i := 1 to Count do
   begin
-    a:= strStr[i * 3 - 2];
-    b:= strStr[i * 3 - 1];
-    buf[i - 1] := CharToByte(a,b);
+    a := strStr[i * 3 - 2];
+    b := strStr[i * 3 - 1];
+    buf[i - 1] := CharToByte(a, b);
   end;
-  Result := Count;
+  result := Count;
+end;
+
+function FormatHexStrToBuffer(sStr: string; var buf: array of byte;out bCount:Integer): string;
+var
+  i, Count: Integer;
+  a, b: Char;
+begin
+  sStr := sStr.UpperCase(Trim(sStr));
+  // 去掉中间可能的格式字符
+  // sStr := StringReplace(sStr, '0x', ' ', [rfReplaceAll]); // 替换0x
+  sStr := StringReplace(sStr, '0X', ' ', [rfReplaceAll]); // 替换0X
+  sStr := StringReplace(sStr, ',', ' ', [rfReplaceAll]); // 替换 ,号
+  sStr := StringReplace(sStr, '，', ' ', [rfReplaceAll]); // 替换 ,号
+  sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
+
+  result := StringReplace(sStr, ' ', '', [rfReplaceAll]); // 去掉所有空客
+
+  Count := length(result) div 2;
+  bCount:=Count;
+  //bLen := length(buf);
+  //ZeroMemory(@buf, bLen);
+
+  for i := 0 to Count - 1 do
+  begin
+    a := result[i * 2 + 1];
+    b := result[i * 2 + 2];
+    buf[i] := CharToByte(a, b);
+  end;
+  result := '';
+  for i := 0 to Count -1 do
+  begin
+    result := result + Format('%.02x ', [buf[i]]);
+  end;
 end;
 
 function SpaceCompress(s: string): string;
@@ -301,7 +349,7 @@ begin
     else
       hs1 := hs2;
   end;
-  Result := hs1;
+  result := hs1;
 end;
 
 procedure SetButtonCaptionLeftAlign(btn: TButton);
@@ -313,24 +361,46 @@ begin
   SetWindowLong(btn.handle, GWL_STYLE, Style);
 end;
 
+function StripNonAsciiExceptCRLF(const Value: AnsiString): AnsiString;
+var
+  AnsiCh: AnsiChar;
+begin
+  for AnsiCh in Value do
+    if (AnsiCh >= #32) and (AnsiCh <= #127) and (AnsiCh <> #13) and (AnsiCh <> #10) then
+      result := result + AnsiCh;
+end;
+
 function ByteToWideString(buff: pbyte; len: Integer): String;
 var
   str: AnsiString;
-  buffer: array of byte;
+  // buffer: array of byte;
 begin
   try
-    SetLength(buffer, len);
+    // SetLength(buffer, len);
     SetLength(str, len);
     // Move(buff, buffer, len);
-    CopyMemory(buffer, buff, len);
+    // CopyMemory(buffer, buff, len);
     // Move(buffer, str[1], len);
-    CopyMemory(@str[1], buffer, len);
-    Result := str;
+    CopyMemory(@str[1], buff, len);
+    result := str;
   Except
   end;
 end;
 
 function ByteToWideString2(buff: pbyte; len: Integer): String; // 不要回车换行#13#10
+var
+  str: AnsiString;
+begin
+  try
+    SetLength(str, len);
+    CopyMemory(@str[1], buff, len);
+    str := StringReplace(str, chr(13) + chr(10), '', [rfReplaceAll]); // 删除回车
+    result := StripNonAsciiExceptCRLF(str);
+  Except
+  end;
+end;
+
+function ByteToWideString3(buff: pbyte; len: Integer): String; // 不要回车换行#13#10
 var
   str: AnsiString;
   buffer: array of byte;
@@ -343,7 +413,7 @@ begin
     // Move(buffer, str[1], len);
     CopyMemory(@str[1], buffer, len);
     str := StringReplace(str, chr(13) + chr(10), '', [rfReplaceAll]); // 删除回车
-    Result := trim(str);
+    result := Trim(str);
   Except
   end;
 end;
@@ -383,25 +453,22 @@ begin
   end;
   AppendMenu(Menu, MF_SEPARATOR, 1023, 0);
   SystemMainMenu.Items.Caption := 'Theme';
-  AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, SystemMainMenu.handle,
-    PChar(SystemMainMenu.Items.Caption));
+  AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, SystemMainMenu.handle, PChar(SystemMainMenu.Items.Caption));
   // for i := Low(TStyleManager.StyleNames) to High(TStyleManager.StyleNames) do
   // AppendMenu(Menu,MF_POPUP,100+i,pchar(TStyleManager.StyleNames[i]));
   AppendMenu(GetSysteMmenu(handle, false), MF_SEPARATOR, 1024, nil);
-  AppendMenu(GetSysteMmenu(handle, false), MF_UNCHECKED, 1025,
-    PChar('Keep At The Top Always '));
+  AppendMenu(GetSysteMmenu(handle, false), MF_UNCHECKED, 1025, PChar('Keep At The Top Always '));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1026, pchar(VERSIONNAME));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1027, pchar('English'));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1028,  pchar('Chinese'));
   AppendMenu(GetSysteMmenu(handle, false), MF_SEPARATOR, 1027, nil);
-  AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1028,
-    PChar('Help Support'));
+  AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1028, PChar('Help Support'));
   // AppendMenu(GetSysteMmenu(handle, false), MF_POPUP, 1029, pchar(WEB_SITE));
 end;
 
 function GetStyle(i: Integer): String;
 begin
-  Result := TStyleManager.StyleNames[i];
+  result := TStyleManager.StyleNames[i];
 end;
 
 procedure AdjustSetStyle(Style: String);
@@ -507,15 +574,15 @@ function GetDefaultLauguageStrByName(Name: String; Lang: String): String;
 var
   i: Integer;
 begin
-  Result := '';
+  result := '';
   for i := Low(DefaultLauguageStr) to High(DefaultLauguageStr) do
   begin
     if DefaultLauguageStr[i].Name = Name then
     begin
       if (Lang = 'CN') then
-        Result := DefaultLauguageStr[i].Caption1
+        result := DefaultLauguageStr[i].Caption1
       else
-        Result := DefaultLauguageStr[i].Caption2;
+        result := DefaultLauguageStr[i].Caption2;
       break;
     end;
   end;
@@ -525,12 +592,12 @@ function GetComponentLauguageName(Name: String): String;
 var
   i: Integer;
 begin
-  Result := '';
+  result := '';
   for i := Low(DefaultLauguageStr) to High(DefaultLauguageStr) do
   begin
     if DefaultLauguageStr[i].Name = Name then
     begin
-      Result := 'MESSAGE_' + IntToStr(i);
+      result := 'MESSAGE_' + IntToStr(i);
       break;
     end;
   end;
@@ -553,20 +620,16 @@ begin
       if str = '' then
         Continue;
       if tmpComponent is TButton then
-        TButton(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE', str,
-          TButton(tmpComponent).Caption);
+        TButton(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE', str, TButton(tmpComponent).Caption);
 
       if tmpComponent is TCheckBox then
-        TCheckBox(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE', str,
-          TCheckBox(tmpComponent).Caption);
+        TCheckBox(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE', str, TCheckBox(tmpComponent).Caption);
 
       if tmpComponent is TLabel then
-        TLabel(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE', str,
-          TLabel(tmpComponent).Caption);
+        TLabel(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE', str, TLabel(tmpComponent).Caption);
 
       if tmpComponent is TMenuItem then
-        TMenuItem(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE', str,
-          TMenuItem(tmpComponent).Caption);
+        TMenuItem(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE', str, TMenuItem(tmpComponent).Caption);
       // if tmpComponent is TNotebook then
       // begin
       // for j := 0 to TNotebook(tmpComponent).Pages.Count-1 do
@@ -608,20 +671,16 @@ begin
     Begin
       tmpComponent := Form.Components[i];
       if tmpComponent is TButton then
-        TButton(tmpComponent).Caption := GetDefaultLauguageStrByName
-          (tmpComponent.Name, 'EN');
+        TButton(tmpComponent).Caption := GetDefaultLauguageStrByName(tmpComponent.Name, 'EN');
 
       if tmpComponent is TCheckBox then
-        TCheckBox(tmpComponent).Caption := GetDefaultLauguageStrByName
-          (tmpComponent.Name, 'EN');
+        TCheckBox(tmpComponent).Caption := GetDefaultLauguageStrByName(tmpComponent.Name, 'EN');
 
       if tmpComponent is TLabel then
-        TLabel(tmpComponent).Caption := GetDefaultLauguageStrByName
-          (tmpComponent.Name, 'EN');
+        TLabel(tmpComponent).Caption := GetDefaultLauguageStrByName(tmpComponent.Name, 'EN');
 
       if tmpComponent is TMenuItem then
-        TMenuItem(tmpComponent).Caption := GetDefaultLauguageStrByName
-          (tmpComponent.Name, 'EN');
+        TMenuItem(tmpComponent).Caption := GetDefaultLauguageStrByName(tmpComponent.Name, 'EN');
     End;
   END;
 end;

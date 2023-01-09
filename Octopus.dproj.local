@@ -1,58 +1,60 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2018/05/15 13:06:54.000.960,E:\LiLeiming\OCTOPUS_20180509_100\SplitView.dproj=E:\LiLeiming\OCTOPUS_20180509_100\Octopus.dproj</Transaction>
+    <Transaction>2018/05/15 13:06:54.000.960,E:\LiLeiming\OCTOPUS_20180509_100\Octopus.dproj=E:\LiLeiming\OCTOPUS_20180509_100\SplitView.dproj</Transaction>
     <Transaction>2018/05/16 17:29:33.000.804,=E:\LiLeiming\OCTOPUS_20180509_100\Unit1.pas</Transaction>
-    <Transaction>2018/05/16 17:29:47.000.894,E:\LiLeiming\OCTOPUS_20180509_100\Unit100.pas=E:\LiLeiming\OCTOPUS_20180509_100\Unit1.pas</Transaction>
-    <Transaction>2018/05/21 12:38:00.000.625,=E:\LiLeiming\OCTOPUS_20180509_100\ComPort\CPortCtl.pas</Transaction>
+    <Transaction>2018/05/16 17:29:47.000.894,E:\LiLeiming\OCTOPUS_20180509_100\Unit1.pas=E:\LiLeiming\OCTOPUS_20180509_100\Unit100.pas</Transaction>
     <Transaction>2018/05/21 12:38:00.000.638,=E:\LiLeiming\OCTOPUS_20180509_100\ComPort\CPortEsc.pas</Transaction>
+    <Transaction>2018/05/21 12:38:00.000.625,=E:\LiLeiming\OCTOPUS_20180509_100\ComPort\CPortCtl.pas</Transaction>
     <Transaction>2018/05/21 12:38:00.000.609,=E:\LiLeiming\OCTOPUS_20180509_100\ComPort\CPort.pas</Transaction>
     <Transaction>2018/05/21 12:42:41.000.657,=E:\LiLeiming\OCTOPUS_20180509_100\ComPort\CPortSetup.pas</Transaction>
     <Transaction>2018/05/21 12:42:42.000.384,=E:\LiLeiming\OCTOPUS_20180509_100\ComPort\CPortTrmSet.pas</Transaction>
-    <Transaction>2018/05/30 10:48:01.000.763,E:\LiLeiming\OCTOPUS_20180509_100\OcComPortObj.pas=E:\LiLeiming\OCTOPUS_20180509_100\Unit100.pas</Transaction>
+    <Transaction>2018/05/30 10:48:01.000.763,E:\LiLeiming\OCTOPUS_20180509_100\Unit100.pas=E:\LiLeiming\OCTOPUS_20180509_100\OcComPortObj.pas</Transaction>
     <Transaction>2018/06/07 18:12:18.000.704,=E:\LiLeiming\OCTOPUS_20180607_300\Unit1.pas</Transaction>
-    <Transaction>2018/06/07 18:13:18.000.056,E:\LiLeiming\OCTOPUS_20180607_300\OcProtocol.pas=E:\LiLeiming\OCTOPUS_20180607_300\Unit1.pas</Transaction>
+    <Transaction>2018/06/07 18:13:18.000.056,E:\LiLeiming\OCTOPUS_20180607_300\Unit1.pas=E:\LiLeiming\OCTOPUS_20180607_300\OcProtocol.pas</Transaction>
     <Transaction>2018/06/20 11:09:29.000.168,=F:\dx\OCTOPUS_20180618_400\HID\JvHidControllerClass.pas</Transaction>
-    <Transaction>2018/06/20 11:09:46.000.489,=F:\dx\OCTOPUS_20180618_400\HID\SetupApi.pas</Transaction>
+    <Transaction>2018/06/20 11:09:46.000.264,=F:\dx\OCTOPUS_20180618_400\HID\HidUsage.pas</Transaction>
     <Transaction>2018/06/20 11:09:46.000.289,=F:\dx\OCTOPUS_20180618_400\HID\JVCLVer.pas</Transaction>
-    <Transaction>2018/06/20 11:09:46.000.393,=F:\dx\OCTOPUS_20180618_400\HID\JvResources.pas</Transaction>
     <Transaction>2018/06/20 11:09:46.000.336,=F:\dx\OCTOPUS_20180618_400\HID\JvConsts.pas</Transaction>
+    <Transaction>2018/06/20 11:09:46.000.187,=F:\dx\OCTOPUS_20180618_400\HID\DBT.pas</Transaction>
+    <Transaction>2018/06/20 11:09:46.000.393,=F:\dx\OCTOPUS_20180618_400\HID\JvResources.pas</Transaction>
     <Transaction>2018/06/20 11:09:46.000.445,=F:\dx\OCTOPUS_20180618_400\HID\ModuleLoader.pas</Transaction>
-    <Transaction>2018/06/20 11:09:46.000.312,=F:\dx\OCTOPUS_20180618_400\HID\JvComponentBase.pas</Transaction>
-    <Transaction>2018/06/20 11:09:46.000.514,=F:\dx\OCTOPUS_20180618_400\HID\WinConvTypes.pas</Transaction>
-    <Transaction>2018/06/20 11:09:46.000.238,=F:\dx\OCTOPUS_20180618_400\HID\HidToken.pas</Transaction>
+    <Transaction>2018/06/20 11:09:46.000.489,=F:\dx\OCTOPUS_20180618_400\HID\SetupApi.pas</Transaction>
     <Transaction>2018/06/20 11:09:46.000.215,=F:\dx\OCTOPUS_20180618_400\HID\HID.pas</Transaction>
     <Transaction>2018/06/20 11:09:46.000.420,=F:\dx\OCTOPUS_20180618_400\HID\JvTypes.pas</Transaction>
-    <Transaction>2018/06/20 11:09:46.000.264,=F:\dx\OCTOPUS_20180618_400\HID\HidUsage.pas</Transaction>
-    <Transaction>2018/06/20 11:09:46.000.187,=F:\dx\OCTOPUS_20180618_400\HID\DBT.pas</Transaction>
+    <Transaction>2018/06/20 11:09:46.000.514,=F:\dx\OCTOPUS_20180618_400\HID\WinConvTypes.pas</Transaction>
+    <Transaction>2018/06/20 11:09:46.000.312,=F:\dx\OCTOPUS_20180618_400\HID\JvComponentBase.pas</Transaction>
+    <Transaction>2018/06/20 11:09:46.000.238,=F:\dx\OCTOPUS_20180618_400\HID\HidToken.pas</Transaction>
     <Transaction>2018/06/25 14:53:25.000.712,=F:\dx\OCTOPUS_20180624_400\ocPcDeviceMgt.pas</Transaction>
     <Transaction>2018/06/25 16:24:16.000.628,=F:\dx\OCTOPUS_20180624_400\Unit200.pas</Transaction>
     <Transaction>2018/07/04 08:28:47.000.858,=F:\dx\OCTOPUS_20180701_400\Unit1.pas</Transaction>
-    <Transaction>2018/07/04 08:29:11.000.568,F:\dx\OCTOPUS_20180701_400\Unit1.pas=F:\dx\OCTOPUS_20180701_400\OcDecrypt.pas</Transaction>
+    <Transaction>2018/07/04 08:29:11.000.568,F:\dx\OCTOPUS_20180701_400\OcDecrypt.pas=F:\dx\OCTOPUS_20180701_400\Unit1.pas</Transaction>
     <Transaction>2018/09/09 14:27:40.000.680,=D:\dx\OCTOPUS_20180718_400\LIBFT260.PAS</Transaction>
-    <Transaction>2018/12/03 18:45:45.000.150,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Octopus.dproj=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\SplitView.dproj</Transaction>
-    <Transaction>2018/12/03 18:46:45.000.313,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\SplitView.dproj=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Octopus.dproj</Transaction>
+    <Transaction>2018/12/03 18:45:45.000.150,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\SplitView.dproj=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Octopus.dproj</Transaction>
+    <Transaction>2018/12/03 18:46:45.000.313,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Octopus.dproj=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\SplitView.dproj</Transaction>
     <Transaction>2018/12/04 17:06:29.000.298,=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Unit1.pas</Transaction>
-    <Transaction>2018/12/04 17:06:46.000.633,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\UnitCmdShell.pas=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Unit1.pas</Transaction>
+    <Transaction>2018/12/04 17:06:46.000.633,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Unit1.pas=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\UnitCmdShell.pas</Transaction>
     <Transaction>2018/12/06 14:38:48.000.447,=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Unit1.pas</Transaction>
-    <Transaction>2018/12/06 15:44:58.000.405,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Unit1.pas=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\OcFindAnd.pas</Transaction>
-    <Transaction>2018/12/06 15:44:58.000.405,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Unit1.dfm=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\OcFindAnd.dfm</Transaction>
+    <Transaction>2018/12/06 15:44:58.000.405,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\OcFindAnd.dfm=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Unit1.dfm</Transaction>
+    <Transaction>2018/12/06 15:44:58.000.405,D:\DelphiProjects\dx\OCTOPUS_20181202_4000\OcFindAnd.pas=D:\DelphiProjects\dx\OCTOPUS_20181202_4000\Unit1.pas</Transaction>
     <Transaction>2018/12/15 18:05:06.000.357,D:\DelphiProjects\OCTOPUS\OCTOPUS_20181212_4210\HID\SetupApi.pas=</Transaction>
     <Transaction>2018/12/15 18:06:07.000.610,D:\DelphiProjects\OCTOPUS\OCTOPUS_20181212_4210\LIBFT260.PAS=</Transaction>
     <Transaction>2018/12/15 18:06:34.000.641,=D:\DelphiProjects\OCTOPUS\OCTOPUS_20181212_4210\HID\JvSetupApi.pas</Transaction>
     <Transaction>2022/03/03 20:52:04.000.967,F:\DelphiProjects\OCTOPUS\ComPort\CPortSetup.pas=</Transaction>
     <Transaction>2022/03/03 20:52:29.000.337,F:\DelphiProjects\OCTOPUS\ComPort\CPort.pas=</Transaction>
-    <Transaction>2022/03/03 20:53:48.000.387,=F:\DelphiProjects\OCTOPUS\ComPort\CPortSetup.pas</Transaction>
     <Transaction>2022/03/03 20:53:48.000.340,=F:\DelphiProjects\OCTOPUS\ComPort\CPort.pas</Transaction>
+    <Transaction>2022/03/03 20:53:48.000.387,=F:\DelphiProjects\OCTOPUS\ComPort\CPortSetup.pas</Transaction>
+    <Transaction>2023/01/06 18:37:40.000.172,=F:\DelphiProjects\OCTOPUS\Unit1.pas</Transaction>
+    <Transaction>2023/01/06 18:37:51.000.072,F:\DelphiProjects\OCTOPUS\CRC.pas=F:\DelphiProjects\OCTOPUS\Unit1.pas</Transaction>
   </Transactions>
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="ComPort"/>
+    <File Path="ComPort\CPort.pas"/>
     <File Path="ComPort\CPortCtl.pas"/>
     <File Path="ComPort\CPortEsc.pas"/>
-    <File Path="ComPort\CPortTrmSet.pas"/>
-    <File Path="ComPort\CPort.pas"/>
     <File Path="ComPort\CPortSetup.pas"/>
     <File Path="ComPort\CPortSetup.dfm"/>
+    <File Path="ComPort\CPortTrmSet.pas"/>
     <File Path="HID"/>
     <File Path="HID\DBT.pas"/>
     <File Path="HID\HID.pas"/>
@@ -77,5 +79,6 @@
     <File Path="UnitCmdShell.pas"/>
     <File Path="uSplitView.pas"/>
     <File Path="uSplitView.dfm"/>
+    <File Path="CRC.pas"/>
   </ProjectSortOrder>
 </BorlandProject>

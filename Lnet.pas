@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, IdCustomTCPServer, IdTCPServer, IdBaseComponent, IdComponent,
-  IdTCPConnection, IdTCPClient, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Menus;
+  IdTCPConnection, IdTCPClient, Vcl.StdCtrls, Vcl.ComCtrls, Vcl.Menus,
+  System.Net.URLClient, System.Net.HttpClient, System.Net.HttpClientComponent;
 
 type
   TForm1 = class(TForm)
@@ -19,6 +20,8 @@ type
     PopupMenu1: TPopupMenu;
     fd1: TMenuItem;
     tt1: TMenuItem;
+    NetHTTPRequest1: TNetHTTPRequest;
+    NetHTTPClient1: TNetHTTPClient;
     procedure Button1Click(Sender: TObject);
   private
     { Private declarations }

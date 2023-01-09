@@ -3,20 +3,19 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 480
-  ClientWidth = 321
+  ClientWidth = 796
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 321
+    Width = 796
     Height = 480
     Align = alClient
     BevelOuter = bvNone
@@ -24,7 +23,7 @@ object Form1: TForm1
     object Panel2: TPanel
       Left = 0
       Top = 0
-      Width = 321
+      Width = 796
       Height = 74
       Align = alTop
       BevelOuter = bvNone
@@ -43,7 +42,7 @@ object Form1: TForm1
     object TreeView1: TTreeView
       Left = 0
       Top = 74
-      Width = 321
+      Width = 796
       Height = 406
       Align = alClient
       Indent = 19
@@ -62,7 +61,6 @@ object Form1: TForm1
   end
   object IdTCPClient1: TIdTCPClient
     ConnectTimeout = 0
-    IPVersion = Id_IPv4
     Port = 0
     ReadTimeout = -1
     Left = 32
@@ -83,5 +81,17 @@ object Form1: TForm1
     object tt1: TMenuItem
       Caption = 'tt'
     end
+  end
+  object NetHTTPRequest1: TNetHTTPRequest
+    ConnectionTimeout = 0
+    SendTimeout = 0
+    ResponseTimeout = 0
+    Left = 496
+    Top = 168
+  end
+  object NetHTTPClient1: TNetHTTPClient
+    UserAgent = 'Embarcadero URI Client/1.0'
+    Left = 400
+    Top = 168
   end
 end
