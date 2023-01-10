@@ -1683,15 +1683,15 @@ begin
   Data[7] := $00; // 数据
   Data[8] := $00; // 数据
   pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
-  bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, 89);
+  bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
   if not bStatusOK then
   begin
     OcComPortObj.Log('device is not ready to receive file!');
     exit;
   end;
 
-  Data[2] := OCCOMPROTOCAL_DATA;
-  Data[3] := OCCOMPROTOCAL_FLASH_WRITE; // 写FLASH
+  Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // 写FLASH
+  Data[3] := 0; //
   for i := 0 to SL.Count - 1 do
   begin
     Application.ProcessMessages;
