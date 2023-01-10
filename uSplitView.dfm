@@ -48,7 +48,6 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -270,7 +269,8 @@ object SplitViewForm: TSplitViewForm
               OnChange = ComboBox6Change
               Items.Strings = (
                 'ASCII Format            '#23383#31526#20018
-                'Hexadecimal Format '#21313#20845#36827#21046' ')
+                'Hexadecimal Format '#21313#20845#36827#21046' '
+                'Octopus Protocol      '#21327#35758' ')
             end
             object ComboBox5: TComboBox
               Left = 76
@@ -738,6 +738,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -1000,33 +1001,7 @@ object SplitViewForm: TSplitViewForm
             Height = 478
             Align = alClient
             Lines.Strings = (
-              '4F 63 74 6F '
-              '70 75 73 20 '
-              'D5 C2 D3 '
-              'E3 B4 AE '
-              'BF DA D6 '
-              'FA CA '
-              'D6 4F 63 74 '
-              '6F 70 75 73 '
-              '20 D5 C2 '
-              'D3 E3 B4 '
-              'AE BF DA '
-              'D6 FA '
-              'CA D6 4F '
-              '63 74 6F 70 '
-              '75 73 20 D5 '
-              'C2 D3 '
-              'E3 '
-              'B4 AE BF '
-              'DA D6 '
-              'FA CA D6 '
-              '4F 63 74 6F '
-              '70 75 73 20 '
-              'D5 C2 D3 '
-              'E3 B4 AE '
-              'BF DA '
-              'D6 FA CA '
-              'D6 ')
+              'restart')
             ScrollBars = ssVertical
             TabOrder = 0
           end
@@ -1039,13 +1014,22 @@ object SplitViewForm: TSplitViewForm
             BevelOuter = bvNone
             TabOrder = 1
             object Button16: TButton
-              Left = 2
+              Left = 99
               Top = 0
-              Width = 308
+              Width = 211
               Height = 34
               Caption = #21457#36865#25805#20316
               TabOrder = 0
               OnClick = Button16Click
+            end
+            object Button27: TButton
+              Left = 3
+              Top = 0
+              Width = 94
+              Height = 34
+              Caption = #28165#38500
+              TabOrder = 1
+              OnClick = Button27Click
             end
           end
           object Panel18: TPanel
@@ -1090,9 +1074,9 @@ object SplitViewForm: TSplitViewForm
               Width = 237
               Height = 25
               Style = csDropDownList
-              ItemIndex = 0
+              ItemIndex = 1
               TabOrder = 0
-              Text = 'Read'
+              Text = 'Write'
               Items.Strings = (
                 'Read'
                 'Write'
@@ -1108,8 +1092,9 @@ object SplitViewForm: TSplitViewForm
               Style = csDropDownList
               ItemIndex = 0
               TabOrder = 1
-              Text = 'I2C'
+              Text = 'Octopus'
               Items.Strings = (
+                'Octopus'
                 'I2C'
                 'SPI'
                 'RS232'
@@ -1126,9 +1111,12 @@ object SplitViewForm: TSplitViewForm
               Top = 34
               Width = 237
               Height = 25
+              ItemIndex = 0
               TabOrder = 2
-              Text = '0x40'
+              Text = '0x00'
               OnKeyPress = ComboBox10KeyPress
+              Items.Strings = (
+                '0x00')
             end
             object ComboBox11: TComboBox
               Left = 73

@@ -17,51 +17,61 @@ uses
 
 // type OCCOMPROTOCAL_STATUS=();
 const
-  OCCOMPROTOCAL_HEAD = $0101; // $55AA;
-  OCCOMPROTOCAL_HEAD2 = $0AFF; // 不同的头码，不同数据格式
-
-  OCCOMPROTOCAL_END = $7E; // $AA55;
-
-  OCCOMPROTOCAL_START = 10; // 连接，要求对方回复 状态是否可以连接
-  OCCOMPROTOCAL_ACK = 11; // 一般相应，要求对方相应当前状态
-  OCCOMPROTOCAL_READY = 12; // 准备就绪标记
-  OCCOMPROTOCAL_OVER = 13; // 任务结束标记
-  OCCOMPROTOCAL_GOT = $0E00; // 14; //数据包确认标记收到标记 ,复合在高字节
-
-  OCCOMPROTOCAL_I2C_READ = 50;
-  OCCOMPROTOCAL_I2C_WRITE = 51;
-  OCCOMPROTOCAL_SPI_READ = 52;
-  OCCOMPROTOCAL_SPI_WRITE = 53;
-  OCCOMPROTOCAL_WIFI_READ = 54;
-  OCCOMPROTOCAL_WIFI_WRITE = 55;
-  OCCOMPROTOCAL_UART_READ = 56;
-  OCCOMPROTOCAL_UART_WRITE = 57;
-
-  OCCOMPROTOCAL_DATA1 = $FA; // 标准协议数据 最大负载是512字节
-  OCCOMPROTOCAL_DATA2 = $FB; // 非标准协议表示数据是连续的没有分包或者说只有一个包
-  OCCOMPROTOCAL_DATA_OVER = $FD; // 数据发送完成
-
-  OCCOMPROTOCAL_ERROR = $FFFF;
-  OCCOMPROTOCAL_NONE = $0000;
   OCCOMPROTOCAL_PACK_RING_BUFFER_HIGHT = 1024 * 4;
 
-  OCCOMPROTOCAL_WM_ACK = WM_APP + 100;
+  OCCOMPROTOCAL_HEAD = $0101; // $55AA;
+  OCCOMPROTOCAL_HEAD2 = $0AFF; // 不同的头码，不同数据格式
+  // OCCOMPROTOCAL_HEAD2_BigEndian = $FF0A; //大端存储
+  OCCOMPROTOCAL_END = $7E; // $AA55;
 
-  OCCOMPROTOCAL_PACK_PACKPAYLOAD_MAX_LENGTH = 500;
+  // 一级命令
+  OCCOMPROTOCAL_DATA = $DA; // 标准协议数据 包最大是512字节
+  // OCCOMPROTOCAL_DATA2 = $DB; // 非标准协议表示数据是连续的没有分包或者说只有一个包
+  OCCOMPROTOCAL_DATA_COMPLETE = $DC; // 数据发送完成
+  OCCOMPROTOCAL_OVER = OCCOMPROTOCAL_DATA_COMPLETE; // 任务结束标记
+
+  OCCOMPROTOCAL_REBOOT = $BB; // reboot
+  OCCOMPROTOCAL_INBOOT = $B1; // start to boot loacd
+  OCCOMPROTOCAL_INAPP = $BA; // start to app
+
+  OCCOMPROTOCAL_START = $00; // 连接，要求对方回复 状态是否可以连接
+  OCCOMPROTOCAL_ACK = $01; // 一般相应，要求对方相应当前状态
+  OCCOMPROTOCAL_CONFIRM = $02; // 数据包确认标记收到标记 ,复合在高字节
+
+  // 二级命令
+  OCCOMPROTOCAL_FLASH_READ = $F0;
+  OCCOMPROTOCAL_FLASH_WRITE = $F1;
+
+  // OCCOMPROTOCAL_I2C_READ = 50;
+  // OCCOMPROTOCAL_I2C_WRITE = 51;
+  // OCCOMPROTOCAL_SPI_READ = 52;
+  // OCCOMPROTOCAL_SPI_WRITE = 53;
+  // OCCOMPROTOCAL_WIFI_READ = 54;
+  // OCCOMPROTOCAL_WIFI_WRITE = 55;
+  // OCCOMPROTOCAL_UART_READ = 56;
+  // OCCOMPROTOCAL_UART_WRITE = 57;
+
+  // OCCOMPROTOCAL_ERROR = $FFFF;
+  // OCCOMPROTOCAL_NONE = $0000;
+
+
+  // OCCOMPROTOCAL_WM_ACK = WM_APP + 100;
+
   OCCOMPROTOCAL_PACK_MAX_LENGTH = 512;
+  OCCOMPROTOCAL_PACK_PACKPAYLOAD_MAX_LENGTH = OCCOMPROTOCAL_PACK_MAX_LENGTH - 7;
 
 type
 
   POcComPack = ^TOcComPack;
   POcComPack2 = ^TOcComPackHead2;
 
-  TOcComPack = packed record // 7+500 =524
+  TOcComPack = packed record // 7+512 =519 //实际填充数据整个包的长度不要超过512，需要预留CRC和结束码
     Head: WORD; // 头部识别码 2
     PID: WORD; // 包的类型  2
     Index: byte; // 包的索引  1
     Length: WORD; // 实际数据长度  2
-    data: array [0 .. OCCOMPROTOCAL_PACK_PACKPAYLOAD_MAX_LENGTH] of byte; // 包后面的数据 500
-    // CRC: byte; // CRC校验    2
+    data: array [0 .. 511] of byte; // 包后面的数据
+    // CRC: byte; // CRC校验    2 //填充到有效负载的后面
     // EndFlag:byte; 1
   end;
 
@@ -94,8 +104,8 @@ type
     Constructor Create();
     destructor Destroy;
 
-    function CreatePack(Id: byte): TOcComPack; overload;
-    function CreatePack(Head: WORD; Id: byte): TOcComPack; overload;
+    function CreatePack(Id: WORD): TOcComPack; overload;
+    function CreatePack(Head: WORD; Id: WORD): TOcComPack; overload;
 
     function AddPackToPackList(OcComPack: POcComPack): Integer; overload;
     function AddPackToPackList(OcComPack: POcComPack2): Integer; overload;
@@ -104,10 +114,10 @@ type
     function CheckPackCRC(p: POcComPack2; bLength: Integer): Boolean; overload;
 
     function WaitingForACK(OcComPack: TOcComPackHead; timeOut: Integer): Boolean; overload;
-    function WaitingForACK(OcComPack: TOcComPackHead2; timeOut: Integer): Boolean; overload;
+    // function WaitingForACK(OcComPack: TOcComPackHead2; timeOut: Integer): Boolean; overload;
     function WaitingForACK(ACK: Integer; timeOut: Integer): Boolean; overload;
 
-    function GetLastPackHead(): TOcComPackHead;
+    // function GetLastPackHead(): TOcComPackHead;
     function GetLastPack(): POcComPack;
     function GetNewPack(): POcComPack;
 
@@ -116,6 +126,8 @@ type
     procedure ClearPacks();
     function CheckPackMinLength(bLength: Integer): Boolean;
     function CheckPackLength(p: POcComPack; bLength: Integer): Boolean;
+    procedure SetCRC8(pPOcComPack: POcComPack);
+    procedure SetEndFlag(pPOcComPack: POcComPack);
 
     function ParserPack(buff: PByte; Count: Integer): Integer;
 
@@ -141,23 +153,27 @@ begin
 
 end;
 
-function TOcComProtocal.CreatePack(Id: byte): TOcComPack;
+function TOcComProtocal.CreatePack(Id: WORD): TOcComPack;
 var
   OcComPack: TOcComPack;
 begin
-  OcComPack.Length := SizeOf(TOcComPackHead);
-  OcComPack.Head := OCCOMPROTOCAL_HEAD;
-  OcComPack.PID := Id;
+  ZeroMemory(@OcComPack, SizeOf(TOcComPack));
+  OcComPack.Head := OCCOMPROTOCAL_HEAD; // 2
+  OcComPack.PID := Id; // 2
+  OcComPack.Index := 0; // 1
+  OcComPack.Length := 0; // 没有数据      //2
   Result := OcComPack;
 end;
 
-function TOcComProtocal.CreatePack(Head: WORD; Id: byte): TOcComPack;
+function TOcComProtocal.CreatePack(Head: WORD; Id: WORD): TOcComPack;
 var
   OcComPack: TOcComPack;
 begin
-  OcComPack.Length := SizeOf(TOcComPackHead);
-  OcComPack.Head := Head;
-  OcComPack.PID := Id;
+  ZeroMemory(@OcComPack, SizeOf(TOcComPack));
+  OcComPack.Head := Head; // 2
+  OcComPack.PID := Id; // 2
+  OcComPack.Index := 0; // 1
+  OcComPack.Length := 0; // 没有数据      //2
   Result := OcComPack;
 end;
 
@@ -261,37 +277,10 @@ begin
     end;
 
     Oc := FPackList_RB[FPackList_RB_Top];
-    if (Oc.Head = OcComPack.Head) and (Oc.PID = byte(OcComPack.PID)) and (Oc.Index = OcComPack.Index) { and (Oc.Total = OcComPack.Total) } and (Oc.Length = OcComPack.Length) and
-      ((Oc.PID and $FF00) = OCCOMPROTOCAL_GOT) then // 表示这个包收到
+    if (Oc.Head = OcComPack.Head) and (Oc.PID = byte(OcComPack.PID)) and (Oc.Index = OcComPack.Index) { and (Oc.Total = OcComPack.Total) } and (Oc.Length = OcComPack.Length) then // 表示这个包收到
     begin
       Result := True;
       break;
-    end;
-  end;
-end;
-
-function TOcComProtocal.WaitingForACK(OcComPack: TOcComPackHead2; timeOut: Integer): Boolean;
-var
-  Oc: TOcComPack;
-  Start: real;
-  // pb: PByte;
-begin
-  Result := false;
-  Start := GetTickCount;
-  while (True) do
-  begin
-    if (GetTickCount - Start) > timeOut then
-    begin
-      break; // 超时推出
-    end;
-    Oc := FPackList_RB[FPackList_RB_Top];
-    if (Oc.Head = OcComPack.Head) and (Oc.PID = byte(OcComPack.PID)) and (Oc.Length = OcComPack.Length) then // 表示这个包收到
-    begin
-      if Oc.data[0] = 89 then // 0x59 89 Y
-      begin
-        Result := True;
-        break;
-      end;
     end;
   end;
 end;
@@ -320,7 +309,7 @@ begin
         break;
       end;
     end;
-    //Application.
+    // Application.
   end;
 end;
 
@@ -329,16 +318,16 @@ begin
   Result := nil;
   if (FPackList_RB_NewIndex <> FPackList_RB_Top) then
   begin
-     Result:= GetLastPack();
-     FPackList_RB_NewIndex:= FPackList_RB_Top;
+    Result := GetLastPack();
+    FPackList_RB_NewIndex := FPackList_RB_Top;
   end
 end;
 
-function TOcComProtocal.GetLastPackHead(): TOcComPackHead;
-begin
-  Result.PID := OCCOMPROTOCAL_ERROR;
-  CopyMemory(@Result, @FPackList_RB[FPackList_RB_Top], SizeOf(TOcComPackHead));
-end;
+// function TOcComProtocal.GetLastPackHead(): TOcComPackHead;
+// begin
+// Result.PID := OCCOMPROTOCAL_ERROR;
+// CopyMemory(@Result, @FPackList_RB[FPackList_RB_Top], SizeOf(TOcComPackHead));
+// end;
 
 function TOcComProtocal.GetLastPack(): POcComPack;
 begin
@@ -405,10 +394,11 @@ var
 begin
   pb := @p;
   Result := 0;
-  for i := 0 to p.Length - 2 do
+  for i := 0 to (SizeOf(TOcComPackHead) + p.Length - 1) do
   begin
     // result := CalCRC8(data,result,GenPoly8); // 按位计算CRC
     Result := QuickCRC8(pb^, Result); // 快速查表计算CRC
+    INC(pb);
   end;
 end;
 
@@ -417,27 +407,32 @@ var
   iByte: Integer; // 记录消费掉的字节个数
   p1: POcComPack;
   p2: POcComPack2;
-  // pw: PByte;
+
+  OcComPack: TOcComPack; // 无效的数据打包显示
+  // OcComPack_Count: Integer;
 begin
   iByte := 0;
   Result := 0; // 记录消费掉的字节个数
 
+  OcComPack.Head := 0;
+  OcComPack.PID := 0;
+  OcComPack.Length := 0;
+
   while (True) do
   begin
     Result := iByte; // 记录消费掉的字节个数
-
-    if (not CheckPackMinLength(Count - Result)) then
-      break; // 退出需要更多数据
+    if (Count - iByte < 2) then
+      break;
 
     p1 := @buff[iByte];
     p2 := @buff[iByte];
 
     if (p1^.Head = OCCOMPROTOCAL_HEAD) then // 对包头
     begin
-      if (SizeOf(TOcComPackHead) + p1^.Length + 2) > (Count - iByte) then
-      begin
-        break; // 负载不全，等待更多数据
-      end
+      if (not CheckPackMinLength(Count - iByte)) then
+        break // 头码不全，需要更多数据
+      else if (SizeOf(TOcComPackHead) + p1^.Length + 2) > (Count - iByte) then
+        break // 负载不全,需要更多数据
       else if CheckPackCRC(p1, Count - iByte) then
       begin
         iByte := iByte + AddPackToPackList(p1);
@@ -452,10 +447,10 @@ begin
     end
     else if (p2^.Head = OCCOMPROTOCAL_HEAD2) then // 对包头
     begin
-      if p2^.Length > (Count - iByte) then
-      begin
-        break; // 负载不全，等待更多数据
-      end
+      if (not CheckPackMinLength(Count - iByte)) then
+        break // 头码不全，需要更多数据
+      else if p2^.Length > (Count - iByte) then
+        break // 负载不全，需要更多数据
       else if CheckPackCRC(p2, Count - iByte) then
       begin
         iByte := iByte + AddPackToPackList(p2);
@@ -471,11 +466,36 @@ begin
 
     else
     begin
-      INC(iByte); // 继续寻找，跳过的字节数
+      OcComPack.data[OcComPack.Length] := buff[iByte];
+      INC(OcComPack.Length);
+      INC(iByte); // 继续寻找，跳过的字节数  //记录消费掉的字节个数
     end;
-    // Result := iByte;//记录消费掉的字节个数
+
   end; // while
 
+  if Assigned(FCallBackFun) and (OcComPack.Length > 0) then
+    FCallBackFun(@OcComPack); // 打赢废弃数据
+  OcComPack.Length := 0;
+end;
+
+procedure TOcComProtocal.SetCRC8(pPOcComPack: POcComPack);
+var
+  CRC: byte;
+  // i: Integer;
+begin;
+  CRC := CRC8(pPOcComPack); // 快速查表计算CRC
+  // i :=  pPOcComPack.Length;
+  // if i > SizeOf(TOcComPack) then
+  pPOcComPack.data[pPOcComPack.Length] := CRC;
+end;
+
+procedure TOcComProtocal.SetEndFlag(pPOcComPack: POcComPack);
+var
+  CRC: byte;
+  // i: Integer;
+begin;
+  // i := SizeOf(TOcComPackHead) + pPOcComPack.Length + 1;
+  pPOcComPack.data[pPOcComPack.Length + 1] := OCCOMPROTOCAL_END;
 end;
 
 function GetGUI(): String;

@@ -188,6 +188,7 @@ type
     LabeledEdit1: TLabeledEdit;
     Button14: TButton;
     Label4: TLabel;
+    Button27: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -254,7 +255,7 @@ type
     function CheckHID(DeviceName: String): TJvHidDevice;
     function GetHID_IDX(DeviceName: String): Integer;
     function CheckHID_ShortName(DeviceName: String): String;
-    function GetCurrentDeviceName(): String;
+
     procedure HIDWrite(HidDev: TJvHidDevice; buf: Array of byte; WriteCount: Integer; var BytesWritten: Cardinal);
     procedure JvHidDeviceController1DeviceData(HidDev: TJvHidDevice; ReportID: byte; const Data: Pointer; Size: Word);
     procedure Button16Click(Sender: TObject);
@@ -287,6 +288,7 @@ type
     procedure Button14Click(Sender: TObject);
 
     function GetStringGridValidStr(sStr: String): String;
+    procedure Button27Click(Sender: TObject);
   private
     // ComReceiveCount: Integer;
     // ComReceiveBuffer: array [0 .. 1048576] of Byte;
@@ -324,8 +326,11 @@ type
     procedure FalconLoadCfg();
     procedure UpdateUiLaunguage(Lang: String);
     procedure MultiCOMPort_UI_Update(DeviceName: String);
+
     function GetDeciceByFullName(DeviceName: string): TOcComPortObj;
     function GetDeciceByPort(Port: string): TOcComPortObj;
+    function GetCurrentDeviceName(): String;
+
     procedure MultiComPortSaveLog();
     procedure UpdateOcComPortObjAtrribute();
     // procedure UpdateOcComPortObjAtrribute2(OcComPortObj: TOcComPortObj);
@@ -1194,86 +1199,82 @@ var
   Addressb: array [0 .. 9] of byte;
   rwCount: Integer;
   // address1: String;
-  fT260_STATUS: Integer;
+  // fT260_STATUS: Integer;
   SL: TStringList;
+  // sendFormat:Integer;
 begin
-  SL := TStringList.Create;
-  str := Trim(ComboBox10.Text);
-  // ExtractStrings([ ' '],   [],   PChar(str),   SL);
-  AdressCount := FormatHexStrToByte2(str, Addressb);
 
+  OcComPortObj := GetDeciceByFullName(GetCurrentDeviceName());
+
+  if (OcComPortObj = nil) then
+  begin
+    // Log0('No device is found,please open a device.');
+    MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    exit;
+  end;
+  if (not OcComPortObj.Connected) then
+  begin
+    // Log0('No device is found,please open a device.');
+    MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    exit;
+  end;
+
+  SL := TStringList.Create;
+  // ExtractStrings([ ' '],   [],   PChar(str),   SL); ExtractStrings函数分割字符串
+  AdressCount := FormatHexStrToByte2(Trim(ComboBox10.Text), Addressb);
   WantReadCount := StrToInt(Trim(ComboBox11.Text));
   str := '';
   for i := 0 to Memo5.Lines.Count - 1 do
     str := str + Trim(Memo5.Lines.Strings[i]) + ' ';
+  str := Trim(str);
+  // sendFormat:= ComboBox6.ItemIndex;
 
-  if (AdressCount > 1) then
-    Count2 := FormatHexStrToByte2(str, Datas[1])
-  else
-    Count2 := FormatHexStrToByte2(str, Datas);
-
-  if (CurrentDevicesJvHidDevice = nil) then
-    exit;
-{$IFDEF CPU32BITS}
-  case ComboBox12.ItemIndex of
-    0:
+  case ComboBox6.ItemIndex of
+    Ord(S_ASCIIFormat):
       begin
-        case ComboBox9.ItemIndex of
-          0:
-            ID := OCCOMPROTOCAL_I2C_READ;
-          1:
-            ID := OCCOMPROTOCAL_SPI_READ;
-        else
-          ID := OCCOMPROTOCAL_DATA1;
-        end;
-        // Ret := OcComPortObj.SendProtocolData(Addressb, Count, ID, False);
-        if (AdressCount > 1) then
-        begin
-          Datas[0] := Addressb[1];
-
-          Log0('Readed datas from device ' + Format('0x%.02x,0x%.02x', [Addressb[0], Addressb[1]]) + ' ' + inttostr(rwCount) + '/' + inttostr(WantReadCount));
-        end
-        else if (AdressCount = 1) then
-        begin
-
-          Log0('Readed datas from device ' + Format('0x%.02x,0x%.02x', [Addressb[0], Addressb[1]]) + ' ' + inttostr(rwCount) + '/' + inttostr(WantReadCount));
-        end;
-        if fT260_STATUS = 0 then
-        begin
-          LogBuffer0(Datas, rwCount);
-        end;
+        WideStringToByte(str, Datas);
+        Count2 := Length(str);
       end;
-    1:
+    Ord(S_HexadecimalFormat):
       begin
-        case ComboBox9.ItemIndex of
-          0:
-            ID := OCCOMPROTOCAL_I2C_WRITE;
-          1:
-            ID := OCCOMPROTOCAL_SPI_WRITE;
-        else
-          ID := OCCOMPROTOCAL_DATA1;
-        end;
         if (AdressCount > 1) then
+          str := FormatHexStrToBuffer(str, &Datas[1], Count2)
+        else
+          str := FormatHexStrToBuffer(str, Datas, Count2);
+      end;
+    Ord(S_OctopusProtocol):
+      begin
+        if not checkIsHexStr(str) then
         begin
-          Datas[0] := Addressb[1];
-          // fT260_STATUS:=FT260_I2CMaster_Write(CurrentDevicesJvHidDevicePFT260_HANDLE,Addressb[0],FT260_I2C_START,@Datas,1,@rwCount);
-
-          Log0('Writen datas to device ' + Format('0x%.02x', [Addressb[0]]) + ' ' + inttostr(rwCount) + '/' + inttostr(Count2));
+          WideStringToByte(str, Datas);
+          Count2 := Length(str);
         end
         else
         begin
-
-          Log0('Writen datas to device ' + Format('0x%.02x', [Addressb[0]]) + ' ' + inttostr(rwCount) + '/' + inttostr(Count2));
+          if (AdressCount > 1) then
+            str := FormatHexStrToBuffer(str, &Datas[1], Count2)
+          else
+            str := FormatHexStrToBuffer(str, Datas, Count2);
         end;
-        LogBuffer0(Datas, rwCount);
       end;
-  else
-    begin
-      // OcComPortObj.RequestProtocolConnection;
-      // TThread.CreateAnonymousThread(OcComPortObj. OcComPortObj.RequestProtocolConnection).Start; //!!!
-    end;
   end;
-{$ENDIF}
+
+  OcComPortObj.SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, Datas, Count2, False);
+
+  { case ComboBox9.ItemIndex of
+    0: // octopus
+    begin
+    // ID := OCCOMPROTOCAL_DATA;
+    OcComPortObj.SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, Datas, Count2, False);
+    end;
+    1: // i2c
+    begin
+    // ID := OCCOMPROTOCAL_I2C_READ;
+    end
+    end; }
+
+  SL.Clear;
+  SL.Free;
 end;
 
 procedure TSplitViewForm.Button17Click(Sender: TObject);
@@ -1336,7 +1337,11 @@ procedure TSplitViewForm.Button14Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
   CodePage: Integer;
+  // data : array[0..255] of byte;
 begin
+  // zeroMemory(@data,sizeOf(data));
+  // IntToBuffer(123456,Data,4);测试
+
   OcComPortObj := GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if OcComPortObj = nil then
   begin
@@ -1637,14 +1642,19 @@ var
   SL: TStringList;
   i: Integer;
   str, tempstr: String;
-  Length: Integer;
+  iLength: Integer;
   baseAddress: dword;
   dataType: String;
   Data: array [0 .. 511] of byte;
   bb4, bb3: byte;
   pPOcComPack: POcComPack;
   bCount: Integer;
-  iDataCount:Integer;
+  // iDataCount: Integer;
+  // reTryCount: Integer;
+  fileSize: Integer;
+  checksum: dword;
+  bStatusOK: Boolean;
+Label FINISHED_OVER;
 begin
   SL := TStringList.Create;
   SL.LoadFromFile(FullFileNameLoaded);
@@ -1655,11 +1665,14 @@ begin
   end;
 
   ZeroMemory(@Data, 512);
-  iDataCount:=0;
+  // iDataCount := 0;
+  fileSize := 0;
+  checksum := 0;
+
   Data[0] := $FF;
   Data[1] := $0A;
 
-  Data[2] := OCCOMPROTOCAL_DATA1;
+  Data[2] := OCCOMPROTOCAL_INBOOT; // 进入bootLAOD
   Data[3] := $00;
 
   Data[4] := $00;
@@ -1667,6 +1680,18 @@ begin
   Data[5] := $00; // 数据长度
   Data[6] := $00; // 数据长度
 
+  Data[7] := $00; // 数据
+  Data[8] := $00; // 数据
+  pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
+  bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, 89);
+  if not bStatusOK then
+  begin
+    OcComPortObj.Log('device is not ready to receive file!');
+    exit;
+  end;
+
+  Data[2] := OCCOMPROTOCAL_DATA;
+  Data[3] := OCCOMPROTOCAL_FLASH_WRITE; // 写FLASH
   for i := 0 to SL.Count - 1 do
   begin
     Application.ProcessMessages;
@@ -1676,54 +1701,80 @@ begin
       OcComPortObj.Log('The file format is wrong.');
       break;
     end;
-    if str = '00000001FF' then
+    if str = ':00000001FF' then
+    begin
+      Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
+      Data[5] := 6;
+      IntToBuffer(fileSize, &Data[7], 2);
+      IntToBuffer(checksum, &Data[9], 4);
+      pPOcComPack := @Data[0];
+      bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
+      DelayDelay(30);
+      OcComPortObj.LogBuff('file size:', &Data[7], 2);
+      OcComPortObj.LogBuff('file summ:', &Data[9], 4);
       break;
+    end;
 
     tempstr := Copy(str, 2, 2); // 数据长度
-    FormatHexStrToBuffer(tempstr, &data[5], bCount);
-    Length := Data[5];//先读出有效负载
-    Data[5] := 4 { 32 Flash地址 } + Length; // 有效数据的长度
+    FormatHexStrToBuffer(tempstr, &Data[5], bCount);
+    iLength := Data[5]; // 先读出有效负载,不包括CRC
+    Data[5] := 4 { 32 Flash地址 } + iLength; // 有效数据的长度
 
     dataType := Copy(str, 8, 2); // 数据类型
     if dataType = '04' then // 扩展的高位地址
     begin
-      tempstr := Copy(str, 10, Length * 2); // 数据
-      FormatHexStrToBuffer(tempstr, &data[7], bCount);
+      tempstr := Copy(str, 10, iLength * 2); // 数据
+      FormatHexStrToBuffer(tempstr, &Data[7], bCount);
       baseAddress := MakeDWord(MakeWord(Data[7], Data[8]), 0);
       bb4 := Data[7];
       bb3 := Data[8];
-      //OcComPortObj.Log('Other Data：'+str);
+      // OcComPortObj.Log('Other Data：'+str);
     end
     else if dataType = '00' then
     begin
+      // OcComPortObj.Log('Record Data Count:'+IntToStr(iDataCount));
       tempstr := Copy(str, 4, 4); // 数据地址
-      FormatHexStrToBuffer(tempstr, &data[9], bCount);
+      FormatHexStrToBuffer(tempstr, &Data[9], bCount); // 9、10
 
-      tempstr := Copy(str, 10, Length * 2 + 2); // 数据
-      FormatHexStrToBuffer(tempstr, &data[11], bCount);
+      tempstr := Copy(str, 10, iLength * 2 + 2); // 数据 加2个字符为CRC一个字节
+      FormatHexStrToBuffer(tempstr, &Data[11], bCount); // buffer里面包括CRC
 
       Data[7] := bb4;
       Data[8] := bb3;
 
-      pPOcComPack := @Data[0];
-
-      //OcComPortObj.Log('Record Data Count:'+IntToStr(iDataCount));
-      OcComPortObj.SendProtocolPackage(pPOcComPack);
-      if not OcComPortObj.WaitProtocolACK(89,2000) then
-         OcComPortObj.Log('time out');
-
-      // OcComPortObj.FalconComSendBuffer(Data, 7 + Data[5]+2);
-      //DelayDelay(30);
-      // OcComPortObj.LogBuff('>', PByte(pPOcComPack)^, 7 + Data[5]+2);
-      INC(iDataCount);
-
+      fileSize := fileSize + iLength;
+      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // 计算sum不要算上crc
+      pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
+      bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
+      if (not bStatusOK) then
+        break;
+      { OcComPortObj.SendProtocolPackage(pPOcComPack);
+        while (not OcComPortObj.WaitProtocolACK(data[7], 2000)) do
+        begin
+        INC(reTryCount);
+        if reTryCount > 10 then //>=11
+        begin
+        OcComPortObj.Log('No ack from device transmit failed!');
+        INC(reTryCount);
+        // Exit;
+        GOTO FINISHED_OVER;
+        end;
+        OcComPortObj.Log('time out, try ' + inttostr(reTryCount));
+        OcComPortObj.SendProtocolPackage(pPOcComPack);
+        end; }
     end
     else
     begin
-      //OcComPortObj.Log('Other Data：'+str);
+      // OcComPortObj.Log('Other Data：'+str);
     end;
-  end;
-  StatusBarPrintFileSize();
+  end; // for
+
+FINISHED_OVER:
+  if bStatusOK = False then
+    OcComPortObj.Log('Transmit file failed!')
+  else
+    OcComPortObj.Log('Transmit file finished!');
+
 end;
 
 procedure TSplitViewForm.Button24Click(Sender: TObject);
@@ -1806,6 +1857,11 @@ begin
     else
       Memo1.Lines.SaveToFile(SaveDialog1.FileName);
   end;
+end;
+
+procedure TSplitViewForm.Button27Click(Sender: TObject);
+begin
+  Memo5.Clear;
 end;
 
 procedure TSplitViewForm.Button2Click(Sender: TObject);
@@ -2938,7 +2994,7 @@ begin
     SV_L.Open;
 end;
 
-function TSplitViewForm.GetCurrentDeviceName: String;
+function TSplitViewForm.GetCurrentDeviceName(): String;
 begin
   Result := '';
   if (ComboBoxEx1.Items.Count > 0) and (ComboBoxEx1.ItemIndex >= 0) then
@@ -3714,7 +3770,7 @@ begin
 
     Notebook3.Pages[0] := '数据发送';
     Notebook3.Pages[1] := '批量发送 ';
-    Notebook3.Pages[2] := '协议转换 ';
+    Notebook3.Pages[2] := '协议发送 ';
     Notebook3.Pages[3] := '图形 ';
 
     for i := 0 to 2 do
@@ -4253,7 +4309,7 @@ begin
   ComboBox10.Width := ComboBox9.Width;
   ComboBox11.Width := ComboBox9.Width;
   ComboBox12.Width := ComboBox9.Width;
-  Button16.Width := Memo5.Width + 3;
+  Button16.Width := Memo5.Width + 3 - 100;
   ComboBox10.Left := ComboBox9.Left;
   ComboBox11.Left := ComboBox9.Left;
   ComboBox12.Left := ComboBox9.Left;

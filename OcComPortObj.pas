@@ -179,9 +179,13 @@ type
 
     procedure SendProtocolACK(); // 发送ACK
     function WaitProtocolACK(ACK: integer; timeOut: integer): Boolean;
-    function SendProtocolData(Buffer: Array Of Byte; Count: integer; TypeID: Word; NeedACK: Boolean): Boolean;
-    function SendProtocolPackage(OcComPack: POcComPack): Boolean; overload;
-    function SendProtocolPackage(OcComPack: POcComPack2): Boolean; overload;
+    function WaitProtocolACK2(ACKBuffer: array of Byte; bCount: integer; timeOut: integer): Boolean;
+
+    function SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean; overload;
+    function SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean; overload;
+    function SendProtocolPackage(pPOcComPack: POcComPack): Boolean; overload;
+    // function SendProtocolPackage(pPOcComPack: POcComPack2): Boolean; overload;
+    function SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: integer): Boolean;
 
     function GetPacks(): integer;
     procedure PrintReceivedProtocolData(Index: integer);
@@ -303,14 +307,14 @@ end;
 function GetLineNumberStrForLog(LineNumber: Int64): string;
 begin
   // Result := '';
-  //if (LineNumber < 0) then
-  //  LineNumber := 0;
-  //if LineNumber < 100 then
-  //  Result := Format('%0.2d| ', [LineNumber])
-  //else if LineNumber < 1000 then
-  //  Result := Format('%0.3d| ', [LineNumber])
-  //else if LineNumber < 10000 then
-  //  Result := Format('%0.4d| ', [LineNumber])
+  // if (LineNumber < 0) then
+  // LineNumber := 0;
+  // if LineNumber < 100 then
+  // Result := Format('%0.2d| ', [LineNumber])
+  // else if LineNumber < 1000 then
+  // Result := Format('%0.3d| ', [LineNumber])
+  // else if LineNumber < 10000 then
+  // Result := Format('%0.4d| ', [LineNumber])
   if LineNumber < 100000 then
     Result := Format('%0.5d| ', [LineNumber])
 
@@ -405,10 +409,11 @@ end;
 procedure TComUIHandleThread.Execute;
 var
   j: Int64;
-  s: String;
+  s, f: String;
 begin
   j := 0;
   s := '';
+  f := '%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3 + 10) + 's';
   while (self.Terminated = false) do
   begin
     // ReStart:
@@ -479,7 +484,8 @@ begin
           begin
             j := FUIStartIndex + 1;
             if FOcComPortObj.FHexModeWithString then
-              s := Trim(s) + '            ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1], FOcComPortObj.FHexModeFormatCount);
+              s := Format(f, [Trim(s)]);
+            s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1], FOcComPortObj.FHexModeFormatCount);
             FOcComPortObj.Log(s);
             s := ''; // 这时J 的值无意义
           end;
@@ -493,13 +499,14 @@ begin
         begin
           if FOcComPortObj.FHexModeWithString then
           begin
+            s := Format(f, [Trim(s)]);
             if FOcComPortObj.FHexModeFormatCount > 0 then
             begin
-              s := Format('%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3) + 's', [s]);
-              s := s + '           ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount);
+              // s := Format('%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3) + 's', [s]);
+              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount);
             end
             else
-              s := Trim(s) + '            ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
+              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
           end;
           FOcComPortObj.Log(s);
           s := '';
@@ -760,11 +767,30 @@ end;
 procedure TOcComPortObj.LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
 var
   str: String;
-  i: integer;
+  i,j: integer;
+  f: string;
 begin
   str := '';
-  for i := Low(Buff) to Count - 1 do
+  if (Count <= 0) then
+    exit;
+  j:=0;
+  f := '%-' + IntToStr(FHexModeFormatCount * 3 + 10) + 's';
+  for i := 0 to Count - 1 do
+  begin
     str := str + Format('%.02x ', [Buff[i]]);
+    INC(j);
+    if ((i + 1) mod FHexModeFormatCount) = 0 then
+    begin
+      str := Format(f, [Trim(str)]);
+      str := str + ByteToWideString2(@Buff[i - FHexModeFormatCount + 1], FHexModeFormatCount);
+      Log(flag + str);
+      str := '';
+       j:=0;
+    end;
+  end;
+
+  str := Format(f,[Trim(str)]);
+  str :=str + ByteToWideString2(@Buff[Count - j], j);
   Log(flag + str);
 end;
 
@@ -776,7 +802,7 @@ var
 begin
   if (LogMemo = nil) or (LogMemo.Parent = nil) then
   begin
-    Exit;
+    exit;
   end;
   isBottom := IsLogBottom();
   PreLogLinesCount := LogMemo.Lines.Count;
@@ -805,7 +831,7 @@ var
 begin
   if (LogMemo = nil) or (LogMemo.Parent = nil) then
   begin
-    Exit;
+    exit;
   end;
   if appendMod then
   begin
@@ -864,13 +890,13 @@ begin
       FComSentCount := FComSentCount + Count;
     except
       Log('Sorry Write to device fail!!');
-      Exit;
+      exit;
     end;
   end
   else
   begin
     Log('Device was closed,please open a device.');
-    Exit;
+    exit;
   end;
 end;
 
@@ -902,15 +928,15 @@ begin
       except
         Result := false;
         Log('Sorry Write to device fail!!');
-        Exit;
+        exit;
       end;
     end
     else
     begin
       Log('Device was closed,please open a device.');
-      Exit;
+      exit;
     end;
-    Exit;
+    exit;
   end;
   if SendFormat = Ord(S_HexadecimalFormat) then
   begin
@@ -925,20 +951,29 @@ begin
         FComSentCount := FComSentCount + bLength;
       except
         Log('Sorry Write to device fail!!');
-        Exit;
+        exit;
       end;
     end
     else
     begin
       Log('Device was closed,please open a device.');
-      Exit;
+      exit;
     end;
   end;
   if SendFormat = Ord(S_OctopusProtocol) then
   begin
-    s := FormatHexStrToByte(Trim(str), buf, bLength);
-    // Len := (Length(str) + 2) div 3;
-    SendProtocolData(buf, bLength, OCCOMPROTOCAL_DATA1, false);
+    if checkIsHexStr(str) then
+    begin
+      s := FormatHexStrToByte(Trim(str), buf, bLength);
+      SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
+    end
+    else
+    begin
+      WideStringToByte(str, buf);
+      bLength := Length(str);
+      SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
+    end;
+
     FComSentCount := FComSentCount + bLength;
   end;
 
@@ -970,15 +1005,15 @@ begin
       except
         Result := false;
         Log('Sorry Write to device fail!!');
-        Exit;
+        exit;
       end;
     end
     else
     begin
       Log('Device was closed,please open a device.');
-      Exit;
+      exit;
     end;
-    Exit;
+    exit;
   end;
   if SendFormat = Ord(S_HexadecimalFormat) then
   begin
@@ -991,20 +1026,20 @@ begin
         FComSentCount := FComSentCount + bLength;
       except
         Log('Sorry Write to device fail!!');
-        Exit;
+        exit;
       end;
     end
     else
     begin
       Log('Device was closed,please open a device.');
-      Exit;
+      exit;
     end;
   end;
   if SendFormat = Ord(S_OctopusProtocol) then
   begin
     s := FormatHexStrToByte(Trim(str), buf, bLength);
     // Len := (Length(str) + 2) div 3;
-    self.SendProtocolData(buf, bLength, OCCOMPROTOCAL_DATA1, false);
+    SendProtocolData(OCCOMPROTOCAL_DATA, buf, bLength, false);
   end;
 end;
 
@@ -1030,15 +1065,15 @@ begin
       except
         Result := false;
         Log('Sorry Write to device fail!!');
-        Exit;
+        exit;
       end;
     end
     else
     begin
       Log('Device was closed,please open a device.');
-      Exit;
+      exit;
     end;
-    Exit;
+    exit;
   end;
   if SendFormat = Ord(S_HexadecimalFormat) then
   begin
@@ -1053,21 +1088,30 @@ begin
         FComSentCount := FComSentCount + bLength;
       except
         Log('Sorry Write to device fail!!');
-        Exit;
+        exit;
       end;
     end
     else
     begin
       Log('Device was closed,please open a device.');
-      Exit;
+      exit;
     end;
   end;
 
   if SendFormat = Ord(S_OctopusProtocol) then
   begin
-    s := FormatHexStrToByte(Trim(str), buf, bLength);
-    // Len := (Length(str) + 2) div 3;
-    self.SendProtocolData(buf, bLength, OCCOMPROTOCAL_DATA1, false);
+    if checkIsHexStr(str) then
+    begin
+      s := FormatHexStrToByte(Trim(str), buf, bLength);
+      SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
+    end
+    else
+    begin
+      WideStringToByte(str, buf);
+      bLength := Length(str);
+      SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
+    end;
+    FComSentCount := FComSentCount + bLength;
   end;
 
   if Assigned(FCallBackFun) then
@@ -1088,7 +1132,7 @@ begin
   begin
     dt := GetSystemDateTimeStampStr2(2);
     Result := ln + dt;
-    Exit;
+    exit;
   end;
   if FShowDate then
   begin
@@ -1111,7 +1155,7 @@ begin
     Rows := 1;
   Result := Rows;
   if Length = 0 then
-    Exit;
+    exit;
 
   try
     for i := 0 to Length - 1 do
@@ -1173,10 +1217,10 @@ begin
       begin
         if FComUIHandleThread.Suspended then
           FComUIHandleThread.Suspended := false; // 启动后台线程
-        Exit;
+        exit;
       end;
       if (FComUIHandleThread.Suspended = false) then // 后台正在处理数据
-        Exit; // 数据转入后台处理，等待后台线程处理完成
+        exit; // 数据转入后台处理，等待后台线程处理完成
       if (FComUIHandleThread.Suspended) then // 无需后台处理数据，或者后台数据处理完成，事情做完了就挂起
       begin
         ClearInternalBuff(); // 不能少，清楚后台BUFFER ，转入前台处理
@@ -1369,23 +1413,23 @@ procedure TOcComPortObj.RequestProtocolConnection;
 var
   b: array of Byte;
 begin
-  SendProtocolData(b, 0, OCCOMPROTOCAL_START, false);
+  // SendProtocolData(b, 0, OCCOMPROTOCAL_START, false);
 end;
 
 procedure TOcComPortObj.SendProtocolACK();
 var
   b: array of Byte;
 begin
-  SendProtocolData(b, 0, OCCOMPROTOCAL_ACK, false);
+  // SendProtocolData(b, 0, OCCOMPROTOCAL_ACK, false);
 end;
 
-function TOcComPortObj.SendProtocolPackage(OcComPack: POcComPack): Boolean;
+function TOcComPortObj.SendProtocolPackage(pPOcComPack: POcComPack): Boolean;
 var
   p: pbyte;
   ilength: integer;
 begin
-  p := pbyte(OcComPack);
-  ilength := SizeOf(TOcComPackHead) + OcComPack.Length + 2; { crc + end }
+  p := pbyte(pPOcComPack);
+  ilength := SizeOf(TOcComPackHead) + pPOcComPack.Length + 2; { crc + end }
 
   if FShowSendingLog then
     LogBuff('-> ', p^, ilength);
@@ -1395,105 +1439,84 @@ begin
   Result := True;
 end;
 
-function TOcComPortObj.SendProtocolPackage(OcComPack: POcComPack2): Boolean;
+function TOcComPortObj.SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: integer): Boolean;
 var
   p: pbyte;
+  ilength: integer;
+  reTryCount: integer;
 begin
-  p := pbyte(OcComPack);
-  FalconComSendBuffer(p^, OcComPack.Length); // 发送
-  if FShowSendingLog then
-    LogBuff('>', p^, OcComPack.Length);
-
   Result := True;
+  reTryCount := 0;
+  SendProtocolPackage(pPOcComPack);
+  while (not WaitProtocolACK(ACK, 2000)) do
+  begin
+    INC(reTryCount);
+    if reTryCount > 10 then // >=11
+    begin
+      Log('No ack from device transmit failed!');
+      Result := false;
+      exit;
+    end;
+    Log('time out, try ' + IntToStr(reTryCount));
+    SendProtocolPackage(pPOcComPack);
+  end;
 end;
 
-function TOcComPortObj.SendProtocolData(Buffer: Array Of Byte; Count: integer; TypeID: Word; NeedACK: Boolean): Boolean;
-var
-  p: pbyte;
-  OcComPack: TOcComPack;
-  OcComPack2: TOcComPackHead;
-  po: POcComPack;
-  // Len: integer;
-  // b:Array of Byte;
-  packs, i, psize, j: integer;
-  PaLoad_Length: integer;
+function TOcComPortObj.SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean;
 begin
-  OcComPack := self.FOcComProtocal.CreatePack(TypeID);
+  SendProtocolData(OCCOMPROTOCAL_HEAD, TypeID, Buffer, Count, NeedACK);
+end;
+
+function TOcComPortObj.SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean;
+var
+  OcComPack: TOcComPack;
+  OcComPackHead: TOcComPackHead;
+  packs, i, j: integer;
+  PaLoad_Max_Length: integer;
+begin
+  OcComPack := FOcComProtocal.CreatePack(Head, TypeID);
   Result := True;
-  PaLoad_Length := OCCOMPROTOCAL_PACK_PACKPAYLOAD_HIGHT + 1;
+  PaLoad_Max_Length := OCCOMPROTOCAL_PACK_PACKPAYLOAD_MAX_LENGTH;
+  j := 0; // 分包数据索引
+
   case OcComPack.PID of
     OCCOMPROTOCAL_START, OCCOMPROTOCAL_OVER, OCCOMPROTOCAL_ACK:
       begin
-        psize := SizeOf(TOcComPackHead); // 包头长度 + 有效符合+ CRC
-        OcComPack.Length := psize;
-        OcComPack.Index := 0;
-        // OcComPack.Total := 1;
-        p := @OcComPack;
-        self.FalconComSendBuffer(p^, OcComPack.Length);
-        if FShowSendingLog then
-          LogBuff(SEND_FLAG, p^, OcComPack.Length);
+        FOcComProtocal.SetCRC8(@OcComPack);
+        FOcComProtocal.SetEndFlag(@OcComPack);
+        SendProtocolPackage(@OcComPack);
       end;
-    OCCOMPROTOCAL_I2C_READ, OCCOMPROTOCAL_I2C_WRITE, OCCOMPROTOCAL_SPI_READ, OCCOMPROTOCAL_SPI_WRITE, OCCOMPROTOCAL_DATA1:
+    OCCOMPROTOCAL_DATA:
       begin
-        // Len := Count; // Length(Buffer); //暂时不考虑分包的问题 注意包的最大总长度限制
         packs := 1; // 默认情况下一个包处理
-        if Count > PaLoad_Length then // 需要分包
+        if Count > PaLoad_Max_Length then // 需要分包
         begin
-          packs := (Count div PaLoad_Length);
-          if (Count mod PaLoad_Length) > 0 then
+          packs := (Count div PaLoad_Max_Length);
+          if (Count mod PaLoad_Max_Length) > 0 then
             packs := packs + 1;
-        end
-        else
-          packs := 1;
+        end;
 
-        j := 0;
         for i := 0 to packs - 1 do
         begin
-          j := PaLoad_Length * i;
+          j := PaLoad_Max_Length * i;
           if j >= Count then
             break;
 
-          po := @OcComPack;
-          po.Head := OCCOMPROTOCAL_HEAD;
-
           if NeedACK then
-          begin
-            po.PID := OCCOMPROTOCAL_ACK;
-            po.PID := (po.PID shl 8) + TypeID;
-          end
+            OcComPack.PID := MakeWord(OCCOMPROTOCAL_ACK, TypeID)
           else
-            po.PID := TypeID;
+            OcComPack.PID := TypeID;
 
-          po.Index := i;
-          // po.Total := packs;
-          po.Length := Count; // SizeOf(TOcComPack);
+          OcComPack.Index := i;
+          if Count > PaLoad_Max_Length then // 需要分包
+            OcComPack.Length := PaLoad_Max_Length
+          else
+            OcComPack.Length := Count;
 
-          // if i = packs - 1 then
-          // begin
-          // PaLoad_Length := Len - j;
-          // po.Length := SizeOf(TOcComPackHead) + PaLoad_Length + 2;
-          // 包头长度 + 有效符合+ CRC
-          // end;
-
-          CopyMemory(@po.data[0], @Buffer[j], PaLoad_Length);
-
-          // if FNeedCRC16 then
-          // po.CRC := self.FOcComProtocal.CalCRC16(po.data, PaLoad_Length)
-          // else
-          // po.CRC := OCCOMPROTOCAL_END;
-
-          p := @OcComPack;
-          self.FalconComSendBuffer(p^, SizeOf(TOcComPackHead) + po.Length + 2); // 发送
-          if FShowSendingLog then
-            PrintProtocolPack('>', @OcComPack);
-          // LogBuff('>',p^,po.Length);
-          if NeedACK then
-          begin
-            CopyMemory(@OcComPack2, @OcComPack, SizeOf(TOcComPackHead));
-            Result := self.FOcComProtocal.WaitingForACK(OcComPack2, 5000);
-            if Result = false then
-              Exit;
-          end;
+          CopyMemory(@OcComPack.data[0], @Buffer[j], OcComPack.Length);
+          FOcComProtocal.SetCRC8(@OcComPack);
+          FOcComProtocal.SetEndFlag(@OcComPack);
+          SendProtocolPackage(@OcComPack);
         end; // for
 
       end; // OCCOMPROTOCAL_DATA1:
@@ -1507,6 +1530,7 @@ var
 begin
   Result := false;
   Start := GetTickCount;
+
   while (True) do
   begin
     Application.ProcessMessages;
@@ -1525,45 +1549,75 @@ begin
     begin
       break; // 超时推出
     end;
+  end; // while (True) do
+
+end;
+
+function TOcComPortObj.WaitProtocolACK2(ACKBuffer: array of Byte; bCount: integer; timeOut: integer): Boolean;
+var
+  pOc: POcComPack;
+  Start: real;
+  iOK, ilength: integer;
+begin
+  Result := false;
+  Start := GetTickCount;
+  while (True) do
+  begin
+    Application.ProcessMessages;
+    pOc := self.FOcComProtocal.GetNewPack();
+
+    if pOc <> nil then
+    begin
+      iOK := 0;
+      ilength := bCount;
+      while (ilength >= 0) do
+      begin
+        if (pOc.data[bCount] = ACKBuffer[bCount]) then
+          INC(iOK)
+        else
+          break;
+
+        Dec(ilength);
+      end;
+
+      if (ilength = bCount) then
+      begin
+        Result := True;
+        break;
+      end;
+    end;
+
+    if (GetTickCount - Start) > timeOut then
+    begin
+      break; // 超时推出
+    end;
 
   end;
 end;
 
+// 包解析完成后回调
 procedure TOcComPortObj.OcComPortObjRxProtocol(OcComPack: POcComPack);
 begin
   case OcComPack.PID of
     OCCOMPROTOCAL_ACK: // 客户端简单应答，表示可以连接 //收到应答
       begin
-
       end;
-    OCCOMPROTOCAL_READY: // 客户端已经就绪，可以操作
+    OCCOMPROTOCAL_DATA: // 收到客户端的数据包
       begin
-
-      end;
-    OCCOMPROTOCAL_DATA1: // 收到客户端的数据包
-      begin
-
-      end;
-    OCCOMPROTOCAL_DATA2: // 收到客户端的非标准数据包
-      begin
-
       end;
     OCCOMPROTOCAL_OVER: // 接收完毕 一个大的任务完成
       begin
-
       end;
-    OCCOMPROTOCAL_GOT: // 客户端收到数据包后发回的收到应答 ，以便发送下一个包
-      begin
-
-      end
   else
     begin
 
     end;
   end;
-  // FComProcessedCount:=FComProcessedCount+OcComPack2.Length + SizeOf(TOcComPackHead)+2;
 
-  PrintProtocolPack('', OcComPack);
+  if (OcComPack.Head = 0) and (OcComPack.PID = 0) and (OcComPack.Length > 0) then
+    LogBuff('', OcComPack.data, OcComPack.Length)
+  else
+    PrintProtocolPack('', OcComPack);
   // PrintReceivedProtocolData(-1); // 输出最新收到的包 ，非保准超大数据包没有保存，
   if Assigned(FCallBackFun) then
     FCallBackFun();
@@ -1571,10 +1625,12 @@ end;
 
 procedure TOcComPortObj.PrintProtocolPack(flag: String; OcComPack: POcComPack);
 var
-  j: integer;
-  str: String;
+  j, l: integer;
+  str, f: String;
 begin
   str := flag;
+  // s := '';
+
   str := str + Format('%.04x ', [OcComPack.Head]);
   str := str + Format('%.04x ', [OcComPack.PID]);
   str := str + Format('%.02x ', [OcComPack.Index]);
@@ -1585,6 +1641,17 @@ begin
     str := str + Format('%.02x ', [OcComPack.data[j]]);
   end;
   // str := str + Format('%.04x ', [OcComPack.CRC]);
+  l := OcComPack.Length + SizeOf(TOcComPackHead);
+  if (l <= 16) then
+    f := '%-' + IntToStr(16 * 3 + 10) + 's'
+  else if (l <= 32) then
+    f := '%-' + IntToStr(32 * 3 + 10) + 's'
+  else
+    f := '%-' + IntToStr(l * 3 + 10) + 's';
+
+  if FHexModeWithString then
+    str := Format(f, [Trim(str)]);
+  str := str + ByteToWideString2(@OcComPack.data, OcComPack.Length);
   Log(str);
 end;
 
@@ -1673,7 +1740,7 @@ var
 begin
   if self.connected = false then
   begin
-    Exit;
+    exit;
   end;
   CurrentLine := LogMemo.CaretPos.Y; // 光标所在的行
 
@@ -1687,7 +1754,7 @@ begin
       FalconComSendData_Terminal(' ', self.FSendFormat);
       FCommadLineStr := '';
       Key := #0;
-      Exit;
+      exit;
     end;
 
     // CurrentLine := LogMemo.CaretPos.Y;
@@ -1707,7 +1774,7 @@ begin
     FCommadLineStr := '';
     cmd := '';
     Key := #0;
-    Exit;
+    exit;
   end;
 
   if (Key = #9) then
@@ -1718,7 +1785,7 @@ begin
     if cmd = Key then
     begin
       Key := #0;
-      Exit; // 只有tab
+      exit; // 只有tab
     end;
     Log('');
     FalconComSendData_Terminal(cmd, self.FSendFormat);
@@ -1739,11 +1806,11 @@ begin
     if (Trim(FCommadLineStr) = Trim(LastStr)) then // 光标最后的空行
     begin
       delete(FCommadLineStr, Length(FCommadLineStr), Length(FCommadLineStr));
-      Exit;
+      exit;
     end
     else if Length(LastStr) > Len then // 有输入删
     begin
-      Exit;
+      exit;
     end;
 
     if (j > 0) then // 最后一行有回显
@@ -1761,7 +1828,7 @@ begin
     else
     begin
       Key := #0;
-      Exit;
+      exit;
     end;
   end; // if key=#8 then
 
@@ -1806,7 +1873,7 @@ begin
     if (FCommandHistory.Count <= 0) then
     begin
       Key := 0;
-      Exit;
+      exit;
     end;
 
     if (Length(LastStr) > Length(FLastLineStr)) then
@@ -1831,7 +1898,7 @@ begin
 
     FCommandHistoryIndex := FCommandHistoryIndex - 1;
     Key := 0;
-    Exit;
+    exit;
   END;
 
   if (Shift = [ssCtrl]) then

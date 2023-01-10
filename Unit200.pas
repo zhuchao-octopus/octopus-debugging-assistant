@@ -35,28 +35,28 @@ Const
   DEFAULT_FIXED_COLS = 2;
   DEFAULT_MAX_CHART_POINTS = 30;
 
-  OCCOMPROTOCAL_START = 10; // 连接，要求对方回复 状态是否可以连接
-  OCCOMPROTOCAL_ACK = 11; // 一般相应，要求对方相应当前状态
-  OCCOMPROTOCAL_READY = 12; // 准备就绪标记
-  OCCOMPROTOCAL_OVER = 13; // 任务结束标记
-  OCCOMPROTOCAL_GOT = $0E00; // 14; //数据包确认标记收到标记 ,复合在高字节
+  { OCCOMPROTOCAL_START = 10; // 连接，要求对方回复 状态是否可以连接
+    OCCOMPROTOCAL_ACK = 11; // 一般相应，要求对方相应当前状态
+    OCCOMPROTOCAL_READY = 12; // 准备就绪标记
+    OCCOMPROTOCAL_OVER = 13; // 任务结束标记
+    OCCOMPROTOCAL_GOT = $0E00; // 14; //数据包确认标记收到标记 ,复合在高字节
 
-  OCCOMPROTOCAL_I2C_READ = 50;
-  OCCOMPROTOCAL_I2C_WRITE = 51;
-  OCCOMPROTOCAL_SPI_READ = 52;
-  OCCOMPROTOCAL_SPI_WRITE = 53;
-  OCCOMPROTOCAL_WIFI_READ = 54;
-  OCCOMPROTOCAL_WIFI_WRITE = 55;
-  OCCOMPROTOCAL_UART_READ = 56;
-  OCCOMPROTOCAL_UART_WRITE = 57;
+    OCCOMPROTOCAL_I2C_READ = 50;
+    OCCOMPROTOCAL_I2C_WRITE = 51;
+    OCCOMPROTOCAL_SPI_READ = 52;
+    OCCOMPROTOCAL_SPI_WRITE = 53;
+    OCCOMPROTOCAL_WIFI_READ = 54;
+    OCCOMPROTOCAL_WIFI_WRITE = 55;
+    OCCOMPROTOCAL_UART_READ = 56;
+    OCCOMPROTOCAL_UART_WRITE = 57;
 
-  OCCOMPROTOCAL_DATA1 = $FC; // 标准协议数据 最大负载是512字节
-  OCCOMPROTOCAL_DATA2 = $FD; // 非标准协议表示数据是连续的，没有分包，或者说只有一个包
+    OCCOMPROTOCAL_DATA1 = $FC; // 标准协议数据 最大负载是512字节
+    OCCOMPROTOCAL_DATA2 = $FD; // 非标准协议表示数据是连续的，没有分包，或者说只有一个包
 
-  OCCOMPROTOCAL_ERROR = $FFFF;
-  OCCOMPROTOCAL_NONE = $0000;
-  OCCOMPROTOCAL_PACK_PACKPAYLOAD_HIGHT = 511;
-  OCCOMPROTOCAL_PACK_RING_BUFFER_HIGHT = 1023;
+    OCCOMPROTOCAL_ERROR = $FFFF;
+    OCCOMPROTOCAL_NONE = $0000;
+    OCCOMPROTOCAL_PACK_PACKPAYLOAD_HIGHT = 511;
+    OCCOMPROTOCAL_PACK_RING_BUFFER_HIGHT = 1023; }
 
 type
   TOnClicEvent = procedure(Sender: TObject) of object;
@@ -131,9 +131,12 @@ function ByteToWideString2(buff: pbyte; len: Integer): String; // 不要回车换行#1
 procedure WideStringToByte(str: String; var buff: array of byte);
 function GetDefaultLauguageStrByName(Name: String; Lang: String): String;
 procedure SetButtonCaptionLeftAlign(btn: TButton);
-function FormatHexStrToByte(sStr: string; var buf: array of byte;out bCount:Integer): string;
-function FormatHexStrToByte2(sStr: string; var buf: array of byte): Integer;
-function FormatHexStrToBuffer(sStr: string; var buf: array of byte;out bCount:Integer): string;
+
+function FormatHexStrToByte(sStr: string; var buffer: array of byte; out bCount: Integer): string;
+function FormatHexStrToByte2(sStr: string; var buffer: array of byte): Integer;
+function FormatHexStrToBuffer(sStr: string; var buffer: array of byte; out bCount: Integer): string;
+
+function ChecksumBuffer(buffer: array of byte; out bCount: Integer): Dword;
 
 function SpaceCompress(s: string): string;
 function GetBuildInfo(FileName: string): String;
@@ -142,20 +145,70 @@ function IsMovieFile(const fn: string): Boolean;
 function IsTxtFile(const fn: string): Boolean;
 function IsHexFile(const fn: string): Boolean;
 function MakeWord(b2: byte; b1: byte): Word;
-function MakeDWord(w2: Word; w1: Word): DWord;
+function MakeDWord(w2: Word; w1: Word): Dword;
+
+procedure IntToBuffer(value: Int64; var buffer: array of byte; iCount: Integer);
+procedure StrToBuffer(str: String; var buffer: array of byte);
+
+function checkIsHexStr(sStr: String): Boolean;
 
 implementation
 
-function MakeWord(b2: byte; b1: byte): Word;
+function checkIsHexStr(sStr: String): Boolean;
+var
+  i: Integer;
 begin
-  result := b2;
-  result := result shl 8 + b1;
+  Result := true;
+  sStr := UpperCase(Trim(sStr));
+  sStr := StringReplace(sStr, '0X', ' ', [rfReplaceAll]); // 替换0X
+  sStr := StringReplace(sStr, ',', ' ', [rfReplaceAll]); // 替换 ,号
+  sStr := StringReplace(sStr, '，', ' ', [rfReplaceAll]); // 替换 ,号
+  sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
+
+  sStr := StringReplace(sStr, ' ', '', [rfReplaceAll]); // 去掉所有空客
+  for i := 1 to Length(sStr) do //字符索引 从 1 .... Length(sStr)
+  begin
+      if not (sStr[i] in ['0'..'9','A','B','C','D','E','F']) then
+       begin
+         Result:=false;
+         break;
+       end;
+  end;
 end;
 
-function MakeDWord(w2: Word; w1: Word): DWord;
+procedure StrToBuffer(str: String; var buffer: array of byte);
 begin
-  result := w2;
-  result := result shl 16 + w1;
+  CopyMemory(@buffer, @str[1], Length(str));
+end;
+
+// 动态数组名作为参数传提可以通过了Length(buffer) 获取实际长度
+// &@取地址后作为指针传递无法得到实际的长度
+// 动态数组必须加上 VAR 关键字才能是引用传递，否则也是值传递
+procedure IntToBuffer(value: Int64; var buffer: array of byte; iCount: Integer);
+var
+  i, j: Integer;
+begin
+  // for I := 0 to iCount -1 do
+  j := 0;
+  for i := iCount - 1 downto 0 do
+  begin
+    buffer[j] := value shr (i * 8);
+    INC(j);
+    // if(j >= Length(buffer)) then
+    // break;
+  end;
+end;
+
+function MakeWord(b2: byte; b1: byte): Word;
+begin
+  Result := b2;
+  Result := Result shl 8 + b1;
+end;
+
+function MakeDWord(w2: Word; w1: Word): Dword;
+begin
+  Result := w2;
+  Result := Result shl 16 + w1;
 end;
 
 function IsImageFile(const fn: string): Boolean;
@@ -163,7 +216,7 @@ var
   extfn: String;
 begin
   extfn := LowerCase(ExtractFileExt(fn));
-  result := (extfn = '.jpg') or (extfn = '.jpeg') or (extfn = '.gif') or (extfn = '.png') or (extfn = '.bmp');
+  Result := (extfn = '.jpg') or (extfn = '.jpeg') or (extfn = '.gif') or (extfn = '.png') or (extfn = '.bmp');
 end;
 
 function IsMovieFile(const fn: string): Boolean;
@@ -171,7 +224,7 @@ var
   extfn: String;
 begin
   extfn := LowerCase(ExtractFileExt(fn));
-  result := (extfn = '.rmvb') or (extfn = '.rm') or (extfn = '.mov') or (extfn = '.mkv') or (extfn = '.avi') or (extfn = '.flv');
+  Result := (extfn = '.rmvb') or (extfn = '.rm') or (extfn = '.mov') or (extfn = '.mkv') or (extfn = '.avi') or (extfn = '.flv');
 end;
 
 function IsTxtFile(const fn: string): Boolean;
@@ -179,7 +232,7 @@ var
   extfn: String;
 begin
   extfn := LowerCase(ExtractFileExt(fn));
-  result := (extfn = '.txt') or (extfn = '.csv') or (extfn = '.cvs') or (extfn = '.scv');
+  Result := (extfn = '.txt') or (extfn = '.csv') or (extfn = '.cvs') or (extfn = '.scv');
 end;
 
 function IsHexFile(const fn: string): Boolean;
@@ -187,17 +240,17 @@ var
   extfn: String;
 begin
   extfn := LowerCase(ExtractFileExt(fn));
-  result := (extfn = '.hex');
+  Result := (extfn = '.hex');
 end;
 
 function GetBuildInfo(FileName: string): String;
 var
-  VerInfoSize, VerValueSize, Dummy: DWord;
+  VerInfoSize, VerValueSize, Dummy: Dword;
   VerInfo: Pointer;
   VerValue: PVSFixedFileInfo;
   V1, V2, V3, V4: Word;
 begin
-  result := '';
+  Result := '';
   if not FileExists(FileName) then
     Exit;
   VerInfoSize := GetFileVersionInfoSize(PChar(FileName), Dummy);
@@ -213,7 +266,7 @@ begin
     V2 := dwFileVersionMS and $FFFF;
     V3 := dwFileVersionLS shr 16;
     V4 := dwFileVersionLS and $FFFF;
-    result := IntToStr(V1) + '.' + IntToStr(V2) + '.' + IntToStr(V3) + '.' + IntToStr(V4);
+    Result := IntToStr(V1) + '.' + IntToStr(V2) + '.' + IntToStr(V3) + '.' + IntToStr(V4);
   end;
   FreeMem(VerInfo, VerInfoSize);
 end;
@@ -222,22 +275,22 @@ function CharToDigit(c: Char): byte; // 字符表示的数，而不是对应的ASCII 值
 begin
   case c of
     '0' .. '9':
-      result := Ord(c) - 48;
+      Result := Ord(c) - 48;
     'A' .. 'F':
-      result := Ord(c) - Ord('A') + 10;
+      Result := Ord(c) - Ord('A') + 10;
     'a' .. 'f':
-      result := Ord(c) - Ord('a') + 10;
+      Result := Ord(c) - Ord('a') + 10;
   else
-    result := 0;
+    Result := 0;
   end;
 end;
 
 function CharToByte(a, b: Char): byte;
 begin
-  result := CharToDigit(a) * 16 + CharToDigit(b);
+  Result := CharToDigit(a) * 16 + CharToDigit(b);
 end;
 
-function FormatHexStrToByte(sStr: string; var buf: array of byte;out bCount:Integer): string;
+function FormatHexStrToByte(sStr: string; var buffer: array of byte; out bCount: Integer): string;
 var
   i, Count, bLen: Word;
   a, b: Char;
@@ -251,29 +304,29 @@ begin
   sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
 
   // 压缩中间空格,就是把多个空格替换成一个,并去掉两头的空格
-  result := Trim(SpaceCompress(sStr));
+  Result := Trim(SpaceCompress(sStr));
 
-  Count := (length(result) + 2) div 3;
-  bCount:= Count;
+  Count := (Length(Result) + 2) div 3;
+  bCount := Count;
 
-  bLen := length(buf);
-  ZeroMemory(@buf, bLen);
+  bLen := Length(buffer);
+  ZeroMemory(@buffer, bLen);
 
   for i := 1 to Count do
   begin
-    a := result[i * 3 - 2];
-    b := result[i * 3 - 1];
-    buf[i - 1] := CharToByte(a, b);
+    a := Result[i * 3 - 2];
+    b := Result[i * 3 - 1];
+    buffer[i - 1] := CharToByte(a, b);
   end;
 
-  result := '';
+  Result := '';
   for i := 1 to Count do
   begin
-    result := result + Format('%.02x ', [buf[i - 1]]);
+    Result := Result + Format('%.02x ', [buffer[i - 1]]);
   end;
 end;
 
-function FormatHexStrToByte2(sStr: string; var buf: array of byte): Integer;
+function FormatHexStrToByte2(sStr: string; var buffer: array of byte): Integer;
 var
   i, Count, bLen: Word;
   a, b: Char;
@@ -290,20 +343,20 @@ begin
   // 压缩中间空格,就是把多个空格替换成一个,并去掉两头的空格
   strStr := Trim(SpaceCompress(sStr));
 
-  Count := (length(strStr) + 2) div 3;
-  bLen := length(buf);
-  ZeroMemory(@buf, bLen);
+  Count := (Length(strStr) + 2) div 3;
+  bLen := Length(buffer);
+  ZeroMemory(@buffer, bLen);
 
   for i := 1 to Count do
   begin
     a := strStr[i * 3 - 2];
     b := strStr[i * 3 - 1];
-    buf[i - 1] := CharToByte(a, b);
+    buffer[i - 1] := CharToByte(a, b);
   end;
-  result := Count;
+  Result := Count;
 end;
 
-function FormatHexStrToBuffer(sStr: string; var buf: array of byte;out bCount:Integer): string;
+function FormatHexStrToBuffer(sStr: string; var buffer: array of byte; out bCount: Integer): string;
 var
   i, Count: Integer;
   a, b: Char;
@@ -316,23 +369,34 @@ begin
   sStr := StringReplace(sStr, '，', ' ', [rfReplaceAll]); // 替换 ,号
   sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
 
-  result := StringReplace(sStr, ' ', '', [rfReplaceAll]); // 去掉所有空客
+  Result := StringReplace(sStr, ' ', '', [rfReplaceAll]); // 去掉所有空客
 
-  Count := length(result) div 2;
-  bCount:=Count;
-  //bLen := length(buf);
-  //ZeroMemory(@buf, bLen);
+  Count := Length(Result) div 2;
+  bCount := Count;
+  // bLen := length(buf);
+  // ZeroMemory(@buf, bLen);
 
   for i := 0 to Count - 1 do
   begin
-    a := result[i * 2 + 1];
-    b := result[i * 2 + 2];
-    buf[i] := CharToByte(a, b);
+    a := Result[i * 2 + 1];
+    b := Result[i * 2 + 2];
+    buffer[i] := CharToByte(a, b);
   end;
-  result := '';
-  for i := 0 to Count -1 do
+  Result := '';
+  for i := 0 to Count - 1 do
   begin
-    result := result + Format('%.02x ', [buf[i]]);
+    Result := Result + Format('%.02x ', [buffer[i]]);
+  end;
+end;
+
+function ChecksumBuffer(buffer: array of byte; out bCount: Integer): Dword;
+var
+  i: Integer;
+begin
+  Result := 0;
+  for i := 0 to bCount - 1 do
+  begin
+    Result := Result + buffer[i];
   end;
 end;
 
@@ -349,7 +413,7 @@ begin
     else
       hs1 := hs2;
   end;
-  result := hs1;
+  Result := hs1;
 end;
 
 procedure SetButtonCaptionLeftAlign(btn: TButton);
@@ -361,13 +425,13 @@ begin
   SetWindowLong(btn.handle, GWL_STYLE, Style);
 end;
 
-function StripNonAsciiExceptCRLF(const Value: AnsiString): AnsiString;
+function StripNonAsciiExceptCRLF(const value: AnsiString): AnsiString;
 var
   AnsiCh: AnsiChar;
 begin
-  for AnsiCh in Value do
+  for AnsiCh in value do
     if (AnsiCh >= #32) and (AnsiCh <= #127) and (AnsiCh <> #13) and (AnsiCh <> #10) then
-      result := result + AnsiCh;
+      Result := Result + AnsiCh;
 end;
 
 function ByteToWideString(buff: pbyte; len: Integer): String;
@@ -382,7 +446,7 @@ begin
     // CopyMemory(buffer, buff, len);
     // Move(buffer, str[1], len);
     CopyMemory(@str[1], buff, len);
-    result := str;
+    Result := str;
   Except
   end;
 end;
@@ -395,7 +459,7 @@ begin
     SetLength(str, len);
     CopyMemory(@str[1], buff, len);
     str := StringReplace(str, chr(13) + chr(10), '', [rfReplaceAll]); // 删除回车
-    result := StripNonAsciiExceptCRLF(str);
+    Result := StripNonAsciiExceptCRLF(str);
   Except
   end;
 end;
@@ -413,7 +477,7 @@ begin
     // Move(buffer, str[1], len);
     CopyMemory(@str[1], buffer, len);
     str := StringReplace(str, chr(13) + chr(10), '', [rfReplaceAll]); // 删除回车
-    result := Trim(str);
+    Result := Trim(str);
   Except
   end;
 end;
@@ -425,7 +489,7 @@ var
 begin
   astr := str;
   // setLength(@buff[0],Length(astr));
-  CopyMemory(@buff, @astr[1], length(astr));
+  CopyMemory(@buff, @astr[1], Length(astr));
   // for i := 0 to sizeof(str)-1 do
   // buff[i+1]:=Byte(str[i]);
 end;
@@ -468,7 +532,7 @@ end;
 
 function GetStyle(i: Integer): String;
 begin
-  result := TStyleManager.StyleNames[i];
+  Result := TStyleManager.StyleNames[i];
 end;
 
 procedure AdjustSetStyle(Style: String);
@@ -574,15 +638,15 @@ function GetDefaultLauguageStrByName(Name: String; Lang: String): String;
 var
   i: Integer;
 begin
-  result := '';
+  Result := '';
   for i := Low(DefaultLauguageStr) to High(DefaultLauguageStr) do
   begin
     if DefaultLauguageStr[i].Name = Name then
     begin
       if (Lang = 'CN') then
-        result := DefaultLauguageStr[i].Caption1
+        Result := DefaultLauguageStr[i].Caption1
       else
-        result := DefaultLauguageStr[i].Caption2;
+        Result := DefaultLauguageStr[i].Caption2;
       break;
     end;
   end;
@@ -592,12 +656,12 @@ function GetComponentLauguageName(Name: String): String;
 var
   i: Integer;
 begin
-  result := '';
+  Result := '';
   for i := Low(DefaultLauguageStr) to High(DefaultLauguageStr) do
   begin
     if DefaultLauguageStr[i].Name = Name then
     begin
-      result := 'MESSAGE_' + IntToStr(i);
+      Result := 'MESSAGE_' + IntToStr(i);
       break;
     end;
   end;

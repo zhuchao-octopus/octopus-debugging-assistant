@@ -110,8 +110,8 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=$(MSBuildProjectName);FileVersion=3.0.0.1339;InternalName=Octopus;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.0.0.0;Comments=1234998.CN</VerInfo_Keys>
-        <VerInfo_Build>1339</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=$(MSBuildProjectName);FileVersion=3.0.0.1348;InternalName=Octopus;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.0.0.0;Comments=1234998.CN</VerInfo_Keys>
+        <VerInfo_Build>1348</VerInfo_Build>
         <VerInfo_MajorVer>3</VerInfo_MajorVer>
         <Icon_MainIcon>Octopus_Icon3.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
@@ -135,10 +135,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.331;InternalName=OCTOPUS ;LegalCopyright= 2008-2028;LegalTrademarks=;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.332;InternalName=OCTOPUS ;LegalCopyright= 2008-2028;LegalTrademarks=;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>Octopus_Icon4.ico</Icon_MainIcon>
         <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_Build>331</VerInfo_Build>
+        <VerInfo_Build>332</VerInfo_Build>
         <UWP_DelphiLogo44>79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo150>
         <VerInfo_Release>8</VerInfo_Release>
@@ -147,9 +147,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.358;InternalName=OCTOPUS ;LegalCopyright=2008-2028;LegalTrademarks=;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.367;InternalName=OCTOPUS ;LegalCopyright=2008-2028;LegalTrademarks=;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>Octopus_Icon3.ico</Icon_MainIcon>
-        <VerInfo_Build>358</VerInfo_Build>
+        <VerInfo_Build>367</VerInfo_Build>
         <UWP_DelphiLogo44>79c25bc8359f51a4_white.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>79c25bc8359f51a4_white.png</UWP_DelphiLogo150>
         <VerInfo_Release>8</VerInfo_Release>
@@ -226,16 +226,16 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="Win32\Debug\Octopus.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>Octopus.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="79c25bc8359f51a4_white.png" Configuration="Release" Class="UWP_DelphiLogo150">
                     <Platform Name="Win64">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo150x150.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Win32\Debug\Octopus.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>Octopus.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
