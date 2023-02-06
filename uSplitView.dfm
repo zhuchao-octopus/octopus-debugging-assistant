@@ -738,7 +738,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
-      PageIndex = 1
+      PageIndex = 2
       TabOrder = 1
       object TPage
         Left = 0
@@ -818,7 +818,7 @@ object SplitViewForm: TSplitViewForm
                 Top = 0
                 Width = 235
                 Height = 34
-                Caption = #21457#36865#25968#25454
+                Caption = #21457#36865#25991#26412#20869#23481
                 TabOrder = 1
                 OnClick = Button8Click
               end
@@ -881,7 +881,7 @@ object SplitViewForm: TSplitViewForm
               Top = 198
               Width = 311
               Height = 34
-              Caption = #20135#29983#31616#21333#32047#21152#21644#26657#39564#23383#33410#24182#20197'7E'#32467#26463
+              Caption = #35745#31639#20986'CRC8'#26657#39564#23383#33410
               TabOrder = 3
               OnClick = Button13Click
             end
@@ -998,38 +998,49 @@ object SplitViewForm: TSplitViewForm
             Left = 3
             Top = 127
             Width = 308
-            Height = 478
+            Height = 439
             Align = alClient
             Lines.Strings = (
               'restart')
             ScrollBars = ssVertical
             TabOrder = 0
+            ExplicitHeight = 478
           end
           object Panel16: TPanel
             Left = 0
-            Top = 608
+            Top = 569
             Width = 314
-            Height = 35
+            Height = 74
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
+            ExplicitTop = 568
             object Button16: TButton
-              Left = 99
+              Left = 79
               Top = 0
-              Width = 211
+              Width = 235
               Height = 34
-              Caption = #21457#36865#25805#20316
+              Caption = #21457#36865#25991#26412#20869#23481
               TabOrder = 0
               OnClick = Button16Click
             end
             object Button27: TButton
               Left = 3
               Top = 0
-              Width = 94
+              Width = 75
               Height = 34
-              Caption = #28165#38500
+              Caption = #28165#31354
               TabOrder = 1
               OnClick = Button27Click
+            end
+            object Button28: TButton
+              Left = 3
+              Top = 36
+              Width = 311
+              Height = 36
+              Caption = #21457#36865#25991#20214
+              TabOrder = 2
+              OnClick = Button28Click
             end
           end
           object Panel18: TPanel
@@ -1111,12 +1122,12 @@ object SplitViewForm: TSplitViewForm
               Top = 34
               Width = 237
               Height = 25
-              ItemIndex = 0
               TabOrder = 2
-              Text = '0x00'
+              Text = '0x08000000'
               OnKeyPress = ComboBox10KeyPress
               Items.Strings = (
-                '0x00')
+                '0x08000000'
+                '0x08002000')
             end
             object ComboBox11: TComboBox
               Left = 73

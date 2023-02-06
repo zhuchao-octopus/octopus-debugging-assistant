@@ -189,6 +189,7 @@ type
     Button14: TButton;
     Label4: TLabel;
     Button27: TButton;
+    Button28: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -289,6 +290,7 @@ type
 
     function GetStringGridValidStr(sStr: String): String;
     procedure Button27Click(Sender: TObject);
+    procedure Button28Click(Sender: TObject);
   private
     // ComReceiveCount: Integer;
     // ComReceiveBuffer: array [0 .. 1048576] of Byte;
@@ -359,6 +361,7 @@ type
 
     procedure SendFileAsCommon(OcComPortObj: TOcComPortObj);
     procedure SendFileAsHex(OcComPortObj: TOcComPortObj);
+    procedure SendFileAsBin(OcComPortObj: TOcComPortObj);
   end;
 
 var
@@ -377,7 +380,7 @@ implementation
 
 uses
   Vcl.Themes, ocPcDeviceMgt, ShlObj, ActiveX, ComObj, IniFiles, ShellAPI,
-  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol;
+  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol,CRC;
 
 {$R *.dfm}
 
@@ -1328,9 +1331,11 @@ begin
   end;
 
   for i := Low(buffer) to High(buffer) do
-    by := by + buffer[i];
+   by := QuickCRC8(buffer[i], by); // 快速查表计算CRC
 
-  Memo2.Text := ss + ' ' + Format('%.02x ', [by]) + ' 7E';
+   //by := by + buffer[i];
+
+  Memo2.Text := ss + ' ' + Format('%.02x ', [by]);
 end;
 
 procedure TSplitViewForm.Button14Click(Sender: TObject);
@@ -1601,6 +1606,7 @@ begin
       exit;
     end;
     OcComPortObj.Log('> Start Sending File:' + FullFileNameLoaded);
+
     while True do
     begin
       // Log('FileStream.Position='+Inttostr(FileStream.Position));
@@ -1610,7 +1616,6 @@ begin
         break;
 
       OcComPortObj.FalconComSendBuffer(buffer, Len);
-
       Application.ProcessMessages;
       ss := '';
       for i := 0 to Len - 1 do
@@ -1777,6 +1782,128 @@ FINISHED_OVER:
 
 end;
 
+procedure TSplitViewForm.SendFileAsBin(OcComPortObj: TOcComPortObj);
+var
+  // SL: TStringList;
+  //i: Integer;
+  tempstr: String;
+  iLength: Integer;
+  baseAddress: dword;
+  dataType: String;
+  Data: array [0 .. 511] of byte;
+  // bb4, bb3: byte;
+  pPOcComPack: POcComPack;
+  bCount: Integer;
+  // iDataCount: Integer;
+  // reTryCount: Integer;
+  fileSize: Integer;
+  checksum: dword;
+  bStatusOK: Boolean;
+Label FINISHED_OVER;
+const
+  DEFAULT_LENGTH = 64;
+begin
+  // SL := TStringList.Create;
+  // SL.LoadFromFile(FullFileNameLoaded);
+  if not OcComPortObj.Connected then
+  begin
+    OcComPortObj.Log('Device was closed,please open a device.');
+    exit;
+  end;
+  if (FileStream = nil) or (FileStream.Size = 0) then
+  begin
+    OcComPortObj.Log('FileStream = nil/File size = 0!');
+    exit;
+  end;
+
+  ZeroMemory(@Data, 512);
+  // iDataCount := 0;
+  fileSize := 0;
+  checksum := 0;
+  dataType := '00';
+
+  Data[0] := $FF;
+  Data[1] := $0A;
+
+  Data[2] := OCCOMPROTOCAL_INBOOT; // 进入bootLAOD
+  Data[3] := $00;
+
+  Data[4] := $00;
+
+  Data[5] := $00; // 数据长度不包括数据包头和后面的结束位/CRC
+  Data[6] := $00; // 数据长度不包括数据包头和后面的结束位/CRC
+
+  Data[7] := $00; // 数据
+  Data[8] := $00; // 数据
+  Data[9] := $00; // 数据
+  Data[10] := $00; // 数据
+
+  pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
+  bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
+  if not bStatusOK then
+  begin
+    OcComPortObj.Log('device is not ready to receive file!');
+    exit;
+  end;
+
+  // 准备传输数据
+  try
+    tempstr := Trim(ComboBox10.Text);
+    FormatHexStrToBuffer(tempstr, &Data[7], bCount);
+    baseAddress := MakeDWord(MakeWord(Data[7], Data[8]), MakeWord(Data[9], Data[10]));
+  except
+    OcComPortObj.Log('invalide base addresss ='+tempstr);
+    exit;
+  end;
+
+  OcComPortObj.Log('base addresss ='+tempstr);
+  Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // 写FLASH
+  // for i := 0 to SL.Count - 1 do
+  while (True) do
+  begin
+    Application.ProcessMessages;
+    iLength := FileStream.Read(&Data[11], DEFAULT_LENGTH);
+    if (iLength <= 0) then
+    begin
+      Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
+      Data[5] := 6;
+      IntToBuffer(FileStream.Size, &Data[7], 2);
+      IntToBuffer(checksum, &Data[9], 4);
+      pPOcComPack := @Data[0];
+      bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
+      DelayDelay(30);
+      OcComPortObj.LogBuff('file size:', &Data[7], 2);
+      OcComPortObj.LogBuff('file summ:', &Data[9], 4);
+      break;
+    end;
+
+    Data[5] := 4 { 32 Flash地址 } + iLength; // 有效数据长度不包括数据包头和后面的结束位/CRC
+
+    if dataType = '00' then
+    begin
+      IntToBuffer(baseAddress, &Data[7], 4);
+      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // 计算sum不要算上crc
+      pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
+      bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
+      if (not bStatusOK) then
+        break;
+
+      baseAddress := baseAddress + DEFAULT_LENGTH;
+    end
+    else
+    begin
+      // OcComPortObj.Log('Other Data：'+str);
+    end;
+  end; // for
+
+FINISHED_OVER:
+  if bStatusOK = False then
+    OcComPortObj.Log('Transmit file failed!')
+  else
+    OcComPortObj.Log('Transmit file finished!');
+
+end;
+
 procedure TSplitViewForm.Button24Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
@@ -1862,6 +1989,66 @@ end;
 procedure TSplitViewForm.Button27Click(Sender: TObject);
 begin
   Memo5.Clear;
+end;
+
+procedure TSplitViewForm.Button28Click(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
+begin
+  if ComboBoxEx1.Items.Count <= 0 then
+    exit;
+  OcComPortObj := GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  if OcComPortObj = nil then
+  begin
+    OcComPortObj.Log('No device is found,please open a device.');
+    exit;
+  end;
+
+  if OpenDialog1.Execute then
+  begin
+    FullFileNameLoaded := OpenDialog1.FileName;
+    if FileExists(FullFileNameLoaded) then
+    begin
+      FileStream := readFileToStream(FullFileNameLoaded);
+      OcComPortObj.Log(' ');
+      OcComPortObj.Log('File Name: ' + FullFileNameLoaded);
+      OcComPortObj.Log('File Size: ' + inttostr(FileStream.Size) + ' Bytes');
+      // OcComPortObj.Log('This file have been loaded,press the left-bottom button to start sending');
+      if (FileStream.Size > 1024 * 1024 * 5) then
+      begin
+        OcComPortObj.Log('This file size is too biger,only support less then 5M size file.');
+        FileStream.Free;
+        FileStream := nil;
+        FullFileNameLoaded := '';
+      end;
+    end;
+  end;
+
+  if not FileExists(FullFileNameLoaded) then
+  begin
+    OcComPortObj.Log('do not exist the file ' + FullFileNameLoaded);
+    exit;
+  end;
+
+  Combobox9.ItemIndex:=0;//octopus 协议发送文件
+
+  if IsHexFile(FullFileNameLoaded) then
+  begin
+    if (FileStream <> nil) then
+      FileStream.Free;
+    FileStream := nil;
+    SendFileAsHex(OcComPortObj);
+  end
+  else if IsBinFile(FullFileNameLoaded) then
+  begin
+    SendFileAsBin(OcComPortObj);
+      if (FileStream <> nil) then
+      FileStream.Free;
+    FileStream := nil;
+    FullFileNameLoaded := '';
+  end
+  else
+    SendFileAsCommon(OcComPortObj);
 end;
 
 procedure TSplitViewForm.Button2Click(Sender: TObject);
@@ -4301,15 +4488,20 @@ begin
   Button1.Width := Panel4.Width - Button3.Width - 3;
 
   Button8.Width := Panel2.Width - Button7.Width - 5;
+
   Button9.Width := Memo3.Width + 2;
   Button11.Width := Memo3.Width + 2;
   Button25.Width := Button11.Width;
+  Button28.Width := Button11.Width;
+  Button13.Width := Button11.Width;
 
   ComboBox9.Width := Memo5.Width - Label7.Width - 25;
   ComboBox10.Width := ComboBox9.Width;
   ComboBox11.Width := ComboBox9.Width;
   ComboBox12.Width := ComboBox9.Width;
-  Button16.Width := Memo5.Width + 3 - 100;
+
+  Button16.Width := Button8.Width;// Memo5.Width + 3 - 100;
+
   ComboBox10.Left := ComboBox9.Left;
   ComboBox11.Left := ComboBox9.Left;
   ComboBox12.Left := ComboBox9.Left;

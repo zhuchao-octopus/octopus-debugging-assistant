@@ -144,6 +144,8 @@ function IsImageFile(const fn: string): Boolean;
 function IsMovieFile(const fn: string): Boolean;
 function IsTxtFile(const fn: string): Boolean;
 function IsHexFile(const fn: string): Boolean;
+function IsBinFile(const fn: string): Boolean;
+
 function MakeWord(b2: byte; b1: byte): Word;
 function MakeDWord(w2: Word; w1: Word): Dword;
 
@@ -241,6 +243,14 @@ var
 begin
   extfn := LowerCase(ExtractFileExt(fn));
   Result := (extfn = '.hex');
+end;
+
+function IsBinFile(const fn: string): Boolean;
+var
+  extfn: String;
+begin
+  extfn := LowerCase(ExtractFileExt(fn));
+   Result := (extfn = '.bin') or (extfn = '.binary') or (extfn = '.elf') or (extfn = '.axf');
 end;
 
 function GetBuildInfo(FileName: string): String;
