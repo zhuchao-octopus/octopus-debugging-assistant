@@ -257,7 +257,7 @@ var
   ss: string;
   i1, i2: integer;
   pStr: Pchar;
-  match: TMatch;
+  // match: TMatch;
 begin
   str := Trim(str);
   pStr := StrRScan(Pchar(str), 'C');
@@ -767,13 +767,13 @@ end;
 procedure TOcComPortObj.LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
 var
   str: String;
-  i,j: integer;
+  i, j: integer;
   f: string;
 begin
   str := '';
   if (Count <= 0) then
     exit;
-  j:=0;
+  j := 0;
   f := '%-' + IntToStr(FHexModeFormatCount * 3 + 10) + 's';
   for i := 0 to Count - 1 do
   begin
@@ -785,12 +785,12 @@ begin
       str := str + ByteToWideString2(@Buff[i - FHexModeFormatCount + 1], FHexModeFormatCount);
       Log(flag + str);
       str := '';
-       j:=0;
+      j := 0;
     end;
   end;
 
-  str := Format(f,[Trim(str)]);
-  str :=str + ByteToWideString2(@Buff[Count - j], j);
+  str := Format(f, [Trim(str)]);
+  str := str + ByteToWideString2(@Buff[Count - j], j);
   Log(flag + str);
 end;
 
@@ -825,9 +825,9 @@ begin
 end;
 
 procedure TOcComPortObj.LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
-var
-  i, PreLogLinesCount: Int64;
-  str: String;
+// var
+// i: Int64;
+// str: String;
 begin
   if (LogMemo = nil) or (LogMemo.Parent = nil) then
   begin
@@ -1148,7 +1148,7 @@ end;
 
 function TOcComPortObj.SaveToTheExcelFile(Length: integer; Rows: integer): integer;
 var
-  FileName: String;
+  // FileName: String;
   i: integer;
 begin
   if Rows = 0 then
@@ -1171,7 +1171,7 @@ end;
 
 procedure TOcComPortObj.OcComPortObjRxChar(Sender: TObject; Count: integer);
 var
-  i, Index: integer;
+  i: integer;
   PreLogLinesCount: Int64;
   s, ln: String;
   Buff: array of Byte;
@@ -1410,15 +1410,15 @@ begin
 end;
 
 procedure TOcComPortObj.RequestProtocolConnection;
-var
-  b: array of Byte;
+// var
+// b: array of Byte;
 begin
   // SendProtocolData(b, 0, OCCOMPROTOCAL_START, false);
 end;
 
 procedure TOcComPortObj.SendProtocolACK();
-var
-  b: array of Byte;
+// var
+// b: array of Byte;
 begin
   // SendProtocolData(b, 0, OCCOMPROTOCAL_ACK, false);
 end;
@@ -1433,16 +1433,17 @@ begin
 
   if FShowSendingLog then
     LogBuff('-> ', p^, ilength);
-  // PrintSendProtocolPack(OcComPack);
 
+  // PrintSendProtocolPack(OcComPack);
+  // 串口写入数据
   FalconComSendBuffer(p^, ilength); // 校验位和结束标记可有可无
   Result := True;
 end;
 
 function TOcComPortObj.SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: integer): Boolean;
 var
-  p: pbyte;
-  ilength: integer;
+  // p: pbyte;
+  // ilength: integer;
   reTryCount: integer;
 begin
   Result := True;
@@ -1457,20 +1458,20 @@ begin
       Result := false;
       exit;
     end;
-    Log('time out, try ' + IntToStr(reTryCount));
+    Log('Time Out Try ... ' + IntToStr(reTryCount));
     SendProtocolPackage(pPOcComPack);
   end;
 end;
 
 function TOcComPortObj.SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean;
 begin
-  SendProtocolData(OCCOMPROTOCAL_HEAD, TypeID, Buffer, Count, NeedACK);
+  Result := SendProtocolData(OCCOMPROTOCAL_HEAD, TypeID, Buffer, Count, NeedACK);
 end;
 
 function TOcComPortObj.SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean;
 var
   OcComPack: TOcComPack;
-  OcComPackHead: TOcComPackHead;
+  // OcComPackHead: TOcComPackHead;
   packs, i, j: integer;
   PaLoad_Max_Length: integer;
 begin
@@ -1557,7 +1558,7 @@ function TOcComPortObj.WaitProtocolACK2(ACKBuffer: array of Byte; bCount: intege
 var
   pOc: POcComPack;
   Start: real;
-  iOK, ilength: integer;
+  ilength: integer;
 begin
   Result := false;
   Start := GetTickCount;
@@ -1568,13 +1569,11 @@ begin
 
     if pOc <> nil then
     begin
-      iOK := 0;
+      // iOK := 0;
       ilength := bCount;
       while (ilength >= 0) do
       begin
-        if (pOc.data[bCount] = ACKBuffer[bCount]) then
-          INC(iOK)
-        else
+        if (pOc.data[bCount] <> ACKBuffer[bCount]) then
           break;
 
         Dec(ilength);
@@ -1657,7 +1656,7 @@ end;
 
 procedure TOcComPortObj.PrintReceivedProtocolData(Index: integer);
 var
-  i, j, v: integer;
+  i, j: integer;
   str: String;
 begin
   str := '';
@@ -1846,7 +1845,7 @@ procedure TOcComPortObj.KeyDown(Sender: TObject; var Key: Word; Shift: TShiftSta
 var
   cmdbuf: array [0 .. 1] of Byte;
   CurrentLine: integer;
-  thid: Dword;
+  // thid: Dword;
   i, j: integer;
   LastStr: String;
   MaskedKeyState: TShiftState;
@@ -1945,9 +1944,8 @@ var
   ProcessInfo: TProcessInformation;
   Buffer: Pchar;
   BytesRead: Dword;
-  aprun: Dword;
-
-  buf, strline: string;
+  // aprun: Dword;
+  buf: string;
   cmdstr: string;
 begin
   cmdstr := str;

@@ -1004,7 +1004,6 @@ object SplitViewForm: TSplitViewForm
               'restart')
             ScrollBars = ssVertical
             TabOrder = 0
-            ExplicitHeight = 478
           end
           object Panel16: TPanel
             Left = 0
@@ -1014,7 +1013,6 @@ object SplitViewForm: TSplitViewForm
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
-            ExplicitTop = 568
             object Button16: TButton
               Left = 79
               Top = 0
@@ -1325,12 +1323,13 @@ object SplitViewForm: TSplitViewForm
       item
         Bevel = pbNone
         Text = 'http://www.1234998.top'
-        Width = 230
+        Width = 250
       end
       item
         Bevel = pbNone
         Width = 50
       end>
+    OnDrawPanel = StatusBar1DrawPanel
   end
   object Panel1: TPanel
     Left = 320

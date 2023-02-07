@@ -291,6 +291,8 @@ type
     function GetStringGridValidStr(sStr: String): String;
     procedure Button27Click(Sender: TObject);
     procedure Button28Click(Sender: TObject);
+    procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
+    procedure StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
   private
     // ComReceiveCount: Integer;
     // ComReceiveBuffer: array [0 .. 1048576] of Byte;
@@ -300,7 +302,7 @@ type
 
     OctopusCfgDir: String;
     OctopusCfgDir_LogFileName: String;
-    FileStream: TFileStream;
+    // FFileStream: TFileStream;
     FullFileNameLoaded: String;
     OcComPortList: TStringList;
     OcHIDDeviceList: TStringList;
@@ -308,6 +310,8 @@ type
     // LoopStringList: TStringList;
     // FTimer1Timer_Count: Integer;
     FCheck, FNoCheck: TBitmap;
+
+    Fprogress, FprogressMax: Integer;
 
     procedure MyAppMsg(var Msg: TMsg; var Handled: Boolean);
     Procedure WMSysCommand(var Msg: TWMMenuSelect); message WM_SysCommand;
@@ -360,8 +364,8 @@ type
     function getDeviceTabIndex(DeviceName: String): Integer;
 
     procedure SendFileAsCommon(OcComPortObj: TOcComPortObj);
-    procedure SendFileAsHex(OcComPortObj: TOcComPortObj);
-    procedure SendFileAsBin(OcComPortObj: TOcComPortObj);
+    procedure SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
+    procedure SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
   end;
 
 var
@@ -380,7 +384,7 @@ implementation
 
 uses
   Vcl.Themes, ocPcDeviceMgt, ShlObj, ActiveX, ComObj, IniFiles, ShellAPI,
-  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol,CRC;
+  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol, CRC, math;
 
 {$R *.dfm}
 
@@ -1076,6 +1080,49 @@ begin
     CharMoveSeries(0, Count);
 end;
 
+procedure TSplitViewForm.StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
+begin
+  StatusBar1.Panels[1].Style := psOwnerDraw;
+  self.Fprogress := progress;
+  self.FprogressMax := progressMax;
+  StatusBar1.Repaint;
+end;
+
+procedure TSplitViewForm.StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
+var
+  X: Integer;
+  str: String;
+begin
+  if (Panel.Index = 1) and (Fprogress = 0) and (FprogressMax = 0) then
+  begin
+    str := 'http://www.1234998.top';
+    with StatusBar1.Canvas do
+    begin
+      Brush.Color := clMenuBar;
+      Font.Color := clBlack;
+      // X := Floor((Rect.Right - Rect.Left) * Fprogress / FprogressMax);
+      Rectangle(Rect.Left, Rect.Top, Rect.Width, Rect.Height);
+      TextOut(Rect.Left, Rect.Top, str);
+      // TextOut(Rect.TopLeft.X+3,Rect.TopLeft.Y, str);
+    end;
+    exit;
+  end;
+  if (Panel.Index = 1) and (Fprogress >= 0) and (FprogressMax > 0) and (Fprogress <= FprogressMax) then
+  begin
+    str := IntToStr(Floor(self.Fprogress / self.FprogressMax * 100)) + '%';
+    with StatusBar1.Canvas do
+    begin
+      Brush.Color := $00641F04;
+      Font.Color := clWhite;
+      X := Floor((Rect.Right - Rect.Left) * Fprogress / FprogressMax);
+      Rectangle(Rect.Left, Rect.Top, Rect.Left + X, Rect.Bottom - 1);
+      TextOut(Rect.Left + X - TextWidth(str) - 1, Rect.Top, str);
+      // TextOut(Rect.TopLeft.X+3,Rect.TopLeft.Y, str);
+    end;
+  end;
+
+end;
+
 procedure TSplitViewForm.StatusBarPrintFileSize();
 var
   OcComPortObj: TOcComPortObj;
@@ -1088,16 +1135,16 @@ begin
   if (OcComPortObj.LogMemo <> nil) and (OcComPortObj.Connected) then
   begin
     // StatusBar1.Panels.BeginUpdate;
-    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + inttostr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' + inttostr(OcComPortObj.ComReceiveCount) + ' Bytes | ' +
-      'Processed: ' + inttostr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + inttostr(Length(OcComPortObj.LogMemo.Text)) + ' Bytes | ' + 'Line: ' +
-      inttostr(OcComPortObj.LogMemo.CaretPos.Y) + ' | ' + 'Lines: ' + inttostr(OcComPortObj.LogMemo.Lines.Count) + ' | Packs: ' + inttostr(OcComPortObj.GetPacks);
+    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes | ' +
+      'Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + IntToStr(Length(OcComPortObj.LogMemo.Text)) + ' Bytes | ' + 'Line: ' +
+      IntToStr(OcComPortObj.LogMemo.CaretPos.Y) + ' | ' + 'Lines: ' + IntToStr(OcComPortObj.LogMemo.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
     // StatusBar1.Panels.EndUpdate;
   end
   else
   begin
-    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + inttostr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' + inttostr(OcComPortObj.ComReceiveCount) + ' Bytes | ' +
-      'Processed: ' + inttostr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + inttostr(Length(Memo1.Text)) + ' Bytes | ' + 'Line: ' + inttostr(Memo1.CaretPos.Y) + ' | ' + 'Lines: ' +
-      inttostr(Memo1.Lines.Count) + ' | Packs: ' + inttostr(OcComPortObj.GetPacks);
+    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes | ' +
+      'Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + IntToStr(Length(Memo1.Text)) + ' Bytes | ' + 'Line: ' + IntToStr(Memo1.CaretPos.Y) + ' | ' + 'Lines: ' +
+      IntToStr(Memo1.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
   end;
 
   StatusBar1.Update;
@@ -1331,9 +1378,9 @@ begin
   end;
 
   for i := Low(buffer) to High(buffer) do
-   by := QuickCRC8(buffer[i], by); // 快速查表计算CRC
+    by := QuickCRC8(buffer[i], by); // 快速查表计算CRC
 
-   //by := by + buffer[i];
+  // by := by + buffer[i];
 
   Memo2.Text := ss + ' ' + Format('%.02x ', [by]);
 end;
@@ -1544,6 +1591,7 @@ end;
 procedure TSplitViewForm.Button23Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
+  FileStream: TFileStream;
 begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   { if OcComPortObj = nil then
@@ -1576,15 +1624,15 @@ begin
       FileStream := readFileToStream(FullFileNameLoaded);
       OcComPortObj.Log(' ');
       OcComPortObj.Log('File Name: ' + FullFileNameLoaded);
-      OcComPortObj.Log('File Size: ' + inttostr(FileStream.Size) + ' Bytes');
+      OcComPortObj.Log('File Size: ' + IntToStr(FileStream.Size) + ' Bytes');
       // OcComPortObj.Log('This file have been loaded,press the left-bottom button to start sending');
       if (FileStream.Size > 1024 * 1024 * 5) then
       begin
         OcComPortObj.Log('This file size is too biger,only support less then 5M size file.');
-        FileStream.Free;
-        FileStream := nil;
         FullFileNameLoaded := '';
       end;
+      FileStream.Free;
+      FileStream := nil;
     end;
   end;
 end;
@@ -1595,40 +1643,39 @@ var
   buffer: array [0 .. 31] of byte;
   ss: String;
 begin
-
-  if (FileStream <> nil) then
-  begin
+  { if (FFileStream <> nil) then
+    begin
     // sz := FileStream.Size;
-    FileStream.Seek(0, soFromBeginning);
+    FFileStream.Seek(0, soFromBeginning);
     if (not OcComPortObj.Connected) then
     begin
-      OcComPortObj.Log('Device was closed,please open a device.');
-      exit;
+    OcComPortObj.Log('Device was closed,please open a device.');
+    exit;
     end;
     OcComPortObj.Log('> Start Sending File:' + FullFileNameLoaded);
 
     while True do
     begin
-      // Log('FileStream.Position='+Inttostr(FileStream.Position));
-      ZeroMemory(@buffer, sizeof(buffer));
-      Len := FileStream.Read(buffer, sizeof(buffer));
-      if (Len <= 0) then
-        break;
+    // Log('FileStream.Position='+Inttostr(FileStream.Position));
+    ZeroMemory(@buffer, sizeof(buffer));
+    Len := FFileStream.Read(buffer, sizeof(buffer));
+    if (Len <= 0) then
+    break;
 
-      OcComPortObj.FalconComSendBuffer(buffer, Len);
-      Application.ProcessMessages;
-      ss := '';
-      for i := 0 to Len - 1 do
-      begin
-        ss := ss + Format('%.02x ', [buffer[i]]);
-      end;
-      OcComPortObj.Log(ss);
+    OcComPortObj.FalconComSendBuffer(buffer, Len);
+    Application.ProcessMessages;
+    ss := '';
+    for i := 0 to Len - 1 do
+    begin
+    ss := ss + Format('%.02x ', [buffer[i]]);
+    end;
+    OcComPortObj.Log(ss);
     end;
     OcComPortObj.Log('File have been sent successfully。');
-    FileStream.Free;
-    FileStream := nil;
+    FFileStream.Free;
+    FFileStream := nil;
     FullFileNameLoaded := '';
-  end;
+    end; }
 end;
 
 procedure DelayDelay(msec: Integer);
@@ -1642,7 +1689,7 @@ begin
     Application.ProcessMessages; // 关键在这里
 end;
 
-procedure TSplitViewForm.SendFileAsHex(OcComPortObj: TOcComPortObj);
+procedure TSplitViewForm.SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
 var
   SL: TStringList;
   i: Integer;
@@ -1656,13 +1703,13 @@ var
   bCount: Integer;
   // iDataCount: Integer;
   // reTryCount: Integer;
-  fileSize: Integer;
+  fileSent: Integer;
   checksum: dword;
   bStatusOK: Boolean;
 Label FINISHED_OVER;
 begin
   SL := TStringList.Create;
-  SL.LoadFromFile(FullFileNameLoaded);
+  SL.LoadFromFile(FileName);
   if not OcComPortObj.Connected then
   begin
     OcComPortObj.Log('Device was closed,please open a device.');
@@ -1671,7 +1718,7 @@ begin
 
   ZeroMemory(@Data, 512);
   // iDataCount := 0;
-  fileSize := 0;
+  fileSent := 0;
   checksum := 0;
 
   Data[0] := $FF;
@@ -1689,14 +1736,17 @@ begin
   Data[8] := $00; // 数据
   pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
   bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
+
   if not bStatusOK then
   begin
     OcComPortObj.Log('device is not ready to receive file!');
     exit;
   end;
+  //OcComPortObj.Log('Device is ready to receive file.');
 
+  StatusBar1DrawProgress(0, 0);
   Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // 写FLASH
-  Data[3] := 0; //
+
   for i := 0 to SL.Count - 1 do
   begin
     Application.ProcessMessages;
@@ -1706,11 +1756,11 @@ begin
       OcComPortObj.Log('The file format is wrong.');
       break;
     end;
-    if str = ':00000001FF' then
+    if str = ':00000001FF' then//结束标记
     begin
       Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
       Data[5] := 6;
-      IntToBuffer(fileSize, &Data[7], 2);
+      IntToBuffer(fileSent, &Data[7], 2);
       IntToBuffer(checksum, &Data[9], 4);
       pPOcComPack := @Data[0];
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
@@ -1747,26 +1797,14 @@ begin
       Data[7] := bb4;
       Data[8] := bb3;
 
-      fileSize := fileSize + iLength;
+      fileSent := fileSent + iLength;
       checksum := checksum + ChecksumBuffer(&Data[11], iLength); // 计算sum不要算上crc
       pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
+
+      StatusBar1DrawProgress(i + 1, SL.Count);
       if (not bStatusOK) then
         break;
-      { OcComPortObj.SendProtocolPackage(pPOcComPack);
-        while (not OcComPortObj.WaitProtocolACK(data[7], 2000)) do
-        begin
-        INC(reTryCount);
-        if reTryCount > 10 then //>=11
-        begin
-        OcComPortObj.Log('No ack from device transmit failed!');
-        INC(reTryCount);
-        // Exit;
-        GOTO FINISHED_OVER;
-        end;
-        OcComPortObj.Log('time out, try ' + inttostr(reTryCount));
-        OcComPortObj.SendProtocolPackage(pPOcComPack);
-        end; }
     end
     else
     begin
@@ -1776,51 +1814,59 @@ begin
 
 FINISHED_OVER:
   if bStatusOK = False then
-    OcComPortObj.Log('Transmit file failed!')
+  begin
+    OcComPortObj.Log('Transmit file failed!');
+  end
   else
+  begin
     OcComPortObj.Log('Transmit file finished!');
-
+    StatusBar1DrawProgress(SL.Count, SL.Count);
+  end;
+  SL.Free;
 end;
 
-procedure TSplitViewForm.SendFileAsBin(OcComPortObj: TOcComPortObj);
+procedure TSplitViewForm.SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
 var
   // SL: TStringList;
-  //i: Integer;
+  // i: Integer;
   tempstr: String;
   iLength: Integer;
   baseAddress: dword;
-  dataType: String;
+  // dataType: String;
   Data: array [0 .. 511] of byte;
   // bb4, bb3: byte;
   pPOcComPack: POcComPack;
   bCount: Integer;
   // iDataCount: Integer;
   // reTryCount: Integer;
-  fileSize: Integer;
+  fileSent: Integer;
   checksum: dword;
   bStatusOK: Boolean;
+  MemoryStream: TMemoryStream;
 Label FINISHED_OVER;
 const
-  DEFAULT_LENGTH = 64;
+  DEFAULT_LENGTH = 16;
 begin
-  // SL := TStringList.Create;
-  // SL.LoadFromFile(FullFileNameLoaded);
+
   if not OcComPortObj.Connected then
   begin
     OcComPortObj.Log('Device was closed,please open a device.');
     exit;
   end;
-  if (FileStream = nil) or (FileStream.Size = 0) then
+
+  MemoryStream := TMemoryStream.Create;
+  MemoryStream.LoadFromFile(FileName);
+  if (MemoryStream = nil) or (MemoryStream.Size = 0) then
   begin
     OcComPortObj.Log('FileStream = nil/File size = 0!');
     exit;
   end;
 
   ZeroMemory(@Data, 512);
-  // iDataCount := 0;
-  fileSize := 0;
+
+  fileSent := 0;
   checksum := 0;
-  dataType := '00';
+  // dataType := '00';
 
   Data[0] := $FF;
   Data[1] := $0A;
@@ -1832,12 +1878,12 @@ begin
 
   Data[5] := $00; // 数据长度不包括数据包头和后面的结束位/CRC
   Data[6] := $00; // 数据长度不包括数据包头和后面的结束位/CRC
-
+  //实体
   Data[7] := $00; // 数据
   Data[8] := $00; // 数据
   Data[9] := $00; // 数据
   Data[10] := $00; // 数据
-
+  // 进入BOOT LOLOAD MODE
   pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
   bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
   if not bStatusOK then
@@ -1852,24 +1898,27 @@ begin
     FormatHexStrToBuffer(tempstr, &Data[7], bCount);
     baseAddress := MakeDWord(MakeWord(Data[7], Data[8]), MakeWord(Data[9], Data[10]));
   except
-    OcComPortObj.Log('invalide base addresss ='+tempstr);
+    OcComPortObj.Log('invalide base addresss =' + tempstr);
     exit;
   end;
 
-  OcComPortObj.Log('base addresss ='+tempstr);
+  StatusBar1DrawProgress(0, 0);
+  OcComPortObj.Log('Base Addresss: ' + tempstr);
   Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // 写FLASH
+
   // for i := 0 to SL.Count - 1 do
   while (True) do
   begin
-    Application.ProcessMessages;
-    iLength := FileStream.Read(&Data[11], DEFAULT_LENGTH);
+    // Application.ProcessMessages;
+    iLength := MemoryStream.Read(&Data[11], DEFAULT_LENGTH);
     if (iLength <= 0) then
     begin
       Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
       Data[5] := 6;
-      IntToBuffer(FileStream.Size, &Data[7], 2);
+      IntToBuffer(MemoryStream.Size, &Data[7], 2);
       IntToBuffer(checksum, &Data[9], 4);
       pPOcComPack := @Data[0];
+      // 通知发送完成
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
       DelayDelay(30);
       OcComPortObj.LogBuff('file size:', &Data[7], 2);
@@ -1879,21 +1928,24 @@ begin
 
     Data[5] := 4 { 32 Flash地址 } + iLength; // 有效数据长度不包括数据包头和后面的结束位/CRC
 
-    if dataType = '00' then
+    // if dataType = '00' then
     begin
       IntToBuffer(baseAddress, &Data[7], 4);
-      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // 计算sum不要算上crc
+      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // 计算sum
       pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
+
+      // 发送数据
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
+      // OcComPortObj.LogBuff('>', Data, Data[5] + 7 + 1); // 数据实体长度+包头+CRC
+
+      fileSent := fileSent + iLength;
+      StatusBar1DrawProgress(fileSent, MemoryStream.Size);
+
       if (not bStatusOK) then
         break;
-
       baseAddress := baseAddress + DEFAULT_LENGTH;
-    end
-    else
-    begin
-      // OcComPortObj.Log('Other Data：'+str);
     end;
+    // else;
   end; // for
 
 FINISHED_OVER:
@@ -1901,7 +1953,7 @@ FINISHED_OVER:
     OcComPortObj.Log('Transmit file failed!')
   else
     OcComPortObj.Log('Transmit file finished!');
-
+  MemoryStream.Free;
 end;
 
 procedure TSplitViewForm.Button24Click(Sender: TObject);
@@ -1925,10 +1977,7 @@ begin
 
   if IsHexFile(FullFileNameLoaded) then
   begin
-    if (FileStream <> nil) then
-      FileStream.Free;
-    FileStream := nil;
-    SendFileAsHex(OcComPortObj);
+    SendFileAsHex(OcComPortObj, FullFileNameLoaded);
   end
   else
     SendFileAsCommon(OcComPortObj);
@@ -1961,9 +2010,9 @@ begin
   Memo2.Text := ss;
   i := Pos('(', Button25.Caption);
   if i > 0 then
-    Button25.Caption := Copy(Button25.Caption, 1, i - 1) + '( ' + inttostr(bLength) + ' ) Bytes'
+    Button25.Caption := Copy(Button25.Caption, 1, i - 1) + '( ' + IntToStr(bLength) + ' ) Bytes'
   else
-    Button25.Caption := Button25.Caption + ' ( ' + inttostr(bLength) + ' ) Bytes';
+    Button25.Caption := Button25.Caption + ' ( ' + IntToStr(bLength) + ' ) Bytes';
 end;
 
 procedure TSplitViewForm.Button26Click(Sender: TObject);
@@ -1994,6 +2043,8 @@ end;
 procedure TSplitViewForm.Button28Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
+  FileStream: TFileStream;
+  FileNameLoaded: String;
 begin
   if ComboBoxEx1.Items.Count <= 0 then
     exit;
@@ -2006,49 +2057,45 @@ begin
 
   if OpenDialog1.Execute then
   begin
-    FullFileNameLoaded := OpenDialog1.FileName;
-    if FileExists(FullFileNameLoaded) then
+    FileNameLoaded := OpenDialog1.FileName;
+    if FileExists(FileNameLoaded) then
     begin
-      FileStream := readFileToStream(FullFileNameLoaded);
+      FileStream := readFileToStream(FileNameLoaded);
       OcComPortObj.Log(' ');
-      OcComPortObj.Log('File Name: ' + FullFileNameLoaded);
-      OcComPortObj.Log('File Size: ' + inttostr(FileStream.Size) + ' Bytes');
+      OcComPortObj.Log('File Name: ' + FileNameLoaded);
+      OcComPortObj.Log('File Size: ' + IntToStr(FileStream.Size) + ' Bytes');
       // OcComPortObj.Log('This file have been loaded,press the left-bottom button to start sending');
       if (FileStream.Size > 1024 * 1024 * 5) then
       begin
         OcComPortObj.Log('This file size is too biger,only support less then 5M size file.');
-        FileStream.Free;
-        FileStream := nil;
-        FullFileNameLoaded := '';
       end;
+      FileStream.Free;
+      FileStream := nil;
     end;
   end;
 
-  if not FileExists(FullFileNameLoaded) then
+  if not FileExists(FileNameLoaded) then
   begin
-    OcComPortObj.Log('do not exist the file ' + FullFileNameLoaded);
+    OcComPortObj.Log('do not exist the file ' + FileNameLoaded);
     exit;
   end;
 
-  Combobox9.ItemIndex:=0;//octopus 协议发送文件
+  ComboBox9.ItemIndex := 0; // octopus 协议发送文件
 
-  if IsHexFile(FullFileNameLoaded) then
+  if IsHexFile(FileNameLoaded) then
   begin
-    if (FileStream <> nil) then
-      FileStream.Free;
-    FileStream := nil;
-    SendFileAsHex(OcComPortObj);
+    SendFileAsHex(OcComPortObj, FileNameLoaded);
   end
-  else if IsBinFile(FullFileNameLoaded) then
+  else if IsBinFile(FileNameLoaded) then
   begin
-    SendFileAsBin(OcComPortObj);
-      if (FileStream <> nil) then
-      FileStream.Free;
-    FileStream := nil;
-    FullFileNameLoaded := '';
+    SendFileAsBin(OcComPortObj, FileNameLoaded);
   end
   else
     SendFileAsCommon(OcComPortObj);
+
+  if (FileStream <> nil) then
+    FileStream.Free;
+  FileStream := nil;
 end;
 
 procedure TSplitViewForm.Button2Click(Sender: TObject);
@@ -2727,7 +2774,7 @@ begin
     end
     else if SplitViewForm.Notebook2.PageIndex = SplitViewForm.Notebook2.Pages.Count - 2 then // 图形
     begin
-      SplitViewForm.TabSet3.TabIndex := SplitViewForm.TabSet3.Tabs.Count - 1;
+      TabSet3.TabIndex := SplitViewForm.TabSet3.Tabs.Count - 1;
       Notebook3.PageIndex := Notebook3.Pages.Count - 1;
     end
     else
@@ -2789,6 +2836,10 @@ begin
   bmp := TBitmap.Create;
   // Bitmap.DrawMode   := dmTransparent;
   // Bitmap.OuterColor := Bitmap.PixelS[0,0];
+  // ProgressBar1.Parent:=StatusBar1;
+  FprogressMax := 0;
+  Fprogress := 0;
+
   try
     bmp.Handle := LoadBitmap(0, PChar(OBM_CHECKBOXES));
     bmp.PixelFormat := pf32bit;
@@ -2921,10 +2972,13 @@ begin
 
   W1234998.silent := True; // 屏蔽脚本错误
   cbxVclStyles.OnChange(self); // 切换主题
+
   TabSet1.Tabs := Notebook1.Pages;
   TabSet2.Tabs := Notebook2.Pages;
   TabSet3.Tabs := Notebook3.Pages;
 
+  TabSet1.TabIndex := 0;
+  TabSet2.TabIndex := 0;
   TabSet3.TabIndex := 1;
 
   TabSetChange(TabSet1, 0);
@@ -3272,7 +3326,7 @@ begin
     ToWrite := HidDev.Caps.OutputReportByteLength;
     if WriteCount > (HidDev.Caps.OutputReportByteLength - 1) then
     begin
-      Log0('The data length should less than the devices OutputReportByteLength-1 =' + inttostr(HidDev.Caps.OutputReportByteLength));
+      Log0('The data length should less than the devices OutputReportByteLength-1 =' + IntToStr(HidDev.Caps.OutputReportByteLength));
       exit;
     end;
     // ToWrite:= WriteCount+1;
@@ -3288,7 +3342,7 @@ begin
       if not(gdFixed in State) then
         with TStringGrid(Sender).Canvas do
         begin
-          brush.Color := clWindow;
+          Brush.Color := clWindow;
           fillRect(Rect);
           if StringGrid1.Cells[ACol, ARow] = '1' then
             Draw((Rect.Right + Rect.Left - FCheck.Width) div 2 - 2, (Rect.Bottom + Rect.Top - FCheck.Height) div 2, FCheck)
@@ -3684,8 +3738,8 @@ begin
       Octopusini := TIniFile.Create(s);
       for i := 1 to StringGrid1.RowCount - 1 do
       begin
-        Octopusini.WriteString('MyCustData', inttostr(i) + '_2', SplitViewForm.StringGrid1.Cells[2, i]);
-        Octopusini.WriteString('MyCustData', inttostr(i) + '_5', SplitViewForm.StringGrid1.Cells[5, i]);
+        Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', SplitViewForm.StringGrid1.Cells[2, i]);
+        Octopusini.WriteString('MyCustData', IntToStr(i) + '_5', SplitViewForm.StringGrid1.Cells[5, i]);
       end;
       Octopusini.WriteInteger('MyPreference', 'Theme', cbxVclStyles.ItemIndex);
       Octopusini.WriteInteger('MyPreference', 'SV_R_WIDTH', SV_R.Width);
@@ -3740,8 +3794,8 @@ begin
     Octopusini := TIniFile.Create(s);
     for i := 1 to StringGrid1.RowCount - 1 do
     begin
-      StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData', inttostr(i) + '_2', '');
-      StringGrid1.Cells[5, i] := Octopusini.ReadString('MyCustData', inttostr(i) + '_5', '');
+      StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_2', '');
+      StringGrid1.Cells[5, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_5', '');
     end;
 
     cbxVclStyles.ItemIndex := Octopusini.ReadInteger('MyPreference', 'Theme', 0);
@@ -3971,12 +4025,13 @@ begin
     end;
     StatusBar1.Panels.Items[0].Text := '操作说明：ESC、F1、F2、F3';
   end;
+
   TabSet1.Tabs := Notebook1.Pages;
   TabSet2.Tabs := Notebook2.Pages;
-  TabSet3.Tabs := Notebook3.Pages;
+  // TabSet3.Tabs := Notebook3.Pages;
   TabSetChange(TabSet1, 0);
   TabSetChange(TabSet2, 0);
-  TabSetChange(TabSet3, 0);
+  // TabSetChange(TabSet3, 0);
 end;
 
 procedure ShowStartComments(Lang: String);
@@ -4403,13 +4458,13 @@ begin
 
   if OcComPortObj.OcComPortObjPara.BaudRate = 0 then
   begin
-    if ComboBox1.Items.IndexOf(inttostr(OcComPortObj.CustomBaudRate)) < 0 then
+    if ComboBox1.Items.IndexOf(IntToStr(OcComPortObj.CustomBaudRate)) < 0 then
     begin
       ComboBox1.Items.BeginUpdate;
-      ComboBox1.Items.Add(inttostr(OcComPortObj.CustomBaudRate));
+      ComboBox1.Items.Add(IntToStr(OcComPortObj.CustomBaudRate));
       ComboBox1.Items.EndUpdate;
     end;
-    ComboBox1.ItemIndex := ComboBox1.Items.IndexOf(inttostr(OcComPortObj.CustomBaudRate));
+    ComboBox1.ItemIndex := ComboBox1.Items.IndexOf(IntToStr(OcComPortObj.CustomBaudRate));
   end
   else if (OcComPortObj.OcComPortObjPara.BaudRate >= ComboBox1.Items.Count) then
     ComboBox1.ItemIndex := 13
@@ -4430,7 +4485,7 @@ begin
   // CheckBox9.Checked := OcComPortObj.OcComPortObjPara.HexModeWithString;
   CheckBox12.Checked := OcComPortObj.CompatibleUnicode;
 
-  LabeledEdit1.Text := inttostr(OcComPortObj.Timeouts.ReadInterval);
+  LabeledEdit1.Text := IntToStr(OcComPortObj.Timeouts.ReadInterval);
 
   if (OcComPortObj.Connected) then
   begin
@@ -4500,7 +4555,7 @@ begin
   ComboBox11.Width := ComboBox9.Width;
   ComboBox12.Width := ComboBox9.Width;
 
-  Button16.Width := Button8.Width;// Memo5.Width + 3 - 100;
+  Button16.Width := Button8.Width; // Memo5.Width + 3 - 100;
 
   ComboBox10.Left := ComboBox9.Left;
   ComboBox11.Left := ComboBox9.Left;

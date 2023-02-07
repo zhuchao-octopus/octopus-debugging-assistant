@@ -82,7 +82,8 @@ type
     Length: WORD; // 实际数据长度2
   end;
 
-  TOcComPackHead2 = packed record // 用于头部识别
+  // 用于头部识别，兼容其它第三方数据包
+  TOcComPackHead2 = packed record // 用于头部识别，兼容其它第三方数据包
     Head: WORD; // 头部识别码 2
     PID: WORD; // 包的类型  2 //命令+设备地址各一个字节
     Length: byte; // 包的总长度  1
