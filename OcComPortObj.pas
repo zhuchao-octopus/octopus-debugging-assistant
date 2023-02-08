@@ -35,7 +35,11 @@ const
   SEND_FLAG = '-> ';
 
 const
-  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format            字符串 ', 'Hexadecimal Format 十六进制 ', 'Graphic                   图形 ', 'Octopus Protocol     协议 ',
+  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string =
+   ('ASCII Format            字符串 ',
+    'Hexadecimal Format 十六进制 ',
+    'Graphic                   图形 ',
+    'Octopus Protocol     协议 ',
     'File                          文件 ');
 
   MAX_BAUDRATE_INDEX: integer = 15;
@@ -800,14 +804,18 @@ var
   str: String;
   isBottom: Boolean;
 begin
+
   if (LogMemo = nil) or (LogMemo.Parent = nil) then
   begin
+    MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
+
   isBottom := IsLogBottom();
   PreLogLinesCount := LogMemo.Lines.Count;
   LogMemo.Lines.BeginUpdate;
   LogMemo.Lines.Append(Msg);
+
   if FShowLineNumber or FShowDate or FShowTime then
   begin
     for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do

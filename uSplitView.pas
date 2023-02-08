@@ -1742,7 +1742,7 @@ begin
     OcComPortObj.Log('device is not ready to receive file!');
     exit;
   end;
-  //OcComPortObj.Log('Device is ready to receive file.');
+  // OcComPortObj.Log('Device is ready to receive file.');
 
   StatusBar1DrawProgress(0, 0);
   Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // 写FLASH
@@ -1756,7 +1756,7 @@ begin
       OcComPortObj.Log('The file format is wrong.');
       break;
     end;
-    if str = ':00000001FF' then//结束标记
+    if str = ':00000001FF' then // 结束标记
     begin
       Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
       Data[5] := 6;
@@ -1878,7 +1878,7 @@ begin
 
   Data[5] := $00; // 数据长度不包括数据包头和后面的结束位/CRC
   Data[6] := $00; // 数据长度不包括数据包头和后面的结束位/CRC
-  //实体
+  // 实体
   Data[7] := $00; // 数据
   Data[8] := $00; // 数据
   Data[9] := $00; // 数据
@@ -2055,6 +2055,13 @@ begin
     exit;
   end;
 
+  if not OcComPortObj.Connected then
+  begin
+    OcComPortObj.Log('No device is found,please open a device.');
+    exit;
+  end;
+
+  FileNameLoaded:='Null';
   if OpenDialog1.Execute then
   begin
     FileNameLoaded := OpenDialog1.FileName;
@@ -2076,11 +2083,13 @@ begin
 
   if not FileExists(FileNameLoaded) then
   begin
-    OcComPortObj.Log('do not exist the file ' + FileNameLoaded);
+    OcComPortObj.Log('Do not exist the file ' + FileNameLoaded);
     exit;
   end;
 
   ComboBox9.ItemIndex := 0; // octopus 协议发送文件
+  ComboBox7.ItemIndex := Ord(OctopusProtocol);
+  ComboBox7.OnChange(self);//设置协议接收格式
 
   if IsHexFile(FileNameLoaded) then
   begin
@@ -2091,10 +2100,14 @@ begin
     SendFileAsBin(OcComPortObj, FileNameLoaded);
   end
   else
+  begin
     SendFileAsCommon(OcComPortObj);
+  end;
 
   if (FileStream <> nil) then
+  begin
     FileStream.Free;
+  end;
   FileStream := nil;
 end;
 
@@ -2400,11 +2413,13 @@ procedure TSplitViewForm.ComboBox7Change(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
+
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj = nil then // 没有设备
   begin
     exit;
   end;
+
   if (ComboBox7.ItemIndex = Ord(SaveToFile)) and (OcComPortObj.FileStream = nil) then
   begin
     if (SaveDialog1.Execute) and (SaveDialog1.FileName <> '') then
