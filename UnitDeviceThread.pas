@@ -3,11 +3,12 @@ unit UnitDeviceThread;
 interface
 
 uses
-  System.Classes, System.Net.HttpClient;
+  System.SysUtils, System.Classes, System.Net.HttpClient;
 
 type
   TCheckDeviceThreak = class(TThread)
-  ApplicationFileName:String;
+    ApplicationFileName: String;
+    ConfigFileName: String;
   private
     { Private declarations }
     FClient: THTTPClient;
@@ -26,7 +27,8 @@ type
   end;
 
 implementation
- uses NetInterface,GlobalFunctions;
+
+uses NetInterface, GlobalFunctions, IniFiles;
 
 {
   Important: Methods and properties of objects in visual components can only be
@@ -71,10 +73,18 @@ var
   cParam: TStringList;
   // FJson:TJsonObject;
   s: String;
+  Octopusini: TIniFile;
+  timeStamp, timeStamp2: Int64;
 begin
   { Place thread code here }
 
   try
+    Octopusini := TIniFile.Create(ConfigFileName);
+    timeStamp := DateTimeToLongWord(Now(), 240); // 一天只登记一次
+    timeStamp2 := Octopusini.ReadInt64('', 'TIMESTAMP', 0);
+    if (timeStamp = timeStamp2) then
+      Exit;
+
     if FClient = nil then
       FClient := THTTPClient.Create;
     // FClient.OnReceiveData := ReceiveDataEvent;
@@ -83,19 +93,19 @@ begin
     // cParam.Add('grant_type=client_credentials');
     // cParam.Add('client_id=' + '');
     // cParam.Add('client_secret=' + '');
-    FName:='八爪鱼串口调试助手';
-    FBrand:='Octopus';
-    FCustomer:=GetMyComputerName();
-    FMAC:=GetNetBIOSAddress();
-    FAppVersion:= GetBuildInfo(ApplicationFileName);
-    FFwVersion:=  GetWIndowsVersion();
+    FName := '八爪鱼串口调试助手';
+    FBrand := 'Octopus';
+    FCustomer := GetMyComputerName();
+    FMAC := GetNetBIOSAddress();
+    FAppVersion := GetBuildInfo(ApplicationFileName);
+    FFwVersion := GetWIndowsVersion();
 
     cParam.Add('name=' + FName);
     cParam.Add('brand=' + FBrand);
     cParam.Add('customer=' + FCustomer);
 
     cParam.Add('mac=' + FMAC);
-    //cParam.Add('ip=' + FIP);
+    // cParam.Add('ip=' + FIP);
 
     cParam.Add('appVersion=' + FAppVersion);
     cParam.Add('fwVersion=' + FFwVersion);
@@ -105,8 +115,16 @@ begin
 
     URL := 'http://47.106.172.94:8090/zhuchao/octopus/devices/testCheck';
     s := FClient.Post(URL, cParam).ContentAsString;
+
+    Octopusini.WriteInt64('', 'TIMESTAMP', timeStamp);
+
   finally
-    FClient.Free;
+    if FClient <> nil then
+      FClient.Free;
+    if cParam <> nil then
+      cParam.Free;
+    if Octopusini <> nil then
+      Octopusini.Free;
   end;
 
 end;

@@ -361,6 +361,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #39640#32423
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel6: TPanel
           Left = 0
           Top = 0
@@ -893,6 +895,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Octopus '#21333#26465#21457#36865
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel12: TPanel
           AlignWithMargins = True
           Left = 3
@@ -983,6 +987,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
@@ -1097,7 +1103,7 @@ object SplitViewForm: TSplitViewForm
               Left = 74
               Top = 3
               Width = 237
-              Height = 25
+              Height = 118
               Align = alRight
               Style = csDropDownList
               ItemIndex = 0
@@ -1144,6 +1150,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
@@ -1422,6 +1430,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #27874#24418
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
@@ -1486,6 +1496,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3

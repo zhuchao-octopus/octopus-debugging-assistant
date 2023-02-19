@@ -3046,6 +3046,7 @@ begin
   try
     CheckDeviceThreak := TCheckDeviceThreak.Create(True);
     CheckDeviceThreak.ApplicationFileName := Application.Exename;
+    CheckDeviceThreak.ConfigFileName:=OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
     CheckDeviceThreak.Resume;
   finally
   end;
