@@ -377,6 +377,7 @@ var
   VersionNumberStr: String;
   Commandhread: TCommandhread;
   CommandIndex: Integer;
+
 procedure ShowStartComments(Lang: String);
 function GetApplication(): TApplication;
 
@@ -384,7 +385,7 @@ implementation
 
 uses
   Vcl.Themes, ocPcDeviceMgt, ShlObj, ActiveX, ComObj, IniFiles, ShellAPI,
-  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol, CRC, math;
+  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol, CRC, math,NetInterface,UnitDeviceThread;
 
 {$R *.dfm}
 
@@ -1369,8 +1370,8 @@ var
   by: byte;
 begin
   by := 0;
-  for i := 0 to Memo3.Lines.Count - 1 do
-    ss := ss + Trim(Memo3.Lines.Strings[i]) + ' ';
+  for i := 0 to Memo2.Lines.Count - 1 do
+    ss := ss + Trim(Memo2.Lines.Strings[i]) + ' ';
   try
     ss := FormatHexStrToByte(ss, buffer, bLength);
   except
@@ -1756,6 +1757,7 @@ begin
       OcComPortObj.Log('The file format is wrong.');
       break;
     end;
+
     if str = ':00000001FF' then // 结束标记
     begin
       Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
@@ -2835,6 +2837,7 @@ var
   StyleName: String;
   ComComboBox: TComComboBox;
   OcComPortObj: TOcComPortObj;
+  CheckDeviceThreak:TCheckDeviceThreak;
 begin
   FJvHidDeviceController1 := TJvHidDeviceController.Create(nil);
   FJvHidDeviceController1.OnDeviceData := JvHidDeviceController1DeviceData;
@@ -2968,19 +2971,21 @@ begin
   Splitter1.Visible := SV_R.Opened;
 
   VersionNumberStr := GetBuildInfo(Application.Exename);
-  if GetSystemDefaultLangID() = 2052 then
+
+  //if GetSystemDefaultLangID() = 2052 then
   BEGIN
     UILanguage := 'CN';
     UpdateUiLaunguage('CN');
     ShowStartComments('CN');
-  END
-  else
+  END;
+  {else
   begin
     UILanguage := 'EN';
     UpdateUiLaunguage('EN');
     ShowStartComments('EN');
     CheckBox6.Checked := True;
-  end;
+  end;}
+
   AdjustComponentFont(SplitViewForm);
   AppendSystemMenu(self.Handle, nil);
   AdjustComponenAttribute(SplitViewForm);
@@ -3031,6 +3036,13 @@ begin
     end;
   end;
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
+
+  try
+  CheckDeviceThreak:=TCheckDeviceThreak.Create(true);
+  CheckDeviceThreak.ApplicationFileName:=Application.ExeName;
+  CheckDeviceThreak.Resume;
+  finally
+  end;
 end;
 
 function TSplitViewForm.FormHelp(Command: Word; Data: NativeInt; var CallHelp: Boolean): Boolean;

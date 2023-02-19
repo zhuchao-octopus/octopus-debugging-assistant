@@ -41,7 +41,7 @@ uses
   JvSetupApi in 'HID\JvSetupApi.pas',
   CPort in 'ComPort\CPort.pas',
   CPortSetup in 'ComPort\CPortSetup.pas' {ComSetupFrm},
-  CRC in 'CRC.pas';
+  UnitDeviceThread in 'UnitDeviceThread.pas';
 
 {$R *.res}
 

@@ -48,6 +48,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -596,6 +597,7 @@ object SplitViewForm: TSplitViewForm
               Width = 258
               Height = 25
               Caption = 'Switch To English Language'
+              Enabled = False
               TabOrder = 5
               OnClick = CheckBox6Click
             end
@@ -606,6 +608,7 @@ object SplitViewForm: TSplitViewForm
               Height = 25
               Caption = #22312#26700#38754#21019#24314#24555#25463#26041#24335
               Checked = True
+              Enabled = False
               State = cbChecked
               TabOrder = 6
             end
@@ -738,7 +741,6 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
-      PageIndex = 2
       TabOrder = 1
       object TPage
         Left = 0
