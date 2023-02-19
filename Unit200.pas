@@ -11,9 +11,9 @@ uses
 
 Const
 {$IFDEF CPU64BITS}
-  APPLICATION_TITLE = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
+  APPLICATION_TITLE = '八爪鱼串口开发调试助手 64bit '; // for 64 bit;
 {$ELSE}
-  APPLICATION_TITLE = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
+  APPLICATION_TITLE = '八爪鱼串口开发调试助手 32bit '; // for 32 bit;
 {$ENDIF}
   E_MAIL = 'Octopus@1234998.cn';
   WEB_SITE = 'http://www.1234998.cn';
@@ -24,12 +24,12 @@ Const
   DEFAULT_WEBSITE_ADDRESS = 'http://www.1234998.top';
 
 {$IFDEF CPU64BITS}
-  ApplicatonShortcutName = '八爪鱼串口终端'; // for 64 bit;
+  ApplicatonShortcutName = '八爪鱼串口调试助手64'; // for 64 bit;
 {$ELSE}
-  ApplicatonShortcutName = '八爪鱼串口终端'; // for 32 bit;
+  ApplicatonShortcutName = '八爪鱼串口调试助手32'; // for 32 bit;
 {$ENDIF}
-  ApplicatonShortcutName64 = '八爪鱼串口终端'; // for 64 bit;
-  ApplicatonShortcutName32 = '八爪鱼串口终端'; // for 32 bit;
+  //ApplicatonShortcutName64 = '八爪鱼串口调试助手'; // for 64 bit;
+  //ApplicatonShortcutName32 = '八爪鱼串口调试助手'; // for 32 bit;
 
   DEFAULT_ADDRESSMAP_COLS = 32;
   DEFAULT_FIXED_COLS = 2;

@@ -337,7 +337,7 @@ type
     function GetDeciceByPort(Port: string): TOcComPortObj;
     function GetCurrentDeviceName(): String;
 
-    procedure MultiComPortSaveLog();
+    procedure MultiComPortSaveLog(DoClose: Boolean = false);
     procedure UpdateOcComPortObjAtrribute();
     // procedure UpdateOcComPortObjAtrribute2(OcComPortObj: TOcComPortObj);
     procedure ShowTrayIcon(TrayIcon1: TTrayIcon);
@@ -385,7 +385,7 @@ implementation
 
 uses
   Vcl.Themes, ocPcDeviceMgt, ShlObj, ActiveX, ComObj, IniFiles, ShellAPI,
-  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol, CRC, math,NetInterface,UnitDeviceThread;
+  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol, CRC, math, NetInterface, UnitDeviceThread;
 
 {$R *.dfm}
 
@@ -417,7 +417,7 @@ var
   dwcode: array [1 .. 20] of Char;
   res: PChar;
 begin
-  Result := False;
+  Result := false;
   if Pos('http://', LowerCase(url)) = 0 then
     url := 'http://' + url;
 
@@ -566,7 +566,7 @@ begin
   // Hide grid lines:
   // Chart1.Axes.Bottom.Grid.Hide;
   // Chart1.Axes.Left.Grid.Hide;
-  Chart1.View3D := False;
+  Chart1.View3D := false;
   Chart1.Axes.Bottom.Texts.Selected.Hover.Font.Color := clWhite;
   Chart1.Axes.Left.Texts.Selected.Hover.Font.Color := clWhite;
 
@@ -684,7 +684,7 @@ end;
 
 procedure TSplitViewForm.CharZoomSeries(Count: Integer);
 begin
-  Chart1.BottomAxis.Automatic := False;
+  Chart1.BottomAxis.Automatic := false;
   Chart1.BottomAxis.Maximum := Chart1.BottomAxis.Maximum + Count;
   Chart1.BottomAxis.Minimum := Chart1.BottomAxis.Minimum - Count; //
   Chart1.Invalidate;
@@ -698,7 +698,7 @@ begin
   if a <= DEFAULT_MAX_CHART_POINTS then
     exit;
 
-  Chart1.BottomAxis.Automatic := False;
+  Chart1.BottomAxis.Automatic := false;
   Chart1.BottomAxis.Maximum := Chart1.BottomAxis.Maximum + Count;
   Chart1.BottomAxis.Minimum := Chart1.BottomAxis.Minimum + Count; //
   Chart1.Invalidate;
@@ -744,7 +744,7 @@ var
   InFolder: array [0 .. MAX_PATH] of Char;
   LinkFileName: WideString;
 begin
-  Result := False;
+  Result := false;
   if not FileExists(Exe) then
     exit;
   if Lnk = '' then
@@ -769,7 +769,7 @@ begin
     LinkFileName := Format('%s/%s.lnk', [Dir, Lnk]);
   end;
   IPFile := IObj as IPersistFile;
-  if IPFile.Save(PWideChar(LinkFileName), False) = 0 then
+  if IPFile.Save(PWideChar(LinkFileName), false) = 0 then
     Result := True;
 end;
 
@@ -1221,7 +1221,7 @@ end;
 
 procedure TSplitViewForm.Button15Click(Sender: TObject);
 begin
-  CheckBox10.Checked := False;
+  CheckBox10.Checked := false;
   Chart1.BottomAxis.Automatic := True;
   Chart1.Invalidate;
 end;
@@ -1310,7 +1310,7 @@ begin
       end;
   end;
 
-  OcComPortObj.SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, Datas, Count2, False);
+  OcComPortObj.SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, Datas, Count2, false);
 
   { case ComboBox9.ItemIndex of
     0: // octopus
@@ -1499,7 +1499,7 @@ begin
       OcComPortObj.Log(LoopStringList.Strings[i]);
       end;
     }
-    Timer1.Enabled := False;
+    Timer1.Enabled := false;
     // Timer1.Interval := UpDown1.Position;
     Timer1.Enabled := True;
     { end
@@ -1815,7 +1815,7 @@ begin
   end; // for
 
 FINISHED_OVER:
-  if bStatusOK = False then
+  if bStatusOK = false then
   begin
     OcComPortObj.Log('Transmit file failed!');
   end
@@ -1951,7 +1951,7 @@ begin
   end; // for
 
 FINISHED_OVER:
-  if bStatusOK = False then
+  if bStatusOK = false then
     OcComPortObj.Log('Transmit file failed!')
   else
     OcComPortObj.Log('Transmit file finished!');
@@ -2063,7 +2063,7 @@ begin
     exit;
   end;
 
-  FileNameLoaded:='Null';
+  FileNameLoaded := 'Null';
   if OpenDialog1.Execute then
   begin
     FileNameLoaded := OpenDialog1.FileName;
@@ -2091,7 +2091,7 @@ begin
 
   ComboBox9.ItemIndex := 0; // octopus 协议发送文件
   ComboBox7.ItemIndex := Ord(OctopusProtocol);
-  ComboBox7.OnChange(self);//设置协议接收格式
+  ComboBox7.OnChange(self); // 设置协议接收格式
 
   if IsHexFile(FileNameLoaded) then
   begin
@@ -2397,6 +2397,7 @@ begin
   if (ComboBox1.ItemIndex <= MAX_BAUDRATE_INDEX) then // High(TBaudRate))
   begin // 内置波特率
     OcComPortObj.BaudRate := TBaudRate(ComboBox1.ItemIndex);
+    OcComPortObj.BaudRateIndex := ComboBox1.ItemIndex;
   end
   else
   begin // 自定义波特率
@@ -2692,6 +2693,7 @@ begin
           IniFile := TIniFile.Create(s);
           OcComPortObj.ReceiveFormat := IniFile.ReadInteger('', 'ReceiveFormat', 0);
           OcComPortObj.SendFormat := IniFile.ReadInteger('', 'SendFormat', 0);
+          OcComPortObj.BaudRateIndex := IniFile.ReadInteger('', 'BaudRateIndex', 13);
         finally
           IniFile.Free;
         end;
@@ -2730,13 +2732,17 @@ begin
 end;
 
 procedure TSplitViewForm.FormClose(Sender: TObject; var Action: TCloseAction);
-var
-  FileName: String;
-  // ShotCutName: String;
+// var
+// FileName: String;
+// ShotCutName: String;
 begin
   try
+    Timer1.Enabled := false;
+    Timer2.Enabled := false;
+    Timer3.Enabled := false;
+
     ProjectSave(True);
-    MultiComPortSaveLog();
+    MultiComPortSaveLog(True);
     CurrentDevices := nil;
     if CheckBox1.Checked then
     begin
@@ -2837,7 +2843,7 @@ var
   StyleName: String;
   ComComboBox: TComComboBox;
   OcComPortObj: TOcComPortObj;
-  CheckDeviceThreak:TCheckDeviceThreak;
+  CheckDeviceThreak: TCheckDeviceThreak;
 begin
   FJvHidDeviceController1 := TJvHidDeviceController.Create(nil);
   FJvHidDeviceController1.OnDeviceData := JvHidDeviceController1DeviceData;
@@ -2848,7 +2854,7 @@ begin
   Application.OnMessage := MyAppMsg;
   ComComboBox := TComComboBox.Create(self);
   ComComboBox.Parent := self;
-  ComComboBox.Visible := False;
+  ComComboBox.Visible := false;
   FCheck := TBitmap.Create;
   FNoCheck := TBitmap.Create;
   bmp := TBitmap.Create;
@@ -2948,7 +2954,7 @@ begin
   cbxVclStyles.ItemIndex := cbxVclStyles.Items.IndexOf(TStyleManager.ActiveStyle.Name);
   Memo1.Clear;
   Memo1.Tag := 0;
-  CharInit(False);
+  CharInit(false);
 
   OcHIDDeviceList := TStringList.Create;
   OctopusCfgDir := ExtractFilePath(Application.Exename) + '\';
@@ -2972,19 +2978,19 @@ begin
 
   VersionNumberStr := GetBuildInfo(Application.Exename);
 
-  //if GetSystemDefaultLangID() = 2052 then
+  // if GetSystemDefaultLangID() = 2052 then
   BEGIN
     UILanguage := 'CN';
     UpdateUiLaunguage('CN');
     ShowStartComments('CN');
   END;
-  {else
-  begin
+  { else
+    begin
     UILanguage := 'EN';
     UpdateUiLaunguage('EN');
     ShowStartComments('EN');
     CheckBox6.Checked := True;
-  end;}
+    end; }
 
   AdjustComponentFont(SplitViewForm);
   AppendSystemMenu(self.Handle, nil);
@@ -3038,16 +3044,16 @@ begin
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
 
   try
-  CheckDeviceThreak:=TCheckDeviceThreak.Create(true);
-  CheckDeviceThreak.ApplicationFileName:=Application.ExeName;
-  CheckDeviceThreak.Resume;
+    CheckDeviceThreak := TCheckDeviceThreak.Create(True);
+    CheckDeviceThreak.ApplicationFileName := Application.Exename;
+    CheckDeviceThreak.Resume;
   finally
   end;
 end;
 
 function TSplitViewForm.FormHelp(Command: Word; Data: NativeInt; var CallHelp: Boolean): Boolean;
 begin
-  CallHelp := False;
+  CallHelp := false;
 end;
 
 procedure TSplitViewForm.FormShow(Sender: TObject);
@@ -3554,7 +3560,7 @@ begin
     if OcComPortObj.Connected and (TabSet2.TabIndex = i) then
       OcComPortObj.LogMemo.SetFocus;
   end;
-  Splitter1.Visible := False;
+  Splitter1.Visible := false;
 end;
 
 procedure TSplitViewForm.SV_ROpened(Sender: TObject);
@@ -3660,7 +3666,7 @@ begin
   // Timer1.Enabled := False;
   // end;
   Timer1.Tag := 1;
-  Timer1.Enabled := False;
+  Timer1.Enabled := false;
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
     if Trim(StringGrid1.Cells[1, i]) = '1' then
@@ -3727,21 +3733,36 @@ begin
   ProjectSave(True);
 end;
 
-procedure TSplitViewForm.MultiComPortSaveLog();
+procedure TSplitViewForm.MultiComPortSaveLog(DoClose: Boolean);
 var
   i: Integer;
   OcComPortObj: TOcComPortObj;
+  Octopusini: TIniFile;
+  s: String;
 begin
-  for i := 0 to OcComPortList.Count - 1 do
-  begin
-    OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
-    if OcComPortObj <> nil then
+  s := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  try
+    Octopusini := TIniFile.Create(s);
+
+    for i := 0 to OcComPortList.Count - 1 do
     begin
-      if OcComPortObj.Connected then
+      OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
+      if OcComPortObj <> nil then
       begin
-        OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log');
+        if OcComPortObj.Connected then
+        begin
+          OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log');
+          Octopusini.WriteInteger('MyPreference', 'BAUDRATE' + OcComPortObj.Port, OcComPortObj.OcComPortObjPara.BaudRate);
+          if (DoClose) then
+          begin
+            OcComPortObj.Close;
+            OcComPortObj.Free;
+          end;
+        end;
       end;
     end;
+  finally
+    Octopusini.Free;
   end;
 end;
 
@@ -3830,8 +3851,8 @@ begin
     SplitViewForm.Width := Octopusini.ReadInteger('MyPreference', 'MainFormWidth', 1228);
     SplitViewForm.Height := Octopusini.ReadInteger('MyPreference', 'MainFormHeight', 664);
 
-    SV_L.Opened := Octopusini.ReadBool('MyPreference', 'SV_LOPEN', False);
-    SV_R.Opened := Octopusini.ReadBool('MyPreference', 'SV_ROPEN', False);
+    SV_L.Opened := Octopusini.ReadBool('MyPreference', 'SV_LOPEN', false);
+    SV_R.Opened := Octopusini.ReadBool('MyPreference', 'SV_ROPEN', false);
     // UpDown3.Position := Octopusini.ReadInteger('MyPreference', 'LOOPCOUNT', 5);
 
     Memo1.Font.Name := Octopusini.ReadString('MyPreference', 'FONTNAME', '新宋体');
@@ -3841,7 +3862,7 @@ begin
 
     // CheckBox4.Checked := Octopusini.ReadBool('MyPreference', 'SHOWLINENUMBER', False);
     CheckBox1.Checked := Octopusini.ReadBool('MyPreference', 'DESKTOPSHOTCUT', True);
-    CheckBox7.Checked := Octopusini.ReadBool('MyPreference', 'ALPHABLEND', False);
+    CheckBox7.Checked := Octopusini.ReadBool('MyPreference', 'ALPHABLEND', false);
     CheckBox8.Checked := Octopusini.ReadBool('MyPreference', 'CK8', CheckBox8.Checked);
     CheckBox2.Checked := Octopusini.ReadBool('MyPreference', 'CK2', CheckBox2.Checked);
     CheckBox3.Checked := Octopusini.ReadBool('MyPreference', 'CK3', CheckBox3.Checked);
@@ -3899,7 +3920,7 @@ begin
   ReStart:
     bRet := SearchMemo(Memo, FindStr, Options);
 
-    if bRet = False then
+    if bRet = false then
     begin
       if frDown in Options then
       begin
@@ -3928,7 +3949,7 @@ var
   // StringSearchOptions:TStringSearchOptions;
   buffer, p: PChar;
 begin
-  Result := False;
+  Result := false;
   if Length(SearchString) = 0 then
     exit;
 
@@ -4144,7 +4165,7 @@ begin
       begin
         OcComPortObj.ClearLog;
         OcComPortObj.ClearInternalBuff();
-        OcComPortObj.LogMemo.Visible := False;
+        OcComPortObj.LogMemo.Visible := false;
         OcComPortObj.LogMemo.Parent := nil;
       end;
 
@@ -4184,6 +4205,7 @@ begin
     Octopusini := TIniFile.Create(s);
     Octopusini.WriteInteger('', 'SendFormat', ComboBox6.ItemIndex);
     Octopusini.WriteInteger('', 'ReceiveFormat', ComboBox7.ItemIndex);
+    Octopusini.WriteInteger('', 'BaudRateIndex', OcComPortObj.BaudRateIndex);
   finally
     Octopusini.Free;
   end;
@@ -4240,7 +4262,7 @@ begin
       Memo.Align := alClient;
       Memo.Font := Memo1.Font;
       Memo.Color := Memo1.Color;
-      Memo.HideSelection := False;
+      Memo.HideSelection := false;
       Memo.Show;
       Page.DoubleBuffered := True;
       TabSet2.Tabs := Notebook2.Pages;
@@ -4394,7 +4416,7 @@ begin
   end;
 
   if Memo1.ReadOnly then
-    Memo1.ReadOnly := False;
+    Memo1.ReadOnly := false;
   if (Key = VK_LEFT) or (Key = 38) OR (Key = 39) OR (Key = 40) then
     Key := 0;
 
@@ -4479,6 +4501,7 @@ begin
   i := OcComPortList.IndexOf(DeviceName);
   if i < 0 then
     exit;
+
   OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
   if OcComPortObj = nil then
     exit;
@@ -4496,7 +4519,7 @@ begin
   else if (OcComPortObj.OcComPortObjPara.BaudRate >= ComboBox1.Items.Count) then
     ComboBox1.ItemIndex := 13
   else
-    ComboBox1.ItemIndex := OcComPortObj.OcComPortObjPara.BaudRate;
+    ComboBox1.ItemIndex := OcComPortObj.BaudRateIndex;
 
   ComboBox2.ItemIndex := OcComPortObj.OcComPortObjPara.DataBits;
   ComboBox3.ItemIndex := OcComPortObj.OcComPortObjPara.StopBits;
@@ -4517,10 +4540,10 @@ begin
   if (OcComPortObj.Connected) then
   begin
     // ComboBox1.Enabled := False;
-    ComboBox2.Enabled := False;
-    ComboBox3.Enabled := False;
-    ComboBox4.Enabled := False;
-    ComboBox5.Enabled := False;
+    ComboBox2.Enabled := false;
+    ComboBox3.Enabled := false;
+    ComboBox4.Enabled := false;
+    ComboBox5.Enabled := false;
     Button2.Caption := GetDefaultLauguageStrByName('OPRATION_CLOSE', UILanguage) + '【' + OcComPortObj.Port + '】';
   end;
 
@@ -4702,7 +4725,7 @@ begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj = nil then
     exit;
-  OcComPortObj.LogScrollMode := False;
+  OcComPortObj.LogScrollMode := false;
 end;
 
 Initialization

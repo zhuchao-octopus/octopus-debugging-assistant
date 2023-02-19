@@ -73,6 +73,7 @@ type
 
   TOcComPortObj = class(TComport)
   private
+    FOcComPortObjPara: TOcComPortObjPara;
     // Port: String; // change com port;
     // BaudRate: Integer;
     // DataBits: Integer;
@@ -88,6 +89,7 @@ type
     FShowSendingLog: Boolean;
     FHexModeWithString: Boolean; // o
     FHexModeFormatCount: integer;
+    FBaudRateIndex:Integer;
 
     FComReceiveBuffer: array [0 .. INPUT_OUTPUT_BUFFER_SIZE] of Byte;
     // 1024 * 1024 =  1048576 =1M // for com port receive buffer
@@ -149,7 +151,7 @@ type
     function IsLogBottom(): Boolean;
     procedure LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
 
-    property OcComPortObjPara: TOcComPortObjPara read GetConfiguration;
+    property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
     property LogMemo: TMemo read FLogMemo write FLogMemo;
     property StringInternalMemo: TMemo read FStringInternalMemo write FStringInternalMemo;
     property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
@@ -172,6 +174,7 @@ type
     property ShowSendedLog: Boolean read FShowSendingLog write FShowSendingLog;
     property ShowLineNumber: Boolean read FShowLineNumber write FShowLineNumber;
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode default True;
+    property BaudRateIndex: Integer read FBaudRateIndex write FBaudRateIndex;
 
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
 
@@ -627,8 +630,8 @@ begin
 end;
 
 function TOcComPortObj.GetConfiguration(): TOcComPortObjPara;
-var
-  FOcComPortObjPara: TOcComPortObjPara;
+//var
+//  FOcComPortObjPara: TOcComPortObjPara;
 begin
   FOcComPortObjPara.Port := self.Port;
   FOcComPortObjPara.ComportFullName := self.FComportFullName;

@@ -48,7 +48,6 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
