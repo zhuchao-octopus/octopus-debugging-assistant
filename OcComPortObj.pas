@@ -35,14 +35,11 @@ const
   SEND_FLAG = '-> ';
 
 const
-  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string =
-   ('ASCII Format            字符串 ',
-    'Hexadecimal Format 十六进制 ',
-    'Graphic                   图形 ',
-    'Octopus Protocol     协议 ',
+  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format            字符串 ', 'Hexadecimal Format 十六进制 ', 'Graphic                   图形 ', 'Octopus Protocol     协议 ',
     'File                          文件 ');
 
   MAX_BAUDRATE_INDEX: integer = 15;
+  DEFAULT_HEXDATA_HEXSTRING_SPACE = 5;
 
 type
   TCallBackFun = Procedure(Count: integer = 0) of object;
@@ -89,7 +86,7 @@ type
     FShowSendingLog: Boolean;
     FHexModeWithString: Boolean; // o
     FHexModeFormatCount: integer;
-    FBaudRateIndex:Integer;
+    FBaudRateIndex: integer;
 
     FComReceiveBuffer: array [0 .. INPUT_OUTPUT_BUFFER_SIZE] of Byte;
     // 1024 * 1024 =  1048576 =1M // for com port receive buffer
@@ -174,7 +171,7 @@ type
     property ShowSendedLog: Boolean read FShowSendingLog write FShowSendingLog;
     property ShowLineNumber: Boolean read FShowLineNumber write FShowLineNumber;
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode default True;
-    property BaudRateIndex: Integer read FBaudRateIndex write FBaudRateIndex;
+    property BaudRateIndex: integer read FBaudRateIndex write FBaudRateIndex;
 
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
 
@@ -190,8 +187,8 @@ type
 
     function SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean; overload;
     function SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean; overload;
+
     function SendProtocolPackage(pPOcComPack: POcComPack): Boolean; overload;
-    // function SendProtocolPackage(pPOcComPack: POcComPack2): Boolean; overload;
     function SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: integer): Boolean;
 
     function GetPacks(): integer;
@@ -420,7 +417,7 @@ var
 begin
   j := 0;
   s := '';
-  f := '%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3 + 10) + 's';
+
   while (self.Terminated = false) do
   begin
     // ReStart:
@@ -481,41 +478,65 @@ begin
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////hex
     else if self.FOcComPortObj.FReceiveFormat = Ord(HexadecimalFormat) then
     begin
+      f := '%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3 + DEFAULT_HEXDATA_HEXSTRING_SPACE) + 's';
+      // 有数据需要累计，开始实时累计数据
       if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
       begin // 有数据处理数据
+        // 累计字节
         s := s + Format('%.02x ', [FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]]);
         INC(FOcComPortObj.FComProcessedCount);
-        if FOcComPortObj.FHexModeFormatCount > 0 then
+
+        if FOcComPortObj.FHexModeFormatCount > 0 then // 累计中需要格式化处理
         begin
           if ((FUIStartIndex + 1) mod FOcComPortObj.FHexModeFormatCount) = 0 then
           begin
-            j := FUIStartIndex + 1;
-            if FOcComPortObj.FHexModeWithString then
+            j := FUIStartIndex + 1; // 实际已经处理过的数据
+            if FOcComPortObj.FHexModeWithString then // 需要解析翻译
+            begin
               s := Format(f, [Trim(s)]);
-            s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1], FOcComPortObj.FHexModeFormatCount);
+              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1], FOcComPortObj.FHexModeFormatCount);
+            end;
             FOcComPortObj.Log(s);
             s := ''; // 这时J 的值无意义
           end;
         end; //
-        INC(FUIStartIndex);
+
+        INC(FUIStartIndex); // 累计索引计数
       end;
 
-      if FUIStartIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer) then
-      begin // 没有数据准备清场
-        if s <> '' then
+      if FUIStartIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer) then // 已经累计完毕所有数据
+      begin // 没有收到新的数据，准备清场,打印所有累计到的数据
+        if s <> '' then // 有累计数据需要打印
         begin
-          if FOcComPortObj.FHexModeWithString then
+          if FOcComPortObj.FHexModeFormatCount > 0 then //可能存在最后没有格式话的数据，解析固定长度
+          begin
+            if FOcComPortObj.FHexModeWithString then  // 是否需要解析，需要格式话一定需要解析
+            begin
+             if ((Length(FOcComPortObj.FComReceiveInternalBuffer) - j) <= FOcComPortObj.FHexModeFormatCount) then
+               begin
+                s := Format(f, [Trim(s)]);
+                s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount);
+               end
+             else
+               begin //这种情况应该没有
+                s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
+               end;
+            end else
+            begin
+               s := Format(f, [Trim(s)]);
+            end;
+          end;
+
+          {if FOcComPortObj.FHexModeWithString then // 是否需要解析
           begin
             s := Format(f, [Trim(s)]);
-            if FOcComPortObj.FHexModeFormatCount > 0 then
-            begin
-              // s := Format('%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3) + 's', [s]);
-              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount);
-            end
-            else
-              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
-          end;
-          FOcComPortObj.Log(s);
+            if FOcComPortObj.FHexModeFormatCount > 0 then // 可能存在最后没有格式话的数据，解析固定长度
+              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount)
+            else // 解析所有
+             s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
+          end;}
+
+          FOcComPortObj.Log(s); // 打印出所有数据,输出最终数据
           s := '';
         end;
 
@@ -537,28 +558,28 @@ begin
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////Graphic
     else if self.FOcComPortObj.FReceiveFormat = Ord(Graphic) then
     begin
-      { if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
-        begin // 有数据处理数据
-        self.FOcComPortObj.FastLineSeries.AddY
-        (FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]);
+      if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
+      begin // 有数据处理数据
+        FOcComPortObj.FastLineSeries.AddY(FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]);
         // self.FOcComPortObj.FastLineSeries.AddArray(FOcComPortObj.FComReceiveInternalBuffer);
+
         if Assigned(FOcComPortObj.FCallBackFun) then
-        FOcComPortObj.FCallBackFun(1);
+          FOcComPortObj.FCallBackFun(1);
         INC(FUIStartIndex);
         INC(FOcComPortObj.FComProcessedCount);
-        end;
-        if FUIStartIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer) then
-        begin // 没有数据准备清场
+      end;
+      if FUIStartIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer) then
+      begin // 没有数据准备清场
         if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
-        Continue;
+          Continue;
         if FOcComPortObj.FComHandleThread_Wait then
-        Continue;
+          Continue;
         EnterCriticalSection(Critical);
         FOcComPortObj.ClearInternalBuff();
         LeaveCriticalSection(Critical);
         self.Suspended := True; // 忙完了挂起
         Continue;
-        end; }
+      end;
     end; // ord(Graphic)
 
   end; // while(not Self.Terminated) do
@@ -589,12 +610,12 @@ begin
   FComUIHandleThread := TComUIHandleThread.Create(self);
   FOcComProtocal := TOcComProtocal.Create;
   FComPackParserThread := TComPackParserHandleThread.Create(self, FOcComProtocal);
-  self.FComReceiveCount := 0;
-  self.FComProcessedCount := 0;
-  self.FBackGroundProcessRecordCount := OCTOPUS_BACKGROUD_STRING_TRIGGERLINE;
-  self.ClearInternalBuff;
-  self.FHexModeWithString := True;
-  self.FHexModeFormatCount := 16;
+  FComReceiveCount := 0;
+  FComProcessedCount := 0;
+  FBackGroundProcessRecordCount := OCTOPUS_BACKGROUD_STRING_TRIGGERLINE;
+  ClearInternalBuff;
+  FHexModeWithString := True;
+  FHexModeFormatCount := 16;
   SetLength(FComReceiveInternalBuffer, 0);
   FullLogFileName := '';
   FFileStream := nil;
@@ -630,8 +651,8 @@ begin
 end;
 
 function TOcComPortObj.GetConfiguration(): TOcComPortObjPara;
-//var
-//  FOcComPortObjPara: TOcComPortObjPara;
+// var
+// FOcComPortObjPara: TOcComPortObjPara;
 begin
   FOcComPortObjPara.Port := self.Port;
   FOcComPortObjPara.ComportFullName := self.FComportFullName;
@@ -776,20 +797,26 @@ var
   str: String;
   i, j: integer;
   f: string;
+  HexModeFormatCount: integer;
 begin
   str := '';
   if (Count <= 0) then
     exit;
+
+  HexModeFormatCount := 32;
+  if(FHexModeFormatCount > 0) then
+    HexModeFormatCount := FHexModeFormatCount;
+
   j := 0;
-  f := '%-' + IntToStr(FHexModeFormatCount * 3 + 10) + 's';
+  f := '%-' + IntToStr(HexModeFormatCount * 3 + DEFAULT_HEXDATA_HEXSTRING_SPACE) + 's';
   for i := 0 to Count - 1 do
   begin
     str := str + Format('%.02x ', [Buff[i]]);
     INC(j);
-    if ((i + 1) mod FHexModeFormatCount) = 0 then
+    if ((i + 1) mod HexModeFormatCount) = 0 then
     begin
       str := Format(f, [Trim(str)]);
-      str := str + ByteToWideString2(@Buff[i - FHexModeFormatCount + 1], FHexModeFormatCount);
+      str := str + ByteToWideString2(@Buff[i - HexModeFormatCount + 1], HexModeFormatCount);
       Log(flag + str);
       str := '';
       j := 0;
@@ -810,7 +837,7 @@ begin
 
   if (LogMemo = nil) or (LogMemo.Parent = nil) then
   begin
-    MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    MessageBox(Application.Handle, 'No device is found,please open a device.', Pchar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
@@ -1323,26 +1350,24 @@ begin
   /// //////////////////////////////////////////////////////////////////////////
   else if FReceiveFormat = Ord(Graphic) then // receive as Graphic
   begin
-    { ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
-      self.FComHandleThread_Wait := True;
-      try
+    ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
+    self.FComHandleThread_Wait := True;
+    try
       self.Read(FComReceiveBuffer, Count);
-      Except
-      end;
-      self.FComHandleThread_Wait := True;
-      EnterCriticalSection(Critical);
-      if Length(FComReceiveInternalBuffer) = 0 then
+    Except
+    end;
+    self.FComHandleThread_Wait := True;
+    EnterCriticalSection(Critical);
+    if Length(FComReceiveInternalBuffer) = 0 then
       self.ClearInternalBuff;
-      SetLength(FComReceiveInternalBuffer,
-      Length(FComReceiveInternalBuffer) + Count);
-      CopyMemory(@FComReceiveInternalBuffer[Length(FComReceiveInternalBuffer) -
-      Count], @FComReceiveBuffer, Count);
-      LeaveCriticalSection(Critical);
-      FComHandleThread_Wait := false;
-      if FComUIHandleThread.Suspended then
-      begin
+    SetLength(FComReceiveInternalBuffer, Length(FComReceiveInternalBuffer) + Count);
+    CopyMemory(@FComReceiveInternalBuffer[Length(FComReceiveInternalBuffer) - Count], @FComReceiveBuffer, Count);
+    LeaveCriticalSection(Critical);
+    FComHandleThread_Wait := false;
+    if FComUIHandleThread.Suspended then
+    begin
       FComUIHandleThread.Suspended := false; // 启动UI工作线程 绘制图形
-      end; }
+    end;
   end
   /// ///////////////////////////////////////////////////////////////////////////
   else if FReceiveFormat = Ord(OctopusProtocol) then
@@ -1453,8 +1478,6 @@ end;
 
 function TOcComPortObj.SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: integer): Boolean;
 var
-  // p: pbyte;
-  // ilength: integer;
   reTryCount: integer;
 begin
   Result := True;
@@ -1470,7 +1493,12 @@ begin
       exit;
     end;
     Log('Time Out Try ... ' + IntToStr(reTryCount));
+    if (not connected) then
+    begin
+      break;
+    end;
     SendProtocolPackage(pPOcComPack);
+    Application.HandleMessage;
   end;
 end;
 
@@ -1546,8 +1574,7 @@ begin
   while (True) do
   begin
     Application.ProcessMessages;
-    pOc := self.FOcComProtocal.GetNewPack();
-
+    pOc := FOcComProtocal.GetNewPack();
     if pOc <> nil then
     begin
       if pOc.data[0] = ACK then // 0x59 89 Y
@@ -1639,8 +1666,6 @@ var
   str, f: String;
 begin
   str := flag;
-  // s := '';
-
   str := str + Format('%.04x ', [OcComPack.Head]);
   str := str + Format('%.04x ', [OcComPack.PID]);
   str := str + Format('%.02x ', [OcComPack.Index]);
@@ -1653,15 +1678,20 @@ begin
   // str := str + Format('%.04x ', [OcComPack.CRC]);
   l := OcComPack.Length + SizeOf(TOcComPackHead);
   if (l <= 16) then
-    f := '%-' + IntToStr(16 * 3 + 10) + 's'
+    f := '%-' + IntToStr(16 * 3 + DEFAULT_HEXDATA_HEXSTRING_SPACE) + 's'
   else if (l <= 32) then
-    f := '%-' + IntToStr(32 * 3 + 10) + 's'
+    f := '%-' + IntToStr(32 * 3 + DEFAULT_HEXDATA_HEXSTRING_SPACE) + 's'
   else
-    f := '%-' + IntToStr(l * 3 + 10) + 's';
+    f := '%s';
 
   if FHexModeWithString then
+  begin
     str := Format(f, [Trim(str)]);
-  str := str + ByteToWideString2(@OcComPack.data, OcComPack.Length);
+     if (l <= 32) then
+       str := str + ByteToWideString2(@OcComPack.data, OcComPack.Length)
+     else
+       str := Trim(str) + '   '+ByteToWideString2(@OcComPack.data, OcComPack.Length)
+  end;
   Log(str);
 end;
 

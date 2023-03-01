@@ -28,8 +28,8 @@ Const
 {$ELSE}
   ApplicatonShortcutName = '八爪鱼串口调试助手32'; // for 32 bit;
 {$ENDIF}
-  //ApplicatonShortcutName64 = '八爪鱼串口调试助手'; // for 64 bit;
-  //ApplicatonShortcutName32 = '八爪鱼串口调试助手'; // for 32 bit;
+  // ApplicatonShortcutName64 = '八爪鱼串口调试助手'; // for 64 bit;
+  // ApplicatonShortcutName32 = '八爪鱼串口调试助手'; // for 32 bit;
 
   DEFAULT_ADDRESSMAP_COLS = 32;
   DEFAULT_FIXED_COLS = 2;
@@ -119,6 +119,9 @@ var
     $70
   );
 
+function GetDefaultLauguageStrByName(Name: String; Lang: String): String;
+procedure SetButtonCaptionLeftAlign(btn: TButton);
+
 procedure AdjustComponenAttribute(Form: TForm);
 function GetStyle(i: Integer): String;
 procedure AdjustSetStyle(Style: String);
@@ -126,17 +129,18 @@ procedure AdjustComponentFont(Form: TForm; L: String = 'CN');
 procedure LoadLaunguageFromFile(Form: TForm; Path: String);
 procedure AppendSystemMenu(handle: Thandle; OnClicEvent: TOnClicEvent);
 procedure LoadDefaultLaunguage(Form: TForm; Lang: String);
-function ByteToWideString(buff: pbyte; len: Integer): String;
-function ByteToWideString2(buff: pbyte; len: Integer): String; // 不要回车换行#13#10
+
+function ByteToWideString(const buff: pbyte; len: Integer): String;
+function ByteToWideString2(const buff: pbyte; len: Integer): String; // 不要回车换行#13#10
+
 procedure WideStringToByte(str: String; var buff: array of byte);
-function GetDefaultLauguageStrByName(Name: String; Lang: String): String;
-procedure SetButtonCaptionLeftAlign(btn: TButton);
 
 function FormatHexStrToByte(sStr: string; var buffer: array of byte; out bCount: Integer): string;
 function FormatHexStrToByte2(sStr: string; var buffer: array of byte): Integer;
 function FormatHexStrToBuffer(sStr: string; var buffer: array of byte; out bCount: Integer): string;
 
-function ChecksumBuffer(buffer: array of byte; out bCount: Integer): Dword;
+function FormatBufferToHexStr(Const buffer: array of byte; Const bCount: Integer): string;
+function ChecksumBuffer(Const buffer: array of byte; Const bCount: Integer): Integer;
 
 function SpaceCompress(s: string): string;
 function GetBuildInfo(FileName: string): String;
@@ -168,13 +172,13 @@ begin
   sStr := StringReplace(sStr, ' ', ' ', [rfReplaceAll]); // 替换 tab
 
   sStr := StringReplace(sStr, ' ', '', [rfReplaceAll]); // 去掉所有空客
-  for i := 1 to Length(sStr) do //字符索引 从 1 .... Length(sStr)
+  for i := 1 to Length(sStr) do // 字符索引 从 1 .... Length(sStr)
   begin
-      if not (sStr[i] in ['0'..'9','A','B','C','D','E','F']) then
-       begin
-         Result:=false;
-         break;
-       end;
+    if not(sStr[i] in ['0' .. '9', 'A', 'B', 'C', 'D', 'E', 'F']) then
+    begin
+      Result := false;
+      break;
+    end;
   end;
 end;
 
@@ -250,7 +254,7 @@ var
   extfn: String;
 begin
   extfn := LowerCase(ExtractFileExt(fn));
-   Result := (extfn = '.bin') or (extfn = '.binary') or (extfn = '.elf') or (extfn = '.axf');
+  Result := (extfn = '.bin') or (extfn = '.binary') or (extfn = '.elf') or (extfn = '.axf');
 end;
 
 function GetBuildInfo(FileName: string): String;
@@ -399,7 +403,18 @@ begin
   end;
 end;
 
-function ChecksumBuffer(buffer: array of byte; out bCount: Integer): Dword;
+function FormatBufferToHexStr(Const buffer: array of byte; Const bCount: Integer): string;
+var
+ i:Integer;
+begin
+  Result := '';
+  for i := 0 to bCount - 1 do
+  begin
+    Result := Result + Format('%.02x ', [buffer[i]]);
+  end;
+end;
+
+function ChecksumBuffer(Const buffer: array of byte; Const bCount: Integer): Integer;
 var
   i: Integer;
 begin
@@ -444,7 +459,7 @@ begin
       Result := Result + AnsiCh;
 end;
 
-function ByteToWideString(buff: pbyte; len: Integer): String;
+function ByteToWideString(const buff: pbyte; len: Integer): String;
 var
   str: AnsiString;
   // buffer: array of byte;
@@ -461,7 +476,7 @@ begin
   end;
 end;
 
-function ByteToWideString2(buff: pbyte; len: Integer): String; // 不要回车换行#13#10
+function ByteToWideString2(const buff: pbyte; len: Integer): String; // 不要回车换行#13#10
 var
   str: AnsiString;
 begin
@@ -474,7 +489,7 @@ begin
   end;
 end;
 
-function ByteToWideString3(buff: pbyte; len: Integer): String; // 不要回车换行#13#10
+function ByteToWideString3(const buff: pbyte; len: Integer): String; // 不要回车换行#13#10
 var
   str: AnsiString;
   buffer: array of byte;

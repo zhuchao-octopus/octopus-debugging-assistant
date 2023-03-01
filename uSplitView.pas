@@ -1094,32 +1094,35 @@ var
   X: Integer;
   str: String;
 begin
-  if (Panel.Index = 1) and (Fprogress = 0) and (FprogressMax = 0) then
-  begin
-    str := 'http://www.1234998.top';
-    with StatusBar1.Canvas do
+  try
+    if (Panel.Index = 1) and (Fprogress = 0) and (FprogressMax = 0) then
     begin
-      Brush.Color := clMenuBar;
-      Font.Color := clBlack;
-      // X := Floor((Rect.Right - Rect.Left) * Fprogress / FprogressMax);
-      Rectangle(Rect.Left, Rect.Top, Rect.Width, Rect.Height);
-      TextOut(Rect.Left, Rect.Top, str);
-      // TextOut(Rect.TopLeft.X+3,Rect.TopLeft.Y, str);
+      str := 'http://www.1234998.top';
+      with StatusBar1.Canvas do
+      begin
+        Brush.Color := clMenuBar;
+        Font.Color := clBlack;
+        Rectangle(Rect.Left, Rect.Top, Rect.Width, Rect.Height);
+        TextOut(Rect.Left, Rect.Top, str);
+        // TextOut(Rect.TopLeft.X+3,Rect.TopLeft.Y, str);
+      end;
+      exit;
     end;
-    exit;
-  end;
-  if (Panel.Index = 1) and (Fprogress >= 0) and (FprogressMax > 0) and (Fprogress <= FprogressMax) then
-  begin
-    str := IntToStr(Floor(self.Fprogress / self.FprogressMax * 100)) + '%';
-    with StatusBar1.Canvas do
+    if (Panel.Index = 1) and (Fprogress >= 0) and (FprogressMax > 0) and (Fprogress <= FprogressMax) then
     begin
-      Brush.Color := $00641F04;
-      Font.Color := clWhite;
-      X := Floor((Rect.Right - Rect.Left) * Fprogress / FprogressMax);
-      Rectangle(Rect.Left, Rect.Top, Rect.Left + X, Rect.Bottom - 1);
-      TextOut(Rect.Left + X - TextWidth(str) - 1, Rect.Top, str);
-      // TextOut(Rect.TopLeft.X+3,Rect.TopLeft.Y, str);
+      str := IntToStr(Floor(Fprogress / FprogressMax * 100)) + '%';
+      with StatusBar1.Canvas do
+      begin
+        Brush.Color := $00641F04;
+        Font.Color := clWhite;
+        X := Floor((Rect.Right - Rect.Left) * Fprogress / FprogressMax);
+        Rectangle(Rect.Left, Rect.Top, Rect.Left + X, Rect.Bottom - 1);
+        TextOut(Rect.Left + X - TextWidth(str) - 1, Rect.Top, str);
+        // TextOut(Rect.TopLeft.X+3,Rect.TopLeft.Y, str);
+      end;
     end;
+  Except
+    showmessage('未知错误！！');
   end;
 
 end;
@@ -1365,25 +1368,30 @@ end;
 procedure TSplitViewForm.Button13Click(Sender: TObject);
 var
   i, bLength: Integer;
-  buffer: array [0 .. 1020] of byte;
+  buffer: array [0 .. 20000] of byte;
   ss: String;
   by: byte;
+  chucksume: Integer;
 begin
   by := 0;
+  chucksume := 0;
   for i := 0 to Memo2.Lines.Count - 1 do
     ss := ss + Trim(Memo2.Lines.Strings[i]) + ' ';
   try
     ss := FormatHexStrToByte(ss, buffer, bLength);
   except
-    Showmessage('There are too many datas to fomat,but the max length is 1024.');
+    showmessage('There are too many datas to fomat!!!!!!!!!!!!!!!');
   end;
 
   for i := Low(buffer) to High(buffer) do
+  begin
     by := QuickCRC8(buffer[i], by); // 快速查表计算CRC
+    chucksume := chucksume + buffer[i];
+  end;
 
-  // by := by + buffer[i];
-
-  Memo2.Text := ss + ' ' + Format('%.02x ', [by]);
+  // Memo2.Text := ss + ' ' + Format('%.02x ', [by]);
+  Memo3.Lines.Append('crc8:' + Format('%.02x ', [by]));
+  Memo3.Lines.Append('chucksume:' + Format('%.02x ', [chucksume]));
 end;
 
 procedure TSplitViewForm.Button14Click(Sender: TObject);
@@ -1705,7 +1713,7 @@ var
   // iDataCount: Integer;
   // reTryCount: Integer;
   fileSent: Integer;
-  checksum: dword;
+  checksum: Integer;
   bStatusOK: Boolean;
 Label FINISHED_OVER;
 begin
@@ -1718,7 +1726,6 @@ begin
   end;
 
   ZeroMemory(@Data, 512);
-  // iDataCount := 0;
   fileSent := 0;
   checksum := 0;
 
@@ -1736,6 +1743,8 @@ begin
   Data[7] := $00; // 数据
   Data[8] := $00; // 数据
   pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
+
+  bStatusOK := True;
   bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
 
   if not bStatusOK then
@@ -1743,7 +1752,6 @@ begin
     OcComPortObj.Log('device is not ready to receive file!');
     exit;
   end;
-  // OcComPortObj.Log('Device is ready to receive file.');
 
   StatusBar1DrawProgress(0, 0);
   Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // 写FLASH
@@ -1751,6 +1759,12 @@ begin
   for i := 0 to SL.Count - 1 do
   begin
     Application.ProcessMessages;
+    if (not OcComPortObj.Connected) then
+    begin
+      bStatusOK := false;
+      break;
+    end;
+
     str := SL.Strings[i];
     if str[1] <> ':' then
     begin
@@ -1758,15 +1772,22 @@ begin
       break;
     end;
 
+    // OcComPortObj.Log('test ' + str);
     if str = ':00000001FF' then // 结束标记
     begin
       Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
       Data[5] := 6;
+
       IntToBuffer(fileSent, &Data[7], 2);
       IntToBuffer(checksum, &Data[9], 4);
       pPOcComPack := @Data[0];
+
+      bStatusOK := True;
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
+
       DelayDelay(30);
+      // OcComPortObj.Log('Length  :'+IntToStr(fileSent));
+      // OcComPortObj.Log('CheckSum:'+IntToStr(checksum));
       OcComPortObj.LogBuff('file size:', &Data[7], 2);
       OcComPortObj.LogBuff('file summ:', &Data[9], 4);
       break;
@@ -1789,7 +1810,6 @@ begin
     end
     else if dataType = '00' then
     begin
-      // OcComPortObj.Log('Record Data Count:'+IntToStr(iDataCount));
       tempstr := Copy(str, 4, 4); // 数据地址
       FormatHexStrToBuffer(tempstr, &Data[9], bCount); // 9、10
 
@@ -1801,7 +1821,11 @@ begin
 
       fileSent := fileSent + iLength;
       checksum := checksum + ChecksumBuffer(&Data[11], iLength); // 计算sum不要算上crc
+
+      //Memo2.Lines.Append(FormatBufferToHexStr(&Data[11], iLength));
+
       pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
+      bStatusOK := True;
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
 
       StatusBar1DrawProgress(i + 1, SL.Count);
@@ -1988,7 +2012,7 @@ end;
 procedure TSplitViewForm.Button25Click(Sender: TObject);
 var
   i, bLength: Integer;
-  buffer: array [0 .. 1023] of byte;
+  buffer: array [0 .. 20000] of byte;
   ss: String;
   // OcComPortObj: TOcComPortObj;
 begin
@@ -2005,7 +2029,7 @@ begin
     // ss := FormatHexStrToByte(ss, buffer,bLength);
     ss := FormatHexStrToBuffer(ss, buffer, bLength);
   except
-    Showmessage('There are too many datas to fomat,but the max length is 1024.');
+    showmessage('There are too many datas to fomat!!!!!!!!!!');
   end;
 
   // Len := (Length(ss) + 2) div 3;
@@ -2050,6 +2074,7 @@ var
 begin
   if ComboBoxEx1.Items.Count <= 0 then
     exit;
+
   OcComPortObj := GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if OcComPortObj = nil then
   begin
@@ -2213,19 +2238,11 @@ end;
 
 procedure TSplitViewForm.Button7Click(Sender: TObject);
 // var
-// OcComPortObj: TOcComPortObj;
+// MAC:String;
 begin
-  { OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
-    if OcComPortObj = nil then
-    begin
-    exit;
-    end;
-    if not OcComPortObj.Connected then
-    begin
-    exit;
-    end;
-    OcComPortObj.ClearLog; }
   Memo2.Lines.Clear;
+  // MAC := GetNetBIOSAddress();
+  // Memo2.Lines.Add(MAC);
 end;
 
 procedure TSplitViewForm.Button8Click(Sender: TObject);
@@ -3046,7 +3063,7 @@ begin
   try
     CheckDeviceThreak := TCheckDeviceThreak.Create(True);
     CheckDeviceThreak.ApplicationFileName := Application.Exename;
-    CheckDeviceThreak.ConfigFileName:=OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+    CheckDeviceThreak.ConfigFileName := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
     CheckDeviceThreak.Resume;
   finally
   end;
@@ -4095,9 +4112,6 @@ begin
     Log0('################################################');
     LastCMDLineStr := GetCurrentDir() + '>';
     Log0('' + LastCMDLineStr);
-    // SplitViewForm.Memo2.Clear;
-    // SplitViewForm.Memo2.Lines.Add('//You can send any string and file to device at here.');
-    // SplitViewForm.Memo2.Lines.Add('//Note:Hex data format like this: 0xal,5e 3f');
   end
   else
   begin
@@ -4127,8 +4141,6 @@ begin
     OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
     OcComPortObj.Log('################################################');
     SplitViewForm.Memo2.Clear;
-    // SplitViewForm.Memo2.Lines.Add('//You can send any string and file to device at here.');
-    // SplitViewForm.Memo2.Lines.Add('//Note:Hex data format like this: 0xal,5e 3f');
   end
   else
   begin
