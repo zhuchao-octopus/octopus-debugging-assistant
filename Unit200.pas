@@ -72,7 +72,7 @@ var
   DefaultLauguageStr: array [0 .. 59] of TLang = (
     (
       Name: 'OPRATION_OPEN'; Caption1: '打开串口设备'; Caption2: 'Open The Device'), (Name: 'OPRATION_OPEN2'; Caption1: '打开 HID 设备'; Caption2: 'Open The HID Device'), (Name: 'OPRATION_CLOSE';
-    Caption1: '关闭设备'; Caption2: 'Close The Device'), (Name: 'Button4'; Caption1: ''; Caption2: 'Get Ports'),
+    Caption1: '关闭'; Caption2: 'Close The Device'), (Name: 'Button4'; Caption1: ''; Caption2: 'Get Ports'),
 
     (Name: 'Label2'; Caption1: ''; Caption2: 'Baud Rate'), (Name: 'Label5'; Caption1: ''; Caption2: 'Parity'), (Name: 'Label9'; Caption1: ''; Caption2: 'Stop Bits'), (Name: 'Label12'; Caption1: '';
     Caption2: 'Data Bits'), (Name: 'Label13'; Caption1: ''; Caption2: 'SendFormat'), (Name: 'Label15'; Caption1: ''; Caption2: 'FlowControl'), (Name: 'Button7'; Caption1: ''; Caption2: 'Clear Above'),

@@ -1822,7 +1822,7 @@ begin
       fileSent := fileSent + iLength;
       checksum := checksum + ChecksumBuffer(&Data[11], iLength); // 计算sum不要算上crc
 
-      //Memo2.Lines.Append(FormatBufferToHexStr(&Data[11], iLength));
+      // Memo2.Lines.Append(FormatBufferToHexStr(&Data[11], iLength));
 
       pPOcComPack := @Data[0]; // 实际发送的时候长度不包括CRC
       bStatusOK := True;
@@ -4324,6 +4324,7 @@ begin
     OcComPortObj.Open;
   Except
     OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
   if not OcComPortObj.Connected then

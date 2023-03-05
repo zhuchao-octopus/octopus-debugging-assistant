@@ -371,7 +371,7 @@ begin
       end; }
 
     try
-      if Length(FOcComPortObj.FComReceiveInternalBuffer) > SizeOf(TOcComPackHead) then
+      if Length(FOcComPortObj.FComReceiveInternalBuffer) >= SizeOf(TOcComPackHead) then
       begin
         j := self.FOcComProtocal.ParserPack(@FOcComPortObj.FComReceiveInternalBuffer[FStartIndex], Length(FOcComPortObj.FComReceiveInternalBuffer) - FStartIndex);
 
@@ -423,6 +423,10 @@ begin
     // ReStart:
     if FOcComPortObj.FComHandleThread_Wait then
       Continue;
+
+    if (not FOcComPortObj.Connected) then
+      Continue;
+
     case FNeedToReset of // 强制切换接收格式清先前的缓存
       0:
         FOcComPortObj.ClearInternalBuff(0);
@@ -458,6 +462,7 @@ begin
 
       if Assigned(FOcComPortObj.FCallBackFun) then
         FOcComPortObj.FCallBackFun();
+
       INC(FUIStartIndex);
 
       if FUIStartIndex >= FOcComPortObj.StringInternalMemo.Lines.Count then
@@ -508,33 +513,34 @@ begin
       begin // 没有收到新的数据，准备清场,打印所有累计到的数据
         if s <> '' then // 有累计数据需要打印
         begin
-          if FOcComPortObj.FHexModeFormatCount > 0 then //可能存在最后没有格式话的数据，解析固定长度
+          if FOcComPortObj.FHexModeFormatCount > 0 then // 可能存在最后没有格式话的数据，解析固定长度
           begin
-            if FOcComPortObj.FHexModeWithString then  // 是否需要解析，需要格式话一定需要解析
+            if FOcComPortObj.FHexModeWithString then // 是否需要解析，需要格式话一定需要解析
             begin
-             if ((Length(FOcComPortObj.FComReceiveInternalBuffer) - j) <= FOcComPortObj.FHexModeFormatCount) then
-               begin
+              if ((Length(FOcComPortObj.FComReceiveInternalBuffer) - j) <= FOcComPortObj.FHexModeFormatCount) then
+              begin
                 s := Format(f, [Trim(s)]);
                 s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount);
-               end
-             else
-               begin //这种情况应该没有
+              end
+              else
+              begin // 这种情况应该没有
                 s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
-               end;
-            end else
+              end;
+            end
+            else
             begin
-               s := Format(f, [Trim(s)]);
+              s := Format(f, [Trim(s)]);
             end;
           end;
 
-          {if FOcComPortObj.FHexModeWithString then // 是否需要解析
-          begin
+          { if FOcComPortObj.FHexModeWithString then // 是否需要解析
+            begin
             s := Format(f, [Trim(s)]);
             if FOcComPortObj.FHexModeFormatCount > 0 then // 可能存在最后没有格式话的数据，解析固定长度
-              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount)
+            s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount)
             else // 解析所有
-             s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
-          end;}
+            s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
+            end; }
 
           FOcComPortObj.Log(s); // 打印出所有数据,输出最终数据
           s := '';
@@ -779,7 +785,7 @@ end;
 
 procedure TOcComPortObj.ClearLog;
 begin
-  if self.LogMemo.Showing then
+  if (LogMemo <> nil) and self.LogMemo.Showing then
   begin
     self.LogMemo.Clear;
     self.FComProcessedCount := 0;
@@ -804,7 +810,7 @@ begin
     exit;
 
   HexModeFormatCount := 32;
-  if(FHexModeFormatCount > 0) then
+  if (FHexModeFormatCount > 0) then
     HexModeFormatCount := FHexModeFormatCount;
 
   j := 0;
@@ -835,9 +841,9 @@ var
   isBottom: Boolean;
 begin
 
-  if (LogMemo = nil) or (LogMemo.Parent = nil) then
+  if (LogMemo = nil) or (LogMemo.Parent = nil) or (not self.Connected) then
   begin
-    MessageBox(Application.Handle, 'No device is found,please open a device.', Pchar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    // MessageBox(Application.Handle, 'No device is found,please open a device.', Pchar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
@@ -854,6 +860,7 @@ begin
       LogMemo.Lines.Strings[i] := str;
     end;
   end;
+
   LogMemo.Lines.EndUpdate;
 
   if FLogScrollMode and isBottom then
@@ -867,7 +874,7 @@ procedure TOcComPortObj.LogBottomMod(const Msg: string; appendMod: Boolean; bott
 // i: Int64;
 // str: String;
 begin
-  if (LogMemo = nil) or (LogMemo.Parent = nil) then
+  if (LogMemo = nil) or (LogMemo.Parent = nil) or (not self.Connected) then
   begin
     exit;
   end;
@@ -920,7 +927,7 @@ end;
 function TOcComPortObj.FalconComSendBuffer(const Buffer: array of Byte; Count: integer): Bool;
 begin
   Result := True;
-  if self.connected then
+  if self.Connected then
   begin
     try
       // LogBuff('-> ', Buffer, Count);
@@ -946,75 +953,77 @@ var
   s, tempstr: string;
 begin
   Result := True;
-  if SendFormat = Ord(S_ASCIIFormat) then // send string ascci char
-  begin
-    tempstr := str;
-    str := str + #13#10;
-    if self.connected then
-    begin
-      if FShowSendingLog then
+
+  case SendFormat of
+    Ord(S_ASCIIFormat): // send string ascci char
       begin
-        if FReceiveFormat = 1 then
-          Log(SEND_FLAG + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
+        tempstr := str;
+        str := str + #13#10;
+        if self.Connected then
+        begin
+          if FShowSendingLog then
+          begin
+            if FReceiveFormat = 1 then
+              Log(SEND_FLAG + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
+            else
+              Log(SEND_FLAG + str); // new ling in memo for receive data 发送字符串,后面自带换行
+          end;
+
+          try
+            self.writestr(str);
+            FComSentCount := FComSentCount + Length(str);
+          except
+            Result := false;
+            Log('Sorry Write to device fail!!');
+            exit;
+          end;
+        end
         else
-          Log(SEND_FLAG + str); // new ling in memo for receive data 发送字符串,后面自带换行
+        begin
+          Log('Device was closed,please open a device.');
+          exit;
+        end;
       end;
 
-      try
-        self.writestr(str);
-        FComSentCount := FComSentCount + Length(str);
-      except
-        Result := false;
-        Log('Sorry Write to device fail!!');
-        exit;
-      end;
-    end
-    else
-    begin
-      Log('Device was closed,please open a device.');
-      exit;
-    end;
-    exit;
-  end;
-  if SendFormat = Ord(S_HexadecimalFormat) then
-  begin
-    if self.connected then
-    begin
-      s := FormatHexStrToByte(Trim(str), buf, bLength);
-      if FShowSendingLog then
-        Log(SEND_FLAG + s); // Log(''); // new line prepare to receive
+    Ord(S_HexadecimalFormat):
+      begin
+        if self.Connected then
+        begin
+          s := FormatHexStrToByte(Trim(str), buf, bLength);
+          if FShowSendingLog then
+            Log(SEND_FLAG + s); // Log(''); // new line prepare to receive
 
-      try
-        self.Write(buf, bLength);
+          try
+            self.Write(buf, bLength);
+            FComSentCount := FComSentCount + bLength;
+          except
+            Log('Sorry Write to device fail!!');
+            exit;
+          end;
+        end
+        else
+        begin
+          Log('Device was closed,please open a device.');
+          exit;
+        end;
+      end;
+
+    Ord(S_OctopusProtocol):
+      begin
+        if checkIsHexStr(str) then
+        begin
+          s := FormatHexStrToByte(Trim(str), buf, bLength);
+          SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
+        end
+        else
+        begin
+          WideStringToByte(str, buf);
+          bLength := Length(str);
+          SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
+        end;
         FComSentCount := FComSentCount + bLength;
-      except
-        Log('Sorry Write to device fail!!');
-        exit;
       end;
-    end
-    else
-    begin
-      Log('Device was closed,please open a device.');
-      exit;
-    end;
   end;
-  if SendFormat = Ord(S_OctopusProtocol) then
-  begin
-    if checkIsHexStr(str) then
-    begin
-      s := FormatHexStrToByte(Trim(str), buf, bLength);
-      SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
-    end
-    else
-    begin
-      WideStringToByte(str, buf);
-      bLength := Length(str);
-      SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
-    end;
-
-    FComSentCount := FComSentCount + bLength;
-  end;
-
   if Assigned(FCallBackFun) then
     FCallBackFun();
 end;
@@ -1027,57 +1036,62 @@ var
   s: string;
 begin
   Result := True;
-  if SendFormat = Ord(S_ASCIIFormat) then // send string ascci char
-  begin
-    if self.connected then
-    begin
-      try
-        if (Length(str) > 0) and (str[Length(str)] = #9) then
+
+  case SendFormat of
+    Ord(S_ASCIIFormat): // send string ascci char
+      begin
+        if self.Connected then
         begin
+          try
+            if (Length(str) > 0) and (str[Length(str)] = #9) then
+            begin
+            end
+            else
+              str := str + #13;
+            writestr(str);
+
+            FComSentCount := FComSentCount + Length(str);
+          except
+            Result := false;
+            Log('Sorry Write to device fail!!');
+            exit;
+          end;
         end
         else
-          str := str + #13;
-        writestr(str);
+        begin
+          Log('Device was closed,please open a device.');
+          exit;
+        end;
+        // exit;
+      end;
 
-        FComSentCount := FComSentCount + Length(str);
-      except
-        Result := false;
-        Log('Sorry Write to device fail!!');
-        exit;
+    Ord(S_HexadecimalFormat):
+      begin
+        if self.Connected then
+        begin
+          s := FormatHexStrToByte(Trim(str), buf, bLength);
+          // Len := (Length(str) + 2) div 3;
+          try
+            self.Write(buf, bLength);
+            FComSentCount := FComSentCount + bLength;
+          except
+            Log('Sorry Write to device fail!!');
+            exit;
+          end;
+        end
+        else
+        begin
+          Log('Device was closed,please open a device.');
+          exit;
+        end;
       end;
-    end
-    else
-    begin
-      Log('Device was closed,please open a device.');
-      exit;
-    end;
-    exit;
-  end;
-  if SendFormat = Ord(S_HexadecimalFormat) then
-  begin
-    if self.connected then
-    begin
-      s := FormatHexStrToByte(Trim(str), buf, bLength);
-      // Len := (Length(str) + 2) div 3;
-      try
-        self.Write(buf, bLength);
-        FComSentCount := FComSentCount + bLength;
-      except
-        Log('Sorry Write to device fail!!');
-        exit;
+
+    Ord(S_OctopusProtocol):
+      begin
+        s := FormatHexStrToByte(Trim(str), buf, bLength);
+        // Len := (Length(str) + 2) div 3;
+        SendProtocolData(OCCOMPROTOCAL_DATA, buf, bLength, false);
       end;
-    end
-    else
-    begin
-      Log('Device was closed,please open a device.');
-      exit;
-    end;
-  end;
-  if SendFormat = Ord(S_OctopusProtocol) then
-  begin
-    s := FormatHexStrToByte(Trim(str), buf, bLength);
-    // Len := (Length(str) + 2) div 3;
-    SendProtocolData(OCCOMPROTOCAL_DATA, buf, bLength, false);
   end;
 end;
 
@@ -1089,67 +1103,70 @@ var
   s: string;
 begin
   Result := True;
-  if SendFormat = Ord(S_ASCIIFormat) then // send string ascci char
-  begin
-    str := str + #13#10;
-    if self.connected then
-    begin
-      if FShowSendingLog then
-        Log(SEND_FLAG + str);
 
-      try
-        self.writestr(str);
-        FComSentCount := FComSentCount + Length(str);
-      except
-        Result := false;
-        Log('Sorry Write to device fail!!');
-        exit;
+  case SendFormat of
+    Ord(S_ASCIIFormat): // send string ascci char
+      begin
+        str := str + #13#10;
+        if self.Connected then
+        begin
+          if FShowSendingLog then
+            Log(SEND_FLAG + str);
+
+          try
+            self.writestr(str);
+            FComSentCount := FComSentCount + Length(str);
+          except
+            Result := false;
+            Log('Sorry Write to device fail!!');
+            exit;
+          end;
+        end
+        else
+        begin
+          Log('Device was closed,please open a device.');
+          exit;
+        end;
       end;
-    end
-    else
-    begin
-      Log('Device was closed,please open a device.');
-      exit;
-    end;
-    exit;
-  end;
-  if SendFormat = Ord(S_HexadecimalFormat) then
-  begin
-    if self.connected then
-    begin
-      s := FormatHexStrToByte(Trim(str), buf, bLength);
-      if FShowSendingLog then
-        Log(SEND_FLAG + s);
 
-      try
-        self.Write(buf, bLength);
+    Ord(S_HexadecimalFormat):
+      begin
+        if self.Connected then
+        begin
+          s := FormatHexStrToByte(Trim(str), buf, bLength);
+          if FShowSendingLog then
+            Log(SEND_FLAG + s);
+
+          try
+            self.Write(buf, bLength);
+            FComSentCount := FComSentCount + bLength;
+          except
+            Log('Sorry Write to device fail!!');
+            exit;
+          end;
+        end
+        else
+        begin
+          Log('Device was closed,please open a device.');
+          exit;
+        end;
+      end;
+
+    Ord(S_OctopusProtocol):
+      begin
+        if checkIsHexStr(str) then
+        begin
+          s := FormatHexStrToByte(Trim(str), buf, bLength);
+          SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
+        end
+        else
+        begin
+          WideStringToByte(str, buf);
+          bLength := Length(str);
+          SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
+        end;
         FComSentCount := FComSentCount + bLength;
-      except
-        Log('Sorry Write to device fail!!');
-        exit;
       end;
-    end
-    else
-    begin
-      Log('Device was closed,please open a device.');
-      exit;
-    end;
-  end;
-
-  if SendFormat = Ord(S_OctopusProtocol) then
-  begin
-    if checkIsHexStr(str) then
-    begin
-      s := FormatHexStrToByte(Trim(str), buf, bLength);
-      SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
-    end
-    else
-    begin
-      WideStringToByte(str, buf);
-      bLength := Length(str);
-      SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, buf, bLength, false);
-    end;
-    FComSentCount := FComSentCount + bLength;
   end;
 
   if Assigned(FCallBackFun) then
@@ -1221,6 +1238,10 @@ begin
   ln := '';
   FComReceiveCount := FComReceiveCount + Count;
   FComReceiveString := '';
+
+  if (not Connected) then
+    exit; // 突然断开
+
   isBottom := IsLogBottom();
 
   if FReceiveFormat = Ord(ASCIIFormat) then // receive as string
@@ -1493,7 +1514,7 @@ begin
       exit;
     end;
     Log('Time Out Try ... ' + IntToStr(reTryCount));
-    if (not connected) then
+    if (not Connected) then
     begin
       break;
     end;
@@ -1687,10 +1708,10 @@ begin
   if FHexModeWithString then
   begin
     str := Format(f, [Trim(str)]);
-     if (l <= 32) then
-       str := str + ByteToWideString2(@OcComPack.data, OcComPack.Length)
-     else
-       str := Trim(str) + '   '+ByteToWideString2(@OcComPack.data, OcComPack.Length)
+    if (l <= 32) then
+      str := str + ByteToWideString2(@OcComPack.data, OcComPack.Length)
+    else
+      str := Trim(str) + '   ' + ByteToWideString2(@OcComPack.data, OcComPack.Length)
   end;
   Log(str);
 end;
@@ -1778,7 +1799,7 @@ var
   cmd: String;
   LastStr: String;
 begin
-  if self.connected = false then
+  if self.Connected = false then
   begin
     exit;
   end;
@@ -1946,7 +1967,7 @@ begin
     if (Key = $43) then // Control+VK_C
     begin
       cmdbuf[0] := $03;
-      if (self.connected) and (Trim(LogMemo.SelText) = '') then
+      if (self.Connected) and (Trim(LogMemo.SelText) = '') then
         self.FalconComSendBuffer(cmdbuf, 1)
     end
     else if (Key = 70) then // Control+VK_F
