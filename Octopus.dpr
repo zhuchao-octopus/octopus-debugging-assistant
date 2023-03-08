@@ -33,15 +33,17 @@ uses
   JvTypes in 'HID\JvTypes.pas',
   ModuleLoader in 'HID\ModuleLoader.pas',
   WinConvTypes in 'HID\WinConvTypes.pas',
-  ocPcDeviceMgt in 'ocPcDeviceMgt.pas',
-  Unit200 in 'Unit200.pas',
+  uGlobalFunction in 'uGlobalFunction.pas',
   OcDecrypt in 'OcDecrypt.pas',
-  UnitCmdShell in 'UnitCmdShell.pas',
+  uCmdShell in 'uCmdShell.pas',
   OcFindAnd in 'OcFindAnd.pas' {OcFindAndFrm},
   JvSetupApi in 'HID\JvSetupApi.pas',
   CPort in 'ComPort\CPort.pas',
   CPortSetup in 'ComPort\CPortSetup.pas' {ComSetupFrm},
-  UnitDeviceThread in 'UnitDeviceThread.pas';
+  uDeviceThread in 'uDeviceThread.pas',
+  RSAOpenSSL in '..\ZSBWM\RSAOSSL\RSAOpenSSL.pas',
+  libeay32 in '..\ZSBWM\RSAOSSL\libeay32.pas',
+  OcPcDeviceMgt in 'OcPcDeviceMgt.pas';
 
 {$R *.res}
 

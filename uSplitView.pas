@@ -40,7 +40,7 @@ uses
   VCLTee.TeCanvas, VCLTee.TeeGDIPlus, VCLTee.TeEngine,
   VCLTee.Series, VCLTee.TeeProcs, VCLTee.Chart,
   VCLTee.TeeFunci, JvComponentBase, JvHidControllerClass, StrUtils,
-  UnitCmdShell, Vcl.Mask;
+  uCmdShell, Vcl.Mask;
 
 type
   TChartAccess = class(TCustomAxisPanel);
@@ -385,7 +385,7 @@ implementation
 
 uses
   Vcl.Themes, ocPcDeviceMgt, ShlObj, ActiveX, ComObj, IniFiles, ShellAPI,
-  Unit200, Octopus_CRC, WinInet, OcDecrypt, OcProtocol, CRC, math, NetInterface, UnitDeviceThread;
+  uGlobalFunction, Octopus_CRC, WinInet, OcDecrypt, OcProtocol, CRC, math, NetInterface, uDeviceThread;
 
 {$R *.dfm}
 

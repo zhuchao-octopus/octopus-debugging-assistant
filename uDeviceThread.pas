@@ -1,4 +1,4 @@
-unit UnitDeviceThread;
+unit uDeviceThread;
 
 interface
 
@@ -21,10 +21,14 @@ type
     FFwVersion: String;
     FRegion: String;
     FComments: String;
-
+    procedure RSAPublicEncrypt(str: String);
   protected
     procedure Execute; override;
   end;
+
+const
+  publickey =
+    'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDoJ+0689QiXNJKQvROY/lOOcrlCzB9xfNipHdD9xaK7sZb1EcKJQJAl5mqyWz4fWgGAEjrqVPSrkGPgqEpCej1J1VNAx3E4Ig40ZQbl5EAgxo0W36+jQkklKjgcAoVvuhWovAZjcPqfmAUljGfQu8PlbZ8fE4AjHIHikQy88Cy2wIDAQAB';
 
 implementation
 
@@ -63,10 +67,16 @@ uses NetInterface, GlobalFunctions, IniFiles;
 
 { TCheckDeviceThreak }
 
+procedure TCheckDeviceThreak.RSAPublicEncrypt(str: String);
+
+begin
+
+end;
+
 procedure TCheckDeviceThreak.Execute;
 var
-  URL: string;
-  // LResponse: IHTTPResponse;
+  URL, URL2: string;
+  LResponse: IHTTPResponse;
   // LFileName: string;
   // LSize: Int64;
   // ss: TStringStream;
@@ -113,11 +123,15 @@ begin
     cParam.Add('region=' + FRegion);
     cParam.Add('comments=' + FComments);
 
+    //s := RSATestForm.PublicEncrypt(cParam.ToString);
+    //URL2 := 'http://47.106.172.94:8090/zhuchao/octopus/devices/testCheckRSA?str=' + s;
+    //LResponse := FClient.Get(URL);
+
+    if (timeStamp = timeStamp2) then
+      Exit;
     URL := 'http://47.106.172.94:8090/zhuchao/octopus/devices/testCheck';
     s := FClient.Post(URL, cParam).ContentAsString;
-
     Octopusini.WriteInt64('', 'TIMESTAMP', timeStamp);
-
   finally
     if FClient <> nil then
       FClient.Free;

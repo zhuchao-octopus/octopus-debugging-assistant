@@ -1,4 +1,4 @@
-unit Unit200;
+unit uGlobalFunction;
 
 interface
 
@@ -7,7 +7,7 @@ uses
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.ImageList, Vcl.ImgList,
   Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.ValEdit,
-  Vcl.WinXCtrls, Vcl.Menus, IniFiles, Vcl.Themes, unit100;
+  Vcl.WinXCtrls, Vcl.Menus, IniFiles, Vcl.Themes;
 
 Const
 {$IFDEF CPU64BITS}
@@ -405,7 +405,7 @@ end;
 
 function FormatBufferToHexStr(Const buffer: array of byte; Const bCount: Integer): string;
 var
- i:Integer;
+  i: Integer;
 begin
   Result := '';
   for i := 0 to bCount - 1 do

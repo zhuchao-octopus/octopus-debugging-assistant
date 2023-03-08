@@ -7,8 +7,7 @@ uses
   StdCtrls;
 
 const
-  GUID_DEVINTERFACE_USB_DEVICE
-    : TGUID = '{A5DCBF10-6530-11D2-901F-00C04FB951ED}';
+  GUID_DEVINTERFACE_USB_DEVICE: TGUID = '{A5DCBF10-6530-11D2-901F-00C04FB951ED}';
 
   DBT_DEVNODES_CHANGED = $0007;
 
@@ -151,59 +150,34 @@ type
     Reserved: LongInt;
   end;
 
-function SetupDiGetClassDevs(const ClassGuid: PGUID; Enumerator: PChar;
-  hwndParent: HWND; Flags: DWORD): Cardinal; stdcall;
-  external 'Setupapi.dll' name 'SetupDiGetClassDevsA';
+function SetupDiGetClassDevs(const ClassGuid: PGUID; Enumerator: PChar; hwndParent: HWND; Flags: DWORD): Cardinal; stdcall; external 'Setupapi.dll' name 'SetupDiGetClassDevsA';
 
-function SetupDiEnumDeviceInfo(DeviceInfoSet: Cardinal; MemberIndex: DWORD;
-  DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiEnumDeviceInfo';
+function SetupDiEnumDeviceInfo(DeviceInfoSet: Cardinal; MemberIndex: DWORD; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiEnumDeviceInfo';
 
-function SetupDiGetDeviceRegistryProperty(DeviceInfoSet: Cardinal;
-  DeviceInfoData: PSP_DEVINFO_DATA; Propertys: DWORD;
-  PropertyRegDataType: PWORD; PropertyBuffer: PByte; PropertyBufferSize: DWORD;
-  RequiredSize: PDWORD): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiGetDeviceRegistryPropertyA';
+function SetupDiGetDeviceRegistryProperty(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; Propertys: DWORD; PropertyRegDataType: PWORD; PropertyBuffer: PByte; PropertyBufferSize: DWORD;
+  RequiredSize: PDWORD): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetDeviceRegistryPropertyA';
 
-function SetupDiDestroyDeviceInfoList(DeviceInfoSet: Cardinal): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiDestroyDeviceInfoList';
+function SetupDiDestroyDeviceInfoList(DeviceInfoSet: Cardinal): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiDestroyDeviceInfoList';
 
-function SetupDiClassNameFromGuid(ClassGuid: PGUID; ClassName: PChar;
-  ClassNameSize: DWORD; RequiredSize: PDWORD): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiClassNameFromGuidA';
+function SetupDiClassNameFromGuid(ClassGuid: PGUID; ClassName: PChar; ClassNameSize: DWORD; RequiredSize: PDWORD): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiClassNameFromGuidA';
 
-function SetupDiGetClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA)
-  : BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetClassImageList';
+function SetupDiGetClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetClassImageList';
 
-function SetupDiDestroyClassImageList(ClassImageListData
-  : PSP_CLASSIMAGELIST_DATA): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiDestroyClassImageList';
+function SetupDiDestroyClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiDestroyClassImageList';
 
-function SetupDiGetClassImageIndex(ClassImageListData: PSP_CLASSIMAGELIST_DATA;
-  ClassGuid: PGUID; ImageIndex: PINT): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiGetClassImageIndex';
+function SetupDiGetClassImageIndex(ClassImageListData: PSP_CLASSIMAGELIST_DATA; ClassGuid: PGUID; ImageIndex: PINT): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetClassImageIndex';
 
-function SetupDiEnumDriverInfo(DeviceInfoSet: Cardinal;
-  DeviceInfoData: PSP_DEVINFO_DATA; DriverType: DWORD; MemberIndex: DWORD;
-  DriverInfoData: SP_DRVINFO_DATA): BOOL; stdcall;
+function SetupDiEnumDriverInfo(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; DriverType: DWORD; MemberIndex: DWORD; DriverInfoData: SP_DRVINFO_DATA): BOOL; stdcall;
   external 'Setupapi.dll' name 'SetupDiEnumDriverInfoA';
 
-function SetupDiGetSelectedDriver(DeviceInfoSet: Cardinal;
-  DeviceInfoData: PSP_DEVINFO_DATA; DriverInfoData: PSP_DRVINFO_DATA): BOOL;
-  stdcall; external 'Setupapi.dll' name 'SetupDiGetSelectedDriverA';
+function SetupDiGetSelectedDriver(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; DriverInfoData: PSP_DRVINFO_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetSelectedDriverA';
 
-function SetupDiSetClassInstallParams(DeviceInfoSet: Cardinal;
-  DeviceInfoData: PSP_DEVINFO_DATA; ClassInstallParams: PSP_CLASSINSTALL_HEADER;
-  ClassInstallParamsSize: DWORD): BOOL stdcall;
+function SetupDiSetClassInstallParams(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; ClassInstallParams: PSP_CLASSINSTALL_HEADER; ClassInstallParamsSize: DWORD): BOOL stdcall;
   external 'Setupapi.dll' name 'SetupDiSetClassInstallParamsA';
-function SetupDiCallClassInstaller(InstallFunction: DI_FUNCTION;
-  DeviceInfoSet: HDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiCallClassInstaller';
+function SetupDiCallClassInstaller(InstallFunction: DI_FUNCTION; DeviceInfoSet: HDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiCallClassInstaller';
 
-Procedure GetTheHardDevice(yTypes: string; il1: TImageList;
-  var yname: TStringList; var imid: integer) { :TStringList };
-Function GetDeviceName(DeviceInfoSet: Cardinal;
-  DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
+Procedure GetTheHardDevice(yTypes: string; il1: TImageList; var yname: TStringList; var imid: integer) { :TStringList };
+Function GetDeviceName(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
 Function DeviceClassName(Guid: TGUID): string;
 procedure GetAllHardDevice(tr: Ttreeview; il1: TImageList);
 
@@ -241,8 +215,7 @@ begin
   result := str;
 end;
 
-Procedure GetTheHardDevice(yTypes: string; il1: TImageList;
-  var yname: TStringList; var imid: integer) { :TStringList };
+Procedure GetTheHardDevice(yTypes: string; il1: TImageList; var yname: TStringList; var imid: integer) { :TStringList };
 var
   ImageList: SP_CLASSIMAGELIST_DATA;
   HDEVINFO: Cardinal;
@@ -266,8 +239,7 @@ begin
   begin
     GetDeviceName(HDEVINFO, @DeviceInfoData, Name);
 
-    SetupDiGetClassImageIndex(@ImageList, @DeviceInfoData.ClassGuid,
-      @ImageIndex);
+    SetupDiGetClassImageIndex(@ImageList, @DeviceInfoData.ClassGuid, @ImageIndex);
 
     gui := GUIDToString(DeviceInfoData.ClassGuid);
     Types := Trim(DeviceClassName(DeviceInfoData.ClassGuid));
@@ -291,8 +263,7 @@ var
 begin
   ClassNameSzie := 0;
   GetMem(ClassName, ClassNameSzie);
-  while not SetupDiClassNameFromGuid(@Guid, ClassName, ClassNameSzie,
-    @ClassNameSzie) do
+  while not SetupDiClassNameFromGuid(@Guid, ClassName, ClassNameSzie, @ClassNameSzie) do
   begin
     if (GetLastError() = ERROR_INSUFFICIENT_BUFFER) then
     begin
@@ -309,8 +280,7 @@ begin
     FreeMem(ClassName);
 end;
 
-Function GetDeviceName(DeviceInfoSet: Cardinal;
-  DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
+Function GetDeviceName(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
 var
   DataT, buffersize: DWORD;
   buffer: PChar;
@@ -318,11 +288,9 @@ begin
   buffersize := 256;
   buffer := AllocMem(buffersize);
   result := False;
-  if not SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData,
-    SPDRP_FRIENDLYNAME, @DataT, PByte(buffer), buffersize, @buffersize) then
+  if not SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData, SPDRP_FRIENDLYNAME, @DataT, PByte(buffer), buffersize, @buffersize) then
   begin
-    result := SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData,
-      SPDRP_DEVICEDESC, @DataT, PByte(buffer), buffersize, @buffersize)
+    result := SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData, SPDRP_DEVICEDESC, @DataT, PByte(buffer), buffersize, @buffersize)
   end
   else
     result := True;
@@ -334,8 +302,7 @@ begin
   Name := Trim(Name);
 end;
 
-function ChangeDeviceState(HDEVINFO: HDEVINFO; NewStatus: DWORD;
-  SelectedItem: DWORD): Boolean;
+function ChangeDeviceState(HDEVINFO: HDEVINFO; NewStatus: DWORD; SelectedItem: DWORD): Boolean;
 var
   PropChangeParams: SP_PROPCHANGE_PARAMS;
   DeviceInfoData: SP_DEVINFO_DATA;
@@ -352,13 +319,11 @@ begin
   PropChangeParams.Scope := DICS_FLAG_GLOBAL;
   PropChangeParams.StateChange := NewStatus;
 
-  if not SetupDiSetClassInstallParams(HDEVINFO, @DeviceInfoData,
-    PSP_CLASSINSTALL_HEADER(@PropChangeParams), SizeOf(PropChangeParams)) then
+  if not SetupDiSetClassInstallParams(HDEVINFO, @DeviceInfoData, PSP_CLASSINSTALL_HEADER(@PropChangeParams), SizeOf(PropChangeParams)) then
     Exit;
 
   // Call the ClassInstaller and perform the change.
-  if not SetupDiCallClassInstaller(DIF_PROPERTYCHANGE, HDEVINFO, @DeviceInfoData)
-  then
+  if not SetupDiCallClassInstaller(DIF_PROPERTYCHANGE, HDEVINFO, @DeviceInfoData) then
     Exit;
 
   result := True;
@@ -404,10 +369,8 @@ end;
 procedure GetAllHardDevice(tr: Ttreeview; il1: TImageList);
 var
   ImageList: SP_CLASSIMAGELIST_DATA;
-  systemn, keyboardn, portsn, fdcn, hdcn, mousen, monitorn, floppydiskn,
-    hidclassn, cdromn, diskdriven, displayn, usbn, median, netn, scsiadaptern,
-    computern, legacydrivern, volumen, processorn, intelunifieddisplaydrivern,
-    othersn, rootn: TTreenode;
+  systemn, keyboardn, portsn, fdcn, hdcn, mousen, monitorn, floppydiskn, hidclassn, cdromn, diskdriven, displayn, usbn, median, netn, scsiadaptern, computern, legacydrivern, volumen, processorn,
+    intelunifieddisplaydrivern, othersn, rootn: TTreenode;
 
   HDEVINFO: Cardinal;
   DeviceInfoData: SP_DEVINFO_DATA;
@@ -436,8 +399,7 @@ begin
   begin
     GetDeviceName(HDEVINFO, @DeviceInfoData, Name);
 
-    SetupDiGetClassImageIndex(@ImageList, @DeviceInfoData.ClassGuid,
-      @ImageIndex);
+    SetupDiGetClassImageIndex(@ImageList, @DeviceInfoData.ClassGuid, @ImageIndex);
 
     gui := GUIDToString(DeviceInfoData.ClassGuid);
     Types := DeviceClassName(DeviceInfoData.ClassGuid);
@@ -674,8 +636,7 @@ begin
     else if (lowercase(Types) = 'intelunifieddisplaydriver') then
     begin
       if intelunifieddisplaydrivern = nil then
-        intelunifieddisplaydrivern := tr.Items.AddChild(rootn,
-          'IntelUnifiedDisplayDriver');
+        intelunifieddisplaydrivern := tr.Items.AddChild(rootn, 'IntelUnifiedDisplayDriver');
       intelunifieddisplaydrivern.ImageIndex := ImageIndex;
 
       childnode := tr.Items.AddChild(intelunifieddisplaydrivern, name);

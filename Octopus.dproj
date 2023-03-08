@@ -110,8 +110,8 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=$(MSBuildProjectName);FileVersion=3.0.0.1383;InternalName=Octopus;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.0.0.0;Comments=1234998.CN</VerInfo_Keys>
-        <VerInfo_Build>1383</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=$(MSBuildProjectName);FileVersion=3.0.0.1386;InternalName=Octopus;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=3.0.0.0;Comments=1234998.CN</VerInfo_Keys>
+        <VerInfo_Build>1386</VerInfo_Build>
         <VerInfo_MajorVer>3</VerInfo_MajorVer>
         <Icon_MainIcon>Octopus_Icon3.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
@@ -135,10 +135,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.360;InternalName=OCTOPUS ;LegalCopyright= 2008-2028;LegalTrademarks=;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.361;InternalName=OCTOPUS ;LegalCopyright= 2008-2028;LegalTrademarks=;OriginalFilename=Octopus32.exe;ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>Octopus_Icon4.ico</Icon_MainIcon>
         <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_Build>360</VerInfo_Build>
+        <VerInfo_Build>361</VerInfo_Build>
         <UWP_DelphiLogo44>79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>79c25bc8359f51a4_Oringer.png</UWP_DelphiLogo150>
         <VerInfo_Release>8</VerInfo_Release>
@@ -147,9 +147,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.473;InternalName=OCTOPUS ;LegalCopyright=2008-2028;LegalTrademarks=;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=深圳市逐潮科技有限公司;FileDescription=OCTOPUS 八爪鱼串口终端;FileVersion=4.2.8.479;InternalName=OCTOPUS ;LegalCopyright=2008-2028;LegalTrademarks=;OriginalFilename=Octopus64.exe;ProgramID=com.zhuchao.$(MSBuildProjectName);ProductName=$(MSBuildProjectName)串口终端;ProductVersion=4.2.6;Comments=http://www.1234998.top</VerInfo_Keys>
         <Icon_MainIcon>Octopus_Icon3.ico</Icon_MainIcon>
-        <VerInfo_Build>473</VerInfo_Build>
+        <VerInfo_Build>479</VerInfo_Build>
         <UWP_DelphiLogo44>79c25bc8359f51a4_white.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>79c25bc8359f51a4_white.png</UWP_DelphiLogo150>
         <VerInfo_Release>8</VerInfo_Release>
@@ -179,10 +179,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCCReference Include="HID\JvTypes.pas"/>
         <DCCReference Include="HID\ModuleLoader.pas"/>
         <DCCReference Include="HID\WinConvTypes.pas"/>
-        <DCCReference Include="ocPcDeviceMgt.pas"/>
-        <DCCReference Include="Unit200.pas"/>
+        <DCCReference Include="uGlobalFunction.pas"/>
         <DCCReference Include="OcDecrypt.pas"/>
-        <DCCReference Include="UnitCmdShell.pas"/>
+        <DCCReference Include="uCmdShell.pas"/>
         <DCCReference Include="OcFindAnd.pas">
             <Form>OcFindAndFrm</Form>
         </DCCReference>
@@ -192,7 +191,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
             <Form>ComSetupFrm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="UnitDeviceThread.pas"/>
+        <DCCReference Include="uDeviceThread.pas"/>
+        <DCCReference Include="..\ZSBWM\RSAOSSL\RSAOpenSSL.pas"/>
+        <DCCReference Include="..\ZSBWM\RSAOSSL\libeay32.pas"/>
+        <DCCReference Include="OcPcDeviceMgt.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -253,6 +255,12 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="Win64\Debug\Octopus.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>Octopus.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Win64\Debug\Octopus.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>Octopus.exe</RemoteName>
@@ -263,12 +271,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                     <Platform Name="Win64">
                         <RemoteDir>Assets\</RemoteDir>
                         <RemoteName>Logo150x150.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="LIBFT260.PAS" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

@@ -231,7 +231,7 @@ var
 
 implementation
 
-uses Unit200;
+uses uGlobalFunction;
 
 function readFileToStream(FileName: String): TFileStream;
 var
