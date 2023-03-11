@@ -3566,7 +3566,7 @@ begin
       for i := 1 to StringGrid1.RowCount - 1 do
       begin
         Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', SplitViewForm.StringGrid1.Cells[2, i]);
-        // Octopusini.WriteString('MyCustData', IntToStr(i) + '_5', SplitViewForm.StringGrid1.Cells[5, i]);
+        Octopusini.WriteString('MyCustData', IntToStr(i) + '_6', SplitViewForm.StringGrid1.Cells[6, i]);
       end;
       Octopusini.WriteInteger('MyPreference', 'Theme', cbxVclStyles.ItemIndex);
       Octopusini.WriteInteger('MyPreference', 'SV_R_WIDTH', SV_R.Width);
@@ -3622,7 +3622,7 @@ begin
     for i := 1 to StringGrid1.RowCount - 1 do
     begin
       StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_2', '');
-      // StringGrid1.Cells[5, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_5', '');
+      StringGrid1.Cells[6, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_6', '');
     end;
 
     cbxVclStyles.ItemIndex := Octopusini.ReadInteger('MyPreference', 'Theme', 0);
@@ -4533,7 +4533,7 @@ begin
   end;
 
   StringGrid1.RowCount := 1000;
-  StringGrid1.ColCount := 6;
+  StringGrid1.ColCount := 7;
   StringGrid1.ColWidths[0] := 50;
   StringGrid1.ColWidths[1] := 50;
   StringGrid1.ColWidths[2] := 300;
@@ -4549,7 +4549,7 @@ begin
 
   StringGrid1.Cells[4, 0] := '循环';
   StringGrid1.Cells[5, 0] := '间隔';
-  // StringGrid1.Cells[6, 0] := '解释说明';
+   StringGrid1.Cells[6, 0] := '备注';
   StringGrid1.Align := alClient;
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
@@ -4673,7 +4673,7 @@ begin
 
 end;
 
-procedure TSplitViewForm.StringGridSave;
+procedure TSplitViewForm.StringGridSave();
 var
   Octopusini: TIniFile;
   s: String;
@@ -4693,7 +4693,7 @@ begin
   end;
 end;
 
-procedure TSplitViewForm.StringGridLoad;
+procedure TSplitViewForm.StringGridLoad();
 var
   Octopusini: TIniFile;
   s: String;
