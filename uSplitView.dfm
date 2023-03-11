@@ -367,8 +367,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #39640#32423
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel6: TPanel
           Left = 0
           Top = 0
@@ -748,6 +746,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 649
       Align = alClient
+      PageIndex = 2
       TabOrder = 1
       object TPage
         Left = 0
@@ -901,23 +900,20 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Octopus '#21333#26465#21457#36865
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel12: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 464
+          Width = 314
           Height = 643
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
-          ExplicitWidth = 314
           object StringGrid1: TStringGrid
             Left = 0
             Top = 0
-            Width = 464
+            Width = 314
             Height = 605
             Hint = #28857#20987#24038#36793#25353#38062#21457#36865#25968#25454
             Align = alClient
@@ -944,7 +940,6 @@ object SplitViewForm: TSplitViewForm
             OnKeyPress = StringGrid1KeyPress
             OnMouseDown = StringGrid1MouseDown
             OnSelectCell = StringGrid1SelectCell
-            ExplicitWidth = 314
             ColWidths = (
               50
               33
@@ -1957,7 +1952,7 @@ object SplitViewForm: TSplitViewForm
           object Panel4: TPanel
             Left = 0
             Top = 605
-            Width = 464
+            Width = 314
             Height = 38
             Align = alBottom
             Alignment = taLeftJustify
@@ -1965,7 +1960,6 @@ object SplitViewForm: TSplitViewForm
             ParentBackground = False
             ParentColor = True
             TabOrder = 1
-            ExplicitWidth = 314
             object Button1: TButton
               Left = 79
               Top = 3
@@ -1997,8 +1991,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2019,7 +2011,6 @@ object SplitViewForm: TSplitViewForm
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
-            ExplicitHeight = 439
           end
           object Panel16: TPanel
             Left = 0
@@ -2029,8 +2020,6 @@ object SplitViewForm: TSplitViewForm
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
-            ExplicitTop = 570
-            ExplicitWidth = 464
             object Button16: TButton
               Left = 79
               Top = 0
@@ -2114,7 +2103,7 @@ object SplitViewForm: TSplitViewForm
               Left = 74
               Top = 3
               Width = 237
-              Height = 118
+              Height = 25
               Align = alRight
               Style = csDropDownList
               ItemIndex = 0
@@ -2161,26 +2150,22 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 464
+          Width = 314
           Height = 643
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitWidth = 314
           object GroupBox10: TGroupBox
             Left = 0
             Top = 0
-            Width = 464
+            Width = 314
             Height = 643
             Align = alClient
             TabOrder = 0
-            ExplicitWidth = 314
             object CheckBox10: TCheckBox
               Left = 5
               Top = 69
@@ -2443,13 +2428,11 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #27874#24418
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 466
+          Width = 616
           Height = 643
           AllowPanning = pmVertical
           Legend.Visible = False
@@ -2488,7 +2471,6 @@ object SplitViewForm: TSplitViewForm
           Color = -1
           TabOrder = 0
           OnMouseMove = Chart1MouseMove
-          ExplicitWidth = 616
           DefaultCanvas = 'TGDIPlusCanvas'
           PrintMargins = (
             15
@@ -2510,21 +2492,18 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 466
+          Width = 616
           Height = 643
           Align = alClient
           TabOrder = 0
           OnNewWindow2 = W1234998NewWindow2
-          ExplicitWidth = 1086
-          ExplicitHeight = 578
+          ExplicitWidth = 466
           ControlData = {
-            4C0000002A300000754200000000000000000000000000000000000000000000
+            4C000000AA3F0000754200000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126208000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000

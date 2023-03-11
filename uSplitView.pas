@@ -2057,12 +2057,14 @@ begin
   if OcComPortObj = nil then
   begin
     OcComPortObj.Log('No device is found,please open a device.');
+    MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
   if not OcComPortObj.Connected then
   begin
     OcComPortObj.Log('No device is found,please open a device.');
+    MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
