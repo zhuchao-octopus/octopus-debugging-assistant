@@ -61,6 +61,7 @@ type
     ShowLineNumber: Boolean;
     ShowSendedLog: Boolean;
     HexModeWithString: Boolean; // o
+
   end;
 
   // thread for background monitoring of port events
@@ -131,6 +132,7 @@ type
     procedure RunWindosShellCmd(str: string);
     function GetConfiguration(): TOcComPortObjPara;
   public
+    status: integer;
     ExcelApp: Variant;
 
     Constructor Create(AOwner: TComponent; DeviceName: String);
@@ -141,12 +143,14 @@ type
 
     function getCMDStr(): String;
     procedure SaveLog(FullLogFilePath: String);
-    procedure Log(const Msg: string);
+    procedure Log(const Msg: string); //log data
+    procedure DebugLog(const Msg: string);
     procedure LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
-    procedure ClearLog();
 
-    function IsLogBottom(): Boolean;
     procedure LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
+    function IsLogBottom(): Boolean;
+
+    procedure ClearLog();
 
     property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
     property LogMemo: TMemo read FLogMemo write FLogMemo;
@@ -196,6 +200,8 @@ type
     procedure PrintProtocolPack(flag: String; OcComPack: POcComPack);
     procedure RequestProtocolConnection(); // 发送连接请求
 
+    procedure CloseDevice();
+    procedure Free();
   end;
 
   TComUIHandleThread = class(TThread)
@@ -904,6 +910,36 @@ begin
       LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + Msg;
     end;
   end;
+end;
+
+procedure TOcComPortObj.DebugLog(const Msg: string);
+var
+  i, PreLogLinesCount: Int64;
+  str: String;
+  isBottom: Boolean;
+begin
+  if (LogMemo = nil) or (LogMemo.Parent = nil) then
+    exit;
+  isBottom := IsLogBottom();
+  PreLogLinesCount := LogMemo.Lines.Count;
+  LogMemo.Lines.BeginUpdate;
+  LogMemo.Lines.Append(Msg);
+
+  if FShowLineNumber or FShowDate or FShowTime then
+  begin
+    for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do
+    begin
+      str := GetLineNumberDateTimeStamp(i) + LogMemo.Lines.Strings[i];
+      LogMemo.Lines.Strings[i] := str;
+    end;
+  end;
+
+  LogMemo.Lines.EndUpdate;
+
+  if FLogScrollMode and isBottom then
+    LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+  if Assigned(FCallBackFun) then
+    FCallBackFun();
 end;
 
 function TOcComPortObj.IsLogBottom(): Boolean;
@@ -2080,6 +2116,25 @@ begin
       ExitThread(4);
     end;
   end;
+end;
+
+procedure TOcComPortObj.CloseDevice();
+begin
+  try
+    close();
+  except
+    Log('Can not close  ' + OcComPortObjPara.ComportFullName);
+  end;
+  status := 0;
+end;
+
+procedure TOcComPortObj.Free();
+begin
+  CloseDevice();
+  ClearLog;
+  ClearInternalBuff();
+  LogMemo.Visible := false;
+  LogMemo.Parent := nil;
 end;
 
 Initialization

@@ -728,9 +728,9 @@ object SplitViewForm: TSplitViewForm
     end
   end
   object SV_R: TSplitView
-    Left = 942
+    Left = 792
     Top = 0
-    Width = 320
+    Width = 470
     Height = 675
     AnimationStep = 60
     OpenedWidth = 320
@@ -743,51 +743,56 @@ object SplitViewForm: TSplitViewForm
     object Notebook3: TNotebook
       Left = 0
       Top = 0
-      Width = 320
+      Width = 470
       Height = 649
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
+      ExplicitWidth = 320
       object TPage
         Left = 0
         Top = 0
         HelpContext = 1
         Caption = #22359#21457#36865
+        ExplicitWidth = 320
         object Panel2: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 314
+          Width = 464
           Height = 643
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
           ParentBackground = False
           TabOrder = 0
+          ExplicitWidth = 314
           object Panel5: TPanel
             Left = 0
             Top = 232
-            Width = 314
+            Width = 464
             Height = 411
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
             TabOrder = 0
+            ExplicitWidth = 314
             object Panel7: TPanel
               Left = 0
               Top = 0
-              Width = 314
-              Height = 340
+              Width = 464
+              Height = 342
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
               TabOrder = 0
+              ExplicitWidth = 314
+              ExplicitHeight = 340
               object Memo2: TMemo
                 AlignWithMargins = True
                 Left = 3
                 Top = 3
-                Width = 308
-                Height = 334
+                Width = 458
+                Height = 336
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -800,18 +805,21 @@ object SplitViewForm: TSplitViewForm
                 ScrollBars = ssVertical
                 ShowHint = False
                 TabOrder = 0
+                ExplicitWidth = 308
+                ExplicitHeight = 334
               end
             end
             object Panel8: TPanel
               Left = 0
-              Top = 340
-              Width = 314
-              Height = 71
+              Top = 342
+              Width = 464
+              Height = 69
               Align = alBottom
               BevelOuter = bvNone
               ParentBackground = False
               ParentColor = True
               TabOrder = 1
+              ExplicitTop = 341
               object Button7: TButton
                 Left = 2
                 Top = 0
@@ -832,7 +840,7 @@ object SplitViewForm: TSplitViewForm
               end
               object Button25: TButton
                 Left = 2
-                Top = 36
+                Top = 34
                 Width = 311
                 Height = 34
                 Hint = #21435#25481#22810#20313#31354#26684#12289#36887#21495#12289'0x'#12289'0X'#20998#21106#31526#21495
@@ -847,24 +855,26 @@ object SplitViewForm: TSplitViewForm
           object Panel13: TPanel
             Left = 0
             Top = 0
-            Width = 314
+            Width = 464
             Height = 232
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 1
+            ExplicitWidth = 314
             object Memo3: TMemo
               AlignWithMargins = True
               Left = 3
               Top = 3
-              Width = 308
+              Width = 458
               Height = 122
               Align = alTop
               Ctl3D = True
               Lines.Strings = (
-                'Octopus '#31456#40060#20018#21475#21161#25163)
+                #20843#29226#40060#20018#21475#35843#35797#21161#25163)
               ParentCtl3D = False
               ScrollBars = ssVertical
               TabOrder = 0
+              ExplicitWidth = 308
             end
             object Button9: TButton
               Left = 2
@@ -900,20 +910,22 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Octopus '#21333#26465#21457#36865
+        ExplicitWidth = 320
         object Panel12: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 314
+          Width = 464
           Height = 643
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
+          ExplicitWidth = 314
           object StringGrid1: TStringGrid
             Left = 0
             Top = 0
-            Width = 314
+            Width = 464
             Height = 605
             Hint = #28857#20987#24038#36793#25353#38062#21457#36865#25968#25454
             Align = alClient
@@ -922,13 +934,14 @@ object SplitViewForm: TSplitViewForm
             Ctl3D = True
             DefaultColWidth = 50
             DefaultRowHeight = 26
+            DrawingStyle = gdsClassic
             RowCount = 1000
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -16
             Font.Name = 'Segoe UI'
             Font.Style = []
-            Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goRowSizing, goEditing, goAlwaysShowEditor, goFixedColClick, goFixedRowClick]
+            Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goRowSizing, goColSizing, goEditing, goAlwaysShowEditor, goFixedColClick, goFixedRowClick]
             ParentCtl3D = False
             ParentFont = False
             ParentShowHint = False
@@ -938,8 +951,8 @@ object SplitViewForm: TSplitViewForm
             OnFixedCellClick = StringGrid1FixedCellClick
             OnKeyPress = StringGrid1KeyPress
             OnMouseDown = StringGrid1MouseDown
-            OnMouseUp = StringGrid1MouseUp
             OnSelectCell = StringGrid1SelectCell
+            ExplicitWidth = 314
             ColWidths = (
               50
               33
@@ -1952,7 +1965,7 @@ object SplitViewForm: TSplitViewForm
           object Panel4: TPanel
             Left = 0
             Top = 605
-            Width = 314
+            Width = 464
             Height = 38
             Align = alBottom
             Alignment = taLeftJustify
@@ -1960,6 +1973,7 @@ object SplitViewForm: TSplitViewForm
             ParentBackground = False
             ParentColor = True
             TabOrder = 1
+            ExplicitWidth = 314
             object Button1: TButton
               Left = 79
               Top = 3
@@ -1991,35 +2005,40 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
+        ExplicitWidth = 320
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 314
+          Width = 464
           Height = 643
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
           ParentBackground = False
           TabOrder = 0
+          ExplicitWidth = 314
           object Memo5: TMemo
             AlignWithMargins = True
             Left = 3
             Top = 127
-            Width = 308
-            Height = 439
+            Width = 458
+            Height = 441
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
+            ExplicitWidth = 308
+            ExplicitHeight = 439
           end
           object Panel16: TPanel
             Left = 0
-            Top = 569
-            Width = 314
-            Height = 74
+            Top = 571
+            Width = 464
+            Height = 72
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
+            ExplicitTop = 570
             object Button16: TButton
               Left = 79
               Top = 0
@@ -2043,7 +2062,7 @@ object SplitViewForm: TSplitViewForm
               Top = 35
               Width = 311
               Height = 36
-              Caption = #21457#36865#25991#20214
+              Caption = #21457#36865#25991#20214' ( *.bin  *.hex )'
               TabOrder = 2
               OnClick = Button28Click
             end
@@ -2051,11 +2070,12 @@ object SplitViewForm: TSplitViewForm
           object Panel18: TPanel
             Left = 0
             Top = 0
-            Width = 314
+            Width = 464
             Height = 124
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 2
+            ExplicitWidth = 314
             object Label18: TLabel
               Left = 3
               Top = 102
@@ -2100,7 +2120,7 @@ object SplitViewForm: TSplitViewForm
             end
             object ComboBox9: TComboBox
               AlignWithMargins = True
-              Left = 74
+              Left = 224
               Top = 3
               Width = 237
               Height = 25
@@ -2121,6 +2141,7 @@ object SplitViewForm: TSplitViewForm
                 'ZigBee'
                 'Wireless'
                 'ModBus')
+              ExplicitLeft = 74
             end
             object ComboBox10: TComboBox
               Left = 73
@@ -2150,22 +2171,25 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
+        ExplicitWidth = 320
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 314
+          Width = 464
           Height = 643
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitWidth = 314
           object GroupBox10: TGroupBox
             Left = 0
             Top = 0
-            Width = 314
+            Width = 464
             Height = 643
             Align = alClient
             TabOrder = 0
+            ExplicitWidth = 314
             object CheckBox10: TCheckBox
               Left = 5
               Top = 69
@@ -2300,7 +2324,7 @@ object SplitViewForm: TSplitViewForm
     object TabSet3: TTabSet
       Left = 0
       Top = 649
-      Width = 320
+      Width = 470
       Height = 26
       Align = alBottom
       Font.Charset = DEFAULT_CHARSET
@@ -2314,6 +2338,7 @@ object SplitViewForm: TSplitViewForm
         #35774#32622)
       TabIndex = 0
       OnChange = TabSet3Change
+      ExplicitWidth = 320
     end
   end
   object StatusBar1: TStatusBar
@@ -2341,29 +2366,32 @@ object SplitViewForm: TSplitViewForm
   object Panel1: TPanel
     Left = 320
     Top = 0
-    Width = 622
+    Width = 472
     Height = 675
     Align = alClient
     BevelOuter = bvNone
     ParentBackground = False
     ParentColor = True
     TabOrder = 3
+    ExplicitWidth = 622
     object Notebook2: TNotebook
       Left = 0
       Top = 0
-      Width = 622
+      Width = 472
       Height = 649
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 622
       object TPage
         Left = 0
         Top = 0
         Caption = #26412#22320#25991#20214#30446#24405
+        ExplicitWidth = 622
         object Memo1: TMemo
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 616
+          Width = 466
           Height = 643
           Align = alClient
           BorderStyle = bsNone
@@ -2422,17 +2450,19 @@ object SplitViewForm: TSplitViewForm
           WantTabs = True
           OnKeyDown = Memo1KeyDown
           OnKeyPress = Memo1KeyPress
+          ExplicitWidth = 616
         end
       end
       object TPage
         Left = 0
         Top = 0
         Caption = #27874#24418
+        ExplicitWidth = 622
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 616
+          Width = 466
           Height = 643
           AllowPanning = pmVertical
           Legend.Visible = False
@@ -2471,6 +2501,7 @@ object SplitViewForm: TSplitViewForm
           Color = -1
           TabOrder = 0
           OnMouseMove = Chart1MouseMove
+          ExplicitWidth = 616
           DefaultCanvas = 'TGDIPlusCanvas'
           PrintMargins = (
             15
@@ -2492,11 +2523,12 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
+        ExplicitWidth = 622
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
           Top = 3
-          Width = 616
+          Width = 466
           Height = 643
           Align = alClient
           TabOrder = 0
@@ -2504,7 +2536,7 @@ object SplitViewForm: TSplitViewForm
           ExplicitWidth = 1086
           ExplicitHeight = 578
           ControlData = {
-            4C000000AA3F0000754200000000000000000000000000000000000000000000
+            4C0000002A300000754200000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126208000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -2515,7 +2547,7 @@ object SplitViewForm: TSplitViewForm
     object TabSet2: TTabSet
       Left = 0
       Top = 649
-      Width = 622
+      Width = 472
       Height = 26
       ParentCustomHint = False
       Align = alBottom
@@ -2534,6 +2566,7 @@ object SplitViewForm: TSplitViewForm
       TabIndex = 0
       OnChange = TabSet2Change
       OnMouseDown = TabSet2MouseDown
+      ExplicitWidth = 622
     end
   end
   object DeviceIconList: TImageList

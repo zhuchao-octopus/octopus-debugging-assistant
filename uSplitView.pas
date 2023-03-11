@@ -44,6 +44,7 @@ uses
 
 type
   TChartAccess = class(TCustomAxisPanel);
+  TStringGridEx = class(TStringGrid);
 
   THIDReport = packed record
     ReportID: byte;
@@ -193,15 +194,9 @@ type
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
-    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
-    procedure StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-
-    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
-    procedure StringGrid1MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure Button4Click(Sender: TObject);
     procedure ComboBoxEx1Change(Sender: TObject);
     procedure Button2Click(Sender: TObject);
-    procedure StringGrid1FixedCellClick(Sender: TObject; ACol, ARow: Integer);
     procedure Button1Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
@@ -280,7 +275,6 @@ type
     procedure FindDialog1Find(Sender: TObject);
     procedure FindDialog1Show(Sender: TObject);
     procedure FindDialog1Close(Sender: TObject);
-    procedure StringGrid1KeyPress(Sender: TObject; var Key: Char);
     procedure N1Click(Sender: TObject);
     procedure N3Click(Sender: TObject);
     procedure N5Click(Sender: TObject);
@@ -293,6 +287,11 @@ type
     procedure Button28Click(Sender: TObject);
     procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
     procedure StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
+    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+    procedure StringGrid1FixedCellClick(Sender: TObject; ACol, ARow: Integer);
+    procedure StringGrid1KeyPress(Sender: TObject; var Key: Char);
+    procedure StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
   private
     // ComReceiveCount: Integer;
     // ComReceiveBuffer: array [0 .. 1048576] of Byte;
@@ -310,7 +309,7 @@ type
     // LoopStringList: TStringList;
     // FTimer1Timer_Count: Integer;
     FCheck, FNoCheck: TBitmap;
-
+    StringGrid1_Col, StringGrid1_Row: Integer;
     Fprogress, FprogressMax: Integer;
 
     procedure MyAppMsg(var Msg: TMsg; var Handled: Boolean);
@@ -366,7 +365,15 @@ type
     procedure SendFileAsCommon(OcComPortObj: TOcComPortObj);
     procedure SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
     procedure SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
+
+    procedure InitStringGrid();
+    procedure StringGridSelectCell(ACol, ARow: Integer);
+    procedure StringGridSave();
+    procedure StringGridLoad();
   end;
+
+const
+  CHECKCOL: Integer = 3;
 
 var
   SplitViewForm: TSplitViewForm;
@@ -1478,46 +1485,17 @@ begin
 
   if not OcComPortObj.Connected then
   begin
-    // OcComPortObj.Log('The device was closed,please open a device.');
+    OcComPortObj.Log('No device was Connected,please open a device.');
+    MessageBox(Application.Handle, 'No device was Connected,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    Timer1.Enabled := false;
     exit;
   end;
 
   if OcComPortObj.Connected then
   begin
-    { pif LoopStringList = nil then
-      LoopStringList := TStringList.Create;
-      LoopStringList.Clear;
-
-      for i := 1 to StringGrid1.RowCount - 1 do
-      begin
-      if Trim(StringGrid1.Cells[1, i]) = '1' then
-      LoopStringList.Append(Trim(StringGrid1.Cells[2, i]));
-      end;
-
-
-      FTimer1Timer_Count := UpDown3.Position;
-      if (LoopStringList <> nil) and (LoopStringList.Count > 0) then
-      begin
-      if FTimer1Timer_Count > 0 then
-      OcComPortObj.Log('The following data will be sent to device periodic,' +
-      'top loop Count: ' + inttostr(FTimer1Timer_Count));
-
-      for i := 0 to LoopStringList.Count - 1 do
-      begin
-      OcComPortObj.Log(LoopStringList.Strings[i]);
-      end;
-    }
     Timer1.Enabled := false;
     // Timer1.Interval := UpDown1.Position;
     Timer1.Enabled := True;
-    { end
-      else
-      begin
-      OcComPortObj.Log
-      ('No data to send, please select data item by click checkbox item.');
-      exit;
-      end; }
-
   end;
 end;
 
@@ -2854,9 +2832,7 @@ end;
 procedure TSplitViewForm.FormCreate(Sender: TObject);
 var
   i: Integer;
-  bmp: TBitmap;
   j: TRECEIVE_FORMAT;
-  GridRect: TGridRect;
   StyleName: String;
   ComComboBox: TComComboBox;
   OcComPortObj: TOcComPortObj;
@@ -2872,59 +2848,11 @@ begin
   ComComboBox := TComComboBox.Create(self);
   ComComboBox.Parent := self;
   ComComboBox.Visible := false;
-  FCheck := TBitmap.Create;
-  FNoCheck := TBitmap.Create;
-  bmp := TBitmap.Create;
-  // Bitmap.DrawMode   := dmTransparent;
-  // Bitmap.OuterColor := Bitmap.PixelS[0,0];
-  // ProgressBar1.Parent:=StatusBar1;
+
   FprogressMax := 0;
   Fprogress := 0;
 
-  try
-    bmp.Handle := LoadBitmap(0, PChar(OBM_CHECKBOXES));
-    bmp.PixelFormat := pf32bit;
-    bmp.HandleType := bmDIB;
-    bmp.Transparent := True;
-    bmp.TransparentColor := clWhite;
-    // Bmp.Canvas.Brush.Color := clWhite;
-    // Bmp.Canvas.FillRect(Rect(0, 0, Bmp.Width, Bmp.Height));
-
-    FNoCheck.PixelFormat := pf32bit;
-    FNoCheck.HandleType := bmDIB;
-    FNoCheck.Transparent := True;
-    FNoCheck.TransparentColor := clWhite;
-    with FNoCheck do
-    begin
-      Width := bmp.Width div 4;
-      Height := bmp.Height div 3;
-      Canvas.CopyRect(Canvas.cliprect, bmp.Canvas, Canvas.cliprect);
-    end;
-    with FCheck do
-    begin
-      Width := bmp.Width div 4;
-      Height := bmp.Height div 3;
-      Canvas.CopyRect(Canvas.cliprect, bmp.Canvas, Rect(Width, 0, 2 * Width, Height));
-    end;
-  finally
-    DeleteObject(bmp.Handle);
-    bmp.Free;
-  end;
-
-  for i := 1 to StringGrid1.RowCount - 1 do
-  begin
-    StringGrid1.Cells[0, i] := Format('%.04d ', [i]); // '0' + inttostr(i)
-    StringGrid1.Cells[3, i] := '1';
-    StringGrid1.Cells[4, i] := '10';
-  end;
-  with GridRect do
-  begin
-    Top := 2;
-    Left := 2;
-    Bottom := 2;
-    Right := 2;
-  end;
-  StringGrid1.Selection := GridRect;
+  InitStringGrid();
 
   ComComboBox.ComProperty := cpBaudRate;
   ComComboBox.Refresh;
@@ -3110,6 +3038,10 @@ var
   i: Integer;
 begin
   case Msg.message of
+    WM_LBUTTONDOWN:
+      begin
+        TStringGridEx(StringGrid1).MouseToCell(LoWord(Msg.LParam), HiWord(Msg.LParam), StringGrid1_Col, StringGrid1_Row);
+      end;
     WM_KEYDOWN:
       begin
         if Msg.wParam = VK_TAB then
@@ -3385,26 +3317,6 @@ begin
   end;
 end;
 
-procedure TSplitViewForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
-begin
-  try
-    if ACol = 1 then
-    begin
-      if not(gdFixed in State) then
-        with TStringGrid(Sender).Canvas do
-        begin
-          Brush.Color := clWindow;
-          fillRect(Rect);
-          if StringGrid1.Cells[ACol, ARow] = '1' then
-            Draw((Rect.Right + Rect.Left - FCheck.Width) div 2 - 2, (Rect.Bottom + Rect.Top - FCheck.Height) div 2, FCheck)
-          else
-            Draw((Rect.Right + Rect.Left - FCheck.Width) div 2 - 2, (Rect.Bottom + Rect.Top - FCheck.Height) div 2, FNoCheck);
-        end;
-    end;
-  except
-  end;
-end;
-
 function TSplitViewForm.GetStringGridValidStr(sStr: String): String;
 var
   strstr: String;
@@ -3422,134 +3334,6 @@ begin
     Result := Trim(Copy(strstr, 1, Pos - 1))
   else
     Result := Trim(strstr)
-end;
-
-procedure TSplitViewForm.StringGrid1FixedCellClick(Sender: TObject; ACol, ARow: Integer);
-var
-  GridRect: TGridRect;
-  str: String;
-  OcComPortObj: TOcComPortObj;
-  JvHidDevice: TJvHidDevice;
-  buffer: array [0 .. 512] of byte;
-  bLength: Integer;
-  BytesWritten: Cardinal;
-begin
-  OcComPortObj := GetDeciceByFullName(Notebook2.ActivePage);
-  JvHidDevice := nil; // CurrentDevicesJvHidDevice;
-  if ARow > 0 then
-  begin
-    StringGrid1.Row := ARow;
-    str := GetStringGridValidStr(StringGrid1.Cells[2, ARow]);
-    // Trim(StringGrid1.Cells[2, ARow]);
-    if (str <> '') and (JvHidDevice <> nil) then
-    begin
-      str := FormatHexStrToByte(Trim(str), buffer, bLength);
-      // Count := (Length(str) + 2) div 3;
-      HIDWrite(JvHidDevice, buffer, bLength, BytesWritten);
-      if (BytesWritten > 0) then
-        Log0('> ' + str)
-      else
-      begin
-        Log0('> ' + str);
-        Log0('Write faile');
-      end;
-    end
-    else if (OcComPortObj <> nil) then
-    begin
-      if ComboBox6.ItemIndex = 1 then
-        OcComPortObj.FalconComSendData_Common(str, ComboBox6.ItemIndex) // HEX
-      else
-        OcComPortObj.FalconComSendData_Common(str, ComboBox6.ItemIndex);
-      // ASCII
-    end
-    else
-    begin
-      MessageBox(Application.Handle, PChar('No device!! You need to open a device,please use F1 to see how to do that'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
-    end;
-
-    { if StringGrid1.Col >= 3 then
-      StringGrid1.Col := 2; // 指定列号
-
-      if (StringGrid1.Col = 2) then
-      StringGrid1.Col := 0;
-      with GridRect do
-      begin
-      Top := StringGrid1.Selection.Top;
-      Left := 0;
-      Bottom := StringGrid1.Selection.Bottom;
-      Right := StringGrid1.Selection.Right;
-      end;
-      StringGrid1.Selection := GridRect;
-      // StringGrid1.Invalidate;
-      if (StringGrid1.Col = 0) then
-      StringGrid1.Col := 2; }
-
-  end;
-end;
-
-procedure TSplitViewForm.StringGrid1KeyPress(Sender: TObject; var Key: Char);
-begin
-  if (StringGrid1.Col = 3) or (StringGrid1.Col = 4) then
-  begin
-    if not(Key in ['0' .. '9', #8]) then
-      Key := #0;
-  end;
-end;
-
-procedure TSplitViewForm.StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  GridRect: TGridRect;
-begin
-  if StringGrid1.Row = 0 then
-    exit;
-  if (StringGrid1.Col = 1) then
-  begin
-    if StringGrid1.Cells[StringGrid1.Col, StringGrid1.Row] <> '' then
-      StringGrid1.Cells[StringGrid1.Col, StringGrid1.Row] := ''
-    else
-      StringGrid1.Cells[StringGrid1.Col, StringGrid1.Row] := '1';
-
-    with GridRect do
-    begin
-      Top := StringGrid1.Selection.Top;
-      Left := StringGrid1.Selection.Left + 1;
-      Bottom := StringGrid1.Selection.Bottom;
-      Right := StringGrid1.Selection.Right;
-    end;
-    StringGrid1.Selection := GridRect;
-  end;
-
-end;
-
-procedure TSplitViewForm.StringGrid1MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  GridRect: TGridRect;
-begin
-  if StringGrid1.Row = 0 then
-    exit;
-  if (StringGrid1.Col = 1) then
-  begin
-    with GridRect do
-    begin
-      Top := StringGrid1.Selection.Top;
-      Left := StringGrid1.Selection.Left + 1;
-      Bottom := StringGrid1.Selection.Bottom;
-      Right := StringGrid1.Selection.Right;
-    end;
-    StringGrid1.Selection := GridRect;
-  end;
-
-end;
-
-procedure TSplitViewForm.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
-begin
-  with StringGrid1 do
-  begin
-    if ACol in [1] then
-      Options := Options - [goEditing]
-    else
-      Options := Options + [goEditing];
-  end;
 end;
 
 procedure TSplitViewForm.SV_LClosed(Sender: TObject);
@@ -3676,26 +3460,19 @@ begin
     exit;
   end;
 
-  // if FTimer1Timer_Count <> 0 then
-  // CurrentDevices.Log('Loop Count --> ' + inttostr(FTimer1Timer_Count) + '');
-
-  // if (FTimer1Timer_Count = 1) and (FTimer1Timer_Count > 0) then
-  // begin
-  // Timer1.Enabled := False;
-  // end;
   Timer1.Tag := 1;
   Timer1.Enabled := false;
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
-    if Trim(StringGrid1.Cells[1, i]) = '1' then
+    if Trim(StringGrid1.Cells[CHECKCOL, i]) = '1' then
     begin
       if Timer1.Tag = 0 then
         break;
       try
         sStr := GetStringGridValidStr(StringGrid1.Cells[2, i]);
         // Trim(StringGrid1.Cells[2, i]);
-        Count := StrToInt(Trim(StringGrid1.Cells[3, i]));
-        delayCount := StrToInt(Trim(StringGrid1.Cells[4, i]));
+        Count := StrToInt(Trim(StringGrid1.Cells[4, i]));
+        delayCount := StrToInt(Trim(StringGrid1.Cells[5, i]));
         if Count = 0 then
           While (True) do
           begin
@@ -3720,22 +3497,6 @@ begin
   end;
   // Timer1.Enabled:=true;
   Timer1.Tag := 0;
-  { for i := 0 to LoopStringList.Count - 1 do
-    begin
-    sStr := LoopStringList.Strings[i];
-    if (sStr = '') then
-    continue;
-    //if ComboBox6.ItemIndex = 1 then
-    CurrentDevices.FalconComSendData_MultiTimes(sStr, ComboBox6.ItemIndex)
-    //else
-    //  CurrentDevices.FalconComSendData_MultiTimes(sStr, ComboBox6.ItemIndex);
-    end; }
-
-  // if (FTimer1Timer_Count > 1) then
-  // begin
-  // FTimer1Timer_Count := FTimer1Timer_Count - 1;
-  // end;
-  // LeaveCriticalSection(Critical);
 end;
 
 procedure TSplitViewForm.Timer2Timer(Sender: TObject); // 自动保存log
@@ -3805,7 +3566,7 @@ begin
       for i := 1 to StringGrid1.RowCount - 1 do
       begin
         Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', SplitViewForm.StringGrid1.Cells[2, i]);
-        Octopusini.WriteString('MyCustData', IntToStr(i) + '_5', SplitViewForm.StringGrid1.Cells[5, i]);
+        // Octopusini.WriteString('MyCustData', IntToStr(i) + '_5', SplitViewForm.StringGrid1.Cells[5, i]);
       end;
       Octopusini.WriteInteger('MyPreference', 'Theme', cbxVclStyles.ItemIndex);
       Octopusini.WriteInteger('MyPreference', 'SV_R_WIDTH', SV_R.Width);
@@ -3861,7 +3622,7 @@ begin
     for i := 1 to StringGrid1.RowCount - 1 do
     begin
       StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_2', '');
-      StringGrid1.Cells[5, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_5', '');
+      // StringGrid1.Cells[5, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_5', '');
     end;
 
     cbxVclStyles.ItemIndex := Octopusini.ReadInteger('MyPreference', 'Theme', 0);
@@ -4046,15 +3807,6 @@ begin
     Notebook3.Pages[2] := ' Protocol ';
     Notebook3.Pages[3] := ' Graphic ';
 
-    for i := 0 to 2 do
-    begin
-      StringGrid1.Cells[0, 0] := 'Send';
-      StringGrid1.Cells[1, 0] := ' x';
-      StringGrid1.Cells[2, 0] := 'Data You Want To Send';
-      StringGrid1.Cells[3, 0] := 'Times';
-      StringGrid1.Cells[4, 0] := 'Delay';
-      StringGrid1.Cells[5, 0] := 'Comments';
-    end;
     StatusBar1.Panels.Items[0].Text := 'Hot Key ESC、F1、F2';
     AdjustComponentFont(SplitViewForm, 'EN');
   end
@@ -4080,15 +3832,6 @@ begin
     Notebook3.Pages[2] := '协议发送 ';
     Notebook3.Pages[3] := '图形 ';
 
-    for i := 0 to 2 do
-    begin
-      StringGrid1.Cells[0, 0] := '发送';
-      StringGrid1.Cells[1, 0] := ' ';
-      StringGrid1.Cells[2, 0] := '数据内容';
-      StringGrid1.Cells[3, 0] := '次数';
-      StringGrid1.Cells[4, 0] := '间隔';
-      StringGrid1.Cells[5, 0] := '备注';
-    end;
     StatusBar1.Panels.Items[0].Text := '操作说明：ESC、F1、F2、F3';
   end;
 
@@ -4316,6 +4059,7 @@ begin
   OcComPortObj.StringInternalMemo.Parent := self; // 设置大量极限数据的缓冲MEMO
   OcComPortObj.CallBackFun := OcComPortObjCallBack;
   OcComPortObj.LogMemo.PopupMenu := self.PopupMenu1;
+  OcComPortObj.LogMemo.ReadOnly := True;
 
   if (OcComPortObj.ReceiveFormat = Ord(Graphic)) and (OcComPortObj.FastLineSeries = nil) then
     OcComPortObj.FastLineSeries := self.CharInitSeries(True);
@@ -4323,25 +4067,26 @@ begin
   try
     OcComPortObj.Open;
   Except
-    OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
-    MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
-    exit;
-  end;
-  if not OcComPortObj.Connected then
-  begin
-    OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    OcComPortObj.DebugLog('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    OcComPortObj.DebugLog('Open failed!!!!! the device may be in use');
+    // OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName + ' This device may be in use!!');
+    MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, This device may be in use!!'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
-  OcComPortObj.Log(OcComPortObj.OcComPortObjPara.ComportFullName);
-
-  OcComPortObj.Log('');
-
+  OcComPortObj.DebugLog('');
+  OcComPortObj.DebugLog(OcComPortObj.OcComPortObjPara.ComportFullName);
   OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log'); // 打开的时候创建日志文件
+
   i := Notebook2.Pages.IndexOf(DeviceFullName);
   if (i >= 0) then
     TabSet2.TabIndex := i;
-  OcComPortObj.LogMemo.ReadOnly := True;
+
+  if not OcComPortObj.Connected then
+  begin
+    OcComPortObj.DebugLog('Wrong!!!!! open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    // exit;
+  end;
 end;
 
 function TSplitViewForm.GetDeciceByFullName(DeviceName: string): TOcComPortObj;
@@ -4635,10 +4380,10 @@ begin
   ButtonColor1.Width := Panel15.Width;
   ButtonColor2.Width := Panel15.Width;
 
-  if Button1.Width > 240 then
+  { if Button1.Width > 240 then
     StringGrid1.ColWidths[2] := 240 + (Button1.Width - 240) div 2
-  else
-    StringGrid1.ColWidths[2] := Button1.Width - 15;
+    else
+    StringGrid1.ColWidths[2] := Button1.Width - 15; }
 end;
 
 procedure TSplitViewForm.RunWindosShellCmd(str: String; Memo: TMemo);
@@ -4740,6 +4485,231 @@ begin
   if OcComPortObj = nil then
     exit;
   OcComPortObj.LogScrollMode := false;
+end;
+
+/// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+procedure TSplitViewForm.InitStringGrid();
+var
+  bmp: TBitmap;
+  i: Integer;
+  // GridRect: TGridRect;
+begin
+  try
+    FCheck := TBitmap.Create;
+    FNoCheck := TBitmap.Create;
+    bmp := TBitmap.Create;
+    bmp.Handle := LoadBitmap(0, PChar(OBM_CHECKBOXES));
+    bmp.PixelFormat := pf32bit;
+    bmp.HandleType := bmDIB;
+    bmp.Transparent := True;
+    bmp.TransparentColor := clWhite;
+    // Bmp.Canvas.Brush.Color := clWhite;
+    // Bmp.Canvas.FillRect(Rect(0, 0, Bmp.Width, Bmp.Height));
+
+    FNoCheck.PixelFormat := pf32bit;
+    FNoCheck.HandleType := bmDIB;
+    FNoCheck.Transparent := True;
+    FNoCheck.TransparentColor := clWhite;
+    with FNoCheck do
+    begin
+      Width := bmp.Width div 4;
+      Height := bmp.Height div 3;
+      Canvas.CopyRect(Canvas.cliprect, bmp.Canvas, Canvas.cliprect);
+    end;
+    with FCheck do
+    begin
+      Width := bmp.Width div 4;
+      Height := bmp.Height div 3;
+      Canvas.CopyRect(Canvas.cliprect, bmp.Canvas, Rect(Width, 0, 2 * Width, Height));
+    end;
+  finally
+    DeleteObject(bmp.Handle);
+    bmp.Free;
+  end;
+
+  StringGrid1.RowCount := 1000;
+  StringGrid1.ColCount := 6;
+  StringGrid1.ColWidths[0] := 50;
+  StringGrid1.ColWidths[1] := 50;
+  StringGrid1.ColWidths[2] := 300;
+  StringGrid1.ColWidths[3] := 32;
+  StringGrid1.ColWidths[4] := 40;
+  StringGrid1.ColWidths[5] := 40;
+  StringGrid1.FixedCols := 2;
+  StringGrid1.FixedRows := 1;
+
+  StringGrid1.Cells[0, 0] := '字符';
+  StringGrid1.Cells[1, 0] := '字节';
+  StringGrid1.Cells[2, 0] := '待发送文本内容';
+
+  StringGrid1.Cells[4, 0] := '循环';
+  StringGrid1.Cells[5, 0] := '间隔';
+  // StringGrid1.Cells[6, 0] := '解释说明';
+  StringGrid1.Align := alClient;
+  for i := 1 to StringGrid1.RowCount - 1 do
+  begin
+    StringGrid1.Cells[0, i] := Format('%.04d ', [i]); // '0' + inttostr(i)
+    StringGrid1.Cells[1, i] := Format('%.04x ', [i]);
+
+    StringGrid1.Cells[CHECKCOL, i] := '0';
+    StringGrid1.Cells[4, i] := '2';
+    StringGrid1.Cells[5, i] := '10';
+  end;
+
+end;
+
+procedure TSplitViewForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+begin
+  try
+    if (ACol = CHECKCOL) and (ARow > 0) then
+    begin
+      // StringGrid1.BeginUpdate;
+      // if not(gdFixed in State) then
+      with TStringGrid(Sender).Canvas do
+      begin
+        Brush.Color := clWindow;
+        fillRect(Rect);
+        if StringGrid1.Cells[ACol, ARow] = '1' then
+          Draw((Rect.Right + Rect.Left - FCheck.Width) div 2 - 2, (Rect.Bottom + Rect.Top - FCheck.Height) div 2, FCheck)
+        else
+          Draw((Rect.Right + Rect.Left - FCheck.Width) div 2 - 2, (Rect.Bottom + Rect.Top - FCheck.Height) div 2, FNoCheck);
+      end;
+      // StringGrid1.EndUpdate;
+    end;
+  except
+  end;
+end;
+
+procedure TSplitViewForm.StringGrid1FixedCellClick(Sender: TObject; ACol, ARow: Integer);
+var
+  GridRect: TGridRect;
+  str: String;
+  OcComPortObj: TOcComPortObj;
+  buffer: array [0 .. 512] of byte;
+  bLength: Integer;
+  BytesWritten: Cardinal;
+begin
+  if ARow <= 0 then
+    exit;
+  OcComPortObj := GetDeciceByFullName(Notebook2.ActivePage);
+  // OcComPortObj := SettingPagesDlg.getCurrentDevice();
+  if OcComPortObj = nil then
+  begin
+    // MessageBox(Application.Handle, PChar('No device!! You need to open a device,please use F1 to see how to do that'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    exit;
+  end;
+
+  StringGridSelectCell(ACol, ARow);
+
+  str := GetStringGridValidStr(StringGrid1.Cells[2, ARow]);
+
+  if ACol = 0 then
+    OcComPortObj.FalconComSendData_Common(str, 0);
+  if ACol = 1 then
+    OcComPortObj.FalconComSendData_Common(str, 1);
+
+end;
+
+procedure TSplitViewForm.StringGrid1KeyPress(Sender: TObject; var Key: Char);
+begin
+  if (StringGrid1.Col = 4) or (StringGrid1.Col = 5) then
+  begin
+    if not(Key in ['0' .. '9', #8]) then
+      Key := #0;
+  end;
+end;
+
+procedure TSplitViewForm.StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if (StringGrid1_Col = CHECKCOL) OR (StringGrid1_Col = 1) OR (StringGrid1_Col = 0) then
+    StringGridSelectCell(StringGrid1_Col, StringGrid1_Row);
+end;
+
+procedure TSplitViewForm.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
+  with StringGrid1 do
+  begin
+    CanSelect := True;
+    if ACol in [CHECKCOL] then
+      Options := Options - [goEditing]
+    else
+      Options := Options + [goEditing];
+  end;
+end;
+
+procedure TSplitViewForm.StringGridSelectCell(ACol, ARow: Integer);
+var
+  GridRect: TGridRect;
+begin
+
+  StringGrid1.BeginUpdate;
+  if (ACol = CHECKCOL) and (ARow > 0) then
+  begin
+    if StringGrid1.Cells[ACol, ARow] = '1' then
+      StringGrid1.Cells[ACol, ARow] := '0'
+    else if StringGrid1.Cells[ACol, ARow] = '0' then
+      StringGrid1.Cells[ACol, ARow] := '1'
+    else
+      StringGrid1.Cells[ACol, ARow] := '0'
+  end;
+
+  if ((ACol = 1) OR (ACol = 0)) and (ARow > 0) then
+  begin
+    with GridRect do
+    begin
+      Top := ARow; // StringGrid1.Selection.Top;
+      Left := 0;
+      Bottom := ARow;
+      Right := 6;
+    end;
+    StringGrid1.Selection := GridRect;
+  end;
+  StringGrid1.EndUpdate;
+
+end;
+
+procedure TSplitViewForm.StringGridSave;
+var
+  Octopusini: TIniFile;
+  s: String;
+  i: Integer;
+begin
+
+  s := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  try
+    Octopusini := TIniFile.Create(s);
+    for i := 1 to StringGrid1.RowCount - 1 do
+    begin
+      Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', StringGrid1.Cells[2, i]);
+      // Octopusini.WriteString('MyCustData', IntToStr(i) + '_5', StringGrid1.Cells[5, i]);
+    end;
+  finally
+    Octopusini.Free;
+  end;
+end;
+
+procedure TSplitViewForm.StringGridLoad;
+var
+  Octopusini: TIniFile;
+  s: String;
+  i: Integer;
+begin
+  s := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  try
+    Octopusini := TIniFile.Create(s);
+    for i := 1 to StringGrid1.RowCount - 1 do
+    begin
+      StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_2', '');
+      // StringGrid1.Cells[5, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_5', '');
+    end;
+  finally
+    Octopusini.Free;
+  end;
 end;
 
 Initialization
