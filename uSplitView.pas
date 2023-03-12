@@ -3820,7 +3820,7 @@ begin
     LoadLaunguageFromFile(SplitViewForm, OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini');
     Application.Title := APPLICATION_TITLE + VersionNumberStr;
     SplitViewForm.Caption := Application.Title;
-    Notebook1.Pages[0] := 'Octopus 串口设置 F1';
+    Notebook1.Pages[0] := '八爪鱼串口设置';
     Notebook1.Pages[1] := '高级';
 
     if Memo1.Tag = 0 then // 设备关闭状态

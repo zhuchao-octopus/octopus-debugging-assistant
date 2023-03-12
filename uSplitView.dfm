@@ -720,9 +720,10 @@ object SplitViewForm: TSplitViewForm
       Font.Style = []
       ParentShowHint = False
       ShowHint = False
+      SelectedColor = clMenuBar
       Style = tsModernTabs
       Tabs.Strings = (
-        'Octops '#20018#21475#35774#32622)
+        #20843#29226#40060#20018#21475#35774#32622)
       TabIndex = 0
       OnChange = TabSet1Change
     end
@@ -2308,6 +2309,7 @@ object SplitViewForm: TSplitViewForm
       Font.Height = -13
       Font.Name = 'Segoe UI'
       Font.Style = []
+      SelectedColor = clHighlight
       Style = tsModernTabs
       Tabs.Strings = (
         'Octopus '#33258#23450#20041#21457#36865
@@ -2526,7 +2528,7 @@ object SplitViewForm: TSplitViewForm
       ParentShowHint = False
       PopupMenu = PopupMenu1
       ShowHint = False
-      SelectedColor = clYellow
+      SelectedColor = clLime
       Style = tsModernTabs
       Tabs.Strings = (
         #26412#22320#25991#20214#30446#24405)
