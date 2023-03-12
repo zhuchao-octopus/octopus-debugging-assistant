@@ -2133,8 +2133,8 @@ begin
   CloseDevice();
   ClearLog;
   ClearInternalBuff();
-  LogMemo.Visible := false;
-  LogMemo.Parent := nil;
+  //LogMemo.Visible := false;
+  //LogMemo.Parent := nil;
 end;
 
 Initialization

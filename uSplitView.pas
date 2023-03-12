@@ -40,7 +40,9 @@ uses
   VCLTee.TeCanvas, VCLTee.TeeGDIPlus, VCLTee.TeEngine,
   VCLTee.Series, VCLTee.TeeProcs, VCLTee.Chart,
   VCLTee.TeeFunci, JvComponentBase, JvHidControllerClass, StrUtils,
-  uCmdShell, Vcl.Mask;
+  uCmdShell, Vcl.Mask, Vcl.TitleBarCtrls, Vcl.ToolWin, Vcl.ActnMan,
+  Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.BandActn, Vcl.ExtActns, Vcl.StdActns,
+  Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls;
 
 type
   TChartAccess = class(TCustomAxisPanel);
@@ -191,6 +193,42 @@ type
     Label4: TLabel;
     Button27: TButton;
     Button28: TButton;
+    Panel21: TPanel;
+    TitleBarPanel1: TTitleBarPanel;
+    ActionMainMenuBar1: TActionMainMenuBar;
+    ActionManager1: TActionManager;
+    SearchFindFirst1: TSearchFindFirst;
+    SearchFind1: TSearchFind;
+    SearchFindNext1: TSearchFindNext;
+    SearchReplace1: TSearchReplace;
+    EditSelectAll1: TEditSelectAll;
+    DialogOpenPicture1: TOpenPicture;
+    DialogSavePicture1: TSavePicture;
+    DialogColorSelect1: TColorSelect;
+    DialogFontEdit1: TFontEdit;
+    DialogPrintDlg1: TPrintDlg;
+    EditCut1: TEditCut;
+    EditCopy1: TEditCopy;
+    EditPaste1: TEditPaste;
+    EditUndo1: TEditUndo;
+    EditDelete1: TEditDelete;
+    FileOpen1: TFileOpen;
+    FileOpenWith1: TFileOpenWith;
+    FileSaveAs1: TFileSaveAs;
+    FilePrintSetup1: TFilePrintSetup;
+    FilePageSetup1: TFilePageSetup;
+    FileRun1: TFileRun;
+    FileExit1: TFileExit;
+    BrowseForFolder1: TBrowseForFolder;
+    InternetBrowseURL1: TBrowseURL;
+    InternetDownLoadURL1: TDownLoadURL;
+    InternetSendMail1: TSendMail;
+    act_Static: TAction;
+    act_Dynamic: TAction;
+    act_tabset_albottom: TAction;
+    Action2: TAction;
+    CustomizeActionBars1: TCustomizeActionBars;
+    Button29: TButton;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -292,6 +330,9 @@ type
     procedure StringGrid1KeyPress(Sender: TObject; var Key: Char);
     procedure StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+    procedure Button29Click(Sender: TObject);
+    procedure StringGrid1MouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure StringGrid1MouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
   private
     // ComReceiveCount: Integer;
     // ComReceiveBuffer: array [0 .. 1048576] of Byte;
@@ -309,15 +350,17 @@ type
     // LoopStringList: TStringList;
     // FTimer1Timer_Count: Integer;
     FCheck, FNoCheck: TBitmap;
-    StringGrid1_Col, StringGrid1_Row: Integer;
+
     Fprogress, FprogressMax: Integer;
 
     procedure MyAppMsg(var Msg: TMsg; var Handled: Boolean);
     Procedure WMSysCommand(var Msg: TWMMenuSelect); message WM_SysCommand;
     procedure WMDeviceChange(var Msg: TMessage); message WM_DEVICECHANGE;
     procedure UIUpdateDeviceHandleProcess(DevideName: String = ''; ActionType: Integer = $8000);
-    procedure OpenDevice2(DeviceFullName: String);
-    procedure CloseDevice2(DeviceFullName: String);
+    procedure OpenDevice(DeviceFullName: String);
+    procedure StopDevice(DeviceFullName: String);
+    procedure CloseDevice(DeviceFullName: String);
+
     procedure TabSetChange(Sender: TObject; NewTab: Integer);
     procedure GetOctopusHelpFile();
 
@@ -336,7 +379,7 @@ type
     function GetDeciceByPort(Port: string): TOcComPortObj;
     function GetCurrentDeviceName(): String;
 
-    procedure MultiComPortSaveLog(DoClose: Boolean = false);
+    procedure ComPortLogSave(DoClose: Boolean = false);
     procedure UpdateOcComPortObjAtrribute();
     // procedure UpdateOcComPortObjAtrribute2(OcComPortObj: TOcComPortObj);
     procedure ShowTrayIcon(TrayIcon1: TTrayIcon);
@@ -366,6 +409,9 @@ type
     procedure SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
     procedure SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
 
+    procedure ShowStartComments(Language: String); overload;
+    procedure ShowStartComments(OcComPortObj: TOcComPortObj); overload;
+
     procedure InitStringGrid();
     procedure StringGridSelectCell(ACol, ARow: Integer);
     procedure StringGridSave();
@@ -385,7 +431,7 @@ var
   Commandhread: TCommandhread;
   CommandIndex: Integer;
 
-procedure ShowStartComments(Lang: String);
+  // procedure ShowStartComments(Lang: String);
 function GetApplication(): TApplication;
 
 implementation
@@ -1472,33 +1518,6 @@ begin
   CharZoomSeries(10);
 end;
 
-procedure TSplitViewForm.Button1Click(Sender: TObject);
-var
-  i: Integer;
-  OcComPortObj: TOcComPortObj;
-begin
-  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
-  if OcComPortObj = nil then
-  begin
-    exit;
-  end;
-
-  if not OcComPortObj.Connected then
-  begin
-    OcComPortObj.Log('No device was Connected,please open a device.');
-    MessageBox(Application.Handle, 'No device was Connected,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
-    Timer1.Enabled := false;
-    exit;
-  end;
-
-  if OcComPortObj.Connected then
-  begin
-    Timer1.Enabled := false;
-    // Timer1.Interval := UpDown1.Position;
-    Timer1.Enabled := True;
-  end;
-end;
-
 procedure TSplitViewForm.Button20Click(Sender: TObject);
 var
   FileName: String;
@@ -2118,6 +2137,49 @@ begin
   FileStream := nil;
 end;
 
+procedure TSplitViewForm.Button29Click(Sender: TObject);
+begin
+  if FontDialog1.Execute then
+  begin
+    AdjustComponentFont(SplitViewForm, '', FontDialog1.Font);
+  end;
+end;
+
+procedure TSplitViewForm.Button1Click(Sender: TObject);
+var
+  i: Integer;
+  OcComPortObj: TOcComPortObj;
+begin
+  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
+  if OcComPortObj = nil then
+  begin
+    exit;
+  end;
+
+  if not OcComPortObj.Connected then
+  begin
+    OcComPortObj.Log('No device was Connected,please open a device.');
+    MessageBox(Application.Handle, 'No device was Connected,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    Timer1.Enabled := false;
+    exit;
+  end;
+
+  if Timer1.Tag >= 1 then
+  begin
+    MessageBox(Application.Handle, '先停止正在循环的任务！！。', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    exit;
+  end;
+
+  if OcComPortObj.Connected then
+  begin
+    Timer1.Enabled := false;
+    Button1.Tag := 0;
+    Button1.Caption := '循环发送选中的内容';
+    // Timer1.Interval := UpDown1.Position;
+    Timer1.Enabled := True;
+  end;
+end;
+
 procedure TSplitViewForm.Button2Click(Sender: TObject);
 var
   ss: String;
@@ -2152,7 +2214,9 @@ begin
 {$ENDIF}
     end
     else
-      OpenDevice2(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+    begin
+      OpenDevice(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+    end;
   end
   else
   begin
@@ -2168,17 +2232,19 @@ begin
 {$ENDIF}
     end
     else
-      CloseDevice2(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+    begin
+      StopDevice(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+    end;
   end;
 
   MultiCOMPort_UI_Update(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
-  // Self.Update;
 end;
 
 procedure TSplitViewForm.Button3Click(Sender: TObject);
 begin
-  // Timer1.Enabled := False;
+  Timer1.Enabled := false;
   Timer1.Tag := 0;
+  // Button1.Caption := '循环发送选中的内容';
 end;
 
 procedure TSplitViewForm.Button4Click(Sender: TObject);
@@ -2661,7 +2727,7 @@ begin
     if (OcComPortObj <> nil) and (ActionType = DBT_DEVICEREMOVECOMPLETE) then
     begin
       if OcComPortObj.Connected then
-        CloseDevice2(OcComPortObj.OcComPortObjPara.ComportFullName);
+        CloseDevice(OcComPortObj.OcComPortObjPara.ComportFullName);
       // OcComPortObj.Close;//设备移除，关闭它
     end;
 
@@ -2739,7 +2805,7 @@ begin
     Timer3.Enabled := false;
 
     ProjectSave(True);
-    MultiComPortSaveLog(True);
+    ComPortLogSave(True);
     CurrentDevices := nil;
     if CheckBox1.Checked then
     begin
@@ -2776,31 +2842,24 @@ begin
 
   if Sender = TObject(SplitViewForm.TabSet2) then
   begin
+
     Notebook2.PageIndex := NewTab;
     i := ComboBoxEx1.Items.IndexOf(Notebook2.Pages[NewTab]);
-    if i >= 0 then // goto device
+    if (i >= 0) and (ComboBoxEx1.ItemIndex <> i) then // goto device
     begin
       ComboBoxEx1.ItemIndex := i;
       MultiCOMPort_UI_Update(self.GetCurrentDeviceName);
-      // change devices configuration
-      // TabSet3.TabIndex := 0;
-      // Notebook3.PageIndex := 0;
       exit;
     end;
+
     if SplitViewForm.Notebook2.PageIndex = SplitViewForm.Notebook2.Pages.Count - 1 then
-    // help  goto help website
     begin
-      self.GetOctopusHelpFile();
+      self.GetOctopusHelpFile(); // help  goto help website
     end
     else if SplitViewForm.Notebook2.PageIndex = SplitViewForm.Notebook2.Pages.Count - 2 then // 图形
     begin
       TabSet3.TabIndex := SplitViewForm.TabSet3.Tabs.Count - 1;
       Notebook3.PageIndex := Notebook3.Pages.Count - 1;
-    end
-    else
-    begin
-      // TabSet3.TabIndex := 0;
-      // Notebook3.PageIndex := 0;
     end;
   end;
 
@@ -2839,6 +2898,7 @@ var
   ComComboBox: TComComboBox;
   OcComPortObj: TOcComPortObj;
   CheckDeviceThreak: TCheckDeviceThreak;
+  f: TFont;
 begin
   FJvHidDeviceController1 := TJvHidDeviceController.Create(nil);
   FJvHidDeviceController1.OnDeviceData := JvHidDeviceController1DeviceData;
@@ -2939,7 +2999,13 @@ begin
     CheckBox6.Checked := True;
     end; }
 
-  AdjustComponentFont(SplitViewForm);
+  f := TFont.Create;
+  f.Charset := TFontCharset(DEFAULT_CHARSET);
+  f.Color := clWindowText;
+  f.Name := 'Segoe UI';
+  f.Size := 10;
+  AdjustComponentFont(SplitViewForm, '', f);
+
   AppendSystemMenu(self.Handle, nil);
   AdjustComponenAttribute(SplitViewForm);
 
@@ -3042,7 +3108,7 @@ begin
   case Msg.message of
     WM_LBUTTONDOWN:
       begin
-        TStringGridEx(StringGrid1).MouseToCell(LoWord(Msg.LParam), HiWord(Msg.LParam), StringGrid1_Col, StringGrid1_Row);
+        // TStringGridEx(StringGrid1).MouseToCell(LoWord(Msg.LParam), HiWord(Msg.LParam), StringGrid1_Col, StringGrid1_Row);
       end;
     WM_KEYDOWN:
       begin
@@ -3387,7 +3453,7 @@ var
 begin
   TabSetChange(Sender, NewTab);
   i := ComboBoxEx1.Items.IndexOf(Notebook2.Pages[NewTab]);
-  if i >= 0 then
+  if (i >= 0) and (i <> ComboBoxEx1.ItemIndex) then
   begin
     ComboBoxEx1.ItemIndex := i;
     MultiCOMPort_UI_Update(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
@@ -3464,48 +3530,69 @@ begin
 
   Timer1.Tag := 1;
   Timer1.Enabled := false;
+  Button3.Caption := '停止循环';
+  Button1.Caption := '循环发送中 ... ';
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
+    if Timer1.Tag = 0 then
+      break;
     if Trim(StringGrid1.Cells[CHECKCOL, i]) = '1' then
     begin
       if Timer1.Tag = 0 then
         break;
+
       try
         sStr := GetStringGridValidStr(StringGrid1.Cells[2, i]);
-        // Trim(StringGrid1.Cells[2, i]);
         Count := StrToInt(Trim(StringGrid1.Cells[4, i]));
         delayCount := StrToInt(Trim(StringGrid1.Cells[5, i]));
-        if Count = 0 then
+        if Count = 0 then // 不停循环发送
+        begin
           While (True) do
           begin
             CurrentDevices.FalconComSendData_MultiTimes(sStr, ComboBox6.ItemIndex);
             Delay(delayCount);
             if Timer1.Tag = 0 then
               break;
-          end
+          end;
+        end
         else
+        begin
           for j := 0 to Count - 1 do
           begin
             CurrentDevices.FalconComSendData_MultiTimes(sStr, ComboBox6.ItemIndex);
             Delay(delayCount);
+            if Timer1.Tag = 0 then
+              break;
           end;
+        end;
 
         Delay(delayCount);
       Except
         continue;
       end;
+
     end;
 
+  end; // for
+
+  if Timer1.Tag <> 0 then
+  begin
+    Button1.Caption := '循环发送中 ... ' + IntToStr(Button1.Tag);
+    Button1.Tag := Button1.Tag + 1; // 大周期循环次数
+    Timer1.Enabled := True; // 继续下一个大周期循环
+  end
+  else
+  begin
+    Button3.Caption := '循环结束';
+    Button1.Caption := '循环发送选中的内容';
   end;
-  // Timer1.Enabled:=true;
-  Timer1.Tag := 0;
 end;
 
 procedure TSplitViewForm.Timer2Timer(Sender: TObject); // 自动保存log
 begin
   if CheckBox8.Checked then
   begin
-    MultiComPortSaveLog();
+    ComPortLogSave();
   end;
 end;
 
@@ -3514,7 +3601,7 @@ begin
   ProjectSave(True);
 end;
 
-procedure TSplitViewForm.MultiComPortSaveLog(DoClose: Boolean);
+procedure TSplitViewForm.ComPortLogSave(DoClose: Boolean);
 var
   i: Integer;
   OcComPortObj: TOcComPortObj;
@@ -3536,7 +3623,6 @@ begin
           Octopusini.WriteInteger('MyPreference', 'BAUDRATE' + OcComPortObj.Port, OcComPortObj.OcComPortObjPara.BaudRate);
           if (DoClose) then
           begin
-            OcComPortObj.Close;
             OcComPortObj.Free;
           end;
         end;
@@ -3845,9 +3931,9 @@ begin
   // TabSetChange(TabSet3, 0);
 end;
 
-procedure ShowStartComments(Lang: String);
+procedure TSplitViewForm.ShowStartComments(Language: string);
 begin
-  if Lang = 'EN' then
+  if Language = 'EN' then
   begin
     Log0('################################################');
     Log0('Octopus Serial Port Tool ' + VersionNumberStr);
@@ -3875,47 +3961,69 @@ begin
 
 end;
 
-procedure ShowStartComments2(OcComPortObj: TOcComPortObj);
+procedure TSplitViewForm.ShowStartComments(OcComPortObj: TOcComPortObj);
 begin
   if SplitViewForm.UILanguage = 'EN' then
   begin
-    OcComPortObj.Log('################################################');
-    OcComPortObj.Log('Octopus Serial Port Tool ' + VersionNumberStr);
+    OcComPortObj.DebugLog('################################################');
+    OcComPortObj.DebugLog('Octopus Serial Port Tool ' + VersionNumberStr);
     // OcComPortObj.Log(VERSIONNAME); // 'Version  :2.00'
-    OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
-    OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
-    OcComPortObj.Log('################################################');
-    SplitViewForm.Memo2.Clear;
+    OcComPortObj.DebugLog('Home Page :' + WEB_SITE + ' ');
+    OcComPortObj.DebugLog('Function  :' + 'ESC、F1、F2、F3');
+    OcComPortObj.DebugLog('################################################');
+    // SplitViewForm.Memo2.Clear;
   end
   else
   begin
-    OcComPortObj.Log('################################################');
-    OcComPortObj.Log(APPLICATION_TITLE + VersionNumberStr);
+    OcComPortObj.DebugLog('################################################');
+    OcComPortObj.DebugLog(APPLICATION_TITLE + VersionNumberStr);
     // OcComPortObj.Log(VERSIONNAME); // 'Version  :2.00'
-    OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
-    OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
-    OcComPortObj.Log('################################################');
+    OcComPortObj.DebugLog('Home Page :' + WEB_SITE + ' ');
+    OcComPortObj.DebugLog('Function  :' + 'ESC、F1、F2、F3');
+    OcComPortObj.DebugLog('################################################');
   end;
 end;
 
-procedure TSplitViewForm.CloseDevice2(DeviceFullName: String);
+procedure TSplitViewForm.StopDevice(DeviceFullName: String);
+var
+  OcComPortObj: TOcComPortObj;
+  i: Integer;
+  s: String;
+begin
+  OcComPortObj := GetDeciceByFullName(DeviceFullName);
+  if OcComPortObj = nil then
+    exit;
+  if OcComPortObj.Connected then
+  begin
+    OcComPortObj.CloseDevice(); // stop devices
+    OcComPortObj.DebugLog(OcComPortObj.OcComPortObjPara.ComportFullName + ' stopped!!');
+    if (Memo1.Tag = Integer(OcComPortObj)) then
+    begin
+      Memo1.Tag := 0;
+      Memo1.OnKeyDown := Memo1KeyDown;
+      Memo1.OnKeyPress := Memo1KeyPress;
+      Memo1.ReadOnly := True;
+      UpdateUiLaunguage(UILanguage);
+    end;
+  end;
+  s := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.OcComPortObjPara.ComportFullName + '.ini';
+  OcComPortObj.StoreSettings(stIniFile, s);
+end;
+
+procedure TSplitViewForm.CloseDevice(DeviceFullName: String);
 var
   OcComPortObj: TOcComPortObj;
   i: Integer;
   s: String;
   Octopusini: TIniFile;
 begin
-  if OcComPortList = nil then
+
+  OcComPortObj := GetDeciceByFullName(DeviceFullName);
+  if OcComPortObj = nil then
     exit;
-  if DeviceFullName = '' then
-    exit;
-  i := OcComPortList.IndexOf(DeviceFullName);
-  if i < 0 then
-    exit;
-  OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
 
   try
-    if (OcComPortObj <> nil) and (OcComPortObj.Connected) then
+    if OcComPortObj.Connected then
     begin
       OcComPortObj.Close;
 
@@ -3974,26 +4082,22 @@ var
   str: string;
 begin
   str := TabSet2.Tabs[TabSet2.TabIndex];
-  CloseDevice2(str);
+  CloseDevice(str);
   TabSetChange(TabSet2, 0);
   MultiCOMPort_UI_Update(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
 end;
 
-procedure TSplitViewForm.OpenDevice2(DeviceFullName: String);
+procedure TSplitViewForm.OpenDevice(DeviceFullName: String);
 var
   OcComPortObj: TOcComPortObj;
   Page: TPage;
   Memo: TMemo;
   i: Integer;
 begin
-  if OcComPortList = nil then
-    exit;
-  if DeviceFullName = '' then
-    exit;
-
   OcComPortObj := GetDeciceByFullName(DeviceFullName);
   if OcComPortObj = nil then
     exit;
+
   i := Notebook2.Pages.IndexOf(DeviceFullName);
 
   if (i < 0) then // 没有显示组件，则创建组件
@@ -4026,7 +4130,7 @@ begin
       TabSet2.Tabs := Notebook2.Pages;
       OcComPortObj.ClearLog;
       OcComPortObj.ClearInternalBuff();
-      ShowStartComments2(OcComPortObj);
+      ShowStartComments(OcComPortObj);
     end;
   end;
 
@@ -4082,7 +4186,7 @@ begin
 
   i := Notebook2.Pages.IndexOf(DeviceFullName);
   if (i >= 0) then
-    TabSet2.TabIndex := i;
+    TabSet2.TabIndex := i; // 出发tabsete 改变事件
 
   if not OcComPortObj.Connected then
   begin
@@ -4098,12 +4202,13 @@ begin
   Result := nil;
   if DeviceName = '' then
     exit;
+  if OcComPortList = nil then
+    exit;
   try
     i := OcComPortList.IndexOf(DeviceName);
     if i >= 0 then
       Result := TOcComPortObj(OcComPortList.Objects[i]);
   finally
-
   end;
 end;
 
@@ -4248,22 +4353,24 @@ end;
 procedure TSplitViewForm.MultiCOMPort_UI_Update(DeviceName: string); // 更行当前设备UI
 var
   OcComPortObj: TOcComPortObj;
-  i: Integer;
+  // i: Integer;
 begin
   if (ComboBoxEx1.ItemIndex < 0) or (ComboBoxEx1.Text = 'None') then
   begin
     Button2.Caption := GetDefaultLauguageStrByName('OPRATION_OPEN', UILanguage);
     exit;
   end;
-  if OcComPortList = nil then
-    exit;
-  if DeviceName = '' then
-    exit;
-  i := OcComPortList.IndexOf(DeviceName);
-  if i < 0 then
-    exit;
 
-  OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
+  { if OcComPortList = nil then
+    exit;
+    if DeviceName = '' then
+    exit;
+    i := OcComPortList.IndexOf(DeviceName);
+    if i < 0 then
+    exit;
+  }
+
+  OcComPortObj := self.GetDeciceByFullName(DeviceName); // TOcComPortObj(OcComPortList.Objects[i]);
   if OcComPortObj = nil then
     exit;
 
@@ -4551,7 +4658,7 @@ begin
 
   StringGrid1.Cells[4, 0] := '循环';
   StringGrid1.Cells[5, 0] := '间隔';
-   StringGrid1.Cells[6, 0] := '备注';
+  StringGrid1.Cells[6, 0] := '备注';
   StringGrid1.Align := alClient;
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
@@ -4560,7 +4667,7 @@ begin
 
     StringGrid1.Cells[CHECKCOL, i] := '0';
     StringGrid1.Cells[4, i] := '2';
-    StringGrid1.Cells[5, i] := '10';
+    StringGrid1.Cells[5, i] := '1000';
   end;
 
 end;
@@ -4598,6 +4705,8 @@ var
 begin
   if ARow <= 0 then
     exit;
+
+  StringGrid1.Options := StringGrid1.Options - [goEditing];
   OcComPortObj := GetDeciceByFullName(Notebook2.ActivePage);
   // OcComPortObj := SettingPagesDlg.getCurrentDevice();
   if OcComPortObj = nil then
@@ -4607,14 +4716,12 @@ begin
   end;
 
   StringGridSelectCell(ACol, ARow);
-
   str := GetStringGridValidStr(StringGrid1.Cells[2, ARow]);
 
   if ACol = 0 then
     OcComPortObj.FalconComSendData_Common(str, 0);
   if ACol = 1 then
     OcComPortObj.FalconComSendData_Common(str, 1);
-
 end;
 
 procedure TSplitViewForm.StringGrid1KeyPress(Sender: TObject; var Key: Char);
@@ -4627,9 +4734,25 @@ begin
 end;
 
 procedure TSplitViewForm.StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  StringGrid1_Col, StringGrid1_Row: Integer;
 begin
+  StringGrid1.MouseToCell(X, Y, StringGrid1_Col, StringGrid1_Row);
   if (StringGrid1_Col = CHECKCOL) OR (StringGrid1_Col = 1) OR (StringGrid1_Col = 0) then
     StringGridSelectCell(StringGrid1_Col, StringGrid1_Row);
+end;
+
+procedure TSplitViewForm.StringGrid1MouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  if StringGrid1.Col <> 2 then
+    StringGrid1.Col := 2;
+  // Handled:=true;
+end;
+
+procedure TSplitViewForm.StringGrid1MouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  if StringGrid1.Col <> 2 then
+    StringGrid1.Col := 2;
 end;
 
 procedure TSplitViewForm.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);

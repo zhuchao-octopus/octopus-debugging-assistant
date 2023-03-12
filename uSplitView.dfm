@@ -3,26 +3,44 @@ object SplitViewForm: TSplitViewForm
   Top = 0
   AlphaBlendValue = 238
   Caption = 'OCTOPUS '#31456#40060#20018#21475#32456#31471
-  ClientHeight = 699
+  ClientHeight = 750
   ClientWidth = 1265
   Color = clBtnFace
+  CustomTitleBar.Control = TitleBarPanel1
+  CustomTitleBar.Enabled = True
+  CustomTitleBar.Height = 31
+  CustomTitleBar.BackgroundColor = clWhite
+  CustomTitleBar.ForegroundColor = 65793
+  CustomTitleBar.InactiveBackgroundColor = clWhite
+  CustomTitleBar.InactiveForegroundColor = 10066329
+  CustomTitleBar.ButtonForegroundColor = 65793
+  CustomTitleBar.ButtonBackgroundColor = clWhite
+  CustomTitleBar.ButtonHoverForegroundColor = 65793
+  CustomTitleBar.ButtonHoverBackgroundColor = 16053492
+  CustomTitleBar.ButtonPressedForegroundColor = 65793
+  CustomTitleBar.ButtonPressedBackgroundColor = 15395562
+  CustomTitleBar.ButtonInactiveForegroundColor = 10066329
+  CustomTitleBar.ButtonInactiveBackgroundColor = clWhite
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -13
-  Font.Name = 'Segoe UI'
+  Font.Height = -16
+  Font.Name = #24494#36719#38597#40657' Light'
   Font.Style = []
+  GlassFrame.Enabled = True
+  GlassFrame.Top = 31
   Position = poDesktopCenter
+  StyleElements = [seFont, seClient]
   OnClose = FormClose
   OnCreate = FormCreate
   OnHelp = FormHelp
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 17
+  TextHeight = 21
   object Splitter1: TSplitter
     Left = 1262
-    Top = 0
-    Height = 675
+    Top = 30
+    Height = 696
     Align = alRight
     Beveled = True
     OnMoved = Splitter1Moved
@@ -32,9 +50,9 @@ object SplitViewForm: TSplitViewForm
   end
   object SV_L: TSplitView
     Left = 0
-    Top = 0
+    Top = 30
     Width = 320
-    Height = 675
+    Height = 696
     AnimationStep = 60
     OpenedWidth = 320
     ParentColor = True
@@ -46,7 +64,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 320
-      Height = 649
+      Height = 666
       Align = alClient
       TabOrder = 1
       object TPage
@@ -57,7 +75,7 @@ object SplitViewForm: TSplitViewForm
           Left = 0
           Top = 0
           Width = 320
-          Height = 649
+          Height = 666
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
@@ -73,14 +91,8 @@ object SplitViewForm: TSplitViewForm
               Width = 224
               Height = 34
               Caption = #25171#24320#20018#21475
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
               ImageAlignment = iaRight
               ImageIndex = 0
-              ParentFont = False
               TabOrder = 2
               OnClick = Button2Click
             end
@@ -88,16 +100,10 @@ object SplitViewForm: TSplitViewForm
               Left = 5
               Top = 3
               Width = 295
-              Height = 26
+              Height = 30
               ItemsEx = <>
               Style = csExDropDownList
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ItemHeight = 20
-              ParentFont = False
+              ItemHeight = 24
               ParentShowHint = False
               ShowHint = True
               TabOrder = 0
@@ -109,12 +115,6 @@ object SplitViewForm: TSplitViewForm
               Width = 63
               Height = 34
               Caption = #26032#35774#22791
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
               TabOrder = 1
               OnClick = Button4Click
             end
@@ -172,15 +172,9 @@ object SplitViewForm: TSplitViewForm
               Left = 5
               Top = 171
               Width = 64
-              Height = 17
+              Height = 21
               Hint = #21457#36865#25968#25454#30340#26684#24335'ASCI'#20026#23383#31526'HEX'#20026#21313#20845#36827#21046'CMD'#20026#25191#34892#26412#22320'Shell'#21629#20196
               Caption = #21457#36865#26684#24335
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
               ParentShowHint = False
               ShowHint = True
             end
@@ -188,85 +182,49 @@ object SplitViewForm: TSplitViewForm
               Left = 5
               Top = 139
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #27969#25511#21046#31526
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
             end
             object Label5: TLabel
               Left = 5
               Top = 108
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #26657#39564#20301#25968
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
             end
             object Label9: TLabel
               Left = 5
               Top = 77
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #20572#27490#20301#25968
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
             end
             object Label12: TLabel
               Left = 5
               Top = 46
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #25968#25454#20301#25968
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
             end
             object Label2: TLabel
               Left = 5
               Top = 15
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #27874#29305#29575#25968
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
             end
             object Label10: TLabel
               Left = 5
               Top = 201
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #25509#25910#26684#24335
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
             end
             object ComboBox6: TComboBox
               Left = 76
               Top = 167
               Width = 224
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ItemIndex = 0
               ParentColor = True
@@ -282,7 +240,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 136
               Width = 224
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ParentColor = True
               TabOrder = 1
@@ -291,7 +249,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 105
               Width = 224
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ParentColor = True
               TabOrder = 2
@@ -300,7 +258,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 74
               Width = 224
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ParentColor = True
               TabOrder = 3
@@ -309,7 +267,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 43
               Width = 224
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ParentColor = True
               TabOrder = 4
@@ -318,7 +276,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 7
               Width = 224
-              Height = 25
+              Height = 29
               Style = csDropDownList
               DropDownCount = 20
               ParentColor = True
@@ -329,7 +287,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 198
               Width = 224
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ParentColor = True
               TabOrder = 6
@@ -361,27 +319,46 @@ object SplitViewForm: TSplitViewForm
               OnClick = Button26Click
             end
           end
+          object Panel21: TPanel
+            Left = 5
+            Top = 493
+            Width = 310
+            Height = 129
+            TabOrder = 4
+            object Button29: TButton
+              Left = 5
+              Top = 16
+              Width = 295
+              Height = 34
+              Caption = #30028#38754#23383#20307#35774#32622
+              TabOrder = 0
+              OnClick = Button29Click
+            end
+          end
         end
       end
       object TPage
         Left = 0
         Top = 0
         Caption = #39640#32423
+        ExplicitWidth = 0
+        ExplicitHeight = 649
         object Panel6: TPanel
           Left = 0
           Top = 0
           Width = 320
-          Height = 649
+          Height = 666
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           ParentColor = True
           TabOrder = 0
+          ExplicitHeight = 649
           object cbxVclStyles: TComboBox
             Left = 6
             Top = 3
             Width = 308
-            Height = 25
+            Height = 29
             Style = csDropDownList
             DropDownCount = 30
             TabOrder = 0
@@ -627,8 +604,8 @@ object SplitViewForm: TSplitViewForm
             object Label4: TLabel
               Left = 8
               Top = 80
-              Width = 140
-              Height = 17
+              Width = 143
+              Height = 21
               Caption = #21313#20845#36827#21046#23545#40784#26041#24335'   '
             end
             object CheckBox12: TCheckBox
@@ -649,7 +626,7 @@ object SplitViewForm: TSplitViewForm
               Left = 8
               Top = 45
               Width = 293
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ItemIndex = 0
               TabOrder = 1
@@ -667,7 +644,7 @@ object SplitViewForm: TSplitViewForm
               Left = 8
               Top = 102
               Width = 293
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ItemIndex = 0
               TabOrder = 2
@@ -682,10 +659,10 @@ object SplitViewForm: TSplitViewForm
               Left = 8
               Top = 156
               Width = 169
-              Height = 25
+              Height = 29
               Color = clWhite
               EditLabel.Width = 128
-              EditLabel.Height = 17
+              EditLabel.Height = 21
               EditLabel.Caption = #25509#25910#24310#36831#65288#27627#31186#65289
               EditLabel.Color = clBtnHighlight
               EditLabel.ParentColor = False
@@ -708,15 +685,15 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet1: TTabSet
       Left = 0
-      Top = 649
+      Top = 666
       Width = 320
-      Height = 26
+      Height = 30
       Align = alBottom
       DitherBackground = False
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
+      Font.Height = -16
+      Font.Name = #24494#36719#38597#40657' Light'
       Font.Style = []
       ParentShowHint = False
       ShowHint = False
@@ -730,9 +707,9 @@ object SplitViewForm: TSplitViewForm
   end
   object SV_R: TSplitView
     Left = 942
-    Top = 0
+    Top = 30
     Width = 320
-    Height = 675
+    Height = 696
     AnimationStep = 60
     OpenedWidth = 320
     ParentColor = True
@@ -745,50 +722,55 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 320
-      Height = 649
+      Height = 666
       Align = alClient
-      PageIndex = 2
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
         Top = 0
         HelpContext = 1
         Caption = #22359#21457#36865
+        ExplicitWidth = 0
+        ExplicitHeight = 649
         object Panel2: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 314
-          Height = 643
+          Height = 660
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
           ParentBackground = False
           TabOrder = 0
+          ExplicitHeight = 643
           object Panel5: TPanel
             Left = 0
             Top = 232
             Width = 314
-            Height = 411
+            Height = 428
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
             TabOrder = 0
+            ExplicitHeight = 411
             object Panel7: TPanel
               Left = 0
               Top = 0
               Width = 314
-              Height = 342
+              Height = 349
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
               TabOrder = 0
+              ExplicitHeight = 342
               object Memo2: TMemo
                 AlignWithMargins = True
                 Left = 3
                 Top = 3
                 Width = 308
-                Height = 336
+                Height = 343
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -801,11 +783,12 @@ object SplitViewForm: TSplitViewForm
                 ScrollBars = ssVertical
                 ShowHint = False
                 TabOrder = 0
+                ExplicitHeight = 336
               end
             end
             object Panel8: TPanel
               Left = 0
-              Top = 342
+              Top = 349
               Width = 314
               Height = 69
               Align = alBottom
@@ -813,6 +796,7 @@ object SplitViewForm: TSplitViewForm
               ParentBackground = False
               ParentColor = True
               TabOrder = 1
+              ExplicitTop = 342
               object Button7: TButton
                 Left = 2
                 Top = 0
@@ -906,7 +890,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 314
-          Height = 643
+          Height = 660
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
@@ -915,7 +899,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 605
+            Height = 622
             Hint = #28857#20987#24038#36793#25353#38062#21457#36865#25968#25454
             Align = alClient
             BorderStyle = bsNone
@@ -925,14 +909,8 @@ object SplitViewForm: TSplitViewForm
             DefaultRowHeight = 26
             DrawingStyle = gdsClassic
             RowCount = 1000
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -16
-            Font.Name = 'Segoe UI'
-            Font.Style = []
             Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goRowSizing, goColSizing, goEditing, goAlwaysShowEditor, goFixedColClick, goFixedRowClick]
             ParentCtl3D = False
-            ParentFont = False
             ParentShowHint = False
             ShowHint = False
             TabOrder = 0
@@ -940,6 +918,8 @@ object SplitViewForm: TSplitViewForm
             OnFixedCellClick = StringGrid1FixedCellClick
             OnKeyPress = StringGrid1KeyPress
             OnMouseDown = StringGrid1MouseDown
+            OnMouseWheelDown = StringGrid1MouseWheelDown
+            OnMouseWheelUp = StringGrid1MouseWheelUp
             OnSelectCell = StringGrid1SelectCell
             ColWidths = (
               50
@@ -1952,7 +1932,7 @@ object SplitViewForm: TSplitViewForm
           end
           object Panel4: TPanel
             Left = 0
-            Top = 605
+            Top = 622
             Width = 314
             Height = 38
             Align = alBottom
@@ -1981,7 +1961,7 @@ object SplitViewForm: TSplitViewForm
               Top = 3
               Width = 78
               Height = 34
-              Caption = #20572#27490#24490#29615
+              Caption = #24490#29615#32467#26463
               TabOrder = 1
               OnClick = Button3Click
             end
@@ -1992,35 +1972,40 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
+        ExplicitWidth = 0
+        ExplicitHeight = 649
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 314
-          Height = 643
+          Height = 660
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
           ParentBackground = False
           TabOrder = 0
+          ExplicitHeight = 643
           object Memo5: TMemo
             AlignWithMargins = True
             Left = 3
             Top = 127
             Width = 308
-            Height = 441
+            Height = 458
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
+            ExplicitHeight = 441
           end
           object Panel16: TPanel
             Left = 0
-            Top = 571
+            Top = 588
             Width = 314
             Height = 72
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
+            ExplicitTop = 571
             object Button16: TButton
               Left = 79
               Top = 0
@@ -2061,35 +2046,35 @@ object SplitViewForm: TSplitViewForm
               Left = 3
               Top = 102
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #25805#20316#31867#22411
             end
             object Label11: TLabel
               Left = 3
               Top = 72
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #35835#23383#33410#25968
             end
             object Label8: TLabel
               Left = 3
               Top = 42
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #22120#20214#22320#22336
             end
             object Label7: TLabel
               Left = 3
               Top = 13
               Width = 64
-              Height = 17
+              Height = 21
               Caption = #36890#35759#21327#35758
             end
             object ComboBox12: TComboBox
               Left = 73
               Top = 96
               Width = 237
-              Height = 25
+              Height = 29
               Style = csDropDownList
               ItemIndex = 1
               TabOrder = 0
@@ -2104,7 +2089,7 @@ object SplitViewForm: TSplitViewForm
               Left = 74
               Top = 3
               Width = 237
-              Height = 25
+              Height = 118
               Align = alRight
               Style = csDropDownList
               ItemIndex = 0
@@ -2127,7 +2112,7 @@ object SplitViewForm: TSplitViewForm
               Left = 73
               Top = 34
               Width = 237
-              Height = 25
+              Height = 29
               TabOrder = 2
               Text = '0x08000000'
               OnKeyPress = ComboBox10KeyPress
@@ -2139,7 +2124,7 @@ object SplitViewForm: TSplitViewForm
               Left = 73
               Top = 66
               Width = 237
-              Height = 25
+              Height = 29
               TabOrder = 3
               Text = '1'
               OnKeyPress = ComboBox11KeyPress
@@ -2151,22 +2136,26 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
+        ExplicitWidth = 0
+        ExplicitHeight = 649
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 314
-          Height = 643
+          Height = 650
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitHeight = 643
           object GroupBox10: TGroupBox
             Left = 0
             Top = 0
             Width = 314
-            Height = 643
+            Height = 650
             Align = alClient
             TabOrder = 0
+            ExplicitHeight = 643
             object CheckBox10: TCheckBox
               Left = 5
               Top = 69
@@ -2300,16 +2289,16 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet3: TTabSet
       Left = 0
-      Top = 649
+      Top = 666
       Width = 320
-      Height = 26
+      Height = 30
       Align = alBottom
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
+      Font.Height = -16
+      Font.Name = #24494#36719#38597#40657' Light'
       Font.Style = []
-      SelectedColor = clHighlight
+      SelectedColor = clMenuHighlight
       Style = tsModernTabs
       Tabs.Strings = (
         'Octopus '#33258#23450#20041#21457#36865
@@ -2320,7 +2309,7 @@ object SplitViewForm: TSplitViewForm
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 675
+    Top = 726
     Width = 1265
     Height = 24
     Panels = <
@@ -2342,9 +2331,9 @@ object SplitViewForm: TSplitViewForm
   end
   object Panel1: TPanel
     Left = 320
-    Top = 0
+    Top = 30
     Width = 622
-    Height = 675
+    Height = 696
     Align = alClient
     BevelOuter = bvNone
     ParentBackground = False
@@ -2354,7 +2343,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 622
-      Height = 649
+      Height = 666
       Align = alClient
       TabOrder = 0
       object TPage
@@ -2366,7 +2355,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 616
-          Height = 643
+          Height = 660
           Align = alClient
           BorderStyle = bsNone
           Color = clMenuText
@@ -2430,12 +2419,14 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #27874#24418
+        ExplicitWidth = 0
+        ExplicitHeight = 649
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 616
-          Height = 643
+          Height = 650
           AllowPanning = pmVertical
           Legend.Visible = False
           ScrollMouseButton = mbMiddle
@@ -2473,6 +2464,7 @@ object SplitViewForm: TSplitViewForm
           Color = -1
           TabOrder = 0
           OnMouseMove = Chart1MouseMove
+          ExplicitHeight = 643
           DefaultCanvas = 'TGDIPlusCanvas'
           PrintMargins = (
             15
@@ -2494,18 +2486,21 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
+        ExplicitWidth = 0
+        ExplicitHeight = 649
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 616
-          Height = 643
+          Height = 650
           Align = alClient
           TabOrder = 0
           OnNewWindow2 = W1234998NewWindow2
           ExplicitWidth = 466
+          ExplicitHeight = 643
           ControlData = {
-            4C000000AA3F0000754200000000000000000000000000000000000000000000
+            4C000000AA3F00002E4300000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126208000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -2515,15 +2510,15 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet2: TTabSet
       Left = 0
-      Top = 649
+      Top = 666
       Width = 622
-      Height = 26
+      Height = 30
       ParentCustomHint = False
       Align = alBottom
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
+      Font.Height = -16
+      Font.Name = #24494#36719#38597#40657' Light'
       Font.Style = []
       ParentShowHint = False
       PopupMenu = PopupMenu1
@@ -2535,6 +2530,46 @@ object SplitViewForm: TSplitViewForm
       TabIndex = 0
       OnChange = TabSet2Change
       OnMouseDown = TabSet2MouseDown
+    end
+  end
+  object TitleBarPanel1: TTitleBarPanel
+    Left = 0
+    Top = 0
+    Width = 1265
+    Height = 30
+    CustomButtons = <
+      item
+        ButtonType = sbSpacer
+        Enabled = True
+        Width = 46
+        Visible = True
+      end>
+    DesignSize = (
+      1265
+      30)
+    object ActionMainMenuBar1: TActionMainMenuBar
+      AlignWithMargins = True
+      Left = 1041
+      Top = 3
+      Width = 74
+      Height = 24
+      Margins.Right = 150
+      UseSystemFont = False
+      ActionManager = ActionManager1
+      Align = alRight
+      Caption = 'ActionMainMenuBar1'
+      Color = clMenuBar
+      ColorMap.DisabledFontColor = 10461087
+      ColorMap.HighlightColor = clWhite
+      ColorMap.BtnSelectedFont = clWhite
+      ColorMap.SelectedFontColor = clWhite
+      ColorMap.UnusedColor = clWhite
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -16
+      Font.Name = #24494#36719#38597#40657' Light'
+      Font.Style = []
+      Spacing = 0
     end
   end
   object DeviceIconList: TImageList
@@ -3698,5 +3733,243 @@ object SplitViewForm: TSplitViewForm
     OnFind = FindDialog1Find
     Left = 576
     Top = 208
+  end
+  object ActionManager1: TActionManager
+    ActionBars = <
+      item
+        Items = <
+          item
+            Items = <
+              item
+                Action = FileOpen1
+                ImageIndex = 7
+                ShortCut = 16463
+              end
+              item
+                Action = FileOpenWith1
+                Caption = 'O&pen with...'
+              end
+              item
+                Action = FileSaveAs1
+                ImageIndex = 30
+              end
+              item
+                Action = FilePrintSetup1
+              end
+              item
+                Action = FilePageSetup1
+                Caption = 'Pa&ge Setup...'
+              end
+              item
+                Action = FileRun1
+              end
+              item
+                Action = FileExit1
+                ImageIndex = 43
+              end
+              item
+                Action = BrowseForFolder1
+                Caption = '&BrowseForFolder1'
+              end>
+            Caption = '&'#33756#21333
+            ImageIndex = 1
+          end>
+        ActionBar = ActionMainMenuBar1
+      end>
+    Images = DeviceIconList
+    Left = 1072
+    Top = 198
+    StyleName = 'Platform Default'
+    object SearchFindFirst1: TSearchFindFirst
+      Category = 'Edit'
+      Caption = 'F&ind First'
+      Hint = 'Find First|Finds the first occurance of specified text'
+    end
+    object SearchFind1: TSearchFind
+      Category = 'Edit'
+      Caption = '&Find...'
+      Hint = 'Find|Finds the specified text'
+      ImageIndex = 34
+      ShortCut = 16454
+    end
+    object SearchFindNext1: TSearchFindNext
+      Category = 'Edit'
+      Caption = 'Find &Next'
+      Hint = 'Find Next|Repeats the last find'
+      ImageIndex = 33
+      ShortCut = 114
+    end
+    object SearchReplace1: TSearchReplace
+      Category = 'Edit'
+      Caption = '&Replace'
+      Hint = 'Replace|Replaces specific text with different text'
+      ImageIndex = 32
+    end
+    object EditSelectAll1: TEditSelectAll
+      Category = 'Edit'
+      Caption = 'Select &All'
+      Hint = 'Select All|Selects the entire document'
+      ShortCut = 16449
+    end
+    object DialogOpenPicture1: TOpenPicture
+      Category = 'Dialog'
+      Caption = '&Open Picture...'
+      Hint = 'Open Picture'
+      ShortCut = 16463
+    end
+    object DialogSavePicture1: TSavePicture
+      Category = 'Dialog'
+      Caption = '&Save Picture...'
+      Hint = 'Save Picture'
+      ShortCut = 16467
+    end
+    object DialogColorSelect1: TColorSelect
+      Category = 'Dialog'
+      Caption = 'Select &Color...'
+      Hint = 'Color Select'
+    end
+    object DialogFontEdit1: TFontEdit
+      Category = 'Dialog'
+      Caption = 'Select &Font...'
+      Dialog.Font.Charset = DEFAULT_CHARSET
+      Dialog.Font.Color = clWindowText
+      Dialog.Font.Height = -11
+      Dialog.Font.Name = 'Tahoma'
+      Dialog.Font.Style = []
+      Hint = 'Font Select'
+    end
+    object DialogPrintDlg1: TPrintDlg
+      Category = 'Dialog'
+      Caption = '&Print...'
+      ImageIndex = 14
+      ShortCut = 16464
+    end
+    object EditCut1: TEditCut
+      Category = 'Edit'
+      Caption = 'Cu&t'
+      Hint = 'Cut|Cuts the selection and puts it on the Clipboard'
+      ImageIndex = 0
+      ShortCut = 16472
+    end
+    object EditCopy1: TEditCopy
+      Category = 'Edit'
+      Caption = '&Copy'
+      Hint = 'Copy|Copies the selection and puts it on the Clipboard'
+      ImageIndex = 1
+      ShortCut = 16451
+    end
+    object EditPaste1: TEditPaste
+      Category = 'Edit'
+      Caption = '&Paste'
+      Hint = 'Paste|Inserts Clipboard contents'
+      ImageIndex = 2
+      ShortCut = 16470
+    end
+    object EditUndo1: TEditUndo
+      Category = 'Edit'
+      Caption = '&Undo'
+      Hint = 'Undo|Reverts the last action'
+      ImageIndex = 3
+      ShortCut = 16474
+    end
+    object EditDelete1: TEditDelete
+      Category = 'Edit'
+      Caption = '&Delete'
+      Hint = 'Delete|Erases the selection'
+      ImageIndex = 5
+      ShortCut = 46
+    end
+    object FileOpen1: TFileOpen
+      Category = 'File'
+      Caption = '&Open...'
+      Hint = 'Open|Opens an existing file'
+      ImageIndex = 7
+      ShortCut = 16463
+    end
+    object FileOpenWith1: TFileOpenWith
+      Category = 'File'
+      Caption = 'Open with...'
+      FileName = ''
+    end
+    object FileSaveAs1: TFileSaveAs
+      Category = 'File'
+      Caption = 'Save &As...'
+      Hint = 'Save As|Saves the active file with a new name'
+      ImageIndex = 30
+    end
+    object FilePrintSetup1: TFilePrintSetup
+      Category = 'File'
+      Caption = 'Print Set&up...'
+      Hint = 'Print Setup'
+    end
+    object FilePageSetup1: TFilePageSetup
+      Category = 'File'
+      Caption = 'Page Set&up...'
+      Dialog.MinMarginLeft = 0
+      Dialog.MinMarginTop = 0
+      Dialog.MinMarginRight = 0
+      Dialog.MinMarginBottom = 0
+      Dialog.MarginLeft = 1000
+      Dialog.MarginTop = 1000
+      Dialog.MarginRight = 1000
+      Dialog.MarginBottom = 1000
+      Dialog.PageWidth = 8500
+      Dialog.PageHeight = 11000
+    end
+    object FileRun1: TFileRun
+      Category = 'File'
+      Browse = False
+      BrowseDlg.Title = 'Run'
+      Caption = '&Run...'
+      Hint = 'Run|Runs an application'
+      Operation = 'open'
+      ShowCmd = scShowNormal
+    end
+    object FileExit1: TFileExit
+      Category = 'File'
+      Caption = 'E&xit'
+      Hint = 'Exit|Quits the application'
+      ImageIndex = 43
+    end
+    object BrowseForFolder1: TBrowseForFolder
+      Category = 'File'
+      Caption = 'BrowseForFolder1'
+      DialogCaption = 'BrowseForFolder1'
+      BrowseOptions = []
+      BrowseOptionsEx = []
+    end
+    object InternetBrowseURL1: TBrowseURL
+      Category = 'Internet'
+      Caption = '&Browse URL'
+      Hint = 'Browse URL'
+    end
+    object InternetDownLoadURL1: TDownLoadURL
+      Category = 'Internet'
+      Caption = '&Download URL'
+      Hint = 'Download from URL'
+    end
+    object InternetSendMail1: TSendMail
+      Category = 'Internet'
+      Caption = '&Send Mail...'
+      Hint = 'Send email'
+    end
+    object act_Static: TAction
+      Caption = 'act_Static'
+    end
+    object act_Dynamic: TAction
+      Caption = 'act_Dynamic'
+    end
+    object act_tabset_albottom: TAction
+      Caption = #39029#38754#26631#31614#20301#20110#24213#37096
+    end
+    object Action2: TAction
+      Category = 'Internet'
+      Caption = 'Action2'
+    end
+    object CustomizeActionBars1: TCustomizeActionBars
+      Category = 'Tools'
+      Caption = '&Customize...'
+      CustomizeDlg.StayOnTop = False
+    end
   end
 end
