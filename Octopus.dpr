@@ -43,7 +43,8 @@ uses
   uDeviceThread in 'uDeviceThread.pas',
   RSAOpenSSL in '..\ZSBWM\RSAOSSL\RSAOpenSSL.pas',
   libeay32 in '..\ZSBWM\RSAOSSL\libeay32.pas',
-  OcPcDeviceMgt in 'OcPcDeviceMgt.pas';
+  OcPcDeviceMgt in 'OcPcDeviceMgt.pas',
+  Vcl.Tabs in 'Vcl.Tabs.pas';
 
 {$R *.res}
 

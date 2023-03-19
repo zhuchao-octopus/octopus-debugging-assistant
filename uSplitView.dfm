@@ -64,7 +64,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 320
-      Height = 666
+      Height = 662
       Align = alClient
       TabOrder = 1
       object TPage
@@ -75,7 +75,7 @@ object SplitViewForm: TSplitViewForm
           Left = 0
           Top = 0
           Width = 320
-          Height = 666
+          Height = 662
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
@@ -342,18 +342,17 @@ object SplitViewForm: TSplitViewForm
         Top = 0
         Caption = #39640#32423
         ExplicitWidth = 0
-        ExplicitHeight = 649
+        ExplicitHeight = 0
         object Panel6: TPanel
           Left = 0
           Top = 0
           Width = 320
-          Height = 666
+          Height = 662
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           ParentColor = True
           TabOrder = 0
-          ExplicitHeight = 649
           object cbxVclStyles: TComboBox
             Left = 6
             Top = 3
@@ -685,9 +684,9 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet1: TTabSet
       Left = 0
-      Top = 666
+      Top = 662
       Width = 320
-      Height = 30
+      Height = 34
       Align = alBottom
       DitherBackground = False
       Font.Charset = DEFAULT_CHARSET
@@ -722,7 +721,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 320
-      Height = 666
+      Height = 662
       Align = alClient
       PageIndex = 1
       TabOrder = 1
@@ -732,45 +731,42 @@ object SplitViewForm: TSplitViewForm
         HelpContext = 1
         Caption = #22359#21457#36865
         ExplicitWidth = 0
-        ExplicitHeight = 649
+        ExplicitHeight = 0
         object Panel2: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 314
-          Height = 660
+          Height = 656
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
           ParentBackground = False
           TabOrder = 0
-          ExplicitHeight = 643
           object Panel5: TPanel
             Left = 0
             Top = 232
             Width = 314
-            Height = 428
+            Height = 424
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
             TabOrder = 0
-            ExplicitHeight = 411
             object Panel7: TPanel
               Left = 0
               Top = 0
               Width = 314
-              Height = 349
+              Height = 355
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
               TabOrder = 0
-              ExplicitHeight = 342
               object Memo2: TMemo
                 AlignWithMargins = True
                 Left = 3
                 Top = 3
                 Width = 308
-                Height = 343
+                Height = 349
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -783,12 +779,11 @@ object SplitViewForm: TSplitViewForm
                 ScrollBars = ssVertical
                 ShowHint = False
                 TabOrder = 0
-                ExplicitHeight = 336
               end
             end
             object Panel8: TPanel
               Left = 0
-              Top = 349
+              Top = 355
               Width = 314
               Height = 69
               Align = alBottom
@@ -796,7 +791,6 @@ object SplitViewForm: TSplitViewForm
               ParentBackground = False
               ParentColor = True
               TabOrder = 1
-              ExplicitTop = 342
               object Button7: TButton
                 Left = 2
                 Top = 0
@@ -890,7 +884,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 314
-          Height = 660
+          Height = 656
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
@@ -899,7 +893,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 622
+            Height = 618
             Hint = #28857#20987#24038#36793#25353#38062#21457#36865#25968#25454
             Align = alClient
             BorderStyle = bsNone
@@ -1932,7 +1926,7 @@ object SplitViewForm: TSplitViewForm
           end
           object Panel4: TPanel
             Left = 0
-            Top = 622
+            Top = 618
             Width = 314
             Height = 38
             Align = alBottom
@@ -1973,39 +1967,36 @@ object SplitViewForm: TSplitViewForm
         Top = 0
         Caption = #21327#35758#36716#25442
         ExplicitWidth = 0
-        ExplicitHeight = 649
+        ExplicitHeight = 0
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 314
-          Height = 660
+          Height = 656
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
           ParentBackground = False
           TabOrder = 0
-          ExplicitHeight = 643
           object Memo5: TMemo
             AlignWithMargins = True
             Left = 3
             Top = 127
             Width = 308
-            Height = 458
+            Height = 454
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
-            ExplicitHeight = 441
           end
           object Panel16: TPanel
             Left = 0
-            Top = 588
+            Top = 584
             Width = 314
             Height = 72
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
-            ExplicitTop = 571
             object Button16: TButton
               Left = 79
               Top = 0
@@ -2137,25 +2128,23 @@ object SplitViewForm: TSplitViewForm
         Top = 0
         Caption = 'Graphic '
         ExplicitWidth = 0
-        ExplicitHeight = 649
+        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 314
-          Height = 650
+          Height = 656
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitHeight = 643
           object GroupBox10: TGroupBox
             Left = 0
             Top = 0
             Width = 314
-            Height = 650
+            Height = 656
             Align = alClient
             TabOrder = 0
-            ExplicitHeight = 643
             object CheckBox10: TCheckBox
               Left = 5
               Top = 69
@@ -2289,16 +2278,16 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet3: TTabSet
       Left = 0
-      Top = 666
+      Top = 662
       Width = 320
-      Height = 30
+      Height = 34
       Align = alBottom
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
       Font.Name = #24494#36719#38597#40657' Light'
       Font.Style = []
-      SelectedColor = clMenuHighlight
+      SelectedColor = clScrollBar
       Style = tsModernTabs
       Tabs.Strings = (
         'Octopus '#33258#23450#20041#21457#36865
@@ -2343,7 +2332,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 622
-      Height = 666
+      Height = 662
       Align = alClient
       TabOrder = 0
       object TPage
@@ -2355,7 +2344,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 616
-          Height = 660
+          Height = 656
           Align = alClient
           BorderStyle = bsNone
           Color = clMenuText
@@ -2420,13 +2409,13 @@ object SplitViewForm: TSplitViewForm
         Top = 0
         Caption = #27874#24418
         ExplicitWidth = 0
-        ExplicitHeight = 649
+        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 616
-          Height = 650
+          Height = 656
           AllowPanning = pmVertical
           Legend.Visible = False
           ScrollMouseButton = mbMiddle
@@ -2464,7 +2453,6 @@ object SplitViewForm: TSplitViewForm
           Color = -1
           TabOrder = 0
           OnMouseMove = Chart1MouseMove
-          ExplicitHeight = 643
           DefaultCanvas = 'TGDIPlusCanvas'
           PrintMargins = (
             15
@@ -2487,20 +2475,19 @@ object SplitViewForm: TSplitViewForm
         Top = 0
         Caption = #24110#21161
         ExplicitWidth = 0
-        ExplicitHeight = 649
+        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 616
-          Height = 650
+          Height = 656
           Align = alClient
           TabOrder = 0
           OnNewWindow2 = W1234998NewWindow2
-          ExplicitWidth = 466
-          ExplicitHeight = 643
+          ExplicitHeight = 650
           ControlData = {
-            4C000000AA3F00002E4300000000000000000000000000000000000000000000
+            4C000000AA3F0000CD4300000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126208000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -2510,9 +2497,9 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet2: TTabSet
       Left = 0
-      Top = 666
+      Top = 662
       Width = 622
-      Height = 30
+      Height = 34
       ParentCustomHint = False
       Align = alBottom
       Font.Charset = DEFAULT_CHARSET
@@ -2523,7 +2510,7 @@ object SplitViewForm: TSplitViewForm
       ParentShowHint = False
       PopupMenu = PopupMenu1
       ShowHint = False
-      SelectedColor = clLime
+      SelectedColor = clScrollBar
       Style = tsModernTabs
       Tabs.Strings = (
         #26412#22320#25991#20214#30446#24405)
@@ -2537,16 +2524,7 @@ object SplitViewForm: TSplitViewForm
     Top = 0
     Width = 1265
     Height = 30
-    CustomButtons = <
-      item
-        ButtonType = sbSpacer
-        Enabled = True
-        Width = 46
-        Visible = True
-      end>
-    DesignSize = (
-      1265
-      30)
+    CustomButtons = <>
     object ActionMainMenuBar1: TActionMainMenuBar
       AlignWithMargins = True
       Left = 1041

@@ -36,13 +36,13 @@ uses
   Vcl.Imaging.PngImage,
   Vcl.ComCtrls,
   CPortCtl, Vcl.Grids, CPort,
-  Vcl.Tabs, Vcl.Menus, Vcl.OleCtrls, SHDocVw,
+  Vcl.Menus, Vcl.OleCtrls, SHDocVw,
   VCLTee.TeCanvas, VCLTee.TeeGDIPlus, VCLTee.TeEngine,
   VCLTee.Series, VCLTee.TeeProcs, VCLTee.Chart,
   VCLTee.TeeFunci, JvComponentBase, JvHidControllerClass, StrUtils,
   uCmdShell, Vcl.Mask, Vcl.TitleBarCtrls, Vcl.ToolWin, Vcl.ActnMan,
   Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.BandActn, Vcl.ExtActns, Vcl.StdActns,
-  Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls;
+  Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.Tabs;
 
 type
   TChartAccess = class(TCustomAxisPanel);
@@ -4162,7 +4162,7 @@ begin
     OcComPortObj.CodePage := 0;
   end;
 
-  OcComPortObj.StringInternalMemo.Parent := self; // 设置大量极限数据的缓冲MEMO
+  OcComPortObj.StringInternelCache.Parent := self; // 设置大量极限数据的缓冲MEMO
   OcComPortObj.CallBackFun := OcComPortObjCallBack;
   OcComPortObj.LogMemo.PopupMenu := self.PopupMenu1;
   OcComPortObj.LogMemo.ReadOnly := True;
@@ -4641,7 +4641,7 @@ begin
     bmp.Free;
   end;
 
-  StringGrid1.RowCount := 1000;
+  StringGrid1.RowCount := 520;
   StringGrid1.ColCount := 7;
   StringGrid1.ColWidths[0] := 50;
   StringGrid1.ColWidths[1] := 50;
@@ -4704,7 +4704,13 @@ var
   BytesWritten: Cardinal;
 begin
   if ARow <= 0 then
+  begin
+    //if ACol = 0 then
+    //  MessageBox(Application.Handle, PChar('这一列发送字符串'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    //if ACol = 1 then
+    //  MessageBox(Application.Handle, PChar('这一列发送字节（十六进制）'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
+  end;
 
   StringGrid1.Options := StringGrid1.Options - [goEditing];
   OcComPortObj := GetDeciceByFullName(Notebook2.ActivePage);

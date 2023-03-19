@@ -122,15 +122,21 @@ type
     FCommandHistoryIndex: integer;
     FNeedNewLine: Boolean;
     FLogScrollMode: Boolean;
-    procedure OcComPortObjRxChar(Sender: TObject; Count: integer);
-    procedure OcComPortObjRxProtocol(OcComPack: POcComPack);
+    FMouseTextSelection: Boolean;
+    function GetConfiguration(): TOcComPortObjPara;
     function GetLineNumberDateTimeStamp(N: Int64): String;
     function SaveToTheExcelFile(Length: integer; Rows: integer): integer;
+    procedure OcComPortObjRxChar(Sender: TObject; Count: integer);
+    procedure OcComPortObjRxProtocol(OcComPack: POcComPack);
+
     procedure KeyPress(Sender: TObject; var Key: Char);
     procedure KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure MouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+    procedure MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
     procedure RunWindosShellCmd(str: string);
-    function GetConfiguration(): TOcComPortObjPara;
+
+    procedure CachedString(str: String);
   public
     status: integer;
     ExcelApp: Variant;
@@ -143,7 +149,7 @@ type
 
     function getCMDStr(): String;
     procedure SaveLog(FullLogFilePath: String);
-    procedure Log(const Msg: string); //log data
+    procedure Log(const Msg: string); // log data
     procedure DebugLog(const Msg: string);
     procedure LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
 
@@ -154,7 +160,7 @@ type
 
     property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
     property LogMemo: TMemo read FLogMemo write FLogMemo;
-    property StringInternalMemo: TMemo read FStringInternalMemo write FStringInternalMemo;
+    property StringInternelCache: TMemo read FStringInternalMemo write FStringInternalMemo;
     property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
     property ProtocolCallBackFun: TProtocolCallBackFun read FProtocolCallBackFun write FProtocolCallBackFun;
     property ComReceiveCount: Int64 read FComReceiveCount;
@@ -444,11 +450,11 @@ begin
     begin
       if FUIStartIndex = 0 then
       begin
-        s := FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex];
+        s := FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex];
         if Trim(FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1]) = '' then
         begin
           // FOcComPortObj.LogMemo.Lines.Delete(FOcComPortObj.LogMemo.Lines.Count-1);
-          s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count - 1) + Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+          s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count - 1) + Trim(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]);
 
           FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] := s;
         end
@@ -456,26 +462,26 @@ begin
           FOcComPortObj.LogMemo.Lines.Add(s)
         else
           FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] := FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] +
-            Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+            Trim(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]);
       end
       else
       begin
-        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count) + Trim(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count) + Trim(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]);
         FOcComPortObj.LogMemo.Lines.Add(s);
       end;
 
-      FOcComPortObj.FComProcessedCount := FOcComPortObj.FComProcessedCount + Length(FOcComPortObj.StringInternalMemo.Lines.Strings[FUIStartIndex]);
+      FOcComPortObj.FComProcessedCount := FOcComPortObj.FComProcessedCount + Length(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]);
 
       if Assigned(FOcComPortObj.FCallBackFun) then
         FOcComPortObj.FCallBackFun();
 
       INC(FUIStartIndex);
 
-      if FUIStartIndex >= FOcComPortObj.StringInternalMemo.Lines.Count then
+      if FUIStartIndex >= FOcComPortObj.StringInternelCache.Lines.Count then
       begin
         if FOcComPortObj.FComHandleThread_Wait then
           Continue;
-        if FUIStartIndex < FOcComPortObj.StringInternalMemo.Lines.Count then
+        if FUIStartIndex < FOcComPortObj.StringInternelCache.Lines.Count then
           Continue;
         EnterCriticalSection(Critical);
         FOcComPortObj.ClearInternalBuff();
@@ -610,11 +616,11 @@ begin
   // self.LogMemo.Parent.DoubleBuffered:=true;
   // self.LogMemo.Parent.Parent.DoubleBuffered:=true;
   // self.MemoTemp.Parent:=AOwner;
-  self.StringInternalMemo := TMemo.Create(nil);
-  self.StringInternalMemo.ScrollBars := ssBoth;
-  self.StringInternalMemo.ReadOnly := True;
-  self.StringInternalMemo.DoubleBuffered := True;
-  self.StringInternalMemo.Visible := false;
+  self.StringInternelCache := TMemo.Create(nil);
+  self.StringInternelCache.ScrollBars := ssBoth;
+  self.StringInternelCache.ReadOnly := True;
+  self.StringInternelCache.DoubleBuffered := True;
+  self.StringInternelCache.Visible := false;
 
   self.Buffer.InputSize := INPUT_OUTPUT_BUFFER_SIZE;
   self.Buffer.OutputSize := INPUT_OUTPUT_BUFFER_SIZE;
@@ -646,6 +652,7 @@ begin
   FSendFormat := 0;
 
   Timeouts.ReadInterval := 10;
+  FMouseTextSelection := false;
 end;
 
 // destroy component
@@ -755,6 +762,8 @@ begin
   LogMemo.OnKeyDown := self.KeyDown;
   LogMemo.OnKeyPress := self.KeyPress;
   LogMemo.OnMouseDown := self.MouseDown;
+  LogMemo.OnMouseMove := self.MouseMove;
+  LogMemo.OnMouseUp := self.MouseUp;
   FNeedNewLine := True;
 end;
 
@@ -763,9 +772,9 @@ procedure TOcComPortObj.ClearInternalBuff(id: integer = 100);
 begin
   case id of
     0:
-      if self.StringInternalMemo.Parent <> nil then
+      if self.StringInternelCache.Parent <> nil then
       begin
-        self.StringInternalMemo.Clear; // 清字符串缓存区域
+        self.StringInternelCache.Clear; // 清字符串缓存区域
         FComUIHandleThread.FUIStartIndex := 0;
         FComUIHandleThread.ResetID := -1; // 复位，避免反复重置
       end;
@@ -777,9 +786,9 @@ begin
       end
   else
     begin
-      if self.StringInternalMemo.Parent <> nil then
+      if self.StringInternelCache.Parent <> nil then
       begin
-        self.StringInternalMemo.Clear;
+        self.StringInternelCache.Clear;
         FComUIHandleThread.FUIStartIndex := 0;
         SetLength(self.FComReceiveInternalBuffer, 0);
         FComUIHandleThread.ResetID := -1; // 复位，避免反复重置
@@ -1260,6 +1269,17 @@ begin
   Result := Rows;
 end;
 
+procedure TOcComPortObj.CachedString(str: String);
+begin
+  FComHandleThread_Wait := True;
+  EnterCriticalSection(Critical);
+  StringInternelCache.Lines.BeginUpdate;
+  StringInternelCache.Lines.Strings[StringInternelCache.Lines.Count - 1] := StringInternelCache.Lines.Strings[StringInternelCache.Lines.Count - 1] + str;
+  StringInternelCache.Lines.EndUpdate;
+  self.FComHandleThread_Wait := false;
+  LeaveCriticalSection(Critical);
+end;
+
 procedure TOcComPortObj.OcComPortObjRxChar(Sender: TObject; Count: integer);
 var
   i: integer;
@@ -1299,16 +1319,23 @@ begin
     Except
     end;
 
+    if (FMouseTextSelection) then
+    begin
+      CachedString(FComReceiveString); // 复制文本的时候数据暂时存入缓存
+      exit;
+    end;
+    if (StringInternelCache.Lines.Count > 0) and (not FMouseTextSelection) then
+    begin
+      if FComUIHandleThread.Suspended then // 处理后台缓存数据
+        FComUIHandleThread.Suspended := false; // 启动后台线程
+      exit;
+    end;
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
     if FShowLineNumber or FShowDate or FShowTime then
     begin
-      FComHandleThread_Wait := True;
-      EnterCriticalSection(Critical);
-      StringInternalMemo.Lines.BeginUpdate;
-      StringInternalMemo.Lines.Strings[StringInternalMemo.Lines.Count - 1] := StringInternalMemo.Lines.Strings[StringInternalMemo.Lines.Count - 1] + FComReceiveString;
-      StringInternalMemo.Lines.EndUpdate;
-      self.FComHandleThread_Wait := false;
-      LeaveCriticalSection(Critical);
-      if StringInternalMemo.Lines.Count >= FBackGroundProcessRecordCount then
+      CachedString(FComReceiveString); // 缓存数据，方便预处理
+      // 大量数据后台处理
+      if StringInternelCache.Lines.Count >= FBackGroundProcessRecordCount then
       begin
         if FComUIHandleThread.Suspended then
           FComUIHandleThread.Suspended := false; // 启动后台线程
@@ -1316,38 +1343,29 @@ begin
       end;
       if (FComUIHandleThread.Suspended = false) then // 后台正在处理数据
         exit; // 数据转入后台处理，等待后台线程处理完成
+      /// ////////////////////////////////////////////////////////////////////////////////////////////////
+      /// 后台没有处理前台处理，前提是后台任务处理完毕挂起
       if (FComUIHandleThread.Suspended) then // 无需后台处理数据，或者后台数据处理完成，事情做完了就挂起
       begin
         ClearInternalBuff(); // 不能少，清楚后台BUFFER ，转入前台处理
         PreLogLinesCount := LogMemo.Lines.Count;
-
         LogMemo.Lines.BeginUpdate;
-
         if (FComReceiveString[1] = #13) or (FComReceiveString[1] = #10) then
-          // #13#10,分开发送导致无法正确的换行
-          // LogMemo.Lines.Add(FComReceiveString)
-          LogBottomMod(FComReceiveString, True, isBottom)
+          LogBottomMod(FComReceiveString, True, isBottom) // #13#10,分开发送导致无法正确的换行
         else // 自动分行
           LogBottomMod(FComReceiveString, false, isBottom);
-        // LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + FComReceiveString;
-
-        /// /////////////////////////////////////////////////////////////////////
         // 显示行号
         for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do
         begin
           LogMemo.Lines.Strings[i] := GetLineNumberDateTimeStamp(i) + LogMemo.Lines.Strings[i];
         end;
-
         LogMemo.Lines.EndUpdate;
-
         FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
         FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
-        // if Assigned(FCallBackFun) then
-        // FCallBackFun();
       end;
     end
     else
-    begin // 无需特殊处理，不额外显示日期日期信息
+    begin // 直接处理，无需缓存无需特殊处理，不额外显示日期日期信息
       if FNeedNewLine then
       begin
         if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
@@ -1356,10 +1374,6 @@ begin
           FNeedNewLine := false;
 
         FComReceiveString := TrimRight(FComReceiveString);
-
-        // LogMemo.Lines.BeginUpdate;
-        // LogMemo.Lines.Add(FComReceiveString);
-        // LogMemo.Lines.EndUpdate;
         LogBottomMod(FComReceiveString, True, isBottom);
       end
       else
@@ -1371,16 +1385,10 @@ begin
 
         FComReceiveString := TrimRight(FComReceiveString);
         LogBottomMod(FComReceiveString, false, isBottom);
-        // LogMemo.Lines.BeginUpdate;
-        // LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings
-        // [LogMemo.Lines.Count - 1] + FComReceiveString;
-        // LogMemo.Lines.EndUpdate;
       end;
 
       FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
       FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
-      // if Assigned(FCallBackFun) then
-      // FCallBackFun();
     end;
   end
   /// ///////////////////////////////////////////////////////////////////////////
@@ -2031,6 +2039,22 @@ begin
   end;
 end;
 
+procedure TOcComPortObj.MouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+begin
+  if Shift = [ssLeft] then // 鼠标左键按下平且拖动
+  begin
+    if (self.LogMemo <> nil) and (LogMemo.Parent <> nil) then
+    begin
+      FMouseTextSelection := True;
+    end;
+  end;
+end;
+
+procedure TOcComPortObj.MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+begin
+  FMouseTextSelection := false;
+end;
+
 procedure TOcComPortObj.RunWindosShellCmd(str: string);
 const
   { 设置ReadBuffer的大小 }
@@ -2133,8 +2157,8 @@ begin
   CloseDevice();
   ClearLog;
   ClearInternalBuff();
-  //LogMemo.Visible := false;
-  //LogMemo.Parent := nil;
+  // LogMemo.Visible := false;
+  // LogMemo.Parent := nil;
 end;
 
 Initialization
