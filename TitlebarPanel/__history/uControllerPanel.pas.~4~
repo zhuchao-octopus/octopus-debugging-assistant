@@ -1,0 +1,134 @@
+unit uControllerPanel;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Tabs, VCLTee.TeCanvas, Vcl.StdCtrls,
+  Vcl.Grids, Vcl.ExtCtrls;
+
+type
+  TForm1 = class(TForm)
+    Panel6: TPanel;
+    Notebook3: TNotebook;
+    Panel3: TPanel;
+    Panel5: TPanel;
+    Panel7: TPanel;
+    Memo2: TMemo;
+    Panel8: TPanel;
+    Button7: TButton;
+    Button8: TButton;
+    Button25: TButton;
+    Panel13: TPanel;
+    Memo3: TMemo;
+    Button9: TButton;
+    Button11: TButton;
+    Button13: TButton;
+    Panel12: TPanel;
+    StringGrid1: TStringGrid;
+    Panel4: TPanel;
+    Button1: TButton;
+    Button3: TButton;
+    Panel10: TPanel;
+    Memo5: TMemo;
+    Panel16: TPanel;
+    Button16: TButton;
+    Button27: TButton;
+    Button28: TButton;
+    Panel18: TPanel;
+    Label18: TLabel;
+    Label11: TLabel;
+    Label8: TLabel;
+    Label7: TLabel;
+    ComboBox12: TComboBox;
+    ComboBox9: TComboBox;
+    ComboBox10: TComboBox;
+    ComboBox11: TComboBox;
+    Panel9: TPanel;
+    GroupBox10: TGroupBox;
+    CheckBox10: TCheckBox;
+    Button15: TButton;
+    Button18: TButton;
+    Button19: TButton;
+    ButtonColor1: TButtonColor;
+    ButtonColor2: TButtonColor;
+    CheckBox11: TCheckBox;
+    Button20: TButton;
+    Button21: TButton;
+    Button22: TButton;
+    Panel15: TPanel;
+    Label16: TLabel;
+    Label17: TLabel;
+    TabSet3: TTabSet;
+  private
+    FCheck, FNoCheck: TBitmap;
+    { Private declarations }
+     procedure initStringGrid();
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.dfm}
+
+
+procedure Form1.initStringGrid();
+var
+  bmp: TBitmap;
+  i: Integer;
+  GridRect: TGridRect;
+begin
+  try
+    FCheck := TBitmap.Create;
+    FNoCheck := TBitmap.Create;
+    bmp := TBitmap.Create;
+    bmp.Handle := LoadBitmap(0, PChar(OBM_CHECKBOXES));
+    bmp.PixelFormat := pf32bit;
+    bmp.HandleType := bmDIB;
+    bmp.Transparent := True;
+    bmp.TransparentColor := clWhite;
+    // Bmp.Canvas.Brush.Color := clWhite;
+    // Bmp.Canvas.FillRect(Rect(0, 0, Bmp.Width, Bmp.Height));
+
+    FNoCheck.PixelFormat := pf32bit;
+    FNoCheck.HandleType := bmDIB;
+    FNoCheck.Transparent := True;
+    FNoCheck.TransparentColor := clWhite;
+    with FNoCheck do
+    begin
+      Width := bmp.Width div 4;
+      Height := bmp.Height div 3;
+      Canvas.CopyRect(Canvas.cliprect, bmp.Canvas, Canvas.cliprect);
+    end;
+    with FCheck do
+    begin
+      Width := bmp.Width div 4;
+      Height := bmp.Height div 3;
+      Canvas.CopyRect(Canvas.cliprect, bmp.Canvas, Rect(Width, 0, 2 * Width, Height));
+    end;
+  finally
+    DeleteObject(bmp.Handle);
+    bmp.Free;
+  end;
+
+  for i := 1 to StringGrid1.RowCount - 1 do
+  begin
+    //StringGrid1.Cells[0, i] := 'ASCC';//Format('%.02d ', [i]); // '0' + inttostr(i)
+    //StringGrid1.Cells[1, i] := 'ASCC';
+    StringGrid1.Cells[4, i] := '1';
+    StringGrid1.Cells[5, i] := '10';
+  end;
+  with GridRect do
+  begin
+    Top := 2;
+    Left := 2;
+    Bottom := 2;
+    Right := 2;
+  end;
+  StringGrid1.Selection := GridRect;
+end;
+end.

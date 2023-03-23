@@ -1,0 +1,222 @@
+unit Main;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.ToolWin, Vcl.ActnMan,
+  Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.StdActns, Vcl.ExtActns, Vcl.ActnList,
+  System.Actions, Vcl.PlatformDefaultStyleActnCtrls, System.ImageList,
+  Vcl.ImgList, Vcl.ComCtrls, Vcl.BaseImageCollection, Vcl.ImageCollection, Vcl.TitleBarCtrls,
+  Vcl.VirtualImageList, Vcl.Menus, Vcl.StdCtrls, Vcl.WinXCtrls, Vcl.Buttons,
+  Vcl.Tabs;
+
+type
+  TFrmMain = class(TForm)
+    ActionMainMenuBar1: TActionMainMenuBar;
+    TitleBarPanel1: TTitleBarPanel;
+    ActionManager1: TActionManager;
+    DialogOpenPicture1: TOpenPicture;
+    DialogSavePicture1: TSavePicture;
+    DialogColorSelect1: TColorSelect;
+    DialogFontEdit1: TFontEdit;
+    DialogPrintDlg1: TPrintDlg;
+    EditCut1: TEditCut;
+    EditCopy1: TEditCopy;
+    EditPaste1: TEditPaste;
+    EditSelectAll1: TEditSelectAll;
+    EditUndo1: TEditUndo;
+    EditDelete1: TEditDelete;
+    FileOpen1: TFileOpen;
+    FileOpenWith1: TFileOpenWith;
+    FileSaveAs1: TFileSaveAs;
+    FilePrintSetup1: TFilePrintSetup;
+    FilePageSetup1: TFilePageSetup;
+    FileRun1: TFileRun;
+    FileExit1: TFileExit;
+    BrowseForFolder1: TBrowseForFolder;
+    InternetBrowseURL1: TBrowseURL;
+    InternetDownLoadURL1: TDownLoadURL;
+    InternetSendMail1: TSendMail;
+    SearchFind1: TSearchFind;
+    SearchFindNext1: TSearchFindNext;
+    SearchReplace1: TSearchReplace;
+    SearchFindFirst1: TSearchFindFirst;
+    ToolBar16: TToolBar;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
+    VirtualImageList16: TVirtualImageList;
+    ImageCollection1: TImageCollection;
+    VirtualImageList32: TVirtualImageList;
+    Panel1: TPanel;
+    CheckBoxCustomColors: TCheckBox;
+    TabSet1: TTabSet;
+    ComboBoxEx1: TComboBoxEx;
+    ComboBox1: TComboBox;
+    ComboBox2: TComboBox;
+    ComboBox3: TComboBox;
+    procedure FormCreate(Sender: TObject);
+    procedure ActionMainMenuBar1Paint(Sender: TObject);
+    procedure CheckBoxCustomColorsClick(Sender: TObject);
+    procedure CheckBoxOnPaintClick(Sender: TObject);
+    procedure SystemTitlebarButton1Paint(Sender: TObject);
+    procedure SystemTitlebarButton1Click(Sender: TObject);
+  private
+    FLastDWMColorizationColor: TColor;
+    procedure DWMColorizationColorChanged(var Message: TMessage); message WM_DWMCOLORIZATIONCOLORCHANGED;
+    procedure WMActivate(var Message: TWMActivate); message WM_ACTIVATE;
+    procedure UpdateControls;
+    procedure DrawSymbol(ACanvas: TCanvas; ARect: TRect; FGColor, BGColor: TColor);
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmMain: TFrmMain;
+
+implementation
+
+uses
+  Vcl.GraphUtil, Vcl.Themes, System.Types, System.Math, Winapi.GDIPAPI,
+  Winapi.GDIPOBJ;
+
+{$R *.dfm}
+
+procedure TFrmMain.ActionMainMenuBar1Paint(Sender: TObject);
+var
+  LColor: TColor;
+begin
+  if CustomTitleBar.Enabled and not CustomTitleBar.SystemColors then
+  begin
+    if Active then
+      LColor := CustomTitleBar.BackgroundColor
+    else
+      LColor := CustomTitleBar.InactiveBackgroundColor;
+    ActionMainMenuBar1.Canvas.Brush.Color := LColor;
+    ActionMainMenuBar1.Canvas.FillRect(ActionMainMenuBar1.ClientRect);
+  end;
+end;
+
+procedure TFrmMain.CheckBoxCustomColorsClick(Sender: TObject);
+begin
+  CustomTitleBar.SystemColors := not CheckBoxCustomColors.Checked;
+  CustomTitleBar.SystemButtons := not CheckBoxCustomColors.Checked;
+  if CustomTitleBar.SystemColors then
+    CustomTitleBar.InitTitleBarColors;
+  UpdateControls;
+  CustomTitleBar.Invalidate;
+  ActionMainMenuBar1.Invalidate;
+end;
+
+procedure TFrmMain.CheckBoxOnPaintClick(Sender: TObject);
+begin
+  CustomTitleBar.Invalidate;
+end;
+
+procedure TFrmMain.DWMColorizationColorChanged(var Message: TMessage);
+begin
+  if CustomTitleBar.Enabled and CustomTitleBar.SystemColors and
+    (TColor(Message.WParam) <> FLastDWMColorizationColor) then
+  begin
+    FLastDWMColorizationColor := TColor(Message.WParam);
+    CustomTitleBar.InitTitleBarColors;
+    UpdateControls;
+    CustomTitleBar.Invalidate;
+    Message.Result := 0;
+  end;
+end;
+
+procedure TFrmMain.FormCreate(Sender: TObject);
+begin
+  FLastDWMColorizationColor := clNone;
+  for var i: Integer := 0 to ComponentCount - 1 do
+    if (Components[i].Tag = 1) and (Components[i] is TControl) then
+      TControl(Components[i]).Enabled := TOSVersion.Check(10);
+  UpdateControls;
+end;
+
+procedure TFrmMain.DrawSymbol(ACanvas: TCanvas; ARect: TRect; FGColor, BGColor: TColor);
+var
+  LRect: TRect;
+  LGPGraphics: TGPGraphics;
+  LGPPen: TGPPen;
+  LRGBColor, LSize: Integer;
+  LColor: Cardinal;
+  LGPRect: TGPRect;
+  LPath: TGPGraphicsPath;
+begin
+  LRGBColor := ColorToRGB(FGColor);
+  LColor := MakeColor(GetRValue(LRGBColor), GetGValue(LRGBColor), GetBValue(LRGBColor));
+  LGPGraphics := TGPGraphics.Create(ACanvas.Handle);
+  try
+    LGPGraphics.SetSmoothingMode(SmoothingModeAntiAlias);
+    LGPPen := TGPPen.Create(LColor, CurrentPPI / Screen.DefaultPixelsPerInch);
+    try
+      LPath := TGPGraphicsPath.Create;
+      try
+        LPath.Reset;
+        LSize := MulDiv(9, CurrentPPI, Screen.DefaultPixelsPerInch);
+        LRect := CenteredRect(ARect, Rect(0, 0, LSize, LSize));
+
+        LGPRect := MakeRect(LRect.Left, LRect.Top, LRect.Width, LRect.Height);
+        LPath.AddEllipse(LGPRect);
+
+        LSize := MulDiv(2, CurrentPPI, Screen.DefaultPixelsPerInch);
+        InflateRect(LRect, LSize, LSize);
+        LGPRect := MakeRect(LRect.Left, LRect.Top, LRect.Width, LRect.Height);
+        LPath.AddEllipse(LGPRect);
+
+        LGPGraphics.DrawPath(LGPPen, LPath);
+      finally
+        LPath.Free;
+      end;
+    finally
+     LGPPen.Free;
+    end;
+  finally
+    LGPGraphics.Free;
+  end;
+end;
+
+procedure TFrmMain.SystemTitlebarButton1Click(Sender: TObject);
+begin
+  ShowMessage('You clicked the custom caption button !!!!!!');
+end;
+
+procedure TFrmMain.SystemTitlebarButton1Paint(Sender: TObject);
+begin
+  DrawSymbol(TSystemTitlebarButton(Sender).Canvas, TSystemTitlebarButton(Sender).ClientRect,
+    IfThen(Active, CustomTitleBar.ButtonForegroundColor, CustomTitleBar.ButtonInactiveForegroundColor),
+    IfThen(Active, CustomTitleBar.ButtonBackgroundColor, CustomTitleBar.ButtonInactiveBackgroundColor));
+end;
+
+procedure TFrmMain.UpdateControls;
+begin
+
+end;
+
+procedure TFrmMain.WMActivate(var Message: TWMActivate);
+var
+  LColor : TColor;
+begin
+  inherited;
+  if CustomTitleBar.Enabled and Assigned(ActionMainMenuBar1) then
+    ActionMainMenuBar1.Invalidate;
+
+  if TOSVersion.Check(10) and CustomTitleBar.Enabled and not CustomTitleBar.SystemColors then
+  begin
+    if Active then
+      LColor := CustomTitleBar.BackgroundColor
+    else
+      LColor := CustomTitleBar.InactiveBackgroundColor;
+
+    ToolBar16.GradientStartColor := LColor;
+    ToolBar16.GradientEndColor := LColor;
+    //ToolBar32.GradientStartColor := LColor;
+    //ToolBar32.GradientEndColor := LColor;
+  end;
+end;
+
+end.
