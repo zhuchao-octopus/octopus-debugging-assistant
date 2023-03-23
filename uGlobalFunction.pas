@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
+  System.Classes, Vcl.Graphics, Vcl.Buttons,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.ImageList, Vcl.ImgList,
-  Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.ValEdit,Vcl.Tabs,
+  Vcl.StdCtrls, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.ValEdit, Vcl.Tabs,
   Vcl.WinXCtrls, Vcl.Menus, IniFiles, Vcl.Themes;
 
 Const
@@ -125,7 +125,7 @@ procedure SetButtonCaptionLeftAlign(btn: TButton);
 procedure AdjustComponenAttribute(Form: TForm);
 function GetStyle(i: Integer): String;
 procedure AdjustSetStyle(Style: String);
-procedure AdjustComponentFont(Form: TForm; L: String = 'CN'; Font: TFont = nil);
+procedure AdjustComponentFont(Form: TForm; Font: TFont = nil);
 procedure LoadLaunguageFromFile(Form: TForm; Path: String);
 procedure AppendSystemMenu(handle: Thandle; OnClicEvent: TOnClicEvent);
 procedure LoadDefaultLaunguage(Form: TForm; Lang: String);
@@ -590,19 +590,19 @@ begin
 
 end;
 
-procedure AdjustComponentFont(Form: TForm; L: String; Font: TFont); // 不包括日志的字体颜色
+procedure AdjustComponentFont(Form: TForm; Font: TFont); // 不包括日志的字体颜色
 var
   f: TFont;
   i: Integer;
   tmpComponent: TComponent;
 begin
-  if Font = nil then
-    f := TFont.Create
-  else
-    f := Font;
-
-  if L = 'CN' then
+  if Font <> nil then
   begin
+    f := Font;
+  end
+  else
+  begin // 默认字体
+    f := TFont.Create;
     f.Charset := TFontCharset(DEFAULT_CHARSET);
     f.Color := clWindowText;
     f.Name := 'Segoe UI';
@@ -610,62 +610,85 @@ begin
     // f.Style :=[fsBold];
   end;
 
-  if L = 'EN' then
-  begin
-    f.Charset := TFontCharset(DEFAULT_CHARSET);
-    f.Color := clWindowText;
-    f.Name := 'Segoe UI';
-    f.Size := 10;
-  end;
+  Form.Font := f;
   Form.Font := f;
   For i := 0 To Form.ComponentCount - 1 Do
   Begin
     tmpComponent := Form.Components[i];
+
+    if tmpComponent is TForm then
+    begin
+      // TButton(tmpComponent).ParentFont := false;
+      TForm(tmpComponent).Font := f;
+    end;
+
     if tmpComponent is TButton then
     begin
-      //TButton(tmpComponent).ParentFont := false;
+      // TButton(tmpComponent).ParentFont := false;
       TButton(tmpComponent).Font := f;
+      TButton(tmpComponent).Height := 34;
     end;
+
+    if tmpComponent is TSpeedButton then
+    begin
+      // TButton(tmpComponent).ParentFont := false;
+      TSpeedButton(tmpComponent).Font := f;
+      TSpeedButton(tmpComponent).Height := 34;
+    end;
+
     if tmpComponent is TCheckBox then
     begin
-      //TCheckBox(tmpComponent).ParentFont := false;
+      // TCheckBox(tmpComponent).ParentFont := false;
       TCheckBox(tmpComponent).Font := f;
     end;
+
     if tmpComponent is TLabel then
     begin
-      //TLabel(tmpComponent).ParentFont := false;
+      // TLabel(tmpComponent).ParentFont := false;
       TLabel(tmpComponent).Font := f;
     end;
     if tmpComponent is TPanel then
     begin
-      //TPanel(tmpComponent).ParentFont := false;
+      // TPanel(tmpComponent).ParentFont := false;
       TPanel(tmpComponent).Font := f;
     end;
+
     if tmpComponent is TComboBox then
     begin
-      //TComboBox(tmpComponent).ParentFont := false;
+      // TComboBox(tmpComponent).ParentFont := false;
       TComboBox(tmpComponent).Font := f;
     end;
+
     if tmpComponent is TEdit then
     begin
-      //TEdit(tmpComponent).ParentFont := false;
+      // TEdit(tmpComponent).ParentFont := false;
       TEdit(tmpComponent).Font := f;
     end;
+
     if tmpComponent is TSplitView then
     begin
-      //TSplitView(tmpComponent).ParentFont := false;
+      // TSplitView(tmpComponent).ParentFont := false;
       TSplitView(tmpComponent).Font := f;
     end;
+
     if tmpComponent is TStringGrid then
     begin
-      //TStringGrid(tmpComponent).ParentFont := false;
+      // TStringGrid(tmpComponent).ParentFont := false;
       TStringGrid(tmpComponent).Font := f;
     end;
+
     if tmpComponent is TTabSet then
     begin
-      //TStringGrid(tmpComponent).ParentFont := false;
+      // TStringGrid(tmpComponent).ParentFont := false;
       TTabSet(tmpComponent).Font := f;
     end;
+
+    if tmpComponent is TComboBoxEx then
+    begin
+      // TStringGrid(tmpComponent).ParentFont := false;
+      TComboBoxEx(tmpComponent).Font := f;
+    end;
+
   End;
 end;
 

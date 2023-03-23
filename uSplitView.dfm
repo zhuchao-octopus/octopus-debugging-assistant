@@ -23,7 +23,7 @@ object SplitViewForm: TSplitViewForm
   CustomTitleBar.ButtonInactiveBackgroundColor = clWhite
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
+  Font.Color = clBlack
   Font.Height = -16
   Font.Name = #24494#36719#38597#40657' Light'
   Font.Style = []
@@ -167,6 +167,7 @@ object SplitViewForm: TSplitViewForm
             Top = 79
             Width = 310
             Height = 234
+            ParentColor = True
             TabOrder = 2
             object Label13: TLabel
               Left = 5
@@ -341,8 +342,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #39640#32423
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel6: TPanel
           Left = 0
           Top = 0
@@ -696,7 +695,7 @@ object SplitViewForm: TSplitViewForm
       Font.Style = []
       ParentShowHint = False
       ShowHint = False
-      SelectedColor = clMenuBar
+      SelectedColor = clScrollBar
       Style = tsModernTabs
       Tabs.Strings = (
         #20843#29226#40060#20018#21475#35774#32622)
@@ -723,15 +722,12 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 662
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
         Top = 0
         HelpContext = 1
         Caption = #22359#21457#36865
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel2: TPanel
           AlignWithMargins = True
           Left = 3
@@ -838,6 +834,7 @@ object SplitViewForm: TSplitViewForm
               Width = 308
               Height = 122
               Align = alTop
+              BorderStyle = bsNone
               Ctl3D = True
               Lines.Strings = (
                 #20843#29226#40060#20018#21475#35843#35797#21161#25163)
@@ -1966,8 +1963,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2080,7 +2075,7 @@ object SplitViewForm: TSplitViewForm
               Left = 74
               Top = 3
               Width = 237
-              Height = 118
+              Height = 29
               Align = alRight
               Style = csDropDownList
               ItemIndex = 0
@@ -2127,8 +2122,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2287,7 +2280,7 @@ object SplitViewForm: TSplitViewForm
       Font.Height = -16
       Font.Name = #24494#36719#38597#40657' Light'
       Font.Style = []
-      SelectedColor = clScrollBar
+      SelectedColor = clSkyBlue
       Style = tsModernTabs
       Tabs.Strings = (
         'Octopus '#33258#23450#20041#21457#36865
@@ -2394,10 +2387,8 @@ object SplitViewForm: TSplitViewForm
             '      StringGrid1.Cells[0, i] := inttostr(i);'
             '  end;')
           ParentFont = False
-          ParentShowHint = False
           ReadOnly = True
           ScrollBars = ssBoth
-          ShowHint = False
           TabOrder = 0
           WantTabs = True
           OnKeyDown = Memo1KeyDown
@@ -2408,8 +2399,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #27874#24418
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
@@ -2474,8 +2463,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
@@ -2510,7 +2497,7 @@ object SplitViewForm: TSplitViewForm
       ParentShowHint = False
       PopupMenu = PopupMenu1
       ShowHint = False
-      SelectedColor = clScrollBar
+      SelectedColor = clYellow
       Style = tsModernTabs
       Tabs.Strings = (
         #26412#22320#25991#20214#30446#24405)

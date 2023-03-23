@@ -2141,7 +2141,7 @@ procedure TSplitViewForm.Button29Click(Sender: TObject);
 begin
   if FontDialog1.Execute then
   begin
-    AdjustComponentFont(SplitViewForm, '', FontDialog1.Font);
+    AdjustComponentFont(SplitViewForm, FontDialog1.Font);
   end;
 end;
 
@@ -3004,7 +3004,7 @@ begin
   f.Color := clWindowText;
   f.Name := 'Segoe UI';
   f.Size := 10;
-  AdjustComponentFont(SplitViewForm, '', f);
+  AdjustComponentFont(SplitViewForm, f);
 
   AppendSystemMenu(self.Handle, nil);
   AdjustComponenAttribute(SplitViewForm);
@@ -3027,10 +3027,11 @@ begin
   StatusBar1.Panels.Items[0].Width := StatusBar1.Canvas.TextWidth('操作说明： ESC、F1、F2 123456');
   StatusBar1.Panels.Items[1].Width := StatusBar1.Canvas.TextWidth(DEFAULT_WEBSITE_ADDRESS + ' 123456');
   StatusBar1.Panels.Items[1].Text := DEFAULT_WEBSITE_ADDRESS;
+
 {$IFDEF CPU64BITS}
-  TabSet2.SelectedColor := clYellow; // clHighlight; // for 64 bit;
+  // TabSet2.SelectedColor := clYellow; // clHighlight; // for 64 bit;
 {$ELSE}
-  TabSet2.SelectedColor := clRed; // for 32 bit;
+  // TabSet2.SelectedColor := clRed; // for 32 bit;
 {$ENDIF}
   FalconLoadCfg(); // 载入全局设置
   Button4.OnClick(self); // 刷新设备列表
@@ -3896,7 +3897,7 @@ begin
     Notebook3.Pages[3] := ' Graphic ';
 
     StatusBar1.Panels.Items[0].Text := 'Hot Key ESC、F1、F2';
-    AdjustComponentFont(SplitViewForm, 'EN');
+    AdjustComponentFont(SplitViewForm);
   end
   else
   begin
@@ -4125,6 +4126,8 @@ begin
       Memo.Font := Memo1.Font;
       Memo.Color := Memo1.Color;
       Memo.HideSelection := false;
+      Memo.BorderStyle := Memo1.BorderStyle;
+      Memo.AlignWithMargins := Memo1.AlignWithMargins;
       Memo.Show;
       Page.DoubleBuffered := True;
       TabSet2.Tabs := Notebook2.Pages;
@@ -4705,10 +4708,10 @@ var
 begin
   if ARow <= 0 then
   begin
-    //if ACol = 0 then
-    //  MessageBox(Application.Handle, PChar('这一列发送字符串'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
-    //if ACol = 1 then
-    //  MessageBox(Application.Handle, PChar('这一列发送字节（十六进制）'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    // if ACol = 0 then
+    // MessageBox(Application.Handle, PChar('这一列发送字符串'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    // if ACol = 1 then
+    // MessageBox(Application.Handle, PChar('这一列发送字节（十六进制）'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 

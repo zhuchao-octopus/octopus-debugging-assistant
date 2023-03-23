@@ -449,13 +449,12 @@ begin
     if self.FOcComPortObj.FReceiveFormat = Ord(ASCIIFormat) then
     begin
       if FUIStartIndex = 0 then
-      begin
+      begin // 第一行后面接龙
         s := FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex];
         if Trim(FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1]) = '' then
         begin
           // FOcComPortObj.LogMemo.Lines.Delete(FOcComPortObj.LogMemo.Lines.Count-1);
           s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count - 1) + Trim(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]);
-
           FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] := s;
         end
         else if (Length(s) > 0) and (s[1] = #10) then // #13#10,分开发送导致无法正确的换行
@@ -470,19 +469,21 @@ begin
         FOcComPortObj.LogMemo.Lines.Add(s);
       end;
 
+      // 处理完一行
       FOcComPortObj.FComProcessedCount := FOcComPortObj.FComProcessedCount + Length(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]);
-
       if Assigned(FOcComPortObj.FCallBackFun) then
         FOcComPortObj.FCallBackFun();
 
-      INC(FUIStartIndex);
+      INC(FUIStartIndex); // 下一行
 
       if FUIStartIndex >= FOcComPortObj.StringInternelCache.Lines.Count then
       begin
         if FOcComPortObj.FComHandleThread_Wait then
-          Continue;
+          Continue; // 中途有数据加入
         if FUIStartIndex < FOcComPortObj.StringInternelCache.Lines.Count then
-          Continue;
+          Continue; // 中途有数据加入
+
+        // 数据处理完毕，清理缓存
         EnterCriticalSection(Critical);
         FOcComPortObj.ClearInternalBuff();
         LeaveCriticalSection(Critical);
@@ -1292,7 +1293,7 @@ begin
   FComReceiveString := '';
   s := '';
   ln := '';
-  FComReceiveCount := FComReceiveCount + Count;
+  FComReceiveCount := FComReceiveCount + Count; // 统计接收数量
   FComReceiveString := '';
 
   if (not Connected) then
@@ -1319,52 +1320,32 @@ begin
     Except
     end;
 
-    if (FMouseTextSelection) then
+    if (FMouseTextSelection) or (FShowLineNumber or FShowDate or FShowTime) then // 后台工作模式
     begin
       CachedString(FComReceiveString); // 复制文本的时候数据暂时存入缓存
-      exit;
+      FComReceiveString := '';
+      if FMouseTextSelection then
+        exit; // 缓存暂不处理
     end;
-    if (StringInternelCache.Lines.Count > 0) and (not FMouseTextSelection) then
+
+    if (StringInternelCache.Lines.Count > 0) or (Length(StringInternelCache.Text) > 0) then // 如果有缓存确保进入缓存工作模式 后台数据处理
     begin
       if FComUIHandleThread.Suspended then // 处理后台缓存数据
         FComUIHandleThread.Suspended := false; // 启动后台线程
+
+      if (not FMouseTextSelection) and (not FShowLineNumber) and (not FShowDate) and (not FShowTime) then // FComReceiveString <>''
+      begin // 有一种情况，新数据没有被缓存，却进入了后台线程模式，
+        CachedString(FComReceiveString); // 继续缓存，原则上这种情况发生的概率非常低
+        FComReceiveString := '';
+      end;
+
+      /// ///////////////////////////////////////////////////////////////////////////////////////////////////
+      // 还有一种情况，一直在缓存，但是后台线程无法正常工作，BUG
+
       exit;
     end;
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    if FShowLineNumber or FShowDate or FShowTime then
-    begin
-      CachedString(FComReceiveString); // 缓存数据，方便预处理
-      // 大量数据后台处理
-      if StringInternelCache.Lines.Count >= FBackGroundProcessRecordCount then
-      begin
-        if FComUIHandleThread.Suspended then
-          FComUIHandleThread.Suspended := false; // 启动后台线程
-        exit;
-      end;
-      if (FComUIHandleThread.Suspended = false) then // 后台正在处理数据
-        exit; // 数据转入后台处理，等待后台线程处理完成
-      /// ////////////////////////////////////////////////////////////////////////////////////////////////
-      /// 后台没有处理前台处理，前提是后台任务处理完毕挂起
-      if (FComUIHandleThread.Suspended) then // 无需后台处理数据，或者后台数据处理完成，事情做完了就挂起
-      begin
-        ClearInternalBuff(); // 不能少，清楚后台BUFFER ，转入前台处理
-        PreLogLinesCount := LogMemo.Lines.Count;
-        LogMemo.Lines.BeginUpdate;
-        if (FComReceiveString[1] = #13) or (FComReceiveString[1] = #10) then
-          LogBottomMod(FComReceiveString, True, isBottom) // #13#10,分开发送导致无法正确的换行
-        else // 自动分行
-          LogBottomMod(FComReceiveString, false, isBottom);
-        // 显示行号
-        for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do
-        begin
-          LogMemo.Lines.Strings[i] := GetLineNumberDateTimeStamp(i) + LogMemo.Lines.Strings[i];
-        end;
-        LogMemo.Lines.EndUpdate;
-        FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
-        FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
-      end;
-    end
-    else
+
+    /// ////////////////////////////////////////////////////////////////////////////////////////////////////
     begin // 直接处理，无需缓存无需特殊处理，不额外显示日期日期信息
       if FNeedNewLine then
       begin
@@ -1386,7 +1367,7 @@ begin
         FComReceiveString := TrimRight(FComReceiveString);
         LogBottomMod(FComReceiveString, false, isBottom);
       end;
-
+      // 统计处理数量
       FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
       FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
     end;
@@ -1455,7 +1436,8 @@ begin
     self.FComHandleThread_Wait := false;
     if (FComPackParserThread.Suspended) { and (FProtocalData > 0) } then
     begin
-      FComPackParserThread.Suspended := false; // 启动协议解析线程
+      FComPackParserThread.Suspended := false;
+      // 启动协议解析线程
     end;
   end
   /// ///////////////////////////////////////////////////////////////////////////
@@ -1464,7 +1446,8 @@ begin
     if (CompareText(ExtractFileExt(self.FileStreamName), '.txt') = 0) or (CompareText(ExtractFileExt(self.FileStreamName), '.log') = 0) then
     begin
       AssignFile(f, self.FileStreamName);
-      Append(f); // 打开准备追加
+      Append(f);
+      // 打开准备追加
       if FCompatibleUnicode then
         self.ReadUnicodeString(FComReceiveString, Count) // 可以读中文
       else
@@ -2034,6 +2017,8 @@ procedure TOcComPortObj.MouseDown(Sender: TObject; Button: TMouseButton; Shift: 
 begin
   if (self.LogMemo <> nil) and (LogMemo.Parent <> nil) then
   begin
+    if Shift = [ssCtrl] then
+      FMouseTextSelection := True;
     if Assigned(FCallBackFun) then
       FCallBackFun();
   end;
@@ -2052,7 +2037,8 @@ end;
 
 procedure TOcComPortObj.MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
 begin
-  FMouseTextSelection := false;
+  if Shift = [ssCtrl,ssLeft] then
+    FMouseTextSelection := false;
 end;
 
 procedure TOcComPortObj.RunWindosShellCmd(str: string);
