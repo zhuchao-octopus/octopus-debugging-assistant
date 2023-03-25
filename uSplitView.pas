@@ -333,7 +333,9 @@ type
     procedure Button29Click(Sender: TObject);
     procedure StringGrid1MouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
     procedure StringGrid1MouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+    procedure StringGrid1MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
+    // StringGrid1_Col, StringGrid1_Row: Integer;
     // ComReceiveCount: Integer;
     // ComReceiveBuffer: array [0 .. 1048576] of Byte;
     // for com port receive buffer
@@ -420,6 +422,7 @@ type
 
 const
   CHECKCOL: Integer = 3;
+  DATACOL: Integer = 2;
 
 var
   SplitViewForm: TSplitViewForm;
@@ -2680,7 +2683,7 @@ begin
       begin
         if (pPORT <> nil) and (DeviceName <> '') then
         begin
-          Log0('Device ' + DeviceName + ' attached' + #13#10);
+          // Log0('Device ' + DeviceName + ' attached' + #13#10);
           UIUpdateDeviceHandleProcess(DeviceName, DBT_DEVICEARRIVAL);
         end;
       end;
@@ -2688,7 +2691,7 @@ begin
       begin
         if (pPORT <> nil) and (DeviceName <> '') then
         begin
-          Log0('Device ' + DeviceName + ' unattached');
+          // Log0('Device ' + DeviceName + ' unattached');
           // if Trim(DeviceName) = OctopusComPort1.Port then
           // begin
           // OpenCloseTheDevice(false);
@@ -4027,45 +4030,44 @@ begin
     if OcComPortObj.Connected then
     begin
       OcComPortObj.Close;
-
-      if OcComPortObj.LogMemo <> Memo1 then
-      begin
-        OcComPortObj.ClearLog;
-        OcComPortObj.ClearInternalBuff();
-        OcComPortObj.LogMemo.Visible := false;
-        OcComPortObj.LogMemo.Parent := nil;
-      end;
-
-      if (Memo1.Tag = Integer(OcComPortObj)) then
-      begin
-        Memo1.Tag := 0;
-        Memo1.OnKeyDown := Memo1KeyDown;
-        Memo1.OnKeyPress := Memo1KeyPress;
-        Memo1.ReadOnly := True;
-        UpdateUiLaunguage(UILanguage);
-      end;
-
-      i := Notebook2.Pages.IndexOf(DeviceFullName);
-      if (i > 0) and (OcComPortObj.LogMemo <> Memo1) then
-      begin
-        Notebook2.Pages.Delete(i);
-        TabSet2.Tabs := Notebook2.Pages;
-        OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log');
-        // 关闭的时候保存一次记录
-      end;
-      if OcComPortObj.LogMemo = Memo1 then // 最后接触关联
-      begin
-        OcComPortObj.Log(OcComPortObj.OcComPortObjPara.ComportFullName + ' Closed');
-        OcComPortObj.Log(' ');
-        OcComPortObj.LogMemo := nil;
-      end;
     end;
+
+    if (Memo1.Tag = Integer(OcComPortObj)) then
+    begin
+      Memo1.Tag := 0;
+      Memo1.OnKeyDown := Memo1KeyDown;
+      Memo1.OnKeyPress := Memo1KeyPress;
+      Memo1.ReadOnly := True;
+    end;
+
+    if OcComPortObj.LogMemo <> Memo1 then
+    begin
+      OcComPortObj.ClearLog;
+      OcComPortObj.ClearInternalBuff();
+      OcComPortObj.LogMemo.Visible := false;
+      OcComPortObj.LogMemo.Parent := nil;
+    end;
+    if OcComPortObj.LogMemo = Memo1 then
+    begin
+      OcComPortObj.DebugLog(OcComPortObj.OcComPortObjPara.ComportFullName + ' Closed');
+      OcComPortObj.DebugLog(' ');
+      OcComPortObj.LogMemo := nil; // 接触关联
+    end;
+
+    i := Notebook2.Pages.IndexOf(DeviceFullName);
+    if (i > 0) and (OcComPortObj.LogMemo <> Memo1) then
+    begin
+      Notebook2.Pages.Delete(i);
+      TabSet2.Tabs := Notebook2.Pages;
+      OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log');
+      // 关闭的时候保存一次记录
+    end;
+    UpdateUiLaunguage(UILanguage);
   except
-    OcComPortObj.Log('Can not close  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    OcComPortObj.DebugLog('Can not close  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
   end;
 
   s := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.OcComPortObjPara.ComportFullName + '.ini';
-
   OcComPortObj.StoreSettings(stIniFile, s);
 
   try
@@ -4645,6 +4647,7 @@ begin
   end;
 
   StringGrid1.RowCount := 520;
+  StringGrid1.DefaultRowHeight:=26;
   StringGrid1.ColCount := 7;
   StringGrid1.ColWidths[0] := 50;
   StringGrid1.ColWidths[1] := 50;
@@ -4699,12 +4702,8 @@ end;
 
 procedure TSplitViewForm.StringGrid1FixedCellClick(Sender: TObject; ACol, ARow: Integer);
 var
-  GridRect: TGridRect;
   str: String;
   OcComPortObj: TOcComPortObj;
-  buffer: array [0 .. 512] of byte;
-  bLength: Integer;
-  BytesWritten: Cardinal;
 begin
   if ARow <= 0 then
   begin
@@ -4728,9 +4727,15 @@ begin
   str := GetStringGridValidStr(StringGrid1.Cells[2, ARow]);
 
   if ACol = 0 then
+  begin
+    ComboBox6.ItemIndex := 0;
     OcComPortObj.FalconComSendData_Common(str, 0);
+  end;
   if ACol = 1 then
+  begin
+    ComboBox6.ItemIndex := 1;
     OcComPortObj.FalconComSendData_Common(str, 1);
+  end;
 end;
 
 procedure TSplitViewForm.StringGrid1KeyPress(Sender: TObject; var Key: Char);
@@ -4749,6 +4754,18 @@ begin
   StringGrid1.MouseToCell(X, Y, StringGrid1_Col, StringGrid1_Row);
   if (StringGrid1_Col = CHECKCOL) OR (StringGrid1_Col = 1) OR (StringGrid1_Col = 0) then
     StringGridSelectCell(StringGrid1_Col, StringGrid1_Row);
+
+  if StringGrid1_Col = DATACOL then
+    StringGrid1.Col := DATACOL;
+end;
+
+procedure TSplitViewForm.StringGrid1MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  StringGrid1_Col, StringGrid1_Row: Integer;
+begin
+  StringGrid1.MouseToCell(X, Y, StringGrid1_Col, StringGrid1_Row);
+  if StringGrid1_Col = DATACOL then
+    StringGrid1.Col := DATACOL;
 end;
 
 procedure TSplitViewForm.StringGrid1MouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
@@ -4766,13 +4783,23 @@ end;
 
 procedure TSplitViewForm.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
 begin
+  // StringGrid1.MouseToCell(X, Y, StringGrid1_Col, StringGrid1_Row);
   with StringGrid1 do
   begin
-    CanSelect := True;
-    if ACol in [CHECKCOL] then
-      Options := Options - [goEditing]
+    if ACol = CHECKCOL then //多选项列不编辑不选中
+    begin
+      Options := Options - [goEditing];
+      Options := Options + [goRowSelect];
+      CanSelect := false;
+      //Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',False ' + boolToStr(CanSelect));
+    end
     else
+    begin
+      CanSelect := True;
       Options := Options + [goEditing];
+      Options := Options - [goRowSelect];
+      //Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',True ' + boolToStr(CanSelect));
+    end;
   end;
 end;
 
@@ -4780,7 +4807,6 @@ procedure TSplitViewForm.StringGridSelectCell(ACol, ARow: Integer);
 var
   GridRect: TGridRect;
 begin
-
   StringGrid1.BeginUpdate;
   if (ACol = CHECKCOL) and (ARow > 0) then
   begin
@@ -4794,17 +4820,17 @@ begin
 
   if ((ACol = 1) OR (ACol = 0)) and (ARow > 0) then
   begin
-    with GridRect do
+  with GridRect do
     begin
-      Top := ARow; // StringGrid1.Selection.Top;
+      Top := ARow;
       Left := 0;
       Bottom := ARow;
       Right := 6;
     end;
     StringGrid1.Selection := GridRect;
+    //StringGrid1.Options := StringGrid1.Options + [goRowSelect];
   end;
   StringGrid1.EndUpdate;
-
 end;
 
 procedure TSplitViewForm.StringGridSave();
