@@ -226,14 +226,21 @@ object FrmMain: TFrmMain
           TabOrder = 0
           WantTabs = True
         end
+        object BitBtn1: TBitBtn
+          Left = 680
+          Top = 80
+          Width = 75
+          Height = 25
+          Caption = 'BitBtn1'
+          TabOrder = 1
+          OnClick = BitBtn1Click
+        end
       end
       object TPage
         Left = 0
         Top = 0
         HelpContext = 1
         Caption = #22270#24418
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
@@ -298,8 +305,6 @@ object FrmMain: TFrmMain
         Top = 0
         HelpContext = 2
         Caption = #24110#21161
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object WebBrowser1: TWebBrowser
           Left = 136
           Top = 104
@@ -983,5 +988,10 @@ object FrmMain: TFrmMain
     Height = 32
     Left = 1000
     Top = 56
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    Left = 419
+    Top = 141
   end
 end

@@ -613,8 +613,8 @@ begin
   OcComPortObj.ClearLog;
   OcComPortObj.ClearInternalBuff();
 
-  OcComPortObj.StringInternalMemo.Parent := self; // 设置大量极限数据的缓冲MEMO
-  OcComPortObj.StringInternalMemo.DoubleBuffered := True;
+  OcComPortObj.StringInternelCache.Parent := self; // 设置大量极限数据的缓冲MEMO
+  OcComPortObj.StringInternelCache.DoubleBuffered := True;
   // OcComPortObj.CallBackFun := CallBackFun;
   // OcComPortObj.LogMemo.PopupMenu := self.PopupMenu1;
 
@@ -679,8 +679,8 @@ begin
   OcComPortObj.ClearLog;
   OcComPortObj.ClearInternalBuff();
 
-  OcComPortObj.StringInternalMemo.Parent := self; // 设置大量极限数据的缓冲MEMO
-  OcComPortObj.StringInternalMemo.DoubleBuffered := True;
+  OcComPortObj.StringInternelCache.Parent := self; // 设置大量极限数据的缓冲MEMO
+  OcComPortObj.StringInternelCache.DoubleBuffered := True;
   // OcComPortObj.CallBackFun := CallBackFun;
   // OcComPortObj.LogMemo.PopupMenu := self.PopupMenu1;
 

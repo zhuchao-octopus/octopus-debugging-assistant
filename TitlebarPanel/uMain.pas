@@ -76,6 +76,8 @@ type
     act_tabset_albottom: TAction;
     Action2: TAction;
     CustomizeActionBars1: TCustomizeActionBars;
+    BitBtn1: TBitBtn;
+    Timer1: TTimer;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -93,6 +95,8 @@ type
     procedure act_tabset_albottomExecute(Sender: TObject);
     procedure TabSet1DrawTab(Sender: TObject; TabCanvas: TCanvas; R: TRect;
       Index: Integer; Selected: Boolean);
+    procedure BitBtn1Click(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
 
     procedure WMActivate(var Message: TWMActivate); message WM_ACTIVATE;
@@ -230,6 +234,14 @@ begin
   end;
 end;
 
+procedure TFrmMain.BitBtn1Click(Sender: TObject);
+begin
+  Memo1.Lines.BeginUpdate;
+  Memo1.Lines.Add('dafdfdf');
+  Memo1.Lines.EndUpdate;
+
+end;
+
 procedure TFrmMain.SetAsMainForm();
 var
   P: Pointer;
@@ -310,6 +322,14 @@ begin
 
   S := TabSet1.Tabs.Strings[Index];
   TabCanvas.TextRect(R, S, [tfVerticalCenter,tfSingleLine]);
+end;
+
+procedure TFrmMain.Timer1Timer(Sender: TObject);
+begin
+  inherited;
+ Memo1.Lines.BeginUpdate;
+  Memo1.Lines.Add('dafdfdf');
+  Memo1.Lines.EndUpdate;
 end;
 
 procedure TFrmMain.ToolButton1Click(Sender: TObject);

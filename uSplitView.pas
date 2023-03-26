@@ -1192,9 +1192,10 @@ begin
   begin
     exit;
   end;
+  StatusBar1.Panels.BeginUpdate;
   if (OcComPortObj.LogMemo <> nil) and (OcComPortObj.Connected) then
   begin
-    // StatusBar1.Panels.BeginUpdate;
+
     StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes | ' +
       'Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + IntToStr(Length(OcComPortObj.LogMemo.Text)) + ' Bytes | ' + 'Line: ' +
       IntToStr(OcComPortObj.LogMemo.CaretPos.Y) + ' | ' + 'Lines: ' + IntToStr(OcComPortObj.LogMemo.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
@@ -1206,7 +1207,7 @@ begin
       'Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + IntToStr(Length(Memo1.Text)) + ' Bytes | ' + 'Line: ' + IntToStr(Memo1.CaretPos.Y) + ' | ' + 'Lines: ' +
       IntToStr(Memo1.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
   end;
-
+  StatusBar1.Panels.EndUpdate;
   StatusBar1.Update;
   Application.ProcessMessages;
 end;
@@ -2271,8 +2272,9 @@ begin
   begin
     exit;
   end;
+  OcComPortObj.StringInternelCache.Lines.SaveToFile('StringInternelCache.log');
   OcComPortObj.ClearLog;
-  OcComPortObj.ClearInternalBuff; // 高级清楚内部缓存
+  OcComPortObj.ClearInternalBuff; // 清除内部缓存
 
   IF FileExists(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini') then
     DeleteFile(OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini');
@@ -3118,7 +3120,18 @@ begin
       begin
         if Msg.wParam = VK_TAB then
         begin
-
+        end;
+        if Msg.wParam = VK_CONTROL then
+        begin
+          OcComPortObj := GetDeciceByFullName(GetCurrentDeviceName);
+          if (OcComPortObj <> nil) then
+          begin
+            if OcComPortObj.Connected then
+            begin
+              OcComPortObj.MouseTextSelection := True;
+            end;
+          end;
+          // Memo1.Lines.Append('VK_CONTROL Down');
         end;
         if (Msg.wParam = VK_F1) then
         begin
@@ -3207,6 +3220,16 @@ begin
         if (Msg.wParam = VK_F1) then
         begin
           Handled := True;
+        end;
+        if Msg.wParam = VK_CONTROL then
+        begin
+          OcComPortObj := GetDeciceByFullName(GetCurrentDeviceName);
+          if (OcComPortObj <> nil) then
+          begin
+            OcComPortObj.MouseTextSelection := false;
+            OcComPortObj.StartFlushOutCackedString();
+          end;
+          // Memo1.Lines.Append('VK_CONTROL UP');
         end;
       end;
   end; // case   msg.message   of
@@ -3686,8 +3709,14 @@ begin
       Octopusini.WriteBool('MyPreference', 'SV_ROPEN', SV_R.Opened);
 
       Octopusini.WriteInteger('MyPreference', 'CB8', ComboBox8.ItemIndex);
-      Octopusini.WriteInteger('MyPreference', 'CB_CODE', Combobox_CodePage.ItemIndex);
 
+      // Octopusini.WriteInteger('MyPreference', 'CB1', ComboBox1.ItemIndex);
+      // Octopusini.WriteInteger('MyPreference', 'CB7', ComboBox7.ItemIndex);
+
+      Octopusini.WriteInteger('MyPreference', 'CB_CODE', Combobox_CodePage.ItemIndex);
+      // Octopusini.WriteInteger('', 'SendFormat', ComboBox6.ItemIndex);
+      // Octopusini.WriteInteger('', 'ReceiveFormat', ComboBox7.ItemIndex);
+      // Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
       // Octopusini.WriteInteger('MyPreference', 'READINTERVAL', StrToInt(LabeledEdit1.Text));
     finally
       Octopusini.Free;
@@ -3745,6 +3774,9 @@ begin
     CheckBox12.Checked := Octopusini.ReadBool('MyPreference', 'CK12', True);
 
     ComboBox8.ItemIndex := Octopusini.ReadInteger('MyPreference', 'CB8', 0);
+    ComboBox1.ItemIndex := Octopusini.ReadInteger('MyPreference', 'CB1', 0);
+    ComboBox7.ItemIndex := Octopusini.ReadInteger('MyPreference', 'CB7', 0);
+
     Combobox_CodePage.ItemIndex := Octopusini.ReadInteger('MyPreference', 'CB_CODE', 0);
 
     // LabeledEdit1.Text:= IntToStr(Octopusini.ReadInteger('MyPreference', 'READINTERVAL',30));
@@ -3993,6 +4025,7 @@ var
   OcComPortObj: TOcComPortObj;
   i: Integer;
   s: String;
+  Octopusini: TIniFile;
 begin
   OcComPortObj := GetDeciceByFullName(DeviceFullName);
   if OcComPortObj = nil then
@@ -4012,6 +4045,14 @@ begin
   end;
   s := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.OcComPortObjPara.ComportFullName + '.ini';
   OcComPortObj.StoreSettings(stIniFile, s);
+  try
+    Octopusini := TIniFile.Create(s);
+    Octopusini.WriteInteger('', 'SendFormat', ComboBox6.ItemIndex);
+    Octopusini.WriteInteger('', 'ReceiveFormat', ComboBox7.ItemIndex);
+    Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
+  finally
+    Octopusini.Free;
+  end;
 end;
 
 procedure TSplitViewForm.CloseDevice(DeviceFullName: String);
@@ -4069,12 +4110,11 @@ begin
 
   s := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.OcComPortObjPara.ComportFullName + '.ini';
   OcComPortObj.StoreSettings(stIniFile, s);
-
   try
     Octopusini := TIniFile.Create(s);
     Octopusini.WriteInteger('', 'SendFormat', ComboBox6.ItemIndex);
     Octopusini.WriteInteger('', 'ReceiveFormat', ComboBox7.ItemIndex);
-    Octopusini.WriteInteger('', 'BaudRateIndex', OcComPortObj.BaudRateIndex);
+    Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
   finally
     Octopusini.Free;
   end;
@@ -4171,6 +4211,7 @@ begin
   OcComPortObj.CallBackFun := OcComPortObjCallBack;
   OcComPortObj.LogMemo.PopupMenu := self.PopupMenu1;
   OcComPortObj.LogMemo.ReadOnly := True;
+  OcComPortObj.ClearInternalBuff();
 
   if (OcComPortObj.ReceiveFormat = Ord(Graphic)) and (OcComPortObj.FastLineSeries = nil) then
     OcComPortObj.FastLineSeries := self.CharInitSeries(True);
@@ -4647,7 +4688,7 @@ begin
   end;
 
   StringGrid1.RowCount := 520;
-  StringGrid1.DefaultRowHeight:=26;
+  StringGrid1.DefaultRowHeight := 26;
   StringGrid1.ColCount := 7;
   StringGrid1.ColWidths[0] := 50;
   StringGrid1.ColWidths[1] := 50;
@@ -4719,7 +4760,12 @@ begin
   // OcComPortObj := SettingPagesDlg.getCurrentDevice();
   if OcComPortObj = nil then
   begin
-    // MessageBox(Application.Handle, PChar('No device!! You need to open a device,please use F1 to see how to do that'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    MessageBox(Application.Handle, PChar('No device!! You need to open a device,please use F1 to get help'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    exit;
+  end;
+  if not OcComPortObj.Connected then
+  begin
+    MessageBox(Application.Handle, PChar('No device!! You need to open a device,please use F1 to get help'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
@@ -4786,19 +4832,19 @@ begin
   // StringGrid1.MouseToCell(X, Y, StringGrid1_Col, StringGrid1_Row);
   with StringGrid1 do
   begin
-    if ACol = CHECKCOL then //多选项列不编辑不选中
+    if ACol = CHECKCOL then // 多选项列不编辑不选中
     begin
       Options := Options - [goEditing];
       Options := Options + [goRowSelect];
       CanSelect := false;
-      //Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',False ' + boolToStr(CanSelect));
+      // Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',False ' + boolToStr(CanSelect));
     end
     else
     begin
       CanSelect := True;
       Options := Options + [goEditing];
       Options := Options - [goRowSelect];
-      //Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',True ' + boolToStr(CanSelect));
+      // Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',True ' + boolToStr(CanSelect));
     end;
   end;
 end;
@@ -4820,7 +4866,7 @@ begin
 
   if ((ACol = 1) OR (ACol = 0)) and (ARow > 0) then
   begin
-  with GridRect do
+    with GridRect do
     begin
       Top := ARow;
       Left := 0;
@@ -4828,7 +4874,7 @@ begin
       Right := 6;
     end;
     StringGrid1.Selection := GridRect;
-    //StringGrid1.Options := StringGrid1.Options + [goRowSelect];
+    // StringGrid1.Options := StringGrid1.Options + [goRowSelect];
   end;
   StringGrid1.EndUpdate;
 end;

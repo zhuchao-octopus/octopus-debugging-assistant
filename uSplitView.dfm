@@ -722,7 +722,6 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 662
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -877,6 +876,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Octopus '#21333#26465#21457#36865
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel12: TPanel
           AlignWithMargins = True
           Left = 3
@@ -1124,6 +1125,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
@@ -1401,6 +1404,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #27874#24418
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
@@ -1465,6 +1470,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
