@@ -24,7 +24,7 @@ object SplitViewForm: TSplitViewForm
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clBlack
-  Font.Height = -16
+  Font.Height = -13
   Font.Name = #24494#36719#38597#40657' Light'
   Font.Style = []
   GlassFrame.Enabled = True
@@ -36,11 +36,11 @@ object SplitViewForm: TSplitViewForm
   OnHelp = FormHelp
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 21
+  TextHeight = 19
   object Splitter1: TSplitter
     Left = 1262
     Top = 30
-    Height = 696
+    Height = 692
     Align = alRight
     Beveled = True
     OnMoved = Splitter1Moved
@@ -52,7 +52,7 @@ object SplitViewForm: TSplitViewForm
     Left = 0
     Top = 30
     Width = 320
-    Height = 696
+    Height = 692
     AnimationStep = 60
     OpenedWidth = 320
     ParentColor = True
@@ -64,7 +64,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 320
-      Height = 662
+      Height = 658
       Align = alClient
       TabOrder = 1
       object TPage
@@ -75,15 +75,19 @@ object SplitViewForm: TSplitViewForm
           Left = 0
           Top = 0
           Width = 320
-          Height = 662
+          Height = 658
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
           object Panel3: TPanel
-            Left = 5
+            AlignWithMargins = True
+            Left = 6
             Top = 3
-            Width = 310
+            Width = 308
             Height = 73
+            Margins.Left = 6
+            Margins.Right = 6
+            Align = alTop
             TabOrder = 0
             object Button2: TButton
               Left = 76
@@ -100,10 +104,9 @@ object SplitViewForm: TSplitViewForm
               Left = 5
               Top = 3
               Width = 295
-              Height = 30
+              Height = 28
               ItemsEx = <>
               Style = csExDropDownList
-              ItemHeight = 24
               ParentShowHint = False
               ShowHint = True
               TabOrder = 0
@@ -120,10 +123,15 @@ object SplitViewForm: TSplitViewForm
             end
           end
           object Panel14: TPanel
-            Left = 5
-            Top = 402
-            Width = 310
-            Height = 87
+            AlignWithMargins = True
+            Left = 6
+            Top = 407
+            Width = 308
+            Height = 81
+            Margins.Left = 6
+            Margins.Top = 2
+            Margins.Right = 6
+            Align = alTop
             TabOrder = 1
             object Button17: TButton
               Left = 83
@@ -163,17 +171,22 @@ object SplitViewForm: TSplitViewForm
             end
           end
           object Panel19: TPanel
-            Left = 5
-            Top = 79
-            Width = 310
+            AlignWithMargins = True
+            Left = 6
+            Top = 81
+            Width = 308
             Height = 234
+            Margins.Left = 6
+            Margins.Top = 2
+            Margins.Right = 6
+            Align = alTop
             ParentColor = True
             TabOrder = 2
             object Label13: TLabel
               Left = 5
               Top = 171
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Hint = #21457#36865#25968#25454#30340#26684#24335'ASCI'#20026#23383#31526'HEX'#20026#21313#20845#36827#21046'CMD'#20026#25191#34892#26412#22320'Shell'#21629#20196
               Caption = #21457#36865#26684#24335
               ParentShowHint = False
@@ -182,50 +195,50 @@ object SplitViewForm: TSplitViewForm
             object Label15: TLabel
               Left = 5
               Top = 139
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #27969#25511#21046#31526
             end
             object Label5: TLabel
               Left = 5
               Top = 108
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #26657#39564#20301#25968
             end
             object Label9: TLabel
               Left = 5
               Top = 77
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #20572#27490#20301#25968
             end
             object Label12: TLabel
               Left = 5
               Top = 46
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #25968#25454#20301#25968
             end
             object Label2: TLabel
               Left = 5
               Top = 15
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #27874#29305#29575#25968
             end
             object Label10: TLabel
               Left = 5
               Top = 201
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #25509#25910#26684#24335
             end
             object ComboBox6: TComboBox
               Left = 76
               Top = 167
               Width = 224
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ItemIndex = 0
               ParentColor = True
@@ -241,7 +254,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 136
               Width = 224
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ParentColor = True
               TabOrder = 1
@@ -250,7 +263,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 105
               Width = 224
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ParentColor = True
               TabOrder = 2
@@ -259,7 +272,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 74
               Width = 224
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ParentColor = True
               TabOrder = 3
@@ -268,7 +281,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 43
               Width = 224
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ParentColor = True
               TabOrder = 4
@@ -277,7 +290,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 7
               Width = 224
-              Height = 29
+              Height = 27
               Style = csDropDownList
               DropDownCount = 20
               ParentColor = True
@@ -288,7 +301,7 @@ object SplitViewForm: TSplitViewForm
               Left = 76
               Top = 198
               Width = 224
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ParentColor = True
               TabOrder = 6
@@ -296,10 +309,15 @@ object SplitViewForm: TSplitViewForm
             end
           end
           object Panel20: TPanel
-            Left = 5
-            Top = 317
-            Width = 310
+            AlignWithMargins = True
+            Left = 6
+            Top = 320
+            Width = 308
             Height = 82
+            Margins.Left = 6
+            Margins.Top = 2
+            Margins.Right = 6
+            Align = alTop
             TabOrder = 3
             object Button10: TButton
               Left = 5
@@ -321,10 +339,15 @@ object SplitViewForm: TSplitViewForm
             end
           end
           object Panel21: TPanel
-            Left = 5
+            AlignWithMargins = True
+            Left = 6
             Top = 493
-            Width = 310
-            Height = 129
+            Width = 308
+            Height = 72
+            Margins.Left = 6
+            Margins.Top = 2
+            Margins.Right = 6
+            Align = alTop
             TabOrder = 4
             object Button29: TButton
               Left = 5
@@ -346,285 +369,47 @@ object SplitViewForm: TSplitViewForm
           Left = 0
           Top = 0
           Width = 320
-          Height = 662
+          Height = 658
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           ParentColor = True
           TabOrder = 0
-          object cbxVclStyles: TComboBox
-            Left = 6
-            Top = 3
-            Width = 308
-            Height = 29
-            Style = csDropDownList
-            DropDownCount = 30
-            TabOrder = 0
-            OnChange = cbxVclStylesChange
-          end
-          object GroupBox3: TGroupBox
-            Left = 6
-            Top = 35
-            Width = 307
-            Height = 175
-            TabOrder = 1
-            object Label1: TLabel
-              Left = 8
-              Top = 36
-              Width = 147
-              Height = 17
-              Caption = #36879#26126#24230','#20540#36234#23567#36234#28165#29245
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-            end
-            object Label3: TLabel
-              Left = 8
-              Top = 98
-              Width = 152
-              Height = 17
-              Caption = #33258#21160#20445#23384#26102#38388#38388#38548#31186'  '
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-            end
-            object Edit2: TEdit
-              Left = 186
-              Top = 31
-              Width = 90
-              Height = 25
-              Color = clScrollBar
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-              ReadOnly = True
-              TabOrder = 0
-              Text = '238'
-            end
-            object UpDown2: TUpDown
-              Left = 276
-              Top = 31
-              Width = 25
-              Height = 25
-              Associate = Edit2
-              Min = 1
-              Max = 255
-              Position = 238
-              TabOrder = 1
-              OnChanging = UpDown2Changing
-            end
-            object CheckBox8: TCheckBox
-              Left = 8
-              Top = 65
-              Width = 298
-              Height = 25
-              Caption = #25968#25454#33258#21160#20445#23384#21040#26412#22320#25991#20214
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-              TabOrder = 2
-              OnClick = CheckBox8Click
-            end
-            object Edit3: TEdit
-              Left = 186
-              Top = 94
-              Width = 90
-              Height = 25
-              Hint = #21333#20301#31186
-              Color = clScrollBar
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-              ParentShowHint = False
-              ReadOnly = True
-              ShowHint = True
-              TabOrder = 3
-              Text = '10'
-            end
-            object UpDown5: TUpDown
-              Left = 276
-              Top = 94
-              Width = 25
-              Height = 25
-              Associate = Edit3
-              Min = 5
-              Max = 32766
-              Position = 10
-              TabOrder = 4
-              OnChanging = UpDown5Changing
-            end
-            object Button6: TButton
-              Left = 8
-              Top = 131
-              Width = 178
-              Height = 34
-              Caption = #21382#21490#25968#25454#25991#20214#30446#24405
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-              TabOrder = 5
-              OnClick = Button6Click
-            end
-            object Button5: TButton
-              Left = 195
-              Top = 131
-              Width = 106
-              Height = 34
-              Caption = #28165#38500#32531#23384
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-              TabOrder = 6
-              OnClick = Button5Click
-            end
-            object CheckBox7: TCheckBox
-              Left = 8
-              Top = 3
-              Width = 263
-              Height = 25
-              Caption = #31383#21475#32972#26223#21551#29992#36879#26126#25928#26524
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-              TabOrder = 7
-              OnClick = CheckBox7Click
-            end
-          end
-          object GroupBox4: TGroupBox
-            Left = 6
-            Top = 216
-            Width = 307
-            Height = 210
-            TabOrder = 2
-            object CheckBox2: TCheckBox
-              Left = 8
-              Top = 11
-              Width = 297
-              Height = 25
-              Caption = #22987#32456#20445#25345#22312#25152#26377#31383#21475#30340#26368#39030#23618
-              TabOrder = 0
-              OnClick = CheckBox2Click
-            end
-            object CheckBox25: TCheckBox
-              Left = 8
-              Top = 39
-              Width = 273
-              Height = 25
-              Caption = #21457#36865#21644#25509#25910#35760#24405#21069#38754#26174#31034#26102#38388#20449#24687
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clMenuText
-              Font.Height = -13
-              Font.Name = 'Segoe UI'
-              Font.Style = []
-              ParentFont = False
-              TabOrder = 1
-              OnClick = CheckBox25Click
-            end
-            object CheckBox3: TCheckBox
-              Left = 8
-              Top = 67
-              Width = 273
-              Height = 25
-              Caption = #21457#36865#21644#25509#25910#35760#24405#21069#38754#26174#31034#24180#26376#26085#26399
-              TabOrder = 2
-              OnClick = CheckBox3Click
-            end
-            object CheckBox4: TCheckBox
-              Left = 8
-              Top = 95
-              Width = 258
-              Height = 25
-              Caption = #25968#25454#35760#24405#21069#38754#26174#31034#34892#21495
-              TabOrder = 3
-              OnClick = CheckBox4Click
-            end
-            object CheckBox5: TCheckBox
-              Left = 8
-              Top = 123
-              Width = 249
-              Height = 25
-              Caption = #26174#31034#20018#21475#27491#22312#21457#36865#30340#25968#25454
-              TabOrder = 4
-              OnClick = CheckBox5Click
-            end
-            object CheckBox6: TCheckBox
-              Left = 8
-              Top = 179
-              Width = 258
-              Height = 25
-              Caption = 'Switch To English Language'
-              Enabled = False
-              TabOrder = 5
-              OnClick = CheckBox6Click
-            end
-            object CheckBox1: TCheckBox
-              Left = 8
-              Top = 151
-              Width = 209
-              Height = 25
-              Caption = #22312#26700#38754#21019#24314#24555#25463#26041#24335
-              Checked = True
-              Enabled = False
-              State = cbChecked
-              TabOrder = 6
-            end
-          end
           object Panel11: TPanel
-            Left = 6
-            Top = 431
-            Width = 308
-            Height = 193
-            TabOrder = 3
+            AlignWithMargins = True
+            Left = 5
+            Top = 436
+            Width = 310
+            Height = 197
+            Margins.Left = 5
+            Margins.Top = 2
+            Margins.Right = 5
+            Align = alTop
+            TabOrder = 0
             object Label4: TLabel
               Left = 8
-              Top = 80
-              Width = 143
-              Height = 21
-              Caption = #21313#20845#36827#21046#23545#40784#26041#24335'   '
+              Top = 77
+              Width = 134
+              Height = 19
+              Caption = #21313#20845#36827#21046#23545#40784#26041#24335' '#22914#19979
             end
             object CheckBox12: TCheckBox
               Left = 8
-              Top = 17
-              Width = 287
-              Height = 17
-              Hint = #21246#19978#65292#25903#25345#20013#25991#31561#22810#22269#35821#35328#30340#25509#25910
-              Caption = #25509#25910#20351#29992' UNICODE '#23383#31526#38598#32534#30721#65288#20013#25991#65289
-              Checked = True
+              Top = 6
+              Width = 293
+              Height = 28
+              Hint = #21246#36873#25903#25345#20013#25991#31561#22810#22269#35821#35328#19981#36873#20026#26631#20934'ASCII'#23383#31526#38598
+              Caption = #25509#25910#20351#29992'UNICODE'#23383#31526#38598#32534#30721'('#25903#25345#20013#25991')'
               ParentShowHint = False
               ShowHint = True
-              State = cbChecked
               TabOrder = 0
               OnClick = CheckBox12Click
             end
             object Combobox_CodePage: TComboBox
               Left = 8
-              Top = 45
+              Top = 40
               Width = 293
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ItemIndex = 0
               TabOrder = 1
@@ -640,9 +425,9 @@ object SplitViewForm: TSplitViewForm
             end
             object ComboBox8: TComboBox
               Left = 8
-              Top = 102
+              Top = 101
               Width = 293
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ItemIndex = 0
               TabOrder = 2
@@ -655,12 +440,12 @@ object SplitViewForm: TSplitViewForm
             end
             object LabeledEdit1: TLabeledEdit
               Left = 8
-              Top = 156
+              Top = 159
               Width = 169
-              Height = 29
+              Height = 27
               Color = clWhite
-              EditLabel.Width = 128
-              EditLabel.Height = 21
+              EditLabel.Width = 104
+              EditLabel.Height = 19
               EditLabel.Caption = #25509#25910#24310#36831#65288#27627#31186#65289
               EditLabel.Color = clBtnHighlight
               EditLabel.ParentColor = False
@@ -669,13 +454,222 @@ object SplitViewForm: TSplitViewForm
               Text = ''
             end
             object Button14: TButton
-              Left = 200
-              Top = 148
-              Width = 101
-              Height = 33
+              Left = 188
+              Top = 154
+              Width = 113
+              Height = 34
               Caption = #24212#29992
               TabOrder = 4
               OnClick = Button14Click
+            end
+          end
+          object Panel22: TPanel
+            AlignWithMargins = True
+            Left = 5
+            Top = 3
+            Width = 310
+            Height = 41
+            Margins.Left = 5
+            Margins.Right = 5
+            Align = alTop
+            TabOrder = 1
+            object cbxVclStyles: TComboBox
+              AlignWithMargins = True
+              Left = 6
+              Top = 6
+              Width = 295
+              Height = 27
+              Style = csDropDownList
+              DropDownCount = 30
+              TabOrder = 0
+              OnChange = cbxVclStylesChange
+            end
+          end
+          object Panel23: TPanel
+            AlignWithMargins = True
+            Left = 5
+            Top = 49
+            Width = 310
+            Height = 167
+            Margins.Left = 5
+            Margins.Top = 2
+            Margins.Right = 5
+            Align = alTop
+            TabOrder = 2
+            object Label3: TLabel
+              Left = 8
+              Top = 97
+              Width = 125
+              Height = 19
+              Caption = #33258#21160#20445#23384#26102#38388#38388#38548#31186'  '
+            end
+            object Label1: TLabel
+              Left = 8
+              Top = 34
+              Width = 120
+              Height = 19
+              Caption = #36879#26126#24230','#20540#36234#23567#36234#28165#29245
+            end
+            object Edit2: TEdit
+              Left = 186
+              Top = 31
+              Width = 90
+              Height = 27
+              Color = clScrollBar
+              ReadOnly = True
+              TabOrder = 0
+              Text = '238'
+            end
+            object UpDown2: TUpDown
+              Left = 276
+              Top = 31
+              Width = 16
+              Height = 29
+              Associate = Edit2
+              Min = 1
+              Max = 255
+              Position = 238
+              TabOrder = 1
+              OnChanging = UpDown2Changing
+            end
+            object UpDown5: TUpDown
+              Left = 276
+              Top = 94
+              Width = 16
+              Height = 29
+              Associate = Edit3
+              Min = 5
+              Max = 32766
+              Position = 10
+              TabOrder = 2
+              OnChanging = UpDown5Changing
+            end
+            object Edit3: TEdit
+              Left = 186
+              Top = 94
+              Width = 90
+              Height = 27
+              Hint = #21333#20301#31186
+              Color = clScrollBar
+              ParentShowHint = False
+              ReadOnly = True
+              ShowHint = True
+              TabOrder = 3
+              Text = '10'
+            end
+            object Button5: TButton
+              Left = 192
+              Top = 129
+              Width = 109
+              Height = 34
+              Caption = #28165#38500#32531#23384
+              TabOrder = 4
+              OnClick = Button5Click
+            end
+            object Button6: TButton
+              Left = 8
+              Top = 129
+              Width = 178
+              Height = 34
+              Caption = #21382#21490#25968#25454#25991#20214#30446#24405
+              TabOrder = 5
+              OnClick = Button6Click
+            end
+            object CheckBox8: TCheckBox
+              Left = 8
+              Top = 66
+              Width = 247
+              Height = 25
+              Caption = #25968#25454#33258#21160#20445#23384#21040#26412#22320#25991#20214
+              TabOrder = 6
+              OnClick = CheckBox8Click
+            end
+            object CheckBox7: TCheckBox
+              Left = 8
+              Top = 3
+              Width = 241
+              Height = 25
+              Caption = #31383#21475#32972#26223#21551#29992#36879#26126#25928#26524
+              TabOrder = 7
+              OnClick = CheckBox7Click
+            end
+          end
+          object Panel24: TPanel
+            AlignWithMargins = True
+            Left = 5
+            Top = 221
+            Width = 310
+            Height = 210
+            Margins.Left = 5
+            Margins.Top = 2
+            Margins.Right = 5
+            Align = alTop
+            TabOrder = 3
+            object CheckBox2: TCheckBox
+              Left = 10
+              Top = 7
+              Width = 269
+              Height = 25
+              Caption = #22987#32456#20445#25345#22312#25152#26377#31383#21475#30340#26368#39030#23618
+              TabOrder = 0
+              OnClick = CheckBox2Click
+            end
+            object CheckBox25: TCheckBox
+              Left = 10
+              Top = 34
+              Width = 266
+              Height = 25
+              Caption = #21457#36865#21644#25509#25910#35760#24405#21069#38754#26174#31034#26102#38388#20449#24687
+              TabOrder = 1
+              OnClick = CheckBox25Click
+            end
+            object CheckBox3: TCheckBox
+              Left = 10
+              Top = 61
+              Width = 269
+              Height = 25
+              Caption = #21457#36865#21644#25509#25910#35760#24405#21069#38754#26174#31034#24180#26376#26085#26399
+              TabOrder = 2
+              OnClick = CheckBox3Click
+            end
+            object CheckBox4: TCheckBox
+              Left = 10
+              Top = 89
+              Width = 231
+              Height = 25
+              Caption = #25968#25454#35760#24405#21069#38754#26174#31034#34892#21495
+              TabOrder = 3
+              OnClick = CheckBox4Click
+            end
+            object CheckBox5: TCheckBox
+              Left = 10
+              Top = 116
+              Width = 231
+              Height = 25
+              Caption = #26174#31034#20018#21475#27491#22312#21457#36865#30340#25968#25454
+              TabOrder = 4
+              OnClick = CheckBox5Click
+            end
+            object CheckBox1: TCheckBox
+              Left = 10
+              Top = 143
+              Width = 191
+              Height = 25
+              Caption = #22312#26700#38754#21019#24314#24555#25463#26041#24335
+              Checked = True
+              Enabled = False
+              State = cbChecked
+              TabOrder = 5
+            end
+            object CheckBox6: TCheckBox
+              Left = 10
+              Top = 171
+              Width = 258
+              Height = 25
+              Caption = 'Switch To English Language'
+              Enabled = False
+              TabOrder = 6
+              OnClick = CheckBox6Click
             end
           end
         end
@@ -683,7 +677,7 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet1: TTabSet
       Left = 0
-      Top = 662
+      Top = 658
       Width = 320
       Height = 34
       Align = alBottom
@@ -707,7 +701,7 @@ object SplitViewForm: TSplitViewForm
     Left = 942
     Top = 30
     Width = 320
-    Height = 696
+    Height = 692
     AnimationStep = 60
     OpenedWidth = 320
     ParentColor = True
@@ -720,7 +714,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 320
-      Height = 662
+      Height = 658
       Align = alClient
       TabOrder = 1
       object TPage
@@ -733,7 +727,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 314
-          Height = 656
+          Height = 652
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
@@ -743,7 +737,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 232
             Width = 314
-            Height = 424
+            Height = 420
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
@@ -752,7 +746,7 @@ object SplitViewForm: TSplitViewForm
               Left = 0
               Top = 0
               Width = 314
-              Height = 355
+              Height = 351
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
@@ -762,7 +756,7 @@ object SplitViewForm: TSplitViewForm
                 Left = 3
                 Top = 3
                 Width = 308
-                Height = 349
+                Height = 345
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -779,7 +773,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Panel8: TPanel
               Left = 0
-              Top = 355
+              Top = 351
               Width = 314
               Height = 69
               Align = alBottom
@@ -847,7 +841,7 @@ object SplitViewForm: TSplitViewForm
               Top = 129
               Width = 311
               Height = 34
-              Caption = #23558#19978#38754#30340#23383#31526#20018#36716#25442#25104#21313#20845#36827#21046#23383#33410#30721
+              Caption = #23558#19978#38754#23383#31526#20018#36716#25442#25104#21313#20845#36827#21046#23383#33410#30721
               TabOrder = 1
               OnClick = Button9Click
             end
@@ -856,7 +850,7 @@ object SplitViewForm: TSplitViewForm
               Top = 163
               Width = 311
               Height = 34
-              Caption = #23558#19979#38754#30340#21313#20845#36827#21046#23383#33410#30721#36716#25442#25104#23383#31526#20018
+              Caption = #23558#19979#38754#21313#20845#36827#21046#23383#33410#30721#36716#25442#25104#23383#31526#20018
               TabOrder = 2
               OnClick = Button11Click
             end
@@ -865,7 +859,7 @@ object SplitViewForm: TSplitViewForm
               Top = 198
               Width = 311
               Height = 34
-              Caption = #35745#31639#20986'CRC8'#26657#39564#23383#33410
+              Caption = #35745#31639#20986#19979#38754#23383#33410#30721#30340'CRC8'#26657#39564#23383#33410
               TabOrder = 3
               OnClick = Button13Click
             end
@@ -876,14 +870,12 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Octopus '#21333#26465#21457#36865
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel12: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 314
-          Height = 656
+          Height = 652
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
@@ -892,7 +884,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 618
+            Height = 614
             Hint = #28857#20987#24038#36793#25353#38062#21457#36865#25968#25454
             Align = alClient
             BorderStyle = bsNone
@@ -923,10 +915,1011 @@ object SplitViewForm: TSplitViewForm
               41
               50
               186)
+            RowHeights = (
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27
+              27)
           end
           object Panel4: TPanel
             Left = 0
-            Top = 618
+            Top = 614
             Width = 314
             Height = 38
             Align = alBottom
@@ -971,7 +1964,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 314
-          Height = 656
+          Height = 652
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
@@ -982,14 +1975,14 @@ object SplitViewForm: TSplitViewForm
             Left = 3
             Top = 127
             Width = 308
-            Height = 454
+            Height = 450
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
           end
           object Panel16: TPanel
             Left = 0
-            Top = 584
+            Top = 580
             Width = 314
             Height = 72
             Align = alBottom
@@ -1034,36 +2027,36 @@ object SplitViewForm: TSplitViewForm
             object Label18: TLabel
               Left = 3
               Top = 102
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #25805#20316#31867#22411
             end
             object Label11: TLabel
               Left = 3
               Top = 72
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #35835#23383#33410#25968
             end
             object Label8: TLabel
               Left = 3
               Top = 42
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #22120#20214#22320#22336
             end
             object Label7: TLabel
               Left = 3
               Top = 13
-              Width = 64
-              Height = 21
+              Width = 52
+              Height = 19
               Caption = #36890#35759#21327#35758
             end
             object ComboBox12: TComboBox
               Left = 73
               Top = 96
               Width = 237
-              Height = 29
+              Height = 27
               Style = csDropDownList
               ItemIndex = 1
               TabOrder = 0
@@ -1078,7 +2071,7 @@ object SplitViewForm: TSplitViewForm
               Left = 74
               Top = 3
               Width = 237
-              Height = 29
+              Height = 27
               Align = alRight
               Style = csDropDownList
               ItemIndex = 0
@@ -1101,7 +2094,7 @@ object SplitViewForm: TSplitViewForm
               Left = 73
               Top = 34
               Width = 237
-              Height = 29
+              Height = 27
               TabOrder = 2
               Text = '0x08000000'
               OnKeyPress = ComboBox10KeyPress
@@ -1113,7 +2106,7 @@ object SplitViewForm: TSplitViewForm
               Left = 73
               Top = 66
               Width = 237
-              Height = 29
+              Height = 27
               TabOrder = 3
               Text = '1'
               OnKeyPress = ComboBox11KeyPress
@@ -1125,14 +2118,12 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 314
-          Height = 656
+          Height = 652
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
@@ -1140,7 +2131,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 656
+            Height = 652
             Align = alClient
             TabOrder = 0
             object CheckBox10: TCheckBox
@@ -1276,7 +2267,7 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet3: TTabSet
       Left = 0
-      Top = 662
+      Top = 658
       Width = 320
       Height = 34
       Align = alBottom
@@ -1296,9 +2287,9 @@ object SplitViewForm: TSplitViewForm
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 726
+    Top = 722
     Width = 1265
-    Height = 24
+    Height = 28
     Panels = <
       item
         Bevel = pbNone
@@ -1314,13 +2305,15 @@ object SplitViewForm: TSplitViewForm
         Bevel = pbNone
         Width = 50
       end>
+    ParentFont = True
+    UseSystemFont = False
     OnDrawPanel = StatusBar1DrawPanel
   end
   object Panel1: TPanel
     Left = 320
     Top = 30
     Width = 622
-    Height = 696
+    Height = 692
     Align = alClient
     BevelOuter = bvNone
     ParentBackground = False
@@ -1330,8 +2323,9 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 622
-      Height = 662
+      Height = 658
       Align = alClient
+      PageIndex = 1
       TabOrder = 0
       object TPage
         Left = 0
@@ -1342,7 +2336,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 616
-          Height = 656
+          Height = 652
           Align = alClient
           BorderStyle = bsNone
           Color = clMenuText
@@ -1404,23 +2398,29 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #27874#24418
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 616
-          Height = 656
+          Height = 652
           AllowPanning = pmVertical
+          Foot.Visible = False
           Legend.Visible = False
           ScrollMouseButton = mbMiddle
+          SubFoot.Visible = False
+          SubTitle.Visible = False
           Title.Alignment = taLeftJustify
           Title.Font.Color = clBlack
           Title.Font.Name = 'Segoe UI'
           Title.Text.Strings = (
             'TChart Name')
           Title.Visible = False
+          BottomAxis.Automatic = False
+          BottomAxis.AutomaticMaximum = False
+          BottomAxis.AutomaticMinimum = False
+          BottomAxis.Maximum = 19.084318849959800000
+          BottomAxis.Minimum = 4.915681150040209000
           BottomAxis.Visible = False
           LeftAxis.Automatic = False
           LeftAxis.AutomaticMinimum = False
@@ -1433,8 +2433,8 @@ object SplitViewForm: TSplitViewForm
           TopAxis.Automatic = False
           TopAxis.AutomaticMaximum = False
           TopAxis.AutomaticMinimum = False
-          TopAxis.Maximum = 0.000000000330143303
-          TopAxis.Minimum = -0.000000000330143303
+          TopAxis.Maximum = 0.000000000194190742
+          TopAxis.Minimum = -0.000000000194190742
           TopAxis.Visible = False
           View3D = False
           Zoom.Animated = True
@@ -1470,20 +2470,18 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
           Top = 3
           Width = 616
-          Height = 656
+          Height = 652
           Align = alClient
           TabOrder = 0
           OnNewWindow2 = W1234998NewWindow2
           ExplicitHeight = 650
           ControlData = {
-            4C000000AA3F0000CD4300000000000000000000000000000000000000000000
+            4C000000AA3F0000634300000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126208000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -1493,7 +2491,7 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet2: TTabSet
       Left = 0
-      Top = 662
+      Top = 658
       Width = 622
       Height = 34
       ParentCustomHint = False
@@ -1506,7 +2504,7 @@ object SplitViewForm: TSplitViewForm
       ParentShowHint = False
       PopupMenu = PopupMenu1
       ShowHint = False
-      SelectedColor = clYellow
+      SelectedColor = clSkyBlue
       Style = tsModernTabs
       Tabs.Strings = (
         #26412#22320#25991#20214#30446#24405)
@@ -1550,8 +2548,8 @@ object SplitViewForm: TSplitViewForm
     ColorDepth = cd32Bit
     Height = 32
     Width = 32
-    Left = 604
-    Top = 36
+    Left = 570
+    Top = 256
     Bitmap = {
       494C010106008000040020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000004000000001002000000000000080
@@ -2619,32 +3617,34 @@ object SplitViewForm: TSplitViewForm
   object Timer1: TTimer
     Enabled = False
     OnTimer = Timer1Timer
-    Left = 348
-    Top = 147
+    Left = 756
+    Top = 75
   end
   object Timer2: TTimer
     Enabled = False
     Interval = 10000
     OnTimer = Timer2Timer
-    Left = 350
-    Top = 35
+    Left = 758
+    Top = 131
   end
   object OpenDialog1: TOpenDialog
     Left = 424
-    Top = 33
+    Top = 41
   end
   object Timer3: TTimer
     Enabled = False
     Interval = 600000
     OnTimer = Timer3Timer
-    Left = 352
-    Top = 88
+    Left = 760
+    Top = 184
   end
   object PopupMenu1: TPopupMenu
-    Left = 480
-    Top = 136
+    Images = DeviceIconList
+    Left = 424
+    Top = 256
     object CloseTheDevice1: TMenuItem
       Caption = #20851#38381#36825#20010#35774#22791
+      ImageIndex = 0
       OnClick = CloseTheDevice1Click
     end
     object N2: TMenuItem
@@ -2682,11 +3682,11 @@ object SplitViewForm: TSplitViewForm
       '.oct|*.* '#25152#26377#25991#20214'|*.*'
     FilterIndex = 0
     Left = 499
-    Top = 35
+    Top = 43
   end
   object TrayIcon1: TTrayIcon
     Left = 496
-    Top = 296
+    Top = 256
   end
   object FontDialog1: TFontDialog
     Font.Charset = DEFAULT_CHARSET
@@ -2694,19 +3694,19 @@ object SplitViewForm: TSplitViewForm
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
-    Left = 376
-    Top = 247
+    Left = 488
+    Top = 103
   end
   object ColorDialog1: TColorDialog
-    Left = 443
-    Top = 243
+    Left = 411
+    Top = 105
   end
   object FindDialog1: TFindDialog
     OnClose = FindDialog1Close
     OnShow = FindDialog1Show
     OnFind = FindDialog1Find
-    Left = 576
-    Top = 208
+    Left = 568
+    Top = 40
   end
   object ActionManager1: TActionManager
     ActionBars = <
@@ -2716,34 +3716,38 @@ object SplitViewForm: TSplitViewForm
             Items = <
               item
                 Action = FileOpen1
+                Caption = #25171#24320'(&U)...'
                 ImageIndex = 7
                 ShortCut = 16463
               end
               item
-                Action = FileOpenWith1
-                Caption = 'O&pen with...'
-              end
-              item
                 Action = FileSaveAs1
+                Caption = #21478#23384#20026'(&V)...'
                 ImageIndex = 30
               end
               item
                 Action = FilePrintSetup1
+                Caption = #25171#21360#35774#32622'(&W)...'
               end
               item
                 Action = FilePageSetup1
-                Caption = 'Pa&ge Setup...'
+                Caption = #39029#38754#35774#32622'(&X)...'
               end
               item
                 Action = FileRun1
+                Caption = #36816#34892'(&Y)...'
+              end
+              item
+                Action = submitProblem
+                Caption = #25105#26377#38382#39064'(&Z)...'
+              end
+              item
+                Caption = '-'
               end
               item
                 Action = FileExit1
+                Caption = #36864#20986'(&T)'
                 ImageIndex = 43
-              end
-              item
-                Action = BrowseForFolder1
-                Caption = '&BrowseForFolder1'
               end>
             Caption = '&'#33756#21333
             ImageIndex = 1
@@ -2751,8 +3755,8 @@ object SplitViewForm: TSplitViewForm
         ActionBar = ActionMainMenuBar1
       end>
     Images = DeviceIconList
-    Left = 1072
-    Top = 198
+    Left = 1032
+    Top = 70
     StyleName = 'Platform Default'
     object SearchFindFirst1: TSearchFindFirst
       Category = 'Edit'
@@ -2859,6 +3863,7 @@ object SplitViewForm: TSplitViewForm
       Hint = 'Open|Opens an existing file'
       ImageIndex = 7
       ShortCut = 16463
+      OnAccept = FileOpen1Accept
     end
     object FileOpenWith1: TFileOpenWith
       Category = 'File'
@@ -2870,6 +3875,8 @@ object SplitViewForm: TSplitViewForm
       Caption = 'Save &As...'
       Hint = 'Save As|Saves the active file with a new name'
       ImageIndex = 30
+      BeforeExecute = FileSaveAs1BeforeExecute
+      OnAccept = FileSaveAs1Accept
     end
     object FilePrintSetup1: TFilePrintSetup
       Category = 'File'
@@ -2933,8 +3940,9 @@ object SplitViewForm: TSplitViewForm
     object act_Dynamic: TAction
       Caption = 'act_Dynamic'
     end
-    object act_tabset_albottom: TAction
-      Caption = #39029#38754#26631#31614#20301#20110#24213#37096
+    object submitProblem: TAction
+      Caption = 'act_submitProblem'
+      OnExecute = submitProblemExecute
     end
     object Action2: TAction
       Category = 'Internet'

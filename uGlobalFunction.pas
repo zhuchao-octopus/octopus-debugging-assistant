@@ -11,9 +11,9 @@ uses
 
 Const
 {$IFDEF CPU64BITS}
-  APPLICATION_TITLE = '八爪鱼串口开发调试助手 64bit '; // for 64 bit;
+  APPLICATION_TITLE = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
 {$ELSE}
-  APPLICATION_TITLE = '八爪鱼串口开发调试助手 32bit '; // for 32 bit;
+  APPLICATION_TITLE = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
 {$ENDIF}
   E_MAIL = 'Octopus@1234998.cn';
   WEB_SITE = 'http://www.1234998.cn';
@@ -618,8 +618,13 @@ begin
 
     if tmpComponent is TForm then
     begin
-      // TButton(tmpComponent).ParentFont := false;
       TForm(tmpComponent).Font := f;
+    end;
+
+    if tmpComponent is TSplitView then
+    begin
+      // TSplitView(tmpComponent).ParentFont := false;
+      TSplitView(tmpComponent).Font := f;
     end;
 
     if tmpComponent is TButton then
@@ -647,11 +652,6 @@ begin
       // TLabel(tmpComponent).ParentFont := false;
       TLabel(tmpComponent).Font := f;
     end;
-    if tmpComponent is TPanel then
-    begin
-      // TPanel(tmpComponent).ParentFont := false;
-      TPanel(tmpComponent).Font := f;
-    end;
 
     if tmpComponent is TComboBox then
     begin
@@ -665,10 +665,10 @@ begin
       TEdit(tmpComponent).Font := f;
     end;
 
-    if tmpComponent is TSplitView then
+    if tmpComponent is TComboBoxEx then
     begin
-      // TSplitView(tmpComponent).ParentFont := false;
-      TSplitView(tmpComponent).Font := f;
+      // TComboBoxEx(tmpComponent).ParentFont := false;
+      TComboBoxEx(tmpComponent).Font := f;
     end;
 
     if tmpComponent is TStringGrid then
@@ -677,18 +677,27 @@ begin
       TStringGrid(tmpComponent).Font := f;
     end;
 
+    if tmpComponent is TPanel then
+    begin
+      // TPanel(tmpComponent).ParentFont := false;
+      TPanel(tmpComponent).Font := f;
+    end;
+
     if tmpComponent is TTabSet then
     begin
-      // TStringGrid(tmpComponent).ParentFont := false;
+      // TTabSet(tmpComponent).ParentFont := false;
       TTabSet(tmpComponent).Font := f;
     end;
 
-    if tmpComponent is TComboBoxEx then
+     if tmpComponent is TNoteBook then
     begin
-      // TStringGrid(tmpComponent).ParentFont := false;
-      TComboBoxEx(tmpComponent).Font := f;
+      TNoteBook(tmpComponent).Font := f;
     end;
 
+    if tmpComponent is TStatusBar then
+    begin
+      TStatusBar(tmpComponent).Font := f;
+    end;
   End;
 end;
 

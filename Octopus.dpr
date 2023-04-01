@@ -44,7 +44,11 @@ uses
   RSAOpenSSL in '..\ZSBWM\RSAOSSL\RSAOpenSSL.pas',
   libeay32 in '..\ZSBWM\RSAOSSL\libeay32.pas',
   OcPcDeviceMgt in 'OcPcDeviceMgt.pas',
-  Vcl.Tabs in 'Vcl.Tabs.pas';
+  Vcl.Tabs in 'Vcl.Tabs.pas',
+  Mail4Delphi.Intf in '..\ZSBWM\SMTP\Mail4Delphi.Intf.pas',
+  Mail4Delphi in '..\ZSBWM\SMTP\Mail4Delphi.pas',
+  uSetting in '..\ZSBWM\SMTP\uSetting.pas' {ConfigurationFrm},
+  uSMTP in '..\ZSBWM\SMTP\uSMTP.pas' {SubmitProblemFrm};
 
 {$R *.res}
 
@@ -54,6 +58,8 @@ begin
   Application.Title := 'OCTOPUS °Ë×¦Óã´®¿ÚÖÕ¶Ë';
   Application.CreateForm(TSplitViewForm, SplitViewForm);
   Application.CreateForm(TOcFindAndFrm, OcFindAndFrm);
+  Application.CreateForm(TConfigurationFrm, ConfigurationFrm);
+  Application.CreateForm(TSubmitProblemFrm, SubmitProblemFrm);
   Application.Run;
 
 end.

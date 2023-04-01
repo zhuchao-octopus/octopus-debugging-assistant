@@ -45,7 +45,7 @@ type
   TCallBackFun = Procedure(Count: integer = 0) of object;
   TProtocolCallBackFun = Procedure(TypeID: integer) of object;
 
-  TOcComPortObjPara = packed record
+  { TOcComPortObjPara = packed record
     ComportFullName: String;
     Port: String; // change com port;
     BaudRate: integer;
@@ -61,8 +61,7 @@ type
     ShowLineNumber: Boolean;
     ShowSendedLog: Boolean;
     HexModeWithString: Boolean; // o
-
-  end;
+    end; }
 
   // thread for background monitoring of port events
 type
@@ -71,13 +70,12 @@ type
 
   TOcComPortObj = class(TComport)
   private
-    FOcComPortObjPara: TOcComPortObjPara;
-    // Port: String; // change com port;
-    // BaudRate: Integer;
-    // DataBits: Integer;
-    // StopBits: Integer;
-    // ParityBits: Integer;
-    // FlowControl: Integer;
+    FComReceiveBuffer: array [0 .. INPUT_OUTPUT_BUFFER_SIZE] of Byte;
+    // 1024 * 1024 =  1048576 =1M // for com port receive buffer
+    FComReceiveInternalBuffer: array of Byte; // for 异步处理
+    FFastLineSeries: TFastLineSeries;
+
+    FComportFullName: String;
     FSendFormat: integer; // h
     FReceiveFormat: integer; // i
     FLogMemo: TMemo; // j
@@ -87,19 +85,15 @@ type
     FShowSendingLog: Boolean;
     FHexModeWithString: Boolean; // o
     FHexModeFormatCount: integer;
-    FBaudRateIndex: integer;
-
-    FComReceiveBuffer: array [0 .. INPUT_OUTPUT_BUFFER_SIZE] of Byte;
-    // 1024 * 1024 =  1048576 =1M // for com port receive buffer
-    FComReceiveInternalBuffer: array of Byte; // for 异步处理
-    FFastLineSeries: TFastLineSeries;
-
+    FCompatibleUnicode: Boolean;
     FComReceiveString: String;
     FStringInternalMemo: TMemo;
+
     FComUIHandleThread: TComUIHandleThread; // 异步线程
+    FComPackParserThread: TComPackParserHandleThread;
     FBackGroundProcessRecordCount: integer;
     FComHandleThread_Wait: Boolean; // 同步变量
-    FComPackParserThread: TComPackParserHandleThread;
+
     FProtocalData: integer;
     FNeedCRC16: Boolean;
     FComReceiveCount: Int64;
@@ -107,14 +101,12 @@ type
     FComSentCount: Int64;
     FCallBackFun: TCallBackFun;
     FProtocolCallBackFun: TProtocolCallBackFun;
-    FComportFullName: String;
+
     FullLogFileName: String;
     FFileStream: TFileStream;
     FFileStreamName: String;
     FOcComProtocal: TOcComProtocal;
-    FCompatibleUnicode: Boolean;
     FExcelAppRows: Int64;
-
     FCommadLineStr: String;
     FPreCommadLineStr: String;
     FLastLineStr: String;
@@ -123,7 +115,7 @@ type
     FNeedNewLine: Boolean;
     FLogScrollMode: Boolean;
     FMouseTextSelection: Boolean;
-    function GetConfiguration(): TOcComPortObjPara;
+    // function GetConfiguration(): TOcComPortObjPara;
     function GetLineNumberDateTimeStamp(N: Int64): String;
     function SaveToTheExcelFile(Length: integer; Rows: integer): integer;
     procedure OcComPortObjRxChar(Sender: TObject; Count: integer);
@@ -159,7 +151,7 @@ type
 
     procedure ClearLog();
 
-    property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
+    // property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
     property LogMemo: TMemo read FLogMemo write FLogMemo;
     property StringInternelCache: TMemo read FStringInternalMemo write FStringInternalMemo;
     property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
@@ -177,16 +169,19 @@ type
     property ReceiveFormat: integer read FReceiveFormat write FReceiveFormat;
     property SendFormat: integer read FSendFormat write FSendFormat default 0;
 
-    property CompatibleUnicode: Boolean read FCompatibleUnicode write FCompatibleUnicode default True;
+    property CompatibleUnicode: Boolean read FCompatibleUnicode write FCompatibleUnicode default false;
     property NeedCRC16: Boolean read FNeedCRC16 write FNeedCRC16 default false;
     property ShowSendedLog: Boolean read FShowSendingLog write FShowSendingLog;
+    property ShowDate: Boolean read FShowDate write FShowDate;
     property ShowLineNumber: Boolean read FShowLineNumber write FShowLineNumber;
+    property ShowTime: Boolean read FShowTime write FShowTime;
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode default True;
-    property BaudRateIndex: integer read FBaudRateIndex write FBaudRateIndex;
+    // property BaudRateIndex: integer read FBaudRateIndex write FBaudRateIndex;
     property MouseTextSelection: Boolean read FMouseTextSelection write FMouseTextSelection;
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
-
+    property ComportFullName: String read FComportFullName write FComportFullName;
     function FalconComSendBuffer(const Buffer: array of Byte; Count: integer): Bool;
+
     // function FalconComSendBufferWaitACK(Buffer: array of Byte; Count: Integer): Bool;
     function FalconComSendData_Common(str: string; SendFormat: integer): Bool;
     function FalconComSendData_Terminal(str: string; SendFormat: integer): Bool;
@@ -695,7 +690,7 @@ begin
   FFileStream := nil;
 
   FProtocalData := 1;
-  FCompatibleUnicode := True;
+  FCompatibleUnicode := false;
   FExcelAppRows := 0;
   FShowLineNumber := false;
   FCommadLineStr := '';
@@ -730,10 +725,10 @@ begin
   inherited Destroy;
 end;
 
-function TOcComPortObj.GetConfiguration(): TOcComPortObjPara;
-// var
-// FOcComPortObjPara: TOcComPortObjPara;
-begin
+{ function TOcComPortObj.GetConfiguration(): TOcComPortObjPara;
+  // var
+  // FOcComPortObjPara: TOcComPortObjPara;
+  begin
   FOcComPortObjPara.Port := self.Port;
   FOcComPortObjPara.ComportFullName := self.FComportFullName;
   FOcComPortObjPara.BaudRate := Ord(self.BaudRate);
@@ -750,7 +745,7 @@ begin
   FOcComPortObjPara.ShowSendedLog := self.FShowSendingLog;
   FOcComPortObjPara.HexModeWithString := self.FHexModeWithString;
   Result := FOcComPortObjPara;
-end;
+  end; }
 
 procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMemo; k, l, m, N, o: Boolean);
 var
@@ -945,10 +940,11 @@ begin
   if Assigned(FCallBackFun) then
     FCallBackFun();
 end;
-////////////////////////////////////////////////////////////////////////////////////////////////
-//LogMemo 是否需要为底部自动滚动模式
-//bottomMod = true 为自动滚动模式
-//appendMod = true 起新行
+
+/// /////////////////////////////////////////////////////////////////////////////////////////////
+// LogMemo 是否需要为底部自动滚动模式
+// bottomMod = true 为自动滚动模式
+// appendMod = true 起新行
 procedure TOcComPortObj.LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
 begin
   if (LogMemo = nil) or (LogMemo.Parent = nil) or (not self.Connected) then
@@ -959,15 +955,15 @@ begin
   begin
     if (not bottomMod) then
     begin
-     // BeginUpdate memo控件不会滚动更新垂直滚动条不会自动滑动
-     //但是光标会在最新输入点
+      // BeginUpdate memo控件不会滚动更新垂直滚动条不会自动滑动
+      // 但是光标会在最新输入点
       LogMemo.Lines.BeginUpdate;
       LogMemo.Lines.Add(Msg);
       LogMemo.Lines.EndUpdate;
     end
     else
     begin // bottomMod 底部跟踪模式
-      //垂直滚动条自动滚动到最地下
+      // 垂直滚动条自动滚动到最地下
       LogMemo.Lines.Add(Msg);
     end;
   end
@@ -1017,8 +1013,8 @@ begin
     FCallBackFun();
 end;
 
-//LogMemo 垂直滚动条是否滑到了最底部
-//如果是最底部，则LogMemo进入自动滚动模式
+// LogMemo 垂直滚动条是否滑到了最底部
+// 如果是最底部，则LogMemo进入自动滚动模式
 function TOcComPortObj.IsLogBottom(): Boolean;
 var
   SF: TScrollInfo;
@@ -2235,7 +2231,7 @@ begin
     FComUIHandleThread.Suspended := True;
     close();
   except
-    Log('Can not close  ' + OcComPortObjPara.ComportFullName);
+    Log('Can not close  ' + FComportFullName);
   end;
   status := 0;
 end;
