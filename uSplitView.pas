@@ -224,7 +224,7 @@ type
     CheckBox7: TCheckBox;
     Panel24: TPanel;
     CheckBox2: TCheckBox;
-    CheckBox25: TCheckBox;
+    CheckBox_DT: TCheckBox;
     CheckBox3: TCheckBox;
     CheckBox4: TCheckBox;
     CheckBox5: TCheckBox;
@@ -267,7 +267,7 @@ type
     procedure CheckBox5Click(Sender: TObject);
     procedure CheckBox4Click(Sender: TObject);
     procedure CheckBox3Click(Sender: TObject);
-    procedure CheckBox25Click(Sender: TObject);
+    procedure CheckBox_DTClick(Sender: TObject);
     procedure ComboBox8Change(Sender: TObject);
     procedure CloseTheDevice1Click(Sender: TObject);
     procedure TabSet2MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -339,6 +339,7 @@ type
     procedure FileOpen1Accept(Sender: TObject);
     procedure FileSaveAs1Accept(Sender: TObject);
     procedure FileSaveAs1BeforeExecute(Sender: TObject);
+
   private
     // StringGrid1_Col, StringGrid1_Row: Integer;
     // ComReceiveCount: Integer;
@@ -380,6 +381,7 @@ type
 
     procedure SaveProjectSetting(SavePrivate: Boolean);
     procedure SaveDeviceSetting(OcComPortObj: TOcComPortObj);
+    procedure SaveAllComPortLogData(DoClose: Boolean = false);
     procedure LoadProjectSetting();
 
     procedure UpdateUiLaunguage(Lang: String);
@@ -389,8 +391,9 @@ type
     function GetDeciceByPort(Port: string): TOcComPortObj;
     function GetCurrentDeviceName(): String;
 
-    procedure LogDataSave(DoClose: Boolean = false);
+
     procedure UpdateOcComPortObjAtrribute();
+    procedure ApplyCodePageSetting();
     // procedure UpdateOcComPortObjAtrribute2(OcComPortObj: TOcComPortObj);
     procedure ShowTrayIcon(TrayIcon1: TTrayIcon);
     procedure OcComPortObjCallBack(Count: Integer);
@@ -1028,13 +1031,13 @@ begin
     d := Format('%0.4d%0.2d%0.2d', [LocalSystemTime.wYear, LocalSystemTime.wMonth, LocalSystemTime.wDay]);
     Result := d + ' ';
   end;
-  if SplitViewForm.CheckBox25.Checked then // 时间
+  if SplitViewForm.CheckBox_DT.Checked then // 时间
   begin
     t := Format('%0.2d:%0.2d:%0.2d', [LocalSystemTime.wHour, LocalSystemTime.wMinute, LocalSystemTime.wSecond]);
     Result := t + ' ';
   end;
 
-  if SplitViewForm.CheckBox3.Checked and SplitViewForm.CheckBox25.Checked then
+  if SplitViewForm.CheckBox3.Checked and SplitViewForm.CheckBox_DT.Checked then
     Result := d + '/' + t + ' ';
 end;
 
@@ -1068,7 +1071,7 @@ var
 begin
   SplitViewForm.Memo1.Lines.BeginUpdate;
   timeStr := GetLineNumberStrForLog(SplitViewForm.Memo1.Lines.Count);
-  if (SplitViewForm.CheckBox25.Checked or SplitViewForm.CheckBox3.Checked) then
+  if (SplitViewForm.CheckBox_DT.Checked or SplitViewForm.CheckBox3.Checked) then
   begin
     timeStr := timeStr + GetSystemDateTimeStampStr2();
   end;
@@ -1449,6 +1452,11 @@ begin
 end;
 
 procedure TSplitViewForm.Button14Click(Sender: TObject);
+begin
+  ApplyCodePageSetting();
+end;
+
+procedure TSplitViewForm.ApplyCodePageSetting();
 var
   OcComPortObj: TOcComPortObj;
   CodePage: Integer;
@@ -1459,6 +1467,17 @@ begin
     exit;
   end;
   OcComPortObj.Timeouts.ReadInterval := StrToInt(LabeledEdit1.Text);
+
+  case ComboBox8.ItemIndex of
+    0:
+      OcComPortObj.HexModeFormatCount := 16;
+    1:
+      OcComPortObj.HexModeFormatCount := 32;
+    2:
+      OcComPortObj.HexModeFormatCount := 0;
+  else
+    OcComPortObj.HexModeFormatCount := 0;
+  end;
 
   case Combobox_CodePage.ItemIndex of
     0:
@@ -1473,9 +1492,17 @@ begin
       CodePage := CP_UTF7;
     5:
       CodePage := CP_UTF8;
+    6:
+      CheckBox12.Checked := false;
   else
     CodePage := 0;
   end;
+
+  OcComPortObj.ShowTime:= CheckBox_DT.Checked;
+  OcComPortObj.ShowDate:= CheckBox3.Checked;
+  OcComPortObj.ShowLineNumber:= CheckBox4.Checked;
+  OcComPortObj.ShowSendedLog:= CheckBox5.Checked;
+  OcComPortObj.CompatibleUnicode := CheckBox12.Checked;
   OcComPortObj.CodePage := CodePage;
 end;
 
@@ -2344,13 +2371,20 @@ end;
 
 procedure TSplitViewForm.CheckBox12Click(Sender: TObject);
 begin
-  UpdateOcComPortObjAtrribute();
-  Combobox_CodePage.OnChange(self);
+  if CheckBox12.Checked then
+  begin
+    if Combobox_CodePage.ItemIndex >= 6 then
+    begin
+      Combobox_CodePage.ItemIndex := 5;
+    end;
+  end;
+  ApplyCodePageSetting();
+  // UpdateOcComPortObjAtrribute();
 end;
 
-procedure TSplitViewForm.CheckBox25Click(Sender: TObject);
+procedure TSplitViewForm.CheckBox_DTClick(Sender: TObject);
 begin
-  UpdateOcComPortObjAtrribute();
+  ApplyCodePageSetting();
 end;
 
 procedure TSplitViewForm.CheckBox2Click(Sender: TObject);
@@ -2363,17 +2397,17 @@ end;
 
 procedure TSplitViewForm.CheckBox3Click(Sender: TObject);
 begin
-  UpdateOcComPortObjAtrribute();
+  ApplyCodePageSetting();
 end;
 
 procedure TSplitViewForm.CheckBox4Click(Sender: TObject);
 begin
-  UpdateOcComPortObjAtrribute();
+  ApplyCodePageSetting();
 end;
 
 procedure TSplitViewForm.CheckBox5Click(Sender: TObject);
 begin
-  UpdateOcComPortObjAtrribute();
+  ApplyCodePageSetting();
 end;
 
 procedure TSplitViewForm.CheckBox7Click(Sender: TObject);
@@ -2512,7 +2546,8 @@ end;
 
 procedure TSplitViewForm.ComboBox8Change(Sender: TObject);
 begin
-  UpdateOcComPortObjAtrribute();
+  ApplyCodePageSetting();
+  // UpdateOcComPortObjAtrribute();
 end;
 
 procedure TSplitViewForm.ComboBoxEx1Change(Sender: TObject);
@@ -2546,36 +2581,8 @@ begin
 end;
 
 procedure TSplitViewForm.Combobox_CodePageChange(Sender: TObject);
-var
-  OcComPortObj: TOcComPortObj;
-  CodePage: Cardinal;
 begin
-  // if not CheckBox12.Checked then
-  // exit;
-
-  case Combobox_CodePage.ItemIndex of
-    0:
-      CodePage := 0;
-    1:
-      CodePage := 1;
-    2:
-      CodePage := 2;
-    3:
-      CodePage := 42;
-    4:
-      CodePage := CP_UTF7;
-    5:
-      CodePage := CP_UTF8;
-  else
-    CodePage := 0;
-  end;
-
-  OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
-  if OcComPortObj = nil then // 没有设备
-  begin
-    exit;
-  end;
-  OcComPortObj.CodePage := CodePage;
+  ApplyCodePageSetting();
 end;
 
 procedure TSplitViewForm.W1234998NewWindow2(ASender: TObject; var ppDisp: IDispatch; var Cancel: WordBool);
@@ -2779,7 +2786,7 @@ begin
     Timer3.Enabled := false;
 
     SaveProjectSetting(True);
-    LogDataSave(True);
+    SaveAllComPortLogData(True);
     CurrentDevices := nil;
     if CheckBox1.Checked then
     begin
@@ -2991,7 +2998,7 @@ begin
   StatusBar1.Panels.Items[1].Text := DEFAULT_WEBSITE_ADDRESS;
   Button4.OnClick(self); // 刷新设备列表
   LoadProjectSetting(); // 载入全局设置
-
+  AdjustComponentFont(SplitViewForm, SplitViewForm.Font);
   { // 初始化全局配置
     for i := 0 to OcComPortList.Count - 1 do
     begin
@@ -3572,7 +3579,7 @@ procedure TSplitViewForm.Timer2Timer(Sender: TObject); // 自动保存log
 begin
   if CheckBox8.Checked then
   begin
-    LogDataSave();
+    SaveAllComPortLogData();
   end;
 end;
 
@@ -3961,7 +3968,7 @@ begin
     if (Memo1.Tag = 0) then // memo1 没有挂靠
     begin
       OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, Memo1,
-        CheckBox3.Checked, CheckBox25.Checked, CheckBox4.Checked, CheckBox5.Checked, True);
+        CheckBox3.Checked, CheckBox_DT.Checked, CheckBox4.Checked, CheckBox5.Checked, True);
       Notebook2.Pages.Strings[0] := OcComPortObj.ComportFullName;
       TabSet2.Tabs := Notebook2.Pages;
       Memo1.Tag := Integer(OcComPortObj);
@@ -3969,7 +3976,7 @@ begin
     else
     begin
       OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil,
-        CheckBox3.Checked, CheckBox25.Checked, CheckBox4.Checked, CheckBox5.Checked, True);
+        CheckBox3.Checked, CheckBox_DT.Checked, CheckBox4.Checked, CheckBox5.Checked, True);
 
       Notebook2.Pages.Insert(Notebook2.Pages.Count - DEFAULT_FIXED_COLS, OcComPortObj.ComportFullName);
       i := Notebook2.Pages.IndexOf(OcComPortObj.ComportFullName);
@@ -3994,34 +4001,7 @@ begin
     end;
   end;
 
-  OcComPortObj.CompatibleUnicode := CheckBox12.Checked;
-  case ComboBox8.ItemIndex of
-    0:
-      OcComPortObj.HexModeFormatCount := 16;
-    1:
-      OcComPortObj.HexModeFormatCount := 32;
-    2:
-      OcComPortObj.HexModeFormatCount := 0;
-  else
-    OcComPortObj.HexModeFormatCount := 0;
-  end;
-
-  case Combobox_CodePage.ItemIndex of
-    0:
-      OcComPortObj.CodePage := 0;
-    1:
-      OcComPortObj.CodePage := 1;
-    2:
-      OcComPortObj.CodePage := 2;
-    3:
-      OcComPortObj.CodePage := 42;
-    4:
-      OcComPortObj.CodePage := CP_UTF7;
-    5:
-      OcComPortObj.CodePage := CP_UTF8;
-  else
-    OcComPortObj.CodePage := 0;
-  end;
+  ApplyCodePageSetting();
 
   OcComPortObj.StringInternelCache.Parent := self; // 设置大量极限数据的缓冲MEMO
   OcComPortObj.CallBackFun := OcComPortObjCallBack;
@@ -4105,19 +4085,7 @@ begin
   end;
 
   OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil,
-    CheckBox3.Checked, CheckBox25.Checked, CheckBox4.Checked, CheckBox5.Checked, True);
-
-  case ComboBox8.ItemIndex of
-    0:
-      OcComPortObj.HexModeFormatCount := 16;
-    1:
-      OcComPortObj.HexModeFormatCount := 32;
-    2:
-      OcComPortObj.HexModeFormatCount := 0;
-  else
-    OcComPortObj.HexModeFormatCount := 0;
-  end;
-  OcComPortObj.CompatibleUnicode := CheckBox12.Checked;
+    CheckBox3.Checked, CheckBox_DT.Checked, CheckBox4.Checked, CheckBox5.Checked, True);
 end;
 
 // 功能键进入这里
@@ -4247,7 +4215,7 @@ begin
   LabeledEdit1.Text := IntToStr(OcComPortObj.Timeouts.ReadInterval);
 
   CheckBox3.Checked := OcComPortObj.ShowDate;
-  CheckBox25.Checked := OcComPortObj.ShowTime;
+  CheckBox_DT.Checked := OcComPortObj.ShowTime;
   CheckBox4.Checked := OcComPortObj.ShowLineNumber;
   CheckBox5.Checked := OcComPortObj.ShowSendedLog;
 
@@ -4316,7 +4284,7 @@ begin
   Button28.Width := Button11.Width;
   Button13.Width := Button11.Width;
 
-  ComboBox9.Width := Memo5.Width - Label7.Width - 25;
+  ComboBox9.Width := Memo5.Width - 71;
   ComboBox10.Width := ComboBox9.Width;
   ComboBox11.Width := ComboBox9.Width;
   ComboBox12.Width := ComboBox9.Width;
@@ -4449,7 +4417,7 @@ end;
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-procedure TSplitViewForm.LogDataSave(DoClose: Boolean);
+procedure TSplitViewForm.SaveAllComPortLogData(DoClose: Boolean);
 var
   i: Integer;
   OcComPortObj: TOcComPortObj;
@@ -4519,7 +4487,7 @@ begin
       Octopusini.WriteBool('MyPreference', 'CK8', CheckBox8.Checked);
       Octopusini.WriteBool('MyPreference', 'CK2', CheckBox2.Checked);
       Octopusini.WriteBool('MyPreference', 'CK3', CheckBox3.Checked);
-      Octopusini.WriteBool('MyPreference', 'CK25', CheckBox25.Checked);
+      Octopusini.WriteBool('MyPreference', 'CK25', CheckBox_DT.Checked);
       Octopusini.WriteBool('MyPreference', 'CK5', CheckBox5.Checked);
       Octopusini.WriteBool('MyPreference', 'CK6', CheckBox6.Checked);
       Octopusini.WriteBool('MyPreference', 'CK12', CheckBox12.Checked);
@@ -4530,6 +4498,9 @@ begin
       Octopusini.WriteInteger('MyPreference', 'CB8', ComboBox8.ItemIndex);
       Octopusini.WriteInteger('MyPreference', 'CB_CODE', Combobox_CodePage.ItemIndex);
 
+      Octopusini.WriteString('MyPreference', 'MAINUIFONTNAME', SplitViewForm.Font.Name);
+      Octopusini.WriteInteger('MyPreference', 'MAINUIFONTSIZE', SplitViewForm.Font.Size);
+      Octopusini.WriteInteger('MyPreference', 'MAINUIFONTCOLOR', SplitViewForm.Font.Color);
     finally
       Octopusini.Free;
     end;
@@ -4548,7 +4519,7 @@ begin
     s := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
     OcComPortObj.StoreSettings(stIniFile, s);
     Octopusini := TIniFile.Create(s);
-    //Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
+    // Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
     Octopusini.WriteInteger('', 'SendFormat', ComboBox6.ItemIndex);
     Octopusini.WriteInteger('', 'ReceiveFormat', ComboBox7.ItemIndex);
   finally
@@ -4599,7 +4570,7 @@ begin
     CheckBox7.Checked := Octopusini.ReadBool('MyPreference', 'ALPHABLEND', false);
     CheckBox8.Checked := Octopusini.ReadBool('MyPreference', 'CK8', CheckBox8.Checked);
 
-    CheckBox25.Checked := Octopusini.ReadBool('MyPreference', 'CK25', CheckBox25.Checked);
+    CheckBox_DT.Checked := Octopusini.ReadBool('MyPreference', 'CK25', CheckBox_DT.Checked);
     // CheckBox9.Checked := Octopusini.ReadBool('MyPreference', 'CK9',  // CheckBox9.Checked);
 
     CheckBox12.Checked := Octopusini.ReadBool('MyPreference', 'CK12', false);
@@ -4607,6 +4578,9 @@ begin
     ComboBox8.ItemIndex := Octopusini.ReadInteger('MyPreference', 'CB8', 0);
     Combobox_CodePage.ItemIndex := Octopusini.ReadInteger('MyPreference', 'CB_CODE', 0);
     // LabeledEdit1.Text:= IntToStr(Octopusini.ReadInteger('MyPreference', 'READINTERVAL',30));
+
+    SplitViewForm.Font.Name := Octopusini.ReadString('MyPreference', 'MAINUIFONTNAME', 'Segoe UI');
+    SplitViewForm.Font.Size := Octopusini.ReadInteger('MyPreference', 'MAINUIFONTSIZE', 10);
   finally
     Octopusini.Free;
   end;

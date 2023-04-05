@@ -84,7 +84,7 @@ object SplitViewForm: TSplitViewForm
             Left = 6
             Top = 3
             Width = 308
-            Height = 73
+            Height = 76
             Margins.Left = 6
             Margins.Right = 6
             Align = alTop
@@ -125,17 +125,18 @@ object SplitViewForm: TSplitViewForm
           object Panel14: TPanel
             AlignWithMargins = True
             Left = 6
-            Top = 407
+            Top = 413
             Width = 308
-            Height = 81
+            Height = 85
             Margins.Left = 6
             Margins.Top = 2
             Margins.Right = 6
             Align = alTop
             TabOrder = 1
+            ExplicitTop = 407
             object Button17: TButton
               Left = 83
-              Top = 5
+              Top = 6
               Width = 217
               Height = 34
               Caption = #12304#32972#26223#39068#33394#12305#25991#26412#30340#32972#26223#39068#33394
@@ -144,7 +145,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Button12: TButton
               Left = 5
-              Top = 5
+              Top = 6
               Width = 77
               Height = 34
               Caption = #23383#20307#35774#32622
@@ -153,7 +154,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Button24: TButton
               Left = 83
-              Top = 38
+              Top = 42
               Width = 217
               Height = 34
               Caption = #12304#21457#36865#25991#20214#12305#21521#35774#22791#21457#36865#25991#20214
@@ -162,7 +163,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Button23: TButton
               Left = 5
-              Top = 38
+              Top = 42
               Width = 77
               Height = 34
               Caption = #36733#20837#25991#20214
@@ -173,7 +174,7 @@ object SplitViewForm: TSplitViewForm
           object Panel19: TPanel
             AlignWithMargins = True
             Left = 6
-            Top = 81
+            Top = 84
             Width = 308
             Height = 234
             Margins.Left = 6
@@ -182,11 +183,12 @@ object SplitViewForm: TSplitViewForm
             Align = alTop
             ParentColor = True
             TabOrder = 2
+            ExplicitTop = 81
             object Label13: TLabel
               Left = 5
-              Top = 171
-              Width = 52
-              Height = 19
+              Top = 170
+              Width = 54
+              Height = 20
               Hint = #21457#36865#25968#25454#30340#26684#24335'ASCI'#20026#23383#31526'HEX'#20026#21313#20845#36827#21046'CMD'#20026#25191#34892#26412#22320'Shell'#21629#20196
               Caption = #21457#36865#26684#24335
               ParentShowHint = False
@@ -194,49 +196,49 @@ object SplitViewForm: TSplitViewForm
             end
             object Label15: TLabel
               Left = 5
-              Top = 139
-              Width = 52
-              Height = 19
+              Top = 138
+              Width = 54
+              Height = 20
               Caption = #27969#25511#21046#31526
             end
             object Label5: TLabel
               Left = 5
-              Top = 108
-              Width = 52
-              Height = 19
+              Top = 106
+              Width = 54
+              Height = 20
               Caption = #26657#39564#20301#25968
             end
             object Label9: TLabel
               Left = 5
-              Top = 77
-              Width = 52
-              Height = 19
+              Top = 74
+              Width = 54
+              Height = 20
               Caption = #20572#27490#20301#25968
             end
             object Label12: TLabel
               Left = 5
-              Top = 46
-              Width = 52
-              Height = 19
+              Top = 42
+              Width = 54
+              Height = 20
               Caption = #25968#25454#20301#25968
             end
             object Label2: TLabel
               Left = 5
-              Top = 15
-              Width = 52
-              Height = 19
+              Top = 11
+              Width = 54
+              Height = 20
               Caption = #27874#29305#29575#25968
             end
             object Label10: TLabel
               Left = 5
-              Top = 201
-              Width = 52
-              Height = 19
+              Top = 202
+              Width = 54
+              Height = 20
               Caption = #25509#25910#26684#24335
             end
             object ComboBox6: TComboBox
               Left = 76
-              Top = 167
+              Top = 166
               Width = 224
               Height = 27
               Style = csDropDownList
@@ -252,7 +254,7 @@ object SplitViewForm: TSplitViewForm
             end
             object ComboBox5: TComboBox
               Left = 76
-              Top = 136
+              Top = 134
               Width = 224
               Height = 27
               Style = csDropDownList
@@ -261,7 +263,7 @@ object SplitViewForm: TSplitViewForm
             end
             object ComboBox4: TComboBox
               Left = 76
-              Top = 105
+              Top = 102
               Width = 224
               Height = 27
               Style = csDropDownList
@@ -270,7 +272,7 @@ object SplitViewForm: TSplitViewForm
             end
             object ComboBox3: TComboBox
               Left = 76
-              Top = 74
+              Top = 70
               Width = 224
               Height = 27
               Style = csDropDownList
@@ -279,7 +281,7 @@ object SplitViewForm: TSplitViewForm
             end
             object ComboBox2: TComboBox
               Left = 76
-              Top = 43
+              Top = 38
               Width = 224
               Height = 27
               Style = csDropDownList
@@ -311,14 +313,15 @@ object SplitViewForm: TSplitViewForm
           object Panel20: TPanel
             AlignWithMargins = True
             Left = 6
-            Top = 320
+            Top = 323
             Width = 308
-            Height = 82
+            Height = 85
             Margins.Left = 6
             Margins.Top = 2
             Margins.Right = 6
             Align = alTop
             TabOrder = 3
+            ExplicitTop = 320
             object Button10: TButton
               Left = 5
               Top = 6
@@ -330,7 +333,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Button26: TButton
               Left = 5
-              Top = 45
+              Top = 42
               Width = 295
               Height = 34
               Caption = #12304#21478#23384#25968#25454#12305#24403#21069#35774#22791#25509#25910#21040#30340#25968#25454
@@ -341,17 +344,18 @@ object SplitViewForm: TSplitViewForm
           object Panel21: TPanel
             AlignWithMargins = True
             Left = 6
-            Top = 493
+            Top = 503
             Width = 308
-            Height = 72
+            Height = 48
             Margins.Left = 6
             Margins.Top = 2
             Margins.Right = 6
             Align = alTop
             TabOrder = 4
+            ExplicitTop = 497
             object Button29: TButton
               Left = 5
-              Top = 16
+              Top = 6
               Width = 295
               Height = 34
               Caption = #30028#38754#23383#20307#35774#32622
@@ -411,9 +415,9 @@ object SplitViewForm: TSplitViewForm
               Width = 293
               Height = 27
               Style = csDropDownList
-              ItemIndex = 0
+              ItemIndex = 6
               TabOrder = 1
-              Text = ' CP_ACP                { ANSI / GB2312  }'
+              Text = ' CP_ASCII                { ANSI / ASCII }'
               OnChange = Combobox_CodePageChange
               Items.Strings = (
                 ' CP_ACP                { ANSI / GB2312  }'
@@ -421,7 +425,8 @@ object SplitViewForm: TSplitViewForm
                 ' CP_MACCP           { MAC  code page }'
                 ' CP_SYMBOL          { SYMBOL translations }'
                 ' CP_UTF7               { UTF-7 translation }'
-                ' CP_UTF8               { UTF-8 translation }')
+                ' CP_UTF8               { UTF-8 translation }'
+                ' CP_ASCII                { ANSI / ASCII }')
             end
             object ComboBox8: TComboBox
               Left = 8
@@ -524,7 +529,7 @@ object SplitViewForm: TSplitViewForm
               Left = 276
               Top = 31
               Width = 16
-              Height = 29
+              Height = 27
               Associate = Edit2
               Min = 1
               Max = 255
@@ -536,7 +541,7 @@ object SplitViewForm: TSplitViewForm
               Left = 276
               Top = 94
               Width = 16
-              Height = 29
+              Height = 27
               Associate = Edit3
               Min = 5
               Max = 32766
@@ -614,14 +619,14 @@ object SplitViewForm: TSplitViewForm
               TabOrder = 0
               OnClick = CheckBox2Click
             end
-            object CheckBox25: TCheckBox
+            object CheckBox_DT: TCheckBox
               Left = 10
               Top = 34
               Width = 266
               Height = 25
               Caption = #21457#36865#21644#25509#25910#35760#24405#21069#38754#26174#31034#26102#38388#20449#24687
               TabOrder = 1
-              OnClick = CheckBox25Click
+              OnClick = CheckBox_DTClick
             end
             object CheckBox3: TCheckBox
               Left = 10
@@ -716,6 +721,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 658
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -735,9 +741,9 @@ object SplitViewForm: TSplitViewForm
           TabOrder = 0
           object Panel5: TPanel
             Left = 0
-            Top = 232
+            Top = 229
             Width = 314
-            Height = 420
+            Height = 423
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
@@ -746,7 +752,7 @@ object SplitViewForm: TSplitViewForm
               Left = 0
               Top = 0
               Width = 314
-              Height = 351
+              Height = 354
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
@@ -756,7 +762,7 @@ object SplitViewForm: TSplitViewForm
                 Left = 3
                 Top = 3
                 Width = 308
-                Height = 345
+                Height = 348
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -773,7 +779,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Panel8: TPanel
               Left = 0
-              Top = 351
+              Top = 354
               Width = 314
               Height = 69
               Align = alBottom
@@ -817,16 +823,17 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 232
+            Height = 229
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 1
             object Memo3: TMemo
               AlignWithMargins = True
               Left = 3
-              Top = 3
+              Top = 0
               Width = 308
               Height = 122
+              Margins.Top = 0
               Align = alTop
               BorderStyle = bsNone
               Ctl3D = True
@@ -838,7 +845,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Button9: TButton
               Left = 2
-              Top = 129
+              Top = 126
               Width = 311
               Height = 34
               Caption = #23558#19978#38754#23383#31526#20018#36716#25442#25104#21313#20845#36827#21046#23383#33410#30721
@@ -847,7 +854,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Button11: TButton
               Left = 2
-              Top = 163
+              Top = 160
               Width = 311
               Height = 34
               Caption = #23558#19979#38754#21313#20845#36827#21046#23383#33410#30721#36716#25442#25104#23383#31526#20018
@@ -856,10 +863,10 @@ object SplitViewForm: TSplitViewForm
             end
             object Button13: TButton
               Left = 2
-              Top = 198
+              Top = 195
               Width = 311
               Height = 34
-              Caption = #35745#31639#20986#19979#38754#23383#33410#30721#30340'CRC8'#26657#39564#23383#33410
+              Caption = #29992'CRC8'#35745#31639#20986#19979#38754#23383#33410#30721#30340#26657#39564#23383#33410
               TabOrder = 3
               OnClick = Button13Click
             end
@@ -1973,18 +1980,18 @@ object SplitViewForm: TSplitViewForm
           object Memo5: TMemo
             AlignWithMargins = True
             Left = 3
-            Top = 127
+            Top = 122
             Width = 308
-            Height = 450
+            Height = 458
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
           end
           object Panel16: TPanel
             Left = 0
-            Top = 580
+            Top = 583
             Width = 314
-            Height = 72
+            Height = 69
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
@@ -1998,7 +2005,7 @@ object SplitViewForm: TSplitViewForm
               OnClick = Button16Click
             end
             object Button27: TButton
-              Left = 3
+              Left = 2
               Top = 0
               Width = 75
               Height = 34
@@ -2007,8 +2014,8 @@ object SplitViewForm: TSplitViewForm
               OnClick = Button27Click
             end
             object Button28: TButton
-              Left = 3
-              Top = 35
+              Left = 2
+              Top = 34
               Width = 311
               Height = 36
               Caption = #21457#36865#25991#20214' ( *.bin  *.hex )'
@@ -2020,41 +2027,42 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 124
+            Height = 119
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 2
             object Label18: TLabel
-              Left = 3
-              Top = 102
+              Left = 2
+              Top = 96
               Width = 52
               Height = 19
               Caption = #25805#20316#31867#22411
             end
             object Label11: TLabel
-              Left = 3
-              Top = 72
+              Left = 2
+              Top = 65
               Width = 52
               Height = 19
               Caption = #35835#23383#33410#25968
             end
             object Label8: TLabel
-              Left = 3
-              Top = 42
+              Left = 2
+              Top = 35
               Width = 52
               Height = 19
               Caption = #22120#20214#22320#22336
             end
             object Label7: TLabel
-              Left = 3
-              Top = 13
+              Left = 2
+              Top = 5
               Width = 52
               Height = 19
               Caption = #36890#35759#21327#35758
             end
             object ComboBox12: TComboBox
-              Left = 73
-              Top = 96
+              AlignWithMargins = True
+              Left = 74
+              Top = 91
               Width = 237
               Height = 27
               Style = csDropDownList
@@ -2069,10 +2077,9 @@ object SplitViewForm: TSplitViewForm
             object ComboBox9: TComboBox
               AlignWithMargins = True
               Left = 74
-              Top = 3
+              Top = 0
               Width = 237
               Height = 27
-              Align = alRight
               Style = csDropDownList
               ItemIndex = 0
               TabOrder = 1
@@ -2091,8 +2098,9 @@ object SplitViewForm: TSplitViewForm
                 'ModBus')
             end
             object ComboBox10: TComboBox
-              Left = 73
-              Top = 34
+              AlignWithMargins = True
+              Left = 74
+              Top = 30
               Width = 237
               Height = 27
               TabOrder = 2
@@ -2103,8 +2111,9 @@ object SplitViewForm: TSplitViewForm
                 '0x08002000')
             end
             object ComboBox11: TComboBox
-              Left = 73
-              Top = 66
+              AlignWithMargins = True
+              Left = 74
+              Top = 60
               Width = 237
               Height = 27
               TabOrder = 3
@@ -3756,7 +3765,7 @@ object SplitViewForm: TSplitViewForm
       end>
     Images = DeviceIconList
     Left = 1032
-    Top = 70
+    Top = 238
     StyleName = 'Platform Default'
     object SearchFindFirst1: TSearchFindFirst
       Category = 'Edit'
