@@ -414,8 +414,8 @@ begin
 
     if (OcComPortObj <> nil) and (ActionType = DBT_DEVICEREMOVECOMPLETE) then
     begin
-      if OcComPortObj.Connected then
-        closeDevice(OcComPortObj.OcComPortObjPara.ComportFullName);
+      //if OcComPortObj.Connected then
+      //  closeDevice(OcComPortObj.OcComPortObjPara.ComportFullName);
     end;
 
     if DevideNameList.Count = 0 then
@@ -435,7 +435,7 @@ begin
       begin
         OcComPortObj := TOcComPortObj.Create(self, DevideNameList.Strings[i]);
 
-        S := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.OcComPortObjPara.ComportFullName + '.ini';
+       // S := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.OcComPortObjPara.ComportFullName + '.ini';
         // 配置非全局信息
         if FileExists(S) then
         begin
@@ -444,7 +444,7 @@ begin
             IniFile := TIniFile.Create(S);
             OcComPortObj.ReceiveFormat := IniFile.ReadInteger('', 'ReceiveFormat', 0);
             OcComPortObj.SendFormat := IniFile.ReadInteger('', 'SendFormat', 0);
-            OcComPortObj.BaudRateIndex := IniFile.ReadInteger('', 'BaudRateIndex', 13);
+            //OcComPortObj.BaudRateIndex := IniFile.ReadInteger('', 'BaudRateIndex', 13);
           finally
             IniFile.Free;
           end;
@@ -625,14 +625,14 @@ begin
     OcComPortObj.Open;
     Result := OcComPortObj;
   Except
-    OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+   // OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
     Result := nil;
     // MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
   if not OcComPortObj.Connected then
   begin
-    OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    //OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
     Result := nil;
     exit;
   end;
@@ -646,7 +646,7 @@ begin
   OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
   OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
   OcComPortObj.Log('################################################');
-  OcComPortObj.Log(OcComPortObj.OcComPortObjPara.ComportFullName);
+  //OcComPortObj.Log(OcComPortObj.OcComPortObjPara.ComportFullName);
   OcComPortObj.Log('');
 end;
 
@@ -657,8 +657,8 @@ begin
   Result := false;
   if OcComPortObj = nil then
     exit;
-  if OcComPortObj.OcComPortObjPara.ComportFullName = '' then
-    exit;
+  //if OcComPortObj.OcComPortObjPara.ComportFullName = '' then
+ //   exit;
 
   { if (OcComPortObj.LogMemo <> nil) then
     begin
@@ -701,7 +701,7 @@ begin
   end;
   if not OcComPortObj.Connected then
   begin
-    OcComPortObj.Log('Wrong!!! open  ' + OcComPortObj.OcComPortObjPara.ComportFullName + ' has been opened');
+    //OcComPortObj.Log('Wrong!!! open  ' + OcComPortObj.OcComPortObjPara.ComportFullName + ' has been opened');
     // Result := false;
     exit;
   end;

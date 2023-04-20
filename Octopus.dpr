@@ -41,14 +41,29 @@ uses
   CPort in 'ComPort\CPort.pas',
   CPortSetup in 'ComPort\CPortSetup.pas' {ComSetupFrm},
   uDeviceThread in 'uDeviceThread.pas',
-  RSAOpenSSL in '..\ZSBWM\RSAOSSL\RSAOpenSSL.pas',
-  libeay32 in '..\ZSBWM\RSAOSSL\libeay32.pas',
   OcPcDeviceMgt in 'OcPcDeviceMgt.pas',
   Vcl.Tabs in 'Vcl.Tabs.pas',
   Mail4Delphi.Intf in '..\ZSBWM\SMTP\Mail4Delphi.Intf.pas',
   Mail4Delphi in '..\ZSBWM\SMTP\Mail4Delphi.pas',
   uSetting in '..\ZSBWM\SMTP\uSetting.pas' {ConfigurationFrm},
-  uSMTP in '..\ZSBWM\SMTP\uSMTP.pas' {SubmitProblemFrm};
+  uSMTP in '..\ZSBWM\SMTP\uSMTP.pas' {SubmitProblemFrm},
+  NetHttpInterface in '..\ZSBWM\PUBLIC\NetHttpInterface.pas',
+  GlobalFunctions in '..\ZSBWM\PUBLIC\GlobalFunctions.pas',
+  Screenshot in '..\ZSBWM\SCREEN\Screenshot.pas' {ScreenshotFrm},
+  uScreenMain in '..\ZSBWM\SCREEN\uScreenMain.pas' {ScreenMainFrm},
+  uANN_CNN_Cifar10 in '..\ZSBWM\ANN\ZSZS\uANN_CNN_Cifar10.pas',
+  uMachineLearning in '..\ZSBWM\ANN\ZSZS\uMachineLearning.pas' {MachineLearningFrm},
+  uClass_CNN in '..\ZSBWM\ANN\CNN\Common\uClass_CNN.pas',
+  uClass_Imaging in '..\ZSBWM\ANN\CNN\Common\uClass_Imaging.pas',
+  uClasses_Types in '..\ZSBWM\ANN\CNN\Common\uClasses_Types.pas',
+  uFunctions in '..\ZSBWM\ANN\CNN\Common\uFunctions.pas',
+  uCutSetting in '..\ZSBWM\SCREEN\uCutSetting.pas' {CutSettingForm},
+  MainFormUnit in '..\ZSBWM\RSAOSSL\MainFormUnit.pas' {DecryptEncryptFrm},
+  libeay32 in '..\ZSBWM\RSAOSSL\libeay32.pas',
+  RSAOpenSSL in '..\ZSBWM\RSAOSSL\RSAOpenSSL.pas',
+  RSATestUnit in '..\ZSBWM\RSAOSSL\RSATestUnit.pas' {RSATestForm},
+  RSAUnit in '..\ZSBWM\RSAOSSL\RSAUnit.pas',
+  uCRC in '..\ZSBWM\CRC\uCRC.pas' {CRCFRM};
 
 {$R *.res}
 
@@ -60,6 +75,13 @@ begin
   Application.CreateForm(TOcFindAndFrm, OcFindAndFrm);
   Application.CreateForm(TConfigurationFrm, ConfigurationFrm);
   Application.CreateForm(TSubmitProblemFrm, SubmitProblemFrm);
+  Application.CreateForm(TScreenshotFrm, ScreenshotFrm);
+  Application.CreateForm(TScreenMainFrm, ScreenMainFrm);
+  Application.CreateForm(TMachineLearningFrm, MachineLearningFrm);
+  Application.CreateForm(TCutSettingForm, CutSettingForm);
+  Application.CreateForm(TDecryptEncryptFrm, DecryptEncryptFrm);
+  Application.CreateForm(TRSATestForm, RSATestForm);
+  Application.CreateForm(TCRCFRM, CRCFRM);
   Application.Run;
 
 end.

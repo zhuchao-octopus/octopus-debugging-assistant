@@ -235,6 +235,21 @@ object FrmMain: TFrmMain
           TabOrder = 1
           OnClick = BitBtn1Click
         end
+        object RichEdit1: TRichEdit
+          Left = 120
+          Top = 79
+          Width = 464
+          Height = 329
+          Font.Charset = GB2312_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -16
+          Font.Name = #24494#36719#38597#40657' Light'
+          Font.Style = []
+          Lines.Strings = (
+            'RichEdit1')
+          ParentFont = False
+          TabOrder = 2
+        end
       end
       object TPage
         Left = 0

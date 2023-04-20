@@ -66,6 +66,7 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 658
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -133,7 +134,6 @@ object SplitViewForm: TSplitViewForm
             Margins.Right = 6
             Align = alTop
             TabOrder = 1
-            ExplicitTop = 407
             object Button17: TButton
               Left = 83
               Top = 6
@@ -183,12 +183,11 @@ object SplitViewForm: TSplitViewForm
             Align = alTop
             ParentColor = True
             TabOrder = 2
-            ExplicitTop = 81
             object Label13: TLabel
               Left = 5
               Top = 170
-              Width = 54
-              Height = 20
+              Width = 52
+              Height = 19
               Hint = #21457#36865#25968#25454#30340#26684#24335'ASCI'#20026#23383#31526'HEX'#20026#21313#20845#36827#21046'CMD'#20026#25191#34892#26412#22320'Shell'#21629#20196
               Caption = #21457#36865#26684#24335
               ParentShowHint = False
@@ -197,43 +196,43 @@ object SplitViewForm: TSplitViewForm
             object Label15: TLabel
               Left = 5
               Top = 138
-              Width = 54
-              Height = 20
+              Width = 52
+              Height = 19
               Caption = #27969#25511#21046#31526
             end
             object Label5: TLabel
               Left = 5
               Top = 106
-              Width = 54
-              Height = 20
+              Width = 52
+              Height = 19
               Caption = #26657#39564#20301#25968
             end
             object Label9: TLabel
               Left = 5
               Top = 74
-              Width = 54
-              Height = 20
+              Width = 52
+              Height = 19
               Caption = #20572#27490#20301#25968
             end
             object Label12: TLabel
               Left = 5
               Top = 42
-              Width = 54
-              Height = 20
+              Width = 52
+              Height = 19
               Caption = #25968#25454#20301#25968
             end
             object Label2: TLabel
               Left = 5
               Top = 11
-              Width = 54
-              Height = 20
+              Width = 52
+              Height = 19
               Caption = #27874#29305#29575#25968
             end
             object Label10: TLabel
               Left = 5
               Top = 202
-              Width = 54
-              Height = 20
+              Width = 52
+              Height = 19
               Caption = #25509#25910#26684#24335
             end
             object ComboBox6: TComboBox
@@ -321,7 +320,6 @@ object SplitViewForm: TSplitViewForm
             Margins.Right = 6
             Align = alTop
             TabOrder = 3
-            ExplicitTop = 320
             object Button10: TButton
               Left = 5
               Top = 6
@@ -352,7 +350,6 @@ object SplitViewForm: TSplitViewForm
             Margins.Right = 6
             Align = alTop
             TabOrder = 4
-            ExplicitTop = 497
             object Button29: TButton
               Left = 5
               Top = 6
@@ -503,7 +500,7 @@ object SplitViewForm: TSplitViewForm
             TabOrder = 2
             object Label3: TLabel
               Left = 8
-              Top = 97
+              Top = 93
               Width = 125
               Height = 19
               Caption = #33258#21160#20445#23384#26102#38388#38388#38548#31186'  '
@@ -528,7 +525,7 @@ object SplitViewForm: TSplitViewForm
             object UpDown2: TUpDown
               Left = 276
               Top = 31
-              Width = 16
+              Width = 25
               Height = 27
               Associate = Edit2
               Min = 1
@@ -539,8 +536,8 @@ object SplitViewForm: TSplitViewForm
             end
             object UpDown5: TUpDown
               Left = 276
-              Top = 94
-              Width = 16
+              Top = 90
+              Width = 25
               Height = 27
               Associate = Edit3
               Min = 5
@@ -551,7 +548,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Edit3: TEdit
               Left = 186
-              Top = 94
+              Top = 90
               Width = 90
               Height = 27
               Hint = #21333#20301#31186
@@ -564,7 +561,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Button5: TButton
               Left = 192
-              Top = 129
+              Top = 125
               Width = 109
               Height = 34
               Caption = #28165#38500#32531#23384
@@ -573,16 +570,16 @@ object SplitViewForm: TSplitViewForm
             end
             object Button6: TButton
               Left = 8
-              Top = 129
+              Top = 125
               Width = 178
               Height = 34
-              Caption = #21382#21490#25968#25454#25991#20214#30446#24405
+              Caption = #25171#24320#26085#24535#21644#37197#32622#25991#20214#30446#24405
               TabOrder = 5
               OnClick = Button6Click
             end
             object CheckBox8: TCheckBox
               Left = 8
-              Top = 66
+              Top = 65
               Width = 247
               Height = 25
               Caption = #25968#25454#33258#21160#20445#23384#21040#26412#22320#25991#20214
@@ -591,7 +588,7 @@ object SplitViewForm: TSplitViewForm
             end
             object CheckBox7: TCheckBox
               Left = 8
-              Top = 3
+              Top = 5
               Width = 241
               Height = 25
               Caption = #31383#21475#32972#26223#21551#29992#36879#26126#25928#26524
@@ -721,7 +718,6 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 658
       Align = alClient
-      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
@@ -3754,8 +3750,30 @@ object SplitViewForm: TSplitViewForm
                 Caption = '-'
               end
               item
+                Action = act_PictureEdit
+                Caption = #25130#22270#24037#20855'(&T)'
+              end
+              item
+                Action = act_Screenshot
+                Caption = #23631#24149#25130#22270'(&S)'
+              end
+              item
+                Action = act_rsa
+                Caption = #25968#25454#21152#23494'(&R)'
+              end
+              item
+                Action = act_crc
+                Caption = #21508#31867'CRC'#35745#31639'(&C)'
+              end
+              item
+                Caption = #26426#22120#23398#20064#31070#32463#32593#32476'(&Q)'
+              end
+              item
+                Caption = '-'
+              end
+              item
                 Action = FileExit1
-                Caption = #36864#20986'(&T)'
+                Caption = #36864#20986'(&P)'
                 ImageIndex = 43
               end>
             Caption = '&'#33756#21333
@@ -3953,14 +3971,27 @@ object SplitViewForm: TSplitViewForm
       Caption = 'act_submitProblem'
       OnExecute = submitProblemExecute
     end
-    object Action2: TAction
+    object act_Screenshot: TAction
       Category = 'Internet'
-      Caption = 'Action2'
+      Caption = 'act_Screenshot'
+      OnExecute = act_ScreenshotExecute
     end
     object CustomizeActionBars1: TCustomizeActionBars
       Category = 'Tools'
       Caption = '&Customize...'
       CustomizeDlg.StayOnTop = False
+    end
+    object act_PictureEdit: TAction
+      Caption = 'act_PictureEdit'
+      OnExecute = act_PictureEditExecute
+    end
+    object act_rsa: TAction
+      Caption = 'act_rsa'
+      OnExecute = act_rsaExecute
+    end
+    object act_crc: TAction
+      Caption = 'act_crc'
+      OnExecute = act_crcExecute
     end
   end
 end

@@ -42,7 +42,7 @@ uses
   VCLTee.TeeFunci, JvComponentBase, JvHidControllerClass, StrUtils,
   uCmdShell, Vcl.Mask, Vcl.TitleBarCtrls, Vcl.ToolWin, Vcl.ActnMan,
   Vcl.ActnCtrls, Vcl.ActnMenus, Vcl.BandActn, Vcl.ExtActns, Vcl.StdActns,
-  Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.Tabs;
+  Vcl.ActnList, Vcl.PlatformDefaultStyleActnCtrls, Vcl.Tabs, Vcl.Clipbrd;
 
 type
   TChartAccess = class(TCustomAxisPanel);
@@ -207,7 +207,7 @@ type
     act_Static: TAction;
     act_Dynamic: TAction;
     submitProblem: TAction;
-    Action2: TAction;
+    act_Screenshot: TAction;
     CustomizeActionBars1: TCustomizeActionBars;
     Button29: TButton;
     Panel22: TPanel;
@@ -230,6 +230,9 @@ type
     CheckBox5: TCheckBox;
     CheckBox1: TCheckBox;
     CheckBox6: TCheckBox;
+    act_PictureEdit: TAction;
+    act_rsa: TAction;
+    act_crc: TAction;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -339,6 +342,10 @@ type
     procedure FileOpen1Accept(Sender: TObject);
     procedure FileSaveAs1Accept(Sender: TObject);
     procedure FileSaveAs1BeforeExecute(Sender: TObject);
+    procedure act_ScreenshotExecute(Sender: TObject);
+    procedure act_PictureEditExecute(Sender: TObject);
+    procedure act_rsaExecute(Sender: TObject);
+    procedure act_crcExecute(Sender: TObject);
 
   private
     // StringGrid1_Col, StringGrid1_Row: Integer;
@@ -390,7 +397,6 @@ type
     function GetDeciceByFullName(DeviceName: string): TOcComPortObj;
     function GetDeciceByPort(Port: string): TOcComPortObj;
     function GetCurrentDeviceName(): String;
-
 
     procedure UpdateOcComPortObjAtrribute();
     procedure ApplyCodePageSetting();
@@ -454,7 +460,7 @@ implementation
 uses
   Vcl.Themes, ocPcDeviceMgt, ShlObj, ActiveX, ComObj, IniFiles, ShellAPI,
   uGlobalFunction, Octopus_CRC, WinInet, OcDecrypt, OcProtocol, CRC, math, NetInterface, uDeviceThread,
-  uSMTP, printers;
+  uSMTP, printers, Screenshot, uScreenMain, MainFormUnit, uCRC;
 
 {$R *.dfm}
 
@@ -1456,16 +1462,57 @@ begin
   ApplyCodePageSetting();
 end;
 
+procedure TSplitViewForm.act_crcExecute(Sender: TObject);
+begin
+   CRCFrm.show();
+end;
+
+procedure TSplitViewForm.act_PictureEditExecute(Sender: TObject);
+begin
+  ScreenMainFrm.WindowState:= wsNormal;
+  ScreenMainFrm.show();
+  //ShellExecute(handle,'open','PictureEditor.exe','-s','',SW_SHOWNORMAL);
+end;
+
+procedure TSplitViewForm.act_rsaExecute(Sender: TObject);
+begin
+   DecryptEncryptFrm.show();
+end;
+
+procedure TSplitViewForm.act_ScreenshotExecute(Sender: TObject);
+begin
+  WindowState := wsMinimized; // 最小化程序窗口
+  hide; // 把程序藏起来
+  sleep(100);
+  ScreenshotFrm.MouseDownStart := True;
+  ScreenshotFrm.MouseUpDone := True;
+  ScreenshotFrm.CopyScreenToBmp(ScreenshotFrm.Image1); // 捕捉整屏图形到form2中的image1
+  WindowState := wsNormal; // 最小化程序窗口
+
+  if ScreenshotFrm.ShowModal = mrOk then // 在form2中进行图片裁剪
+  begin
+    ScreenMainFrm.Image1.Picture.LoadFromClipboardFormat(CF_BITMAP, Clipboard.GetAsHandle(CF_BITMAP), 0);
+    ScreenMainFrm.WindowState := wsNormal; // 复原窗口状态
+    // ScreenMainFrm.FilePath := FILE_DATA_ANN;
+    // ScreenMainFrm.FileName := FStockDrawKLines.stock.GetLevelKey();
+    show();
+    ScreenMainFrm.show;
+  end;
+end;
+
 procedure TSplitViewForm.ApplyCodePageSetting();
 var
   OcComPortObj: TOcComPortObj;
   CodePage: Integer;
 begin
+
   OcComPortObj := GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if OcComPortObj = nil then
   begin
     exit;
   end;
+
+
   OcComPortObj.Timeouts.ReadInterval := StrToInt(LabeledEdit1.Text);
 
   case ComboBox8.ItemIndex of
@@ -1498,10 +1545,10 @@ begin
     CodePage := 0;
   end;
 
-  OcComPortObj.ShowTime:= CheckBox_DT.Checked;
-  OcComPortObj.ShowDate:= CheckBox3.Checked;
-  OcComPortObj.ShowLineNumber:= CheckBox4.Checked;
-  OcComPortObj.ShowSendedLog:= CheckBox5.Checked;
+  OcComPortObj.ShowTime := CheckBox_DT.Checked;
+  OcComPortObj.ShowDate := CheckBox3.Checked;
+  OcComPortObj.ShowLineNumber := CheckBox4.Checked;
+  OcComPortObj.ShowSendedLog := CheckBox5.Checked;
   OcComPortObj.CompatibleUnicode := CheckBox12.Checked;
   OcComPortObj.CodePage := CodePage;
 end;
@@ -3633,7 +3680,7 @@ begin
   OcComPortObj := GetDeciceByFullName(self.GetCurrentDeviceName);
   if OcComPortObj <> nil then
     OcComPortObj.LogScrollMode := True;
-  self.Show;
+  self.show;
 end;
 
 procedure TSplitViewForm.FindDialog1Find(Sender: TObject);
@@ -3789,7 +3836,7 @@ begin
     if Memo1.Tag = 0 then // 设备关闭状态
       Notebook2.Pages[0] := '本地文件目录 ';
 
-    Notebook2.Pages[Notebook2.Pages.Count - 1] := ' 帮助 ';
+    Notebook2.Pages[Notebook2.Pages.Count - 1] := ' 八爪鱼帮助 ';
     Notebook2.Pages[Notebook2.Pages.Count - 2] := ' 图形 ';
 
     Notebook3.Pages[0] := '数据发送';
@@ -3993,7 +4040,7 @@ begin
       Memo.BorderStyle := Memo1.BorderStyle;
       Memo.AlignWithMargins := Memo1.AlignWithMargins;
       Memo.DoubleBuffered := True;
-      Memo.Show;
+      Memo.show;
       OcComPortObj.ClearLog;
       OcComPortObj.ClearInternalBuff();
       ShowStartComments(OcComPortObj);
@@ -4501,6 +4548,8 @@ begin
       Octopusini.WriteString('MyPreference', 'MAINUIFONTNAME', SplitViewForm.Font.Name);
       Octopusini.WriteInteger('MyPreference', 'MAINUIFONTSIZE', SplitViewForm.Font.Size);
       Octopusini.WriteInteger('MyPreference', 'MAINUIFONTCOLOR', SplitViewForm.Font.Color);
+
+      Octopusini.WriteString('SystemConfiguration', 'VERSIONNUMBER64', VersionNumberStr);
     finally
       Octopusini.Free;
     end;
@@ -4827,7 +4876,7 @@ begin
   // 取消最前端显示
   SetWindowPos(SplitViewForm.Handle, HWND_NOTOPMOST, SplitViewForm.Left, SplitViewForm.Top, SplitViewForm.Width, SplitViewForm.Height, 0);
   CheckBox2.Checked := false;
-  SubmitProblemFrm.Show();
+  SubmitProblemFrm.show();
 end;
 
 procedure TSplitViewForm.StringGridSave();

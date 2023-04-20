@@ -78,6 +78,7 @@ type
     CustomizeActionBars1: TCustomizeActionBars;
     BitBtn1: TBitBtn;
     Timer1: TTimer;
+    RichEdit1: TRichEdit;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -360,12 +361,12 @@ begin
   OcComPortObj := SettingPagesDlg.getAvailableDevice();
   if OcComPortObj = nil then
     Exit;
-  if OcComPortObj.OcComPortObjPara.ComportFullName = '' then
-    Exit;
+  //if OcComPortObj.OcComPortObjPara.ComportFullName = '' then
+  //  Exit;
 
   if OcComPortObj <> nil then
   begin
-    ParentPage := addNotebookItem(OcComPortObj.OcComPortObjPara.ComportFullName);
+    //ParentPage := addNotebookItem(OcComPortObj.OcComPortObjPara.ComportFullName);
     synchTabsetAndNotebookItems();
 
     if ParentPage = nil then
@@ -396,11 +397,11 @@ begin
     OcComPortObj.DebugLog('Home Page :' + WEB_SITE + ' ');
     OcComPortObj.DebugLog('Function  :' + 'ESC¡¢F1¡¢F2¡¢F3');
     OcComPortObj.DebugLog('################################################');
-    OcComPortObj.DebugLog(OcComPortObj.OcComPortObjPara.ComportFullName);
+    //OcComPortObj.DebugLog(OcComPortObj.OcComPortObjPara.ComportFullName);
   end
   else
   begin
-    OcComPortObj.DebugLog('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+   // OcComPortObj.DebugLog('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
     OcComPortObj.DebugLog('Open failed!!!!! the device may be in use');
     // MessageBox(Application.Handle, PChar('Open device ' + OcComPortObj.OcComPortObjPara.ComportFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
   end;
