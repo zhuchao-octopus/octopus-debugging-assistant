@@ -3,7 +3,7 @@ object SplitViewForm: TSplitViewForm
   Top = 0
   AlphaBlendValue = 238
   Caption = 'OCTOPUS '#31456#40060#20018#21475#32456#31471
-  ClientHeight = 750
+  ClientHeight = 766
   ClientWidth = 1265
   Color = clBtnFace
   CustomTitleBar.Control = TitleBarPanel1
@@ -40,7 +40,7 @@ object SplitViewForm: TSplitViewForm
   object Splitter1: TSplitter
     Left = 1262
     Top = 30
-    Height = 692
+    Height = 708
     Align = alRight
     Beveled = True
     OnMoved = Splitter1Moved
@@ -52,7 +52,7 @@ object SplitViewForm: TSplitViewForm
     Left = 0
     Top = 30
     Width = 320
-    Height = 692
+    Height = 708
     AnimationStep = 60
     OpenedWidth = 320
     ParentColor = True
@@ -64,7 +64,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 320
-      Height = 658
+      Height = 674
       Align = alClient
       PageIndex = 1
       TabOrder = 1
@@ -76,7 +76,7 @@ object SplitViewForm: TSplitViewForm
           Left = 0
           Top = 0
           Width = 320
-          Height = 658
+          Height = 674
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
@@ -370,7 +370,7 @@ object SplitViewForm: TSplitViewForm
           Left = 0
           Top = 0
           Width = 320
-          Height = 658
+          Height = 674
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
@@ -379,9 +379,9 @@ object SplitViewForm: TSplitViewForm
           object Panel11: TPanel
             AlignWithMargins = True
             Left = 5
-            Top = 436
+            Top = 426
             Width = 310
-            Height = 197
+            Height = 232
             Margins.Left = 5
             Margins.Top = 2
             Margins.Right = 5
@@ -389,18 +389,25 @@ object SplitViewForm: TSplitViewForm
             TabOrder = 0
             object Label4: TLabel
               Left = 8
-              Top = 77
+              Top = 118
               Width = 134
               Height = 19
-              Caption = #21313#20845#36827#21046#23545#40784#26041#24335' '#22914#19979
+              Caption = #21313#20845#36827#21046#26174#31034#23545#40784#26041#24335' '
+            end
+            object Label6: TLabel
+              Left = 10
+              Top = 65
+              Width = 156
+              Height = 19
+              Caption = #21457#36865#23383#31526#20018#30340#32534#30721#26684#24335#36873#25321
             end
             object CheckBox12: TCheckBox
               Left = 8
               Top = 6
               Width = 293
-              Height = 28
+              Height = 20
               Hint = #21246#36873#25903#25345#20013#25991#31561#22810#22269#35821#35328#19981#36873#20026#26631#20934'ASCII'#23383#31526#38598
-              Caption = #25509#25910#20351#29992'UNICODE'#23383#31526#38598#32534#30721'('#25903#25345#20013#25991')'
+              Caption = #25509#25910#23383#31526#38598#32534#30721#26684#24335#36873#25321'('#25903#25345#20013#25991')'
               ParentShowHint = False
               ShowHint = True
               TabOrder = 0
@@ -408,26 +415,26 @@ object SplitViewForm: TSplitViewForm
             end
             object Combobox_CodePage: TComboBox
               Left = 8
-              Top = 40
+              Top = 29
               Width = 293
               Height = 27
               Style = csDropDownList
-              ItemIndex = 6
+              ItemIndex = 0
               TabOrder = 1
-              Text = ' CP_ASCII                { ANSI / ASCII }'
+              Text = ' CP_ACP        { ANSI / GB2312  }'
               OnChange = Combobox_CodePageChange
               Items.Strings = (
-                ' CP_ACP                { ANSI / GB2312  }'
-                ' CP_OEMCP           { OEM  code page }'
-                ' CP_MACCP           { MAC  code page }'
-                ' CP_SYMBOL          { SYMBOL translations }'
-                ' CP_UTF7               { UTF-7 translation }'
-                ' CP_UTF8               { UTF-8 translation }'
-                ' CP_ASCII                { ANSI / ASCII }')
+                ' CP_ACP        { ANSI / GB2312  }'
+                ' CP_OEMCP   { OEM  code page }'
+                ' CP_MACCP   { MAC  code page }'
+                ' CP_SYMBOL  { SYMBOL translations }'
+                ' CP_UTF7       { UTF-7 translation }'
+                ' CP_UTF8       { UTF-8 translation }'
+                ' CP_ASCII      { ANSI / ASCII }')
             end
             object ComboBox8: TComboBox
               Left = 8
-              Top = 101
+              Top = 141
               Width = 293
               Height = 27
               Style = csDropDownList
@@ -442,7 +449,7 @@ object SplitViewForm: TSplitViewForm
             end
             object LabeledEdit1: TLabeledEdit
               Left = 8
-              Top = 159
+              Top = 195
               Width = 169
               Height = 27
               Color = clWhite
@@ -457,12 +464,31 @@ object SplitViewForm: TSplitViewForm
             end
             object Button14: TButton
               Left = 188
-              Top = 154
+              Top = 190
               Width = 113
               Height = 34
               Caption = #24212#29992
               TabOrder = 4
               OnClick = Button14Click
+            end
+            object CBSendCodePage: TComboBox
+              Left = 10
+              Top = 87
+              Width = 293
+              Height = 27
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 5
+              Text = 'TEncoding.DEFAULT'
+              OnChange = CBSendCodePageChange
+              Items.Strings = (
+                'TEncoding.DEFAULT'
+                'TEncoding.ASCII.Encoding'
+                'TEncoding.ANSI.Encoding'
+                'TEncoding.UTF7.Encoding'
+                'TEncoding.UTF8.Encoding'
+                'TEncoding.Unicode.Encoding'
+                'TEncoding.BigEndianUnicode.Encoding')
             end
           end
           object Panel22: TPanel
@@ -579,9 +605,9 @@ object SplitViewForm: TSplitViewForm
             end
             object CheckBox8: TCheckBox
               Left = 8
-              Top = 65
+              Top = 63
               Width = 247
-              Height = 25
+              Height = 20
               Caption = #25968#25454#33258#21160#20445#23384#21040#26412#22320#25991#20214
               TabOrder = 6
               OnClick = CheckBox8Click
@@ -590,7 +616,7 @@ object SplitViewForm: TSplitViewForm
               Left = 8
               Top = 5
               Width = 241
-              Height = 25
+              Height = 20
               Caption = #31383#21475#32972#26223#21551#29992#36879#26126#25928#26524
               TabOrder = 7
               OnClick = CheckBox7Click
@@ -601,7 +627,7 @@ object SplitViewForm: TSplitViewForm
             Left = 5
             Top = 221
             Width = 310
-            Height = 210
+            Height = 200
             Margins.Left = 5
             Margins.Top = 2
             Margins.Right = 5
@@ -611,7 +637,7 @@ object SplitViewForm: TSplitViewForm
               Left = 10
               Top = 7
               Width = 269
-              Height = 25
+              Height = 20
               Caption = #22987#32456#20445#25345#22312#25152#26377#31383#21475#30340#26368#39030#23618
               TabOrder = 0
               OnClick = CheckBox2Click
@@ -620,7 +646,7 @@ object SplitViewForm: TSplitViewForm
               Left = 10
               Top = 34
               Width = 266
-              Height = 25
+              Height = 20
               Caption = #21457#36865#21644#25509#25910#35760#24405#21069#38754#26174#31034#26102#38388#20449#24687
               TabOrder = 1
               OnClick = CheckBox_DTClick
@@ -629,7 +655,7 @@ object SplitViewForm: TSplitViewForm
               Left = 10
               Top = 61
               Width = 269
-              Height = 25
+              Height = 20
               Caption = #21457#36865#21644#25509#25910#35760#24405#21069#38754#26174#31034#24180#26376#26085#26399
               TabOrder = 2
               OnClick = CheckBox3Click
@@ -638,7 +664,7 @@ object SplitViewForm: TSplitViewForm
               Left = 10
               Top = 89
               Width = 231
-              Height = 25
+              Height = 20
               Caption = #25968#25454#35760#24405#21069#38754#26174#31034#34892#21495
               TabOrder = 3
               OnClick = CheckBox4Click
@@ -647,7 +673,7 @@ object SplitViewForm: TSplitViewForm
               Left = 10
               Top = 116
               Width = 231
-              Height = 25
+              Height = 20
               Caption = #26174#31034#20018#21475#27491#22312#21457#36865#30340#25968#25454
               TabOrder = 4
               OnClick = CheckBox5Click
@@ -656,7 +682,7 @@ object SplitViewForm: TSplitViewForm
               Left = 10
               Top = 143
               Width = 191
-              Height = 25
+              Height = 20
               Caption = #22312#26700#38754#21019#24314#24555#25463#26041#24335
               Checked = True
               Enabled = False
@@ -667,7 +693,7 @@ object SplitViewForm: TSplitViewForm
               Left = 10
               Top = 171
               Width = 258
-              Height = 25
+              Height = 20
               Caption = 'Switch To English Language'
               Enabled = False
               TabOrder = 6
@@ -679,7 +705,7 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet1: TTabSet
       Left = 0
-      Top = 658
+      Top = 674
       Width = 320
       Height = 34
       Align = alBottom
@@ -703,7 +729,7 @@ object SplitViewForm: TSplitViewForm
     Left = 942
     Top = 30
     Width = 320
-    Height = 692
+    Height = 708
     AnimationStep = 60
     OpenedWidth = 320
     ParentColor = True
@@ -716,7 +742,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 320
-      Height = 658
+      Height = 674
       Align = alClient
       TabOrder = 1
       object TPage
@@ -729,7 +755,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 314
-          Height = 652
+          Height = 668
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
@@ -739,7 +765,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 229
             Width = 314
-            Height = 423
+            Height = 439
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
@@ -748,7 +774,7 @@ object SplitViewForm: TSplitViewForm
               Left = 0
               Top = 0
               Width = 314
-              Height = 354
+              Height = 370
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
@@ -758,7 +784,7 @@ object SplitViewForm: TSplitViewForm
                 Left = 3
                 Top = 3
                 Width = 308
-                Height = 348
+                Height = 364
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -775,7 +801,7 @@ object SplitViewForm: TSplitViewForm
             end
             object Panel8: TPanel
               Left = 0
-              Top = 354
+              Top = 370
               Width = 314
               Height = 69
               Align = alBottom
@@ -878,7 +904,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 314
-          Height = 652
+          Height = 668
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
@@ -887,7 +913,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 614
+            Height = 630
             Hint = #28857#20987#24038#36793#25353#38062#21457#36865#25968#25454
             Align = alClient
             BorderStyle = bsNone
@@ -1922,7 +1948,7 @@ object SplitViewForm: TSplitViewForm
           end
           object Panel4: TPanel
             Left = 0
-            Top = 614
+            Top = 630
             Width = 314
             Height = 38
             Align = alBottom
@@ -1967,7 +1993,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 314
-          Height = 652
+          Height = 668
           Align = alClient
           BevelOuter = bvNone
           Color = clMenuBar
@@ -1978,14 +2004,14 @@ object SplitViewForm: TSplitViewForm
             Left = 3
             Top = 122
             Width = 308
-            Height = 458
+            Height = 474
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
           end
           object Panel16: TPanel
             Left = 0
-            Top = 583
+            Top = 599
             Width = 314
             Height = 69
             Align = alBottom
@@ -2128,7 +2154,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 314
-          Height = 652
+          Height = 668
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
@@ -2136,7 +2162,7 @@ object SplitViewForm: TSplitViewForm
             Left = 0
             Top = 0
             Width = 314
-            Height = 652
+            Height = 668
             Align = alClient
             TabOrder = 0
             object CheckBox10: TCheckBox
@@ -2272,7 +2298,7 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet3: TTabSet
       Left = 0
-      Top = 658
+      Top = 674
       Width = 320
       Height = 34
       Align = alBottom
@@ -2292,7 +2318,7 @@ object SplitViewForm: TSplitViewForm
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 722
+    Top = 738
     Width = 1265
     Height = 28
     Panels = <
@@ -2318,7 +2344,7 @@ object SplitViewForm: TSplitViewForm
     Left = 320
     Top = 30
     Width = 622
-    Height = 692
+    Height = 708
     Align = alClient
     BevelOuter = bvNone
     ParentBackground = False
@@ -2328,7 +2354,7 @@ object SplitViewForm: TSplitViewForm
       Left = 0
       Top = 0
       Width = 622
-      Height = 658
+      Height = 674
       Align = alClient
       PageIndex = 1
       TabOrder = 0
@@ -2341,7 +2367,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 616
-          Height = 652
+          Height = 668
           Align = alClient
           BorderStyle = bsNone
           Color = clMenuText
@@ -2408,7 +2434,7 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 616
-          Height = 652
+          Height = 668
           AllowPanning = pmVertical
           Foot.Visible = False
           Legend.Visible = False
@@ -2480,13 +2506,13 @@ object SplitViewForm: TSplitViewForm
           Left = 3
           Top = 3
           Width = 616
-          Height = 652
+          Height = 668
           Align = alClient
           TabOrder = 0
           OnNewWindow2 = W1234998NewWindow2
           ExplicitHeight = 650
           ControlData = {
-            4C000000AA3F0000634300000000000000000000000000000000000000000000
+            4C000000AA3F00000A4500000000000000000000000000000000000000000000
             000000004C000000000000000000000001000000E0D057007335CF11AE690800
             2B2E126208000000000000004C0000000114020000000000C000000000000046
             8000000000000000000000000000000000000000000000000000000000000000
@@ -2496,7 +2522,7 @@ object SplitViewForm: TSplitViewForm
     end
     object TabSet2: TTabSet
       Left = 0
-      Top = 658
+      Top = 674
       Width = 622
       Height = 34
       ParentCustomHint = False
@@ -3726,6 +3752,12 @@ object SplitViewForm: TSplitViewForm
                 ShortCut = 16463
               end
               item
+                Action = FileOpenWithByteHex
+                Caption = #25171#24320#20197#23383#33410#26041#24335'(&Z)'
+                ImageIndex = 7
+                ShortCut = 16463
+              end
+              item
                 Action = FileSaveAs1
                 Caption = #21478#23384#20026'(&V)...'
                 ImageIndex = 30
@@ -3744,36 +3776,36 @@ object SplitViewForm: TSplitViewForm
               end
               item
                 Action = submitProblem
-                Caption = #25105#26377#38382#39064'(&Z)...'
+                Caption = #25105#26377#38382#39064'(&T)...'
               end
               item
                 Caption = '-'
               end
               item
                 Action = act_PictureEdit
-                Caption = #25130#22270#24037#20855'(&T)'
+                Caption = #25130#22270#24037#20855'(&S)'
               end
               item
                 Action = act_Screenshot
-                Caption = #23631#24149#25130#22270'(&S)'
+                Caption = #23631#24149#25130#22270'(&R)'
               end
               item
                 Action = act_rsa
-                Caption = #25968#25454#21152#23494'(&R)'
+                Caption = #25968#25454#21152#23494'(&Q)'
               end
               item
                 Action = act_crc
                 Caption = #21508#31867'CRC'#35745#31639'(&C)'
               end
               item
-                Caption = #26426#22120#23398#20064#31070#32463#32593#32476'(&Q)'
+                Caption = #26426#22120#23398#20064#31070#32463#32593#32476'(&P)'
               end
               item
                 Caption = '-'
               end
               item
                 Action = FileExit1
-                Caption = #36864#20986'(&P)'
+                Caption = #36864#20986'(&O)'
                 ImageIndex = 43
               end>
             Caption = '&'#33756#21333
@@ -3992,6 +4024,14 @@ object SplitViewForm: TSplitViewForm
     object act_crc: TAction
       Caption = 'act_crc'
       OnExecute = act_crcExecute
+    end
+    object FileOpenWithByteHex: TFileOpen
+      Category = 'File'
+      Caption = 'FileOpenWithByteHex'
+      Hint = 'Open|Opens an existing file'
+      ImageIndex = 7
+      ShortCut = 16463
+      OnAccept = FileOpenWithByteHexAccept
     end
   end
 end

@@ -233,6 +233,9 @@ type
     act_PictureEdit: TAction;
     act_rsa: TAction;
     act_crc: TAction;
+    FileOpenWithByteHex: TFileOpen;
+    Label6: TLabel;
+    CBSendCodePage: TComboBox;
 
     procedure FormCreate(Sender: TObject);
     procedure imgMenuClick(Sender: TObject);
@@ -346,6 +349,8 @@ type
     procedure act_PictureEditExecute(Sender: TObject);
     procedure act_rsaExecute(Sender: TObject);
     procedure act_crcExecute(Sender: TObject);
+    procedure FileOpenWithByteHexAccept(Sender: TObject);
+    procedure CBSendCodePageChange(Sender: TObject);
 
   private
     // StringGrid1_Col, StringGrid1_Row: Integer;
@@ -353,6 +358,7 @@ type
     // ComReceiveBuffer: array [0 .. 1048576] of Byte;
     // for com port receive buffer
     // ComReceiveBuffer:array of Byte;
+    FWindowStyle: String;
     FJvHidDeviceController1: TJvHidDeviceController;
 
     OctopusCfgDir: String;
@@ -1285,6 +1291,11 @@ begin
   CharSeriesSetColor(1, ButtonColor2.SymbolColor);
 end;
 
+procedure TSplitViewForm.CBSendCodePageChange(Sender: TObject);
+begin
+  ApplyCodePageSetting();
+end;
+
 procedure TSplitViewForm.Button11Click(Sender: TObject);
 var
   str, s: String;
@@ -1357,8 +1368,8 @@ begin
   for i := 0 to Memo5.Lines.Count - 1 do
     str := str + Trim(Memo5.Lines.Strings[i]) + ' ';
   str := Trim(str);
-  // sendFormat:= ComboBox6.ItemIndex;
 
+  if str = '' then Exit;
   case ComboBox6.ItemIndex of
     Ord(S_ASCIIFormat):
       begin
@@ -1464,25 +1475,25 @@ end;
 
 procedure TSplitViewForm.act_crcExecute(Sender: TObject);
 begin
-   CRCFrm.show();
+  CRCFrm.show();
 end;
 
 procedure TSplitViewForm.act_PictureEditExecute(Sender: TObject);
 begin
-  ScreenMainFrm.WindowState:= wsNormal;
+  ScreenMainFrm.WindowState := wsNormal;
   ScreenMainFrm.show();
-  //ShellExecute(handle,'open','PictureEditor.exe','-s','',SW_SHOWNORMAL);
+  // ShellExecute(handle,'open','PictureEditor.exe','-s','',SW_SHOWNORMAL);
 end;
 
 procedure TSplitViewForm.act_rsaExecute(Sender: TObject);
 begin
-   DecryptEncryptFrm.show();
+  DecryptEncryptFrm.show();
 end;
 
 procedure TSplitViewForm.act_ScreenshotExecute(Sender: TObject);
 begin
   WindowState := wsMinimized; // 最小化程序窗口
-  hide; // 把程序藏起来
+  Hide; // 把程序藏起来
   sleep(100);
   ScreenshotFrm.MouseDownStart := True;
   ScreenshotFrm.MouseUpDone := True;
@@ -1491,7 +1502,8 @@ begin
 
   if ScreenshotFrm.ShowModal = mrOk then // 在form2中进行图片裁剪
   begin
-    ScreenMainFrm.Image1.Picture.LoadFromClipboardFormat(CF_BITMAP, Clipboard.GetAsHandle(CF_BITMAP), 0);
+    //ScreenMainFrm.Image1.Picture.LoadFromClipboardFormat(CF_BITMAP, Clipboard.GetAsHandle(CF_BITMAP), 0);
+    ScreenMainFrm.Image1.Picture.Assign(ScreenshotFrm.ScreenShotBitmap);
     ScreenMainFrm.WindowState := wsNormal; // 复原窗口状态
     // ScreenMainFrm.FilePath := FILE_DATA_ANN;
     // ScreenMainFrm.FileName := FStockDrawKLines.stock.GetLevelKey();
@@ -1511,7 +1523,6 @@ begin
   begin
     exit;
   end;
-
 
   OcComPortObj.Timeouts.ReadInterval := StrToInt(LabeledEdit1.Text);
 
@@ -1545,6 +1556,7 @@ begin
     CodePage := 0;
   end;
 
+  OcComPortObj.SendCodeFormat := CBSendCodePage.ItemIndex;
   OcComPortObj.ShowTime := CheckBox_DT.Checked;
   OcComPortObj.ShowDate := CheckBox3.Checked;
   OcComPortObj.ShowLineNumber := CheckBox4.Checked;
@@ -2408,6 +2420,7 @@ begin
     TStyleManager.SetStyle(cbxVclStyles.Text);
     SplitViewForm.Update;
     SplitViewForm.Repaint;
+    FWindowStyle := cbxVclStyles.Text;
   end;
 end;
 
@@ -2885,27 +2898,6 @@ begin
   end;
 end;
 
-procedure InitFlashAdressMapping(Rows: Integer; Cols: Integer);
-// var
-// address, i: Integer;
-begin
-  // address := 0;
-  { SplitViewForm.StringGrid2.RowCount := Rows + 1;
-    SplitViewForm.StringGrid2.ColCount := Cols + 1;
-    SplitViewForm.StringGrid2.ColWidths[0] := 100;
-    for i := 1 to SplitViewForm.StringGrid2.RowCount - 1 do
-    begin
-    SplitViewForm.StringGrid2.Cells[0, i] := Format('%.08x ', [address]);
-    // '0' + inttostr(i)
-    address := address + Cols;
-    end;
-    for i := 1 to DEFAULT_ADDRESSMAP_COLS  do
-    begin
-    SplitViewForm.StringGrid2.ColWidths[i] := 35;
-    SplitViewForm.StringGrid2.Cells[i, 0] := Format('%.02d', [i-1]);
-    end; }
-end;
-
 procedure TSplitViewForm.FormCreate(Sender: TObject);
 var
   i: Integer;
@@ -2916,12 +2908,24 @@ var
   CheckDeviceThreak: TCheckDeviceThreak;
   f: TFont;
 begin
+  OctopusCfgDir := ExtractFilePath(Application.Exename);
+  // OctopusCfgDir :=  GetSpecialFolderDir(35) + '\My Octopus\';
+  SetCurrentDir(OctopusCfgDir);
+  OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR + GetSystemDateTimeStampStr;
+  if not DirectoryExists(OctopusCfgDir) then
+    CreateDir(OctopusCfgDir);
+  if not DirectoryExists(OctopusCfgDir + CONFIGURATION_DIR) then
+    CreateDir(OctopusCfgDir + CONFIGURATION_DIR);
+  if not DirectoryExists(OctopusCfgDir + LOG_DIR) then
+    CreateDir(OctopusCfgDir + LOG_DIR);
+
   FJvHidDeviceController1 := TJvHidDeviceController.Create(nil);
   FJvHidDeviceController1.OnDeviceData := JvHidDeviceController1DeviceData;
   FJvHidDeviceController1.OnDeviceChange := JvHidDeviceController1DeviceChange;
   FJvHidDeviceController1.OnEnumerate := JvHidDeviceController1Enumerate;
   CurrentDevicesJvHidDevice := nil;
   CurrentDevices := nil;
+
   Application.OnMessage := MyAppMsg;
   ComComboBox := TComComboBox.Create(self);
   ComComboBox.Parent := self;
@@ -2929,9 +2933,10 @@ begin
 
   FprogressMax := 0;
   Fprogress := 0;
-
+  /// /////////////////////////////////////////////
   InitStringGrid();
 
+  /// ////////////////////////////////////////////
   ComComboBox.ComProperty := cpBaudRate;
   ComComboBox.Refresh;
   ComboBox1.Items := ComComboBox.Items;
@@ -2972,27 +2977,12 @@ begin
 
   ComboBox7.ItemIndex := 0;
 
-  for StyleName in TStyleManager.StyleNames do // 初始化主题风格
-    cbxVclStyles.Items.Add(StyleName);
-  cbxVclStyles.ItemIndex := cbxVclStyles.Items.IndexOf(TStyleManager.ActiveStyle.Name);
   Memo1.Clear;
   Memo1.Tag := 0;
   CharInit(false);
 
   OcHIDDeviceList := TStringList.Create;
-  OctopusCfgDir := ExtractFilePath(Application.Exename);
-  // OctopusCfgDir :=  GetSpecialFolderDir(35) + '\My Octopus\';
 
-  SetCurrentDir(OctopusCfgDir);
-  OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR + GetSystemDateTimeStampStr;
-  if not DirectoryExists(OctopusCfgDir) then
-    CreateDir(OctopusCfgDir);
-  if not DirectoryExists(OctopusCfgDir + CONFIGURATION_DIR) then
-    CreateDir(OctopusCfgDir + CONFIGURATION_DIR);
-  if not DirectoryExists(OctopusCfgDir + LOG_DIR) then
-    CreateDir(OctopusCfgDir + LOG_DIR);
-
-  InitFlashAdressMapping(10, DEFAULT_ADDRESSMAP_COLS);
   SV_L.Width := Panel20.Width + 10;
   SV_R.Width := Button9.Width + 10;
   Splitter1.Left := SV_R.Left;
@@ -3044,30 +3034,23 @@ begin
   StatusBar1.Panels.Items[1].Width := StatusBar1.Canvas.TextWidth(DEFAULT_WEBSITE_ADDRESS + ' 123456');
   StatusBar1.Panels.Items[1].Text := DEFAULT_WEBSITE_ADDRESS;
   Button4.OnClick(self); // 刷新设备列表
-  LoadProjectSetting(); // 载入全局设置
-  AdjustComponentFont(SplitViewForm, SplitViewForm.Font);
-  { // 初始化全局配置
-    for i := 0 to OcComPortList.Count - 1 do
-    begin
-    OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
-    if (OcComPortObj <> nil) then
-    begin
-    OcComPortObj.OcComPortObjInit2('', '', 13, -1, -1, -1, -1, -1, -1, nil, CheckBox3.Checked, CheckBox25.Checked, CheckBox4.Checked, CheckBox5.Checked, True);
 
-    case ComboBox8.ItemIndex of
-    0:
-    OcComPortObj.HexModeFormatCount := 16;
-    1:
-    OcComPortObj.HexModeFormatCount := 32;
-    2:
-    OcComPortObj.HexModeFormatCount := 0;
-    else
-    OcComPortObj.HexModeFormatCount := 0;
-    end;
-    end;
-    end; }
+  AdjustComponentFont(SplitViewForm, SplitViewForm.Font);
 
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
+
+  LoadProjectSetting(); // 载入全局设置
+  for StyleName in TStyleManager.StyleNames do // 初始化主题风格
+  begin
+    cbxVclStyles.Items.Add(StyleName);
+    if FWindowStyle = StyleName then
+    begin
+      TStyleManager.SetStyle(StyleName);
+      SplitViewForm.Update;
+      SplitViewForm.Repaint;
+    end;
+  end;
+  cbxVclStyles.ItemIndex := cbxVclStyles.Items.IndexOf(TStyleManager.ActiveStyle.Name);
   try
     CheckDeviceThreak := TCheckDeviceThreak.Create(True);
     CheckDeviceThreak.ApplicationFileName := Application.Exename;
@@ -3639,6 +3622,50 @@ procedure TSplitViewForm.FileOpen1Accept(Sender: TObject);
 begin
   if FileExists(FileOpen1.Dialog.FileName) then
     Memo1.Lines.LoadFromFile(FileOpen1.Dialog.FileName);
+end;
+
+procedure TSplitViewForm.FileOpenWithByteHexAccept(Sender: TObject);
+var
+  FileName: String;
+  FileStream: TFileStream;
+  i, Len, ShowSize: Integer;
+  buffer: array [0 .. 15] of byte;
+const
+  MAXSIZE = 1024 * 1024 * 5;
+begin
+  if not FileExists(FileOpenWithByteHex.Dialog.FileName) then
+    exit;
+
+  try
+    FileName := FileOpenWithByteHex.Dialog.FileName;
+    FileStream := readFileToStream(FileName);
+    if FileStream = nil then
+      exit;
+    ShowSize := 0;
+    Memo1.Clear;
+    if (FileStream.Size > MAXSIZE) then
+    begin
+      Log0('This size is too biger,now only support less then 5M size, ' + IntToStr(FileStream.Size));
+    end;
+
+    FileStream.Seek(0, soFromBeginning);
+    while True do
+    begin
+      ZeroMemory(@buffer, sizeof(buffer));
+      Len := FileStream.Read(buffer, sizeof(buffer));
+      if (Len <= 0) then
+        break;
+      LogBuffer0(buffer, Len);
+      ShowSize := ShowSize + Len;
+      if (ShowSize > MAXSIZE) then
+        exit;
+      Application.ProcessMessages;
+    end;
+  finally
+    Log0('read size:' + IntToStr(ShowSize));
+    FileStream.Free;
+  end;
+
 end;
 
 procedure TSplitViewForm.FileSaveAs1Accept(Sender: TObject);
@@ -4495,6 +4522,26 @@ begin
   end;
 end;
 
+procedure TSplitViewForm.SaveDeviceSetting(OcComPortObj: TOcComPortObj);
+var
+  s: String;
+  Octopusini: TIniFile;
+begin
+  if OcComPortObj = nil then
+    exit;
+  try
+    OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log'); // 打开的时候创建日志文件
+    s := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
+    OcComPortObj.StoreSettings(stIniFile, s);
+    Octopusini := TIniFile.Create(s);
+    // Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
+    Octopusini.WriteInteger('', 'SendFormat', ComboBox6.ItemIndex);
+    Octopusini.WriteInteger('', 'ReceiveFormat', ComboBox7.ItemIndex);
+  finally
+    Octopusini.Free;
+  end;
+end;
+
 // 项目配置，全局配置
 procedure TSplitViewForm.SaveProjectSetting(SavePrivate: Boolean);
 var
@@ -4549,30 +4596,12 @@ begin
       Octopusini.WriteInteger('MyPreference', 'MAINUIFONTSIZE', SplitViewForm.Font.Size);
       Octopusini.WriteInteger('MyPreference', 'MAINUIFONTCOLOR', SplitViewForm.Font.Color);
 
+      Octopusini.WriteString('MyPreference', 'WINDOWS_STYLE', FWindowStyle);
+
       Octopusini.WriteString('SystemConfiguration', 'VERSIONNUMBER64', VersionNumberStr);
     finally
       Octopusini.Free;
     end;
-  end;
-end;
-
-procedure TSplitViewForm.SaveDeviceSetting(OcComPortObj: TOcComPortObj);
-var
-  s: String;
-  Octopusini: TIniFile;
-begin
-  if OcComPortObj = nil then
-    exit;
-  try
-    OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log'); // 打开的时候创建日志文件
-    s := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
-    OcComPortObj.StoreSettings(stIniFile, s);
-    Octopusini := TIniFile.Create(s);
-    // Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
-    Octopusini.WriteInteger('', 'SendFormat', ComboBox6.ItemIndex);
-    Octopusini.WriteInteger('', 'ReceiveFormat', ComboBox7.ItemIndex);
-  finally
-    Octopusini.Free;
   end;
 end;
 
@@ -4630,6 +4659,8 @@ begin
 
     SplitViewForm.Font.Name := Octopusini.ReadString('MyPreference', 'MAINUIFONTNAME', 'Segoe UI');
     SplitViewForm.Font.Size := Octopusini.ReadInteger('MyPreference', 'MAINUIFONTSIZE', 10);
+
+    SplitViewForm.FWindowStyle := Octopusini.ReadString('MyPreference', 'WINDOWS_STYLE', '');
   finally
     Octopusini.Free;
   end;

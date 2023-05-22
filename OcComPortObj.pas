@@ -77,6 +77,7 @@ type
 
     FComportFullName: String;
     FSendFormat: integer; // h
+    FSendCodeFormat: integer;
     FReceiveFormat: integer; // i
     FLogMemo: TMemo; // j
     FShowDate: Boolean;
@@ -168,6 +169,7 @@ type
 
     property ReceiveFormat: integer read FReceiveFormat write FReceiveFormat;
     property SendFormat: integer read FSendFormat write FSendFormat default 0;
+    property SendCodeFormat: integer read FSendCodeFormat write FSendCodeFormat default 0;
 
     property CompatibleUnicode: Boolean read FCompatibleUnicode write FCompatibleUnicode default false;
     property NeedCRC16: Boolean read FNeedCRC16 write FNeedCRC16 default false;
@@ -180,12 +182,12 @@ type
     property MouseTextSelection: Boolean read FMouseTextSelection write FMouseTextSelection;
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
     property ComportFullName: String read FComportFullName write FComportFullName;
-    function FalconComSendBuffer(const Buffer: array of Byte; Count: integer): Bool;
 
-    // function FalconComSendBufferWaitACK(Buffer: array of Byte; Count: Integer): Bool;
+    function FalconComSendBuffer(const Buffer: array of Byte; Count: integer): Bool;
     function FalconComSendData_Common(str: string; SendFormat: integer): Bool;
     function FalconComSendData_Terminal(str: string; SendFormat: integer): Bool;
     function FalconComSendData_MultiTimes(str: string; SendFormat: integer): Bool;
+    function FalconComSendData_SentString(str: string): integer;
 
     procedure SendProtocolACK(); // ·¢ËÍACK
     function WaitProtocolACK(ACK: integer; timeOut: integer): Boolean;
@@ -1079,8 +1081,10 @@ begin
           end;
 
           try
-            self.writestr(str);
-            FComSentCount := FComSentCount + Length(str);
+            //self.writestr(str);
+            //FComSentCount := FComSentCount + Length(str);
+            bLength := FalconComSendData_SentString(str);
+            FComSentCount := FComSentCount + bLength;
           except
             Result := false;
             Log('Sorry Write to device fail!!');
@@ -1156,9 +1160,11 @@ begin
             begin
             end
             else
+            begin
               str := str + #13;
-            writestr(str);
+            end;
 
+            writestr(str);
             FComSentCount := FComSentCount + Length(str);
           except
             Result := false;
@@ -1212,7 +1218,7 @@ var
   s: string;
 begin
   Result := True;
-
+  bLength:=0;
   case SendFormat of
     Ord(S_ASCIIFormat): // send string ascci char
       begin
@@ -1223,8 +1229,9 @@ begin
             Log(SEND_FLAG + str);
 
           try
-            self.writestr(str);
-            FComSentCount := FComSentCount + Length(str);
+            //self.writestr(str);
+            bLength := FalconComSendData_SentString(str);
+            FComSentCount := FComSentCount + bLength;
           except
             Result := false;
             Log('Sorry Write to device fail!!');
@@ -1280,6 +1287,62 @@ begin
 
   if Assigned(FCallBackFun) then
     FCallBackFun();
+end;
+
+function TOcComPortObj.FalconComSendData_SentString(str: string): integer;
+VAR
+  ss: TStringStream;
+begin
+  Result := 0;
+  case self.SendCodeFormat of
+    0:
+      begin
+        self.writestr(str);
+        Result := Length(str);
+      end;
+    1:
+      begin
+        ss := StrToEncode(str, TEncoding.ASCII);
+        self.Write(ss.Bytes, ss.Size);
+        Result := ss.Size;
+      end;
+    2:
+      begin
+        ss := StrToEncode(str, TEncoding.ANSI);
+        self.Write(ss.Bytes, ss.Size);
+        Result := ss.Size;
+      end;
+    3:
+      begin
+        ss := StrToEncode(str, TEncoding.UTF7);
+        self.Write(ss.Bytes, ss.Size);
+        Result := ss.Size;
+      end;
+    4:
+      begin
+        ss := StrToEncode(str, TEncoding.UTF8);
+        self.Write(ss.Bytes, ss.Size);
+        Result := ss.Size;
+      end;
+    5:
+      begin
+        ss := StrToEncode(str, TEncoding.Unicode);
+        self.Write(ss.Bytes, ss.Size);
+        Result := ss.Size;
+      end;
+    6:
+      begin
+        ss := StrToEncode(str, TEncoding.BigEndianUnicode);
+        self.Write(ss.Bytes, ss.Size);
+        Result := ss.Size;
+      end;
+  else
+    begin
+      self.writestr(str);
+      Result := Length(str);
+    end;
+  end;
+  //ss.Free;
 end;
 
 function TOcComPortObj.GetLineNumberDateTimeStamp(N: Int64): String;

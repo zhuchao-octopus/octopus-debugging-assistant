@@ -51,8 +51,6 @@ uses
   GlobalFunctions in '..\ZSBWM\PUBLIC\GlobalFunctions.pas',
   Screenshot in '..\ZSBWM\SCREEN\Screenshot.pas' {ScreenshotFrm},
   uScreenMain in '..\ZSBWM\SCREEN\uScreenMain.pas' {ScreenMainFrm},
-  uANN_CNN_Cifar10 in '..\ZSBWM\ANN\ZSZS\uANN_CNN_Cifar10.pas',
-  uMachineLearning in '..\ZSBWM\ANN\ZSZS\uMachineLearning.pas' {MachineLearningFrm},
   uClass_CNN in '..\ZSBWM\ANN\CNN\Common\uClass_CNN.pas',
   uClass_Imaging in '..\ZSBWM\ANN\CNN\Common\uClass_Imaging.pas',
   uClasses_Types in '..\ZSBWM\ANN\CNN\Common\uClasses_Types.pas',
@@ -77,7 +75,6 @@ begin
   Application.CreateForm(TSubmitProblemFrm, SubmitProblemFrm);
   Application.CreateForm(TScreenshotFrm, ScreenshotFrm);
   Application.CreateForm(TScreenMainFrm, ScreenMainFrm);
-  Application.CreateForm(TMachineLearningFrm, MachineLearningFrm);
   Application.CreateForm(TCutSettingForm, CutSettingForm);
   Application.CreateForm(TDecryptEncryptFrm, DecryptEncryptFrm);
   Application.CreateForm(TRSATestForm, RSATestForm);

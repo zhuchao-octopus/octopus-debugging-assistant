@@ -158,7 +158,22 @@ procedure StrToBuffer(str: String; var buffer: array of byte);
 
 function checkIsHexStr(sStr: String): Boolean;
 
+function StrToEncode(str: string; AEncoding: TEncoding): TStringStream;
+function StringStreamToHexStr(ss:TStringStream):String;
+
 implementation
+
+function StringStreamToHexStr(ss:TStringStream):String;
+var
+   i:Integer;
+begin
+  for i := 0 to ss.Size - 1 do
+    Result := Result + Format('%.2x ', [ss.Bytes[i]]);
+end;
+function StrToEncode(str: string; AEncoding: TEncoding): TStringStream;
+begin
+  Result := TStringStream.Create(str, AEncoding);
+end;
 
 function checkIsHexStr(sStr: String): Boolean;
 var
