@@ -1502,6 +1502,8 @@ begin
 
   if ScreenshotFrm.ShowModal = mrOk then // 在form2中进行图片裁剪
   begin
+   if ScreenshotFrm.ScreenShotBitmap <> nil then
+    begin
     //ScreenMainFrm.Image1.Picture.LoadFromClipboardFormat(CF_BITMAP, Clipboard.GetAsHandle(CF_BITMAP), 0);
     ScreenMainFrm.Image1.Picture.Assign(ScreenshotFrm.ScreenShotBitmap);
     ScreenMainFrm.WindowState := wsNormal; // 复原窗口状态
@@ -1509,6 +1511,11 @@ begin
     // ScreenMainFrm.FileName := FStockDrawKLines.stock.GetLevelKey();
     show();
     ScreenMainFrm.show;
+    end
+    else
+    begin
+       show();
+    end;
   end;
 end;
 

@@ -586,9 +586,9 @@ object SplitViewForm: TSplitViewForm
               Text = '10'
             end
             object Button5: TButton
-              Left = 192
+              Left = 204
               Top = 125
-              Width = 109
+              Width = 97
               Height = 34
               Caption = #28165#38500#32531#23384
               TabOrder = 4
@@ -597,7 +597,7 @@ object SplitViewForm: TSplitViewForm
             object Button6: TButton
               Left = 8
               Top = 125
-              Width = 178
+              Width = 191
               Height = 34
               Caption = #25171#24320#26085#24535#21644#37197#32622#25991#20214#30446#24405
               TabOrder = 5
