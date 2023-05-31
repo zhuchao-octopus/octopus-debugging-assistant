@@ -72,6 +72,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Octops '#20018#21475#35774#32622
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel17: TPanel
           Left = 0
           Top = 0
@@ -744,12 +746,15 @@ object SplitViewForm: TSplitViewForm
       Width = 320
       Height = 674
       Align = alClient
+      PageIndex = 1
       TabOrder = 1
       object TPage
         Left = 0
         Top = 0
         HelpContext = 1
         Caption = #22359#21457#36865
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel2: TPanel
           AlignWithMargins = True
           Left = 3
@@ -1988,6 +1993,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2149,6 +2156,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2362,6 +2371,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #26412#22320#25991#20214#30446#24405
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Memo1: TMemo
           AlignWithMargins = True
           Left = 3
@@ -2501,6 +2512,8 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
