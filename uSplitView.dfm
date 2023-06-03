@@ -72,8 +72,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Octops '#20018#21475#35774#32622
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel17: TPanel
           Left = 0
           Top = 0
@@ -401,7 +399,7 @@ object SplitViewForm: TSplitViewForm
               Top = 65
               Width = 156
               Height = 19
-              Caption = #21457#36865#23383#31526#20018#30340#32534#30721#26684#24335#36873#25321
+              Caption = #21457#36865#31471#23383#31526#38598#32534#30721#26684#24335#36873#25321
             end
             object CheckBox12: TCheckBox
               Left = 8
@@ -409,7 +407,7 @@ object SplitViewForm: TSplitViewForm
               Width = 293
               Height = 20
               Hint = #21246#36873#25903#25345#20013#25991#31561#22810#22269#35821#35328#19981#36873#20026#26631#20934'ASCII'#23383#31526#38598
-              Caption = #25509#25910#23383#31526#38598#32534#30721#26684#24335#36873#25321'('#25903#25345#20013#25991')'
+              Caption = #25509#25910#31471#23383#31526#38598#32534#30721#26684#24335#36873#25321'('#25903#25345#20013#25991')'
               ParentShowHint = False
               ShowHint = True
               TabOrder = 0
@@ -753,8 +751,6 @@ object SplitViewForm: TSplitViewForm
         Top = 0
         HelpContext = 1
         Caption = #22359#21457#36865
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel2: TPanel
           AlignWithMargins = True
           Left = 3
@@ -1993,8 +1989,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2156,8 +2150,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = 'Graphic '
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3
@@ -2371,8 +2363,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #26412#22320#25991#20214#30446#24405
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Memo1: TMemo
           AlignWithMargins = True
           Left = 3
@@ -2512,8 +2502,6 @@ object SplitViewForm: TSplitViewForm
         Left = 0
         Top = 0
         Caption = #24110#21161
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object W1234998: TWebBrowser
           AlignWithMargins = True
           Left = 3
