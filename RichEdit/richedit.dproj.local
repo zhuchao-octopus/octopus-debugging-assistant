@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/06/26 20:50:01.000.670,=F:\DelphiProjects\OCTOPUS\RichEdit\Vcl.Tabs.pas</Transaction>
+    <Transaction>2023/06/26 21:03:32.000.169,=F:\DelphiProjects\OCTOPUS\RichEdit\uSetting.pas</Transaction>
+    <Transaction>2023/06/26 21:04:06.000.218,F:\DelphiProjects\OCTOPUS\RichEdit\uOctopusMain.pas=F:\DelphiProjects\OCTOPUS\RichEdit\remain.pas</Transaction>
+    <Transaction>2023/06/26 21:04:06.000.218,F:\DelphiProjects\OCTOPUS\RichEdit\uOctopusMain.dfm=F:\DelphiProjects\OCTOPUS\RichEdit\remain.dfm</Transaction>
+    <Transaction>2023/06/26 21:04:45.000.559,F:\DelphiProjects\OCTOPUS\RichEdit\uAbout.pas=F:\DelphiProjects\OCTOPUS\RichEdit\reabout.pas</Transaction>
+    <Transaction>2023/06/26 21:04:45.000.559,F:\DelphiProjects\OCTOPUS\RichEdit\uAbout.dfm=F:\DelphiProjects\OCTOPUS\RichEdit\reabout.dfm</Transaction>
+    <Transaction>2023/06/26 21:05:36.000.874,=F:\DelphiProjects\OCTOPUS\OcComPortObj.pas</Transaction>
+    <Transaction>2023/06/26 21:08:11.000.864,=F:\DelphiProjects\OCTOPUS\ComPort\CPort.pas</Transaction>
+    <Transaction>2023/06/26 21:28:20.000.291,=F:\DelphiProjects\OCTOPUS\ComPort\BarCodeScaner.pas</Transaction>
+    <Transaction>2023/06/26 21:28:53.000.707,F:\DelphiProjects\OCTOPUS\RichEdit\uAbout.pas=F:\DelphiProjects\OCTOPUS\RichEdit\uOctopusAbout.pas</Transaction>
+    <Transaction>2023/06/26 21:28:53.000.707,F:\DelphiProjects\OCTOPUS\RichEdit\uAbout.dfm=F:\DelphiProjects\OCTOPUS\RichEdit\uOctopusAbout.dfm</Transaction>
+    <Transaction>2023/06/26 22:13:37.000.976,=F:\DelphiProjects\OCTOPUS\ComPort\CPortSetup.pas</Transaction>
+    <Transaction>2023/06/26 22:14:01.000.344,=F:\DelphiProjects\OCTOPUS\ComPort\CPortEsc.pas</Transaction>
+    <Transaction>2023/06/26 22:14:01.000.448,=F:\DelphiProjects\OCTOPUS\ComPort\CPortTrmSet.pas</Transaction>
+    <Transaction>2023/06/26 22:14:01.000.327,=F:\DelphiProjects\OCTOPUS\ComPort\CPortCtl.pas</Transaction>
+    <Transaction>2023/06/26 22:15:40.000.565,=F:\DelphiProjects\OCTOPUS\OcProtocol.pas</Transaction>
+    <Transaction>2023/06/26 22:16:36.000.175,=F:\DelphiProjects\OCTOPUS\OcPcDeviceMgt.pas</Transaction>
+    <Transaction>2023/06/26 22:17:02.000.402,=F:\DelphiProjects\OCTOPUS\uGlobalFunction.pas</Transaction>
+    <Transaction>2023/06/26 22:17:38.000.565,=F:\DelphiProjects\OCTOPUS\ComPort\CPortReg.pas</Transaction>
+    <Transaction>2023/06/26 22:19:38.000.232,F:\DelphiProjects\OCTOPUS\ComPort\CPortReg.pas=</Transaction>
+    <Transaction>2023/06/26 22:19:56.000.901,F:\DelphiProjects\OCTOPUS\ComPort\BarCodeScaner.pas=</Transaction>
+    <Transaction>2023/07/07 16:03:41.151,F:\DelphiProjects\OCTOPUS\OcComPortObj.pas=</Transaction>
+    <Transaction>2023/07/07 16:03:52.063,=F:\DelphiProjects\OCTOPUS\RichEdit\OcComPortObj.pas</Transaction>
+  </Transactions>
+</BorlandProject>

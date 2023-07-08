@@ -35,8 +35,7 @@ uses
 
 type
   // property types
-  TComProperty = (cpNone, cpPort, cpBaudRate, cpDataBits, cpStopBits, cpParity,
-    cpFlowControl);
+  TComProperty = (cpNone, cpPort, cpBaudRate, cpDataBits, cpStopBits, cpParity, cpFlowControl);
 
   // assistant class for TComComboBox, TComRadioGroup controls
   TComSelect = class
@@ -82,8 +81,7 @@ type
     procedure SetComProperty(const Value: TComProperty);
     procedure SetText(const Value: string);
   protected
-    procedure Notification(AComponent: TComponent;
-      Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Change; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -92,10 +90,8 @@ type
     procedure UpdateSettings;
   published
     property ComPort: TCustomComPort read GetComPort write SetComPort;
-    property ComProperty: TComProperty read GetComProperty write SetComProperty
-      default cpNone;
-    property AutoApply: Boolean read GetAutoApply write SetAutoApply
-      default False;
+    property ComProperty: TComProperty read GetComProperty write SetComProperty default cpNone;
+    property AutoApply: Boolean read GetAutoApply write SetAutoApply default False;
     property Text: string read GetText write SetText;
     property Style;
     property Color;
@@ -162,8 +158,7 @@ type
     procedure SetComPort(const Value: TCustomComPort);
     procedure SetComProperty(const Value: TComProperty);
   protected
-    procedure Notification(AComponent: TComponent;
-      Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Click; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -172,10 +167,8 @@ type
     procedure UpdateSettings;
   published
     property ComPort: TCustomComPort read GetComPort write SetComPort;
-    property ComProperty: TComProperty read GetComProperty write SetComProperty
-      default cpNone;
-    property AutoApply: Boolean read GetAutoApply write SetAutoApply
-      default False;
+    property ComProperty: TComProperty read GetComProperty write SetComProperty default cpNone;
+    property AutoApply: Boolean read GetAutoApply write SetAutoApply default False;
     property Align;
     property Caption;
     property Color;
@@ -228,8 +221,7 @@ type
 
   // property types
   TLedBitmap = Graphics.TBitmap;
-  TLedKind = (lkRedLight, lkGreenLight, lkBlueLight, lkYellowLight,
-    lkPurpleLight, lkBulb, lkCustom);
+  TLedKind = (lkRedLight, lkGreenLight, lkBlueLight, lkYellowLight, lkPurpleLight, lkBulb, lkCustom);
   TComLedSignal = (lsConn, lsCTS, lsDSR, lsRLSD, lsRing, lsRx, lsTx);
   TLedState = (lsOff, lsOn);
   TComLedGlyphs = array [TLedState] of TLedBitmap;
@@ -266,11 +258,9 @@ type
     function IsStateOn: Boolean;
   protected
     procedure Paint; override;
-    procedure Notification(AComponent: TComponent;
-      Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure DoChange(AState: TLedState); dynamic;
-    procedure CMEnabledChanged(var Message: TMessage);
-      message CM_ENABLEDCHANGED;
+    procedure CMEnabledChanged(var Message: TMessage); message CM_ENABLEDCHANGED;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -279,13 +269,10 @@ type
     property LedSignal: TComLedSignal read FLedSignal write SetLedSignal;
     // kind property must be published before GlyphOn, GlyphOff
     property Kind: TLedKind read FKind write SetKind;
-    property GlyphOn: TLedBitmap index 0 read GetGlyph write SetGlyph
-      stored StoredGlyph;
-    property GlyphOff: TLedBitmap index 1 read GetGlyph write SetGlyph
-      stored StoredGlyph;
+    property GlyphOn: TLedBitmap index 0 read GetGlyph write SetGlyph stored StoredGlyph;
+    property GlyphOff: TLedBitmap index 1 read GetGlyph write SetGlyph stored StoredGlyph;
     property State: TLedState read FState write SetState default lsOff;
-    property RingDuration: Integer read GetRingDuration write SetRingDuration
-      default 1000;
+    property RingDuration: Integer read GetRingDuration write SetRingDuration default 1000;
     property Align;
     property DragCursor;
     property DragMode;
@@ -357,8 +344,7 @@ type
   // terminal types
   TTermEmulation = (teVT100orANSI, teVT52, teNone);
   TTermCaret = (tcBlock, tcUnderline, tcNone);
-  TAdvanceCaret = (acChar, acReturn, acLineFeed, acReverseLineFeed, acTab,
-    acBackspace, acPage);
+  TAdvanceCaret = (acChar, acReturn, acLineFeed, acReverseLineFeed, acTab, acBackspace, acPage);
   TArrowKeys = (akTerminal, akWindows);
 
   TTermAttributes = record
@@ -373,10 +359,8 @@ type
     Keys: TArrowKeys;
   end;
 
-  TEscapeEvent = procedure(Sender: TObject; var EscapeCodes: TEscapeCodes)
-    of object;
-  TUnhandledEvent = procedure(Sender: TObject; Code: TEscapeCode; Data: string)
-    of object;
+  TEscapeEvent = procedure(Sender: TObject; var EscapeCodes: TEscapeCodes) of object;
+  TUnhandledEvent = procedure(Sender: TObject; Code: TEscapeCode; Data: string) of object;
   TStrRecvEvent = procedure(Sender: TObject; var Str: string) of object;
   TChScreenEvent = procedure(Sender: TObject; Ch: Char) of object;
 
@@ -462,8 +446,7 @@ type
     procedure WMGetDlgCode(var Message: TWMGetDlgCode); message WM_GETDLGCODE;
     procedure WMHScroll(var Message: TWMHScroll); message WM_HSCROLL;
     procedure WMKillFocus(var Message: TWMSetFocus); message WM_KILLFOCUS;
-    procedure WMLButtonDown(var Message: TWMLButtonDown);
-      message WM_LBUTTONDOWN;
+    procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
     procedure WMSetFocus(var Message: TWMSetFocus); message WM_SETFOCUS;
     procedure WMSize(var Msg: TWMSize); message WM_SIZE;
     procedure WMVScroll(var Message: TWMVScroll); message WM_VSCROLL;
@@ -474,8 +457,7 @@ type
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyPress(var Key: Char); override;
     procedure Loaded; override;
-    procedure Notification(AComponent: TComponent;
-      Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure Paint; override;
     procedure DoChar(Ch: Char); dynamic;
     procedure DoGetEscapeCodes(var EscapeCodes: TEscapeCodes); dynamic;
@@ -493,16 +475,12 @@ type
     procedure SaveToStream(Stream: TStream);
     procedure SelectFont;
     procedure ShowSetupDialog;
-    property AltColor: TColor read FAltColor write SetAltColor
-      default $00A6A6A6;
+    property AltColor: TColor read FAltColor write SetAltColor default $00A6A6A6;
     property AppendLF: Boolean read FAppendLF write FAppendLF default False;
-    property ArrowKeys: TArrowKeys read FArrowKeys write FArrowKeys
-      default akTerminal;
-    property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle
-      default bsSingle;
+    property ArrowKeys: TArrowKeys read FArrowKeys write FArrowKeys default akTerminal;
+    property BorderStyle: TBorderStyle read FBorderStyle write SetBorderStyle default bsSingle;
     property Caret: TTermCaret read FCaret write SetCaret default tcBlock;
-    property Connected: Boolean read GetConnected write SetConnected
-      stored False;
+    property Connected: Boolean read GetConnected write SetConnected stored False;
     property ComPort: TCustomComPort read FComPort write SetComPort;
     property Columns: Integer read FColumns write SetColumns default 80;
     property Emulation: TTermEmulation read FEmulation write SetEmulation;
@@ -511,18 +489,14 @@ type
     property LocalEcho: Boolean read FLocalEcho write FLocalEcho default False;
     property SendLF: Boolean read FSendLF write FSendLF default False;
     property ScrollBars: TScrollStyle read FScrollBars write SetScrollBars;
-    property SmoothScroll: Boolean read FSmoothScroll write FSmoothScroll
-      default False;
+    property SmoothScroll: Boolean read FSmoothScroll write FSmoothScroll default False;
     property Rows: Integer read FRows write SetRows default 24;
     property WantTab: Boolean read FWantTab write FWantTab default False;
     property WrapLines: Boolean read FWrapLines write FWrapLines default False;
     property OnChar: TChScreenEvent read FOnChar write FOnChar;
-    property OnGetEscapeCodes: TEscapeEvent read FOnGetEscapeCodes
-      write FOnGetEscapeCodes;
-    property OnStrRecieved: TStrRecvEvent read FOnStrRecieved
-      write FOnStrRecieved;
-    property OnUnhandledCode: TUnhandledEvent read FOnUnhandledCode
-      write FOnUnhandledCode;
+    property OnGetEscapeCodes: TEscapeEvent read FOnGetEscapeCodes write FOnGetEscapeCodes;
+    property OnStrRecieved: TStrRecvEvent read FOnStrRecieved write FOnStrRecieved;
+    property OnUnhandledCode: TUnhandledEvent read FOnUnhandledCode write FOnUnhandledCode;
   end;
 
   // publish properties
@@ -800,8 +774,7 @@ begin
           end;
         cpFlowControl:
           begin
-            ItemIndex :=
-              Items.IndexOf(FlowControlToStr(FlowControl.FlowControl));
+            ItemIndex := Items.IndexOf(FlowControlToStr(FlowControl.FlowControl));
             if ItemIndex > -1 then
               FFlowControl := StrToFlowControl(Items[ItemIndex]);
           end;
@@ -844,8 +817,7 @@ begin
 end;
 
 // remove ComPort property if being destroyed
-procedure TComComboBox.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TComComboBox.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (AComponent = FComSelect.ComPort) and (Operation = opRemove) then
@@ -966,8 +938,7 @@ begin
 end;
 
 // remove ComPort property if being destroyed
-procedure TComRadioGroup.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TComRadioGroup.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (AComponent = FComSelect.ComPort) and (Operation = opRemove) then
@@ -1129,10 +1100,8 @@ end;
 
 procedure TComLed.SelectLedBitmap(const LedKind: TLedKind);
 const
-  OnBitmaps: array [TLedKind] of string = ('LEDREDON', 'LEDGREENON',
-    'LEDBLUEON', 'LEDYELLOWON', 'LEDPURPLEON', 'LEDBULBON', '');
-  OffBitmaps: array [TLedKind] of string = ('LEDREDOFF', 'LEDGREENOFF',
-    'LEDBLUEOFF', 'LEDYELLOWOFF', 'LEDPURPLEOFF', 'LEDBULBOFF', '');
+  OnBitmaps: array [TLedKind] of string = ('LEDREDON', 'LEDGREENON', 'LEDBLUEON', 'LEDYELLOWON', 'LEDPURPLEON', 'LEDBULBON', '');
+  OffBitmaps: array [TLedKind] of string = ('LEDREDOFF', 'LEDGREENOFF', 'LEDBLUEOFF', 'LEDYELLOWOFF', 'LEDPURPLEOFF', 'LEDBULBOFF', '');
 begin
   if LedKind <> lkCustom then
   begin
@@ -1147,10 +1116,8 @@ var
   Rect: TRect;
 begin
   Rect := GetClientRect;
-  Result.x := Rect.Left +
-    Max(0, (Rect.Right - Rect.Left - FGlyphs[FState].Width) div 2);
-  Result.y := Rect.Top +
-    Max(0, (Rect.Bottom - Rect.Top - FGlyphs[FState].Height) div 2);
+  Result.x := Rect.Left + Max(0, (Rect.Right - Rect.Left - FGlyphs[FState].Width) div 2);
+  Result.y := Rect.Top + Max(0, (Rect.Bottom - Rect.Top - FGlyphs[FState].Height) div 2);
 end;
 
 // change led state on signal change
@@ -1225,8 +1192,7 @@ begin
     begin
       FComPort.FreeNotification(Self);
       FComPort.RegisterLink(FComLink);
-      if (FComPort.Connected) and (not(csDesigning in ComponentState)) and
-        (not(csLoading in ComponentState)) then
+      if (FComPort.Connected) and (not(csDesigning in ComponentState)) and (not(csLoading in ComponentState)) then
         if IsStateOn then
           SetStateInternal(lsOn)
         else
@@ -1361,8 +1327,7 @@ var
   Address: Integer;
 begin
   Address := (Row - 1) * FOwner.Columns + Column - 1;
-  Move(TermChar, Pointer(Integer(FBuffer) + (SizeOf(TComTermChar) * Address))^,
-    SizeOf(TComTermChar));
+  Move(TermChar, Pointer(Integer(FBuffer) + (SizeOf(TComTermChar) * Address))^, SizeOf(TComTermChar));
 end;
 
 // get char from buffer
@@ -1371,8 +1336,7 @@ var
   Address: Integer;
 begin
   Address := (Row - 1) * FOwner.Columns + Column - 1;
-  Move(Pointer(Integer(FBuffer) + (SizeOf(TComTermChar) * Address))^, Result,
-    SizeOf(TComTermChar));
+  Move(Pointer(Integer(FBuffer) + (SizeOf(TComTermChar) * Address))^, Result, SizeOf(TComTermChar));
 end;
 
 // scroll down up line
@@ -1383,12 +1347,10 @@ var
   ScrollRect: TRect;
 begin
   BytesToMove := (FOwner.Rows - 1) * FOwner.Columns * SizeOf(TComTermChar);
-  SourceAddr := Pointer(Integer(FBuffer) + FOwner.Columns *
-    SizeOf(TComTermChar));
+  SourceAddr := Pointer(Integer(FBuffer) + FOwner.Columns * SizeOf(TComTermChar));
   // scroll in buffer
   Move(SourceAddr^, FBuffer^, BytesToMove);
-  SourceAddr := Pointer(Integer(FBuffer) + (FOwner.Rows - 1) * FOwner.Columns *
-    SizeOf(TComTermChar));
+  SourceAddr := Pointer(Integer(FBuffer) + (FOwner.Rows - 1) * FOwner.Columns * SizeOf(TComTermChar));
   FillChar(SourceAddr^, FOwner.Columns * SizeOf(TComTermChar), 0);
   // calculate scrolling rectangle
   with ScrollRect do
@@ -1404,8 +1366,7 @@ begin
     FOwner.Invalidate
   else
 {$ENDIF}
-    ScrollWindowEx(FOwner.Handle, 0, -FOwner.FFontHeight, @ScrollRect, nil, 0,
-      nil, SW_INVALIDATE or SW_ERASE);
+    ScrollWindowEx(FOwner.Handle, 0, -FOwner.FFontHeight, @ScrollRect, nil, 0, nil, SW_INVALIDATE or SW_ERASE);
 end;
 
 // scroll up one line
@@ -1434,8 +1395,7 @@ begin
     FOwner.Invalidate
   else
 {$ENDIF}
-    ScrollWindowEx(FOwner.Handle, 0, FOwner.FFontHeight, @ScrollRect, nil, 0,
-      nil, SW_INVALIDATE or SW_ERASE);
+    ScrollWindowEx(FOwner.Handle, 0, FOwner.FFontHeight, @ScrollRect, nil, 0, nil, SW_INVALIDATE or SW_ERASE);
 end;
 
 // erase line
@@ -1446,8 +1406,7 @@ var
 begin
   // in memory
   BytesToDelete := (FOwner.Columns - Column + 1) * SizeOf(TComTermChar);
-  SourceAddr := Pointer(Integer(FBuffer) + ((Row - 1) * FOwner.Columns + Column
-    - 1) * SizeOf(TComTermChar));
+  SourceAddr := Pointer(Integer(FBuffer) + ((Row - 1) * FOwner.Columns + Column - 1) * SizeOf(TComTermChar));
   FillChar(SourceAddr^, BytesToDelete, 0);
   // on screen
 {$IFDEF DELPHI_4_OR_HIGHER}
@@ -1465,10 +1424,8 @@ var
   SourceAddr: Pointer;
 begin
   // in memory
-  BytesToDelete := (FOwner.Columns - Column + 1 + (FOwner.Rows - Row) *
-    FOwner.Columns) * SizeOf(TComTermChar);
-  SourceAddr := Pointer(Integer(FBuffer) + ((Row - 1) * FOwner.Columns + Column
-    - 1) * SizeOf(TComTermChar));
+  BytesToDelete := (FOwner.Columns - Column + 1 + (FOwner.Rows - Row) * FOwner.Columns) * SizeOf(TComTermChar);
+  SourceAddr := Pointer(Integer(FBuffer) + ((Row - 1) * FOwner.Columns + Column - 1) * SizeOf(TComTermChar));
   FillChar(SourceAddr^, BytesToDelete, 0);
   // on screen
 {$IFDEF DELPHI_4_OR_HIGHER}
@@ -1621,8 +1578,7 @@ begin
     FCaretPos.y := ARow;
 
   if FCaretCreated then
-    SetCaretPos((FCaretPos.x - FTopLeft.x) * FFontWidth,
-      (FCaretPos.y - FTopLeft.y) * FFontHeight + FFontHeight - FCaretHeight);
+    SetCaretPos((FCaretPos.x - FTopLeft.x) * FFontWidth, (FCaretPos.y - FTopLeft.y) * FFontHeight + FFontHeight - FCaretHeight);
 end;
 
 // write data to screen
@@ -1665,8 +1621,7 @@ begin
 end;
 
 // write escape code on screen
-procedure TCustomComTerminal.WriteEscCode(ACode: TEscapeCode;
-  AParams: TStrings);
+procedure TCustomComTerminal.WriteEscCode(ACode: TEscapeCode; AParams: TStrings);
 begin
   if FEscapeCodes <> nil then
     PutEscapeCode(ACode, AParams);
@@ -1820,8 +1775,7 @@ end;
 {$IFDEF DELPHI_4_OR_HIGHER}
 
 // set size to fit whole terminal screen
-function TCustomComTerminal.CanAutoSize(var NewWidth,
-  NewHeight: Integer): Boolean;
+function TCustomComTerminal.CanAutoSize(var NewWidth, NewHeight: Integer): Boolean;
 var
   Border: Integer;
 begin
@@ -1930,8 +1884,7 @@ begin
     FBuffer.Init;
 end;
 
-procedure TCustomComTerminal.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TCustomComTerminal.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (AComponent = FComPort) and (Operation = opRemove) then
@@ -2199,13 +2152,11 @@ begin
 end;
 
 // modify scroll bar
-procedure TCustomComTerminal.ModifyScrollBar(ScrollBar, ScrollCode,
-  Pos: Integer);
+procedure TCustomComTerminal.ModifyScrollBar(ScrollBar, ScrollCode, Pos: Integer);
 var
   CellSize, OldPos, APos, Dx, Dy: Integer;
 begin
-  if (ScrollCode = SB_ENDSCROLL) or
-    ((ScrollCode = SB_THUMBTRACK) and not FSmoothScroll) then
+  if (ScrollCode = SB_ENDSCROLL) or ((ScrollCode = SB_THUMBTRACK) and not FSmoothScroll) then
     Exit;
   if ScrollBar = SB_HORZ then
     CellSize := FFontWidth
@@ -2274,9 +2225,7 @@ var
     Min, Max: Integer;
   begin
     Result := False;
-    if (ScrollBars = ssBoth) or
-      ((Code = SB_HORZ) and (ScrollBars = ssHorizontal)) or
-      ((Code = SB_VERT) and (ScrollBars = ssVertical)) then
+    if (ScrollBars = ssBoth) or ((Code = SB_HORZ) and (ScrollBars = ssHorizontal)) or ((Code = SB_VERT) and (ScrollBars = ssVertical)) then
     begin
       GetScrollRange(Handle, Code, Min, Max);
       Result := Min <> Max;
@@ -2403,16 +2352,14 @@ begin
 end;
 
 // send escape code to port
-procedure TCustomComTerminal.SendCodeNoEcho(Code: TEscapeCode;
-  AParams: TStrings);
+procedure TCustomComTerminal.SendCodeNoEcho(Code: TEscapeCode; AParams: TStrings);
 begin
   if (FComPort <> nil) and (FComPort.Connected) and (FEscapeCodes <> nil) then
     FComPort.WriteStr(FEscapeCodes.EscCodeToStr(Code, AParams));
 end;
 
 // process escape code on screen
-function TCustomComTerminal.PutEscapeCode(ACode: TEscapeCode;
-  AParams: TStrings): Boolean;
+function TCustomComTerminal.PutEscapeCode(ACode: TEscapeCode; AParams: TStrings): Boolean;
 begin
   Result := True;
   with FEscapeCodes do
@@ -2628,8 +2575,7 @@ begin
         TermCh := GetCharAttr;
         TermCh.Ch := Ch;
         FBuffer.SetChar(FCaretPos.x, FCaretPos.y, TermCh);
-        DrawChar(FCaretPos.x - FTopLeft.x + 1, FCaretPos.y - FTopLeft.y +
-          1, TermCh);
+        DrawChar(FCaretPos.x - FTopLeft.x + 1, FCaretPos.y - FTopLeft.y + 1, TermCh);
         AdvanceCaret(acChar);
       end;
   end;
@@ -2668,8 +2614,7 @@ begin
   FSaveAttr := FTermAttr;
 end;
 
-procedure TCustomComTerminal.RxBuf(Sender: TObject; const Buffer;
-  Count: Integer);
+procedure TCustomComTerminal.RxBuf(Sender: TObject; const Buffer; Count: Integer);
 var
   Str: String;
   sa: Ansistring;
@@ -2761,8 +2706,7 @@ begin
     AdjustSize;
 {$ENDIF}
     UpdateScrollRange;
-    if not((csLoading in ComponentState) or (csDesigning in ComponentState))
-    then
+    if not((csLoading in ComponentState) or (csDesigning in ComponentState)) then
     begin
       FBuffer.Init;
       Invalidate;
@@ -2779,8 +2723,7 @@ begin
     AdjustSize;
 {$ENDIF}
     UpdateScrollRange;
-    if not((csLoading in ComponentState) or (csDesigning in ComponentState))
-    then
+    if not((csLoading in ComponentState) or (csDesigning in ComponentState)) then
     begin
       FBuffer.Init;
       Invalidate;

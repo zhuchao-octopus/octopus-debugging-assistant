@@ -18,15 +18,9 @@ type
   // terminal character result
   TEscapeResult = (erChar, erCode, erNothing);
   // terminal escape codes
-  TEscapeCode = (ecUnknown, ecNotCompleted, ecCursorUp, ecCursorDown,
-    ecCursorLeft, ecCursorRight, ecCursorHome, ecCursorMove, ecReverseLineFeed,
-    ecAppCursorLeft, ecAppCursorRight, ecAppCursorUp, ecAppCursorDown,
-    ecEraseLineFrom, ecEraseScreenFrom, ecEraseLine, ecEraseScreen, ecSetTab,
-    ecClearTab, ecClearAllTabs, ecIdentify, ecIdentResponse, ecQueryDevice,
-    ecReportDeviceOK, ecReportDeviceFailure, ecQueryCursorPos,
-    ecReportCursorPos, ecAttributes, ecSetMode, ecResetMode, ecReset,
-    ecSaveCaretAndAttr, ecRestoreCaretAndAttr, ecSaveCaret,
-    ecRestoreCaret, ecTest);
+  TEscapeCode = (ecUnknown, ecNotCompleted, ecCursorUp, ecCursorDown, ecCursorLeft, ecCursorRight, ecCursorHome, ecCursorMove, ecReverseLineFeed, ecAppCursorLeft, ecAppCursorRight, ecAppCursorUp,
+    ecAppCursorDown, ecEraseLineFrom, ecEraseScreenFrom, ecEraseLine, ecEraseScreen, ecSetTab, ecClearTab, ecClearAllTabs, ecIdentify, ecIdentResponse, ecQueryDevice, ecReportDeviceOK,
+    ecReportDeviceFailure, ecQueryCursorPos, ecReportCursorPos, ecAttributes, ecSetMode, ecResetMode, ecReset, ecSaveCaretAndAttr, ecRestoreCaretAndAttr, ecSaveCaret, ecRestoreCaret, ecTest);
 
   // terminal escape codes processor
   TEscapeCodes = class
@@ -39,8 +33,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function ProcessChar(Ch: Char): TEscapeResult; virtual; abstract;
-    function EscCodeToStr(Code: TEscapeCode; AParams: TStrings): string;
-      virtual; abstract;
+    function EscCodeToStr(Code: TEscapeCode; AParams: TStrings): string; virtual; abstract;
     function GetParam(Num: Integer; AParams: TStrings): Integer;
     property Data: string read FData;
     property Code: TEscapeCode read FCode;
@@ -55,8 +48,7 @@ type
     function DetectCode(Str: string): TEscapeCode;
   public
     function ProcessChar(Ch: Char): TEscapeResult; override;
-    function EscCodeToStr(Code: TEscapeCode; AParams: TStrings)
-      : string; override;
+    function EscCodeToStr(Code: TEscapeCode; AParams: TStrings): string; override;
   end;
 
   // ANSI/VT100 escape codes
@@ -68,8 +60,7 @@ type
     function DetectExtCode(Str: string): TEscapeCode;
   public
     function ProcessChar(Ch: Char): TEscapeResult; override;
-    function EscCodeToStr(Code: TEscapeCode; AParams: TStrings)
-      : string; override;
+    function EscCodeToStr(Code: TEscapeCode; AParams: TStrings): string; override;
   end;
 
 implementation
@@ -142,8 +133,7 @@ begin
 end;
 
 // escape code to string
-function TEscapeCodesVT52.EscCodeToStr(Code: TEscapeCode;
-  AParams: TStrings): string;
+function TEscapeCodesVT52.EscCodeToStr(Code: TEscapeCode; AParams: TStrings): string;
 begin
   case Code of
     ecCursorUp:
@@ -167,8 +157,7 @@ begin
     ecIdentResponse:
       Result := #27'/Z';
     ecCursorMove:
-      Result := #27'Y' + Chr(GetParam(1, AParams) + 31) +
-        Chr(GetParam(2, AParams) + 31);
+      Result := #27'Y' + Chr(GetParam(1, AParams) + 31) + Chr(GetParam(2, AParams) + 31);
   else
     Result := '';
   end;
@@ -264,8 +253,7 @@ begin
 end;
 
 // escape code to string conversion
-function TEscapeCodesVT100.EscCodeToStr(Code: TEscapeCode;
-  AParams: TStrings): string;
+function TEscapeCodesVT100.EscCodeToStr(Code: TEscapeCode; AParams: TStrings): string;
 begin
   case Code of
     ecIdentify:
@@ -275,8 +263,7 @@ begin
     ecQueryCursorPos:
       Result := #27'[6n';
     ecReportCursorPos:
-      Result := Format(#27'[%d;%dR', [GetParam(1, AParams),
-        GetParam(2, AParams)]);
+      Result := Format(#27'[%d;%dR', [GetParam(1, AParams), GetParam(2, AParams)]);
     ecQueryDevice:
       Result := #27'[5n';
     ecReportDeviceOK:
@@ -302,8 +289,7 @@ begin
     ecCursorHome:
       Result := #27'[H';
     ecCursorMove:
-      Result := Format(#27'[%d;%df', [GetParam(1, AParams),
-        GetParam(2, AParams)]);
+      Result := Format(#27'[%d;%df', [GetParam(1, AParams), GetParam(2, AParams)]);
     ecEraseScreenFrom:
       Result := #27'[J';
     ecEraseLineFrom:
@@ -498,8 +484,7 @@ var
 
   function CodeIdentify: TEscapeCode;
   begin
-    if (TempParams.Count = 0) or
-      ((TempParams.Count = 1) and (TempParams[0] = '0')) then
+    if (TempParams.Count = 0) or ((TempParams.Count = 1) and (TempParams[0] = '0')) then
       Result := ecIdentify
     else if (TempParams.Count = 2) and (TempParams[1] = '?1') then
       Result := ecIdentResponse

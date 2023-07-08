@@ -78,7 +78,6 @@ type
     CustomizeActionBars1: TCustomizeActionBars;
     BitBtn1: TBitBtn;
     Timer1: TTimer;
-    RichEdit1: TRichEdit;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -366,7 +365,7 @@ begin
 
   if OcComPortObj <> nil then
   begin
-    //ParentPage := addNotebookItem(OcComPortObj.OcComPortObjPara.ComportFullName);
+    ParentPage := addNotebookItem(OcComPortObj.ComportFullName);
     synchTabsetAndNotebookItems();
 
     if ParentPage = nil then

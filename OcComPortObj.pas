@@ -1081,8 +1081,8 @@ begin
           end;
 
           try
-            //self.writestr(str);
-            //FComSentCount := FComSentCount + Length(str);
+            // self.writestr(str);
+            // FComSentCount := FComSentCount + Length(str);
             bLength := FalconComSendData_SentString(str);
             FComSentCount := FComSentCount + bLength;
           except
@@ -1218,7 +1218,7 @@ var
   s: string;
 begin
   Result := True;
-  bLength:=0;
+  bLength := 0;
   case SendFormat of
     Ord(S_ASCIIFormat): // send string ascci char
       begin
@@ -1229,7 +1229,7 @@ begin
             Log(SEND_FLAG + str);
 
           try
-            //self.writestr(str);
+            // self.writestr(str);
             bLength := FalconComSendData_SentString(str);
             FComSentCount := FComSentCount + bLength;
           except
@@ -1342,7 +1342,7 @@ begin
       Result := Length(str);
     end;
   end;
-  //ss.Free;
+  // ss.Free;
 end;
 
 function TOcComPortObj.GetLineNumberDateTimeStamp(N: Int64): String;
