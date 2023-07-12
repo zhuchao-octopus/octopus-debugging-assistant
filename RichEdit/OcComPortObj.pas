@@ -16,6 +16,7 @@ uses
   CPort,
   OcProtocol,
   VCLTee.Series,
+  Vcl.MyPageEdit,
   RegularExpressions;
 
 type
@@ -35,8 +36,7 @@ const
   SEND_FLAG = '-> ';
 
 const
-  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ', 'Hexadecimal Format Receiving ', 'Graphic Analysis ', 'Octopus Protocol Analysis',
-    'File Receiving');
+  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ', 'Hexadecimal Format Receiving ', 'Graphic Analysis ', 'Octopus Protocol Analysis', 'File Receiving');
 
   MAX_BAUDRATE_INDEX: integer = 15;
   DEFAULT_HEXDATA_HEXSTRING_SPACE = 5;
@@ -75,11 +75,11 @@ type
     FComReceiveInternalBuffer: array of Byte; // for “Ï≤Ω¥¶¿Ì
     FFastLineSeries: TFastLineSeries;
 
-    FComportFullName: String;
+    FComPortFullName: String;
     FSendFormat: integer; // h
     FSendCodeFormat: integer;
     FReceiveFormat: integer; // i
-    FLogMemo: TMemo; // j
+    FLogMemo: TMyRichEdit; // j
     FShowDate: Boolean;
     FShowTime: Boolean;
     FShowLineNumber: Boolean;
@@ -138,7 +138,7 @@ type
     Constructor Create(AOwner: TComponent; DeviceName: String);
     destructor Destroy; override;
     // procedure OcComPortObjInit(OcComPortObjPara: TOcComPortObjPara);
-    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMemo; k, l, m, N, o: Boolean);
+    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMyRichEdit; k, l, m, N, o: Boolean);
     procedure ClearInternalBuff(id: integer = 100);
 
     function getCMDStr(): String;
@@ -153,7 +153,7 @@ type
     procedure ClearLog();
 
     // property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
-    property LogMemo: TMemo read FLogMemo write FLogMemo;
+    property LogMemo: TMyRichEdit read FLogMemo write FLogMemo;
     property StringInternelCache: TMemo read FStringInternalMemo write FStringInternalMemo;
     property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
     property ProtocolCallBackFun: TProtocolCallBackFun read FProtocolCallBackFun write FProtocolCallBackFun;
@@ -181,7 +181,7 @@ type
     // property BaudRateIndex: integer read FBaudRateIndex write FBaudRateIndex;
     property MouseTextSelection: Boolean read FMouseTextSelection write FMouseTextSelection;
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
-    property ComportFullName: String read FComportFullName write FComportFullName;
+    property ComPortFullName: String read FComPortFullName write FComPortFullName;
 
     function FalconComSendBuffer(const Buffer: array of Byte; Count: integer): Bool;
     function FalconComSendData_Common(str: string; SendFormat: integer): Bool;
@@ -660,12 +660,15 @@ end;
 Constructor TOcComPortObj.Create(AOwner: TComponent; DeviceName: String);
 begin
   inherited Create(nil);
-  self.FComportFullName := Trim(DeviceName);
+  self.FComPortFullName := Trim(DeviceName);
   self.Port := FalconGetComPort(DeviceName);
-  self.LogMemo := TMemo.Create(nil);
-  self.LogMemo.ScrollBars := ssBoth;
-  self.LogMemo.ReadOnly := True;
-  self.LogMemo.DoubleBuffered := True;
+  // self.LogMemo := TMemo.Create(nil);
+  if self.LogMemo <> nil then
+  begin
+    self.LogMemo.ScrollBars := ssBoth;
+    self.LogMemo.ReadOnly := True;
+    self.LogMemo.DoubleBuffered := True;
+  end;
   // self.LogMemo.Parent.DoubleBuffered:=true;
   // self.LogMemo.Parent.Parent.DoubleBuffered:=true;
   // self.MemoTemp.Parent:=AOwner;
@@ -712,7 +715,7 @@ end;
 destructor TOcComPortObj.Destroy;
 begin
   FStringInternalMemo.Free;
-  FLogMemo.Free;
+  // FLogMemo.Free;
 
   FComUIHandleThread.Suspended := True;
   FComUIHandleThread.Terminate;
@@ -749,7 +752,7 @@ end;
   Result := FOcComPortObjPara;
   end; }
 
-procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMemo; k, l, m, N, o: Boolean);
+procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMyRichEdit; k, l, m, N, o: Boolean);
 var
   threadsuspended: Boolean;
   // oldi:integer;
@@ -760,7 +763,7 @@ begin
   self.FOcComProtocal.CallBackFun := self.OcComPortObjRxProtocol;
 
   if a <> '' then
-    self.FComportFullName := a;
+    self.FComPortFullName := a;
   if b <> '' then
     self.Port := b;
   if (c > MAX_BAUDRATE_INDEX) or (c < 0) then
@@ -804,12 +807,10 @@ begin
   begin
     if self.FLogMemo <> j then
     begin
-      self.FLogMemo.Free;
+      // self.FLogMemo.Free;
       self.FLogMemo := j;
     end;
   end;
-  if self.FLogMemo = nil then
-    self.LogMemo := TMemo.Create(nil);
 
   self.FShowDate := k;
   self.FShowTime := l;
@@ -2294,7 +2295,7 @@ begin
     FComUIHandleThread.Suspended := True;
     close();
   except
-    Log('Can not close  ' + FComportFullName);
+    Log('Can not close  ' + FComPortFullName);
   end;
   status := 0;
 end;

@@ -1,8 +1,8 @@
 object MainForm: TMainForm
   Left = 174
   Top = 107
-  Caption = 'Rich Edit Control Demo'
-  ClientHeight = 537
+  Caption = 'Octopus Serial Port Debugging and Development Assistant'
+  ClientHeight = 630
   ClientWidth = 1205
   Color = clBtnFace
   DoubleBuffered = True
@@ -45,15 +45,16 @@ object MainForm: TMainForm
   PixelsPerInch = 96
   TextHeight = 17
   object Splitter1: TSplitter
-    Left = 802
-    Top = 68
-    Height = 435
+    Left = 872
+    Top = 66
+    Height = 531
     Align = alRight
+    OnMoved = Splitter1Moved
     ExplicitLeft = 1202
     ExplicitTop = -169
     ExplicitHeight = 706
   end
-  object StandardToolBar: TToolBar
+  object StandardToolBar1: TToolBar
     Left = 0
     Top = 0
     Width = 1205
@@ -151,7 +152,7 @@ object MainForm: TMainForm
       Height = 25
       Hint = 'Font Size|Select font size'
       TabOrder = 1
-      Text = '10'
+      Text = '14'
       OnChange = FontSizeChange
     end
     object UpDown1: TUpDown
@@ -160,7 +161,7 @@ object MainForm: TMainForm
       Width = 16
       Height = 25
       Associate = FontSize
-      Position = 10
+      Position = 14
       TabOrder = 2
     end
     object BoldButton: TToolButton
@@ -285,49 +286,40 @@ object MainForm: TMainForm
       OnChange = BGColorBoxChange
     end
   end
-  object StandardUartToolBar: TToolBar
+  object StandardToolBar2: TToolBar
     Left = 0
     Top = 33
     Width = 1205
-    Height = 35
+    Height = 33
     BorderWidth = 2
-    ButtonHeight = 25
-    ButtonWidth = 39
     Color = clBtnFace
+    Images = ToolbarImages
     ParentColor = False
     ParentShowHint = False
     ShowHint = True
     TabOrder = 1
     Transparent = False
     Wrapable = False
-    object ComboBoxEx1: TComboBoxEx
-      AlignWithMargins = True
-      Left = 0
-      Top = 0
-      Width = 257
-      Height = 26
-      ItemsEx = <>
-      Style = csExDropDownList
-      TabOrder = 0
-    end
     object ToolButton9: TToolButton
-      Left = 257
+      Left = 0
       Top = 0
       Width = 8
       Caption = 'ToolButton9'
       Style = tbsSeparator
     end
     object ComboBox1: TComboBox
-      Left = 265
+      Left = 8
       Top = 0
       Width = 136
       Height = 25
+      Hint = 'This is the baud rate of the serial port'
       Style = csDropDownList
       DropDownCount = 20
-      TabOrder = 1
+      TabOrder = 0
+      OnChange = ComboBox1Change
     end
     object ToolButton10: TToolButton
-      Left = 401
+      Left = 144
       Top = 0
       Width = 8
       Caption = 'ToolButton10'
@@ -335,151 +327,163 @@ object MainForm: TMainForm
       Style = tbsSeparator
     end
     object ComboBox2: TComboBox
-      Left = 409
+      Left = 152
       Top = 0
       Width = 222
       Height = 25
+      Hint = 'This is the way the serial port receives the characters '
       Style = csDropDownList
       DropDownCount = 20
-      TabOrder = 2
+      TabOrder = 1
+      OnChange = ComboBox2Change
     end
     object ToolButton11: TToolButton
-      Left = 631
+      Left = 374
       Top = 0
       Width = 15
-      Caption = 'ToolButton11'
       ImageIndex = 1
       Style = tbsSeparator
     end
-    object ToolButton12: TToolButton
-      Left = 646
-      Top = 0
-      Caption = 'Open'
-      ImageIndex = 1
-    end
     object ToolButton13: TToolButton
-      Left = 685
+      Left = 389
       Top = 0
-      Caption = 'Close'
-      ImageIndex = 2
+      Hint = 'Close and remove current page'
+      Caption = '&Close'
+      ImageIndex = 20
+      OnClick = ToolButton13Click
+    end
+    object ToolButton14: TToolButton
+      Left = 412
+      Top = 0
+      Width = 8
+      Caption = 'ToolButton14'
+      ImageIndex = 21
+      Style = tbsSeparator
+    end
+    object ToggleSwitchDeviceOnOff: TToggleSwitch
+      AlignWithMargins = True
+      Left = 420
+      Top = 0
+      Width = 50
+      Height = 22
+      Hint = 'OnOff'
+      ShowStateCaption = False
+      TabOrder = 2
+      OnClick = ToggleSwitchDeviceOnOffClick
+    end
+    object ToolButton15: TToolButton
+      Left = 470
+      Top = 0
+      Width = 8
+      Caption = 'ToolButton15'
+      ImageIndex = 24
+      Style = tbsSeparator
+    end
+    object ToolButton12: TToolButton
+      Left = 478
+      Top = 0
+      Hint = 'Clear content'
+      Caption = ' ToolButton12 '
+      ImageIndex = 23
+      OnClick = ToolButton12Click
+    end
+    object ToolButton16: TToolButton
+      Left = 501
+      Top = 0
+      Caption = 'ToolButton16'
+      ImageIndex = 22
+      OnClick = ToolButton16Click
     end
   end
   object Panel1: TPanel
     Left = 0
-    Top = 68
-    Width = 802
-    Height = 435
+    Top = 66
+    Width = 872
+    Height = 531
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
-    ExplicitLeft = 168
-    ExplicitWidth = 882
-    ExplicitHeight = 441
+    ExplicitWidth = 802
+    ExplicitHeight = 438
     object PageControl1: TPageControl
       Left = 0
       Top = 0
-      Width = 802
-      Height = 435
-      ActivePage = TabSheet1
+      Width = 872
+      Height = 531
       Align = alClient
       TabHeight = 30
       TabOrder = 0
       TabPosition = tpBottom
-      object TabSheet1: TTabSheet
-        Caption = 'TabSheet1'
-        object RichEditor: TRichEdit
-          Left = 0
-          Top = 0
-          Width = 794
-          Height = 397
-          Align = alClient
-          BorderStyle = bsNone
-          Color = clWhite
-          EnableURLs = True
-          Font.Charset = GB2312_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'Default'
-          Font.Style = []
-          HideSelection = False
-          ParentFont = False
-          ScrollBars = ssBoth
-          SpellChecking = True
-          TabOrder = 0
-          WantReturns = False
-          OnChange = RichEditChange
-          OnClick = RichEditorClick
-          OnLinkClick = RichEditorLinkClick
-          OnSelectionChange = SelectionChange
-        end
-      end
-      object TabSheet2: TTabSheet
-        Caption = 'TabSheet2'
-        ImageIndex = 1
-      end
+      ExplicitWidth = 802
+      ExplicitHeight = 438
     end
   end
   object SV_R: TSplitView
-    Left = 805
-    Top = 68
-    Width = 400
-    Height = 435
+    Left = 875
+    Top = 66
+    Width = 330
+    Height = 531
     AnimationStep = 60
-    BevelEdges = []
-    OpenedWidth = 400
+    OpenedWidth = 330
     ParentDoubleBuffered = True
     Placement = svpRight
     TabOrder = 3
-    ExplicitHeight = 441
     object PageControl2: TPageControl
       Left = 0
       Top = 0
-      Width = 400
-      Height = 435
+      Width = 330
+      Height = 531
       ActivePage = TabSheet_SendingData
       Align = alClient
       TabHeight = 30
       TabOrder = 0
       TabPosition = tpBottom
+      ExplicitWidth = 400
+      ExplicitHeight = 438
       object TabSheet_SendingData: TTabSheet
+        AlignWithMargins = True
+        Margins.Left = 0
+        Margins.Top = 0
         Caption = 'Sending Data'
         object Panel2: TPanel
           Left = 0
           Top = 0
-          Width = 392
-          Height = 397
+          Width = 319
+          Height = 490
           Align = alClient
           BevelOuter = bvNone
-          Color = clMenuBar
           ParentBackground = False
           TabOrder = 0
+          ExplicitWidth = 389
+          ExplicitHeight = 397
           object Panel25: TPanel
-            Left = 0
-            Top = 195
-            Width = 392
-            Height = 202
+            AlignWithMargins = True
+            Left = 3
+            Top = 203
+            Width = 313
+            Height = 284
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
             TabOrder = 0
-            ExplicitTop = 229
-            ExplicitHeight = 168
+            ExplicitWidth = 383
+            ExplicitHeight = 191
             object Panel7: TPanel
               Left = 0
               Top = 0
-              Width = 392
-              Height = 131
+              Width = 313
+              Height = 208
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
               TabOrder = 0
-              ExplicitHeight = 97
+              ExplicitWidth = 383
+              ExplicitHeight = 115
               object Memo2: TMemo
-                AlignWithMargins = True
-                Left = 3
-                Top = 3
-                Width = 386
-                Height = 125
+                Left = 0
+                Top = 0
+                Width = 313
+                Height = 208
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -492,115 +496,129 @@ object MainForm: TMainForm
                 ScrollBars = ssVertical
                 ShowHint = False
                 TabOrder = 0
-                ExplicitHeight = 91
+                ExplicitWidth = 383
+                ExplicitHeight = 115
               end
             end
             object Panel8: TPanel
               Left = 0
-              Top = 131
-              Width = 392
-              Height = 71
+              Top = 208
+              Width = 313
+              Height = 76
               Align = alBottom
               BevelOuter = bvNone
               ParentBackground = False
               ParentColor = True
               TabOrder = 1
-              ExplicitTop = 97
-              object Button7: TButton
-                Left = 2
-                Top = 0
+              ExplicitTop = 115
+              ExplicitWidth = 383
+              object Button102: TButton
+                Left = 0
+                Top = 4
                 Width = 75
                 Height = 34
                 Caption = 'Clear'
                 TabOrder = 0
+                OnClick = Button102Click
               end
-              object Button8: TButton
-                Left = 78
-                Top = 0
+              object Button103: TButton
+                Left = 77
+                Top = 4
                 Width = 147
                 Height = 34
-                Caption = 'Send text '
+                Caption = 'Send as text '
                 TabOrder = 1
+                OnClick = Button103Click
               end
-              object Button25: TButton
-                Left = 2
-                Top = 34
-                Width = 311
+              object Button105: TButton
+                Left = 0
+                Top = 40
+                Width = 313
                 Height = 34
                 Hint = #21435#25481#22810#20313#31354#26684#12289#36887#21495#12289'0x'#12289'0X'#20998#21106#31526#21495
                 Caption = 'Format the hex data '
                 ParentShowHint = False
                 ShowHint = True
                 TabOrder = 2
+                OnClick = Button105Click
               end
-              object Button2: TButton
+              object Button104: TButton
                 Left = 226
-                Top = 0
-                Width = 106
+                Top = 4
+                Width = 87
                 Height = 34
-                Caption = 'Send bytes'
+                Caption = 'Send as bytes'
                 TabOrder = 3
+                OnClick = Button104Click
               end
             end
           end
           object Panel13: TPanel
-            Left = 0
-            Top = 0
-            Width = 392
-            Height = 195
+            AlignWithMargins = True
+            Left = 3
+            Top = 3
+            Width = 313
+            Height = 194
             Align = alTop
             BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            ParentBiDiMode = False
             TabOrder = 1
-            object Memo3: TMemo
-              AlignWithMargins = True
-              Left = 3
+            ExplicitWidth = 383
+            object Memo1: TMemo
+              Left = 0
               Top = 0
-              Width = 386
+              Width = 313
               Height = 122
-              Margins.Top = 0
               Align = alTop
-              BorderStyle = bsNone
-              Ctl3D = True
-              ParentCtl3D = False
+              BevelOuter = bvRaised
               ScrollBars = ssVertical
               TabOrder = 0
+              ExplicitWidth = 383
             end
-            object Button9: TButton
-              Left = 2
+            object Button100: TButton
+              Left = 0
               Top = 126
-              Width = 311
+              Width = 313
               Height = 34
               Caption = 'Convert the above string to the hex bytecode '
               TabOrder = 1
+              OnClick = Button100Click
             end
-            object Button11: TButton
-              Left = 2
+            object Button101: TButton
+              Left = 0
               Top = 160
-              Width = 311
+              Width = 313
               Height = 34
               Caption = 'Convert the following hex byte code to string '
               TabOrder = 2
+              OnClick = Button101Click
             end
           end
         end
       end
       object TabSheet_BatchData: TTabSheet
+        AlignWithMargins = True
+        Margins.Left = 0
+        Margins.Top = 0
         Caption = 'Batch Data'
         ImageIndex = 1
-        object Panel4: TPanel
+        object Panel200: TPanel
           Left = 0
           Top = 0
-          Width = 392
-          Height = 397
+          Width = 319
+          Height = 490
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
+          ExplicitWidth = 389
+          ExplicitHeight = 397
           object StringGrid1: TStringGrid
             Left = 0
             Top = 0
-            Width = 392
-            Height = 357
+            Width = 319
+            Height = 450
             Hint = #28857#20987#24038#36793#25353#38062#21457#36865#25968#25454
             Align = alClient
             BorderStyle = bsNone
@@ -623,6 +641,8 @@ object MainForm: TMainForm
             OnMouseWheelDown = StringGrid1MouseWheelDown
             OnMouseWheelUp = StringGrid1MouseWheelUp
             OnSelectCell = StringGrid1SelectCell
+            ExplicitWidth = 389
+            ExplicitHeight = 357
             ColWidths = (
               50
               33
@@ -1632,10 +1652,10 @@ object MainForm: TMainForm
               27
               27)
           end
-          object Panel14: TPanel
+          object Panel201: TPanel
             Left = 0
-            Top = 357
-            Width = 392
+            Top = 450
+            Width = 319
             Height = 40
             Align = alBottom
             Alignment = taLeftJustify
@@ -1643,8 +1663,10 @@ object MainForm: TMainForm
             ParentBackground = False
             ParentColor = True
             TabOrder = 1
-            object Button1: TButton
-              Left = 79
+            ExplicitTop = 357
+            ExplicitWidth = 389
+            object Button201: TButton
+              Left = 80
               Top = 3
               Width = 235
               Height = 34
@@ -1656,110 +1678,125 @@ object MainForm: TMainForm
               Font.Style = []
               ParentFont = False
               TabOrder = 0
+              OnClick = Button201Click
             end
-            object Button3: TButton
+            object Button200: TButton
               Left = 0
               Top = 3
               Width = 78
               Height = 34
-              Caption = ' Loop end'
+              Caption = ' Loop stop'
               TabOrder = 1
+              OnClick = Button200Click
             end
           end
         end
       end
       object TabSheet_ProtocolData: TTabSheet
+        AlignWithMargins = True
+        Margins.Left = 0
+        Margins.Top = 0
         Caption = 'Protocol Data'
         ImageIndex = 2
         object Panel5: TPanel
           Left = 0
           Top = 0
-          Width = 392
-          Height = 397
+          Width = 319
+          Height = 490
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
-          object Memo5: TMemo
+          ExplicitWidth = 389
+          ExplicitHeight = 397
+          object Memo3: TMemo
             AlignWithMargins = True
             Left = 3
             Top = 122
-            Width = 386
-            Height = 200
+            Width = 313
+            Height = 292
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
+            ExplicitWidth = 383
+            ExplicitHeight = 199
           end
           object Panel16: TPanel
             Left = 0
-            Top = 325
-            Width = 392
-            Height = 72
+            Top = 417
+            Width = 319
+            Height = 73
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
-            object Button16: TButton
+            ExplicitTop = 324
+            ExplicitWidth = 389
+            object Button301: TButton
               Left = 79
               Top = 0
               Width = 235
               Height = 34
-              Caption = 'Send text'
+              Caption = 'Send as text'
               TabOrder = 0
+              OnClick = Button301Click
             end
-            object Button27: TButton
+            object Button300: TButton
               Left = 2
               Top = 0
               Width = 75
               Height = 34
               Caption = 'Clear'
               TabOrder = 1
+              OnClick = Button300Click
             end
-            object Button28: TButton
+            object Button302: TButton
               Left = 2
-              Top = 34
+              Top = 35
               Width = 311
               Height = 36
               Caption = 'Send file ( *.bin  *.hex )'
               TabOrder = 2
+              OnClick = Button302Click
             end
           end
           object Panel18: TPanel
             Left = 0
             Top = 0
-            Width = 392
+            Width = 319
             Height = 119
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 2
-            object Label18: TLabel
+            ExplicitWidth = 389
+            object Label003: TLabel
               Left = 2
               Top = 96
               Width = 59
               Height = 17
               Caption = 'Operation'
             end
-            object Label11: TLabel
+            object Label002: TLabel
               Left = 2
               Top = 65
               Width = 64
               Height = 17
               Caption = 'Read Bytes'
             end
-            object Label8: TLabel
+            object Label001: TLabel
               Left = 2
               Top = 35
               Width = 48
               Height = 17
               Caption = 'Address'
             end
-            object Label7: TLabel
+            object Label000: TLabel
               Left = 2
               Top = 5
               Width = 53
               Height = 17
               Caption = 'Protocol '
             end
-            object ComboBox12: TComboBox
+            object ComboBox304: TComboBox
               AlignWithMargins = True
               Left = 74
               Top = 91
@@ -1774,7 +1811,7 @@ object MainForm: TMainForm
                 'Write'
                 'Test Connection')
             end
-            object ComboBox9: TComboBox
+            object ComboBox301: TComboBox
               AlignWithMargins = True
               Left = 74
               Top = 0
@@ -1797,7 +1834,7 @@ object MainForm: TMainForm
                 'Wireless'
                 'ModBus')
             end
-            object ComboBox10: TComboBox
+            object ComboBox302: TComboBox
               AlignWithMargins = True
               Left = 74
               Top = 30
@@ -1809,7 +1846,7 @@ object MainForm: TMainForm
                 '0x08000000'
                 '0x08002000')
             end
-            object ComboBox11: TComboBox
+            object ComboBox303: TComboBox
               AlignWithMargins = True
               Left = 74
               Top = 60
@@ -1826,19 +1863,35 @@ object MainForm: TMainForm
   object StatusPanel: TPanel
     AlignWithMargins = True
     Left = 3
-    Top = 506
+    Top = 599
     Width = 1199
     Height = 28
+    Margins.Top = 2
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
-    ExplicitLeft = 0
-    ExplicitTop = 496
-    ExplicitWidth = 1205
+    ExplicitTop = 506
+    object StatusBar1: TStatusBar
+      Left = 0
+      Top = 0
+      Width = 1199
+      Height = 28
+      Align = alClient
+      Panels = <
+        item
+          Width = 120
+        end
+        item
+          Width = 110
+        end
+        item
+          Width = 50
+        end>
+    end
   end
   object MainMenu: TMainMenu
     Images = ToolbarImages
-    Left = 480
+    Left = 488
     Top = 212
     object FileMenu: TMenuItem
       Caption = '&File'
@@ -1857,9 +1910,10 @@ object MainForm: TMainForm
       object N1: TMenuItem
         Caption = '-'
       end
-      object Setting1: TMenuItem
+      object SettingItem1: TMenuItem
         Caption = 'Setting...'
-        OnClick = Setting1Click
+        ImageIndex = 22
+        OnClick = SettingItem1Click
       end
       object FilePrintItem: TMenuItem
         Action = FilePrintCmd
@@ -1954,48 +2008,139 @@ object MainForm: TMainForm
         AutoCheck = True
       end
     end
-    object View1: TMenuItem
+    object ViewMenu: TMenuItem
       Caption = '&View'
-      object FormatToolBar1: TMenuItem
-        Caption = 'Format Tool Bar'
-        OnClick = FormatToolBar1Click
+      OnClick = ViewMenuClick
+      object FormatToolBarMenuItem1: TMenuItem
+        Caption = 'Format Toolbar'
+        OnClick = FormatToolBarMenuItem1Click
       end
-      object Uart1: TMenuItem
-        Caption = 'UART Tool Bar'
-        OnClick = Uart1Click
+      object FormatToolBarMenuItem2: TMenuItem
+        Caption = 'Serial Port  Toolbar'
+        OnClick = FormatToolBarMenuItem2Click
+      end
+      object RightOperationPanel1: TMenuItem
+        Caption = 'Right Operation Panel'
+        OnClick = RightOperationPanel1Click
+      end
+      object N10: TMenuItem
+        Caption = '-'
+      end
+      object RptatpMenuItem: TMenuItem
+        Caption = 'Right page tabs at top position'
+        OnClick = RptatpMenuItemClick
+      end
+      object RptabpMenuItem: TMenuItem
+        Caption = 'Right page tabs at bottom position'
+        OnClick = RptabpMenuItemClick
+      end
+      object RptarpMenuItem: TMenuItem
+        Caption = 'Right page tabs at right position'
+        OnClick = RptarpMenuItemClick
+      end
+      object LptatpMenuItem: TMenuItem
+        Caption = 'Left page tabs at top position'
+        OnClick = LptatpMenuItemClick
+      end
+      object LptabpMenuItem: TMenuItem
+        Caption = 'Left page tabs at bottom position'
+        OnClick = LptabpMenuItemClick
+      end
+      object LptalpMenuItem: TMenuItem
+        Caption = 'Left page tabs at left position'
+        OnClick = LptalpMenuItemClick
+      end
+      object N8: TMenuItem
+        Caption = '-'
+      end
+      object TopLevelMenuItem: TMenuItem
+        Caption = 'The window is always kept at the top level '
+        OnClick = TopLevelMenuItemClick
       end
     end
-    object ools1: TMenuItem
+    object ToolsMenu: TMenuItem
       Caption = '&Tools'
+      object ScreenshotTool1: TMenuItem
+        Caption = 'Screenshot'
+        OnClick = ScreenshotTool1Click
+      end
+      object ScreenshotTool2: TMenuItem
+        Caption = 'Screenshot Tool'
+        OnClick = ScreenshotTool2Click
+      end
+      object DataEncryption1: TMenuItem
+        Caption = 'Data Encryption'
+        OnClick = DataEncryption1Click
+      end
+      object CRC1: TMenuItem
+        Caption = 'CRC Tool'
+        OnClick = CRC1Click
+      end
+      object MachineLearningOfNeuralNetworks1: TMenuItem
+        Caption = 'Machine Learning Of Neural Networks '
+      end
     end
-    object Skins1: TMenuItem
+    object SkinsMenu: TMenuItem
       Caption = '&Skins'
-      OnClick = Skins1Click
+      OnClick = SkinsMenuClick
+    end
+    object COMMenu: TMenuItem
+      Caption = '&COM'
     end
     object HelpMenu: TMenuItem
       Caption = '&Help'
+      OnClick = HelpMenuClick
+      object WelcomeAndHelp1: TMenuItem
+        Caption = '&Welcome And Help'
+        OnClick = WelcomeAndHelp1Click
+      end
       object HelpAboutItem: TMenuItem
-        Caption = '&About...'
+        Caption = '&About Octopus'
         Hint = 'Show program information'
         OnClick = HelpAbout
+      end
+      object N9: TMenuItem
+        Caption = '-'
+      end
+      object SettingItem2: TMenuItem
+        Caption = 'Setting...'
+        OnClick = SettingItem2Click
+      end
+      object N11: TMenuItem
+        Caption = '-'
+      end
+      object EnglishMenuItem: TMenuItem
+        Caption = 'English'
+        OnClick = EnglishMenuItemClick
+      end
+      object ChineseMenuItem: TMenuItem
+        Caption = 'Chinese'
+        OnClick = ChineseMenuItemClick
+      end
+      object N12: TMenuItem
+        Caption = '-'
+      end
+      object ProblemFeedback1: TMenuItem
+        Caption = 'Problem Feedback'
+        OnClick = ProblemFeedback1Click
       end
     end
   end
   object FontDialog: TFontDialog
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
+    Font.Height = -19
+    Font.Name = #26032#23435#20307
     Font.Style = []
     Left = 328
     Top = 280
   end
   object ToolbarImages: TImageList
-    Left = 400
+    Left = 408
     Top = 212
     Bitmap = {
-      494C010114002000040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
-      0000000000003600000028000000400000006000000001002000000000000060
+      494C010118002000040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      0000000000003600000028000000400000007000000001002000000000000070
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -2124,7 +2269,135 @@ object MainForm: TMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000DBD4D160B2A19BCF9F8A83FFA5908AEEC1B4B19FF8F7F7100000
+      000000000000000000000000000000000000FFFFFFFFFFFFFFFFFCFFFDFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFEFFFDFFFAFFFFFF
+      FFFFDDCED2FFF9EFF3FFFFFFFFFFFFFFFFFFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FF00FFFF0000008000000080000000
+      8000000080000000800000008000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000000000000000000000CFC2
+      BE90A8918AFFA69089FFA48E87FFA28C85FFA18B84FF9F8983FF9D8780FE9B86
+      7FFFF8F7F710000000000000000000000000FDFFFEFFFFFAFFFFFEFAFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFF8F8F9FFFFFAFDFFFFFEFDFFF5E5EDFF6F385FFF7B53
+      69FFFDFEFFFFC385A9FFFEFEFEFFFFFFFFFFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FFC0C0C000C0C0C00000FFFF000080
+      8000008080000080800000808000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000B9A49DDFAC95
+      8EFFAB948CFEA9928BFFA7908AFFA58F88FFA48E87FFA18B84FF9F8A83FF9E88
+      81FE9C8780FFEBE8E7300000000000000000FDFCFDFFC582AEFFFFFDFDFFFCFF
+      FFFFFFFEFFFFFDFEFEFF784E69FF927F8DFFFDFAFBFFFFFAFFFFFFFDFFFF754E
+      6AFF724B65FFB87DA3FFFEFFFDFFFEFFFEFFD47800FFD47800FFFAEEDFFFD478
+      00FFD47800FFEFCDA0FFFFFFFFFFFFFFFFFFFFFFFFFFFDF7EFFFDF9A40FFD478
+      00FFD47800FFD47800FFD47800FFD47800FF00000000C0C0C000C0C0C000C0C0
+      C00000FFFF0000FFFF0000008000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000BCA8A2DFB19A93FFAF98
+      91FFAE9790FEAC958EFFAA948CFEA8918BFFA69089FFA58E87FEA38D86FFA18B
+      84FF9F8A83FF9E8780FEF8F7F71000000000FFF6FEFFBB82A6FFF8F9FAFFFFFA
+      FFFFFBFEFFFFFFFCFFFFAB77A2FFFFFAFFFFFCFEFEFF804B73FF866F80FFFFFA
+      FDFFAF7DA7FFBC84ABFFFFFDFEFFFEFFFEFFD47800FFD47800FFFFFFFFFFDC92
+      30FFFFFFFFFFECC38FFFD47800FFD47800FFD47800FFD68010FFFDF7EFFFFAEE
+      DFFFD47800FFD47800FFD47800FFD47800FF000000000000000000FFFF0000FF
+      FF00008080000000800000000000800000008080000080800000808000008000
+      000000000000000000000000000000000000F5F2F120B69E97FFB49D96FFB29B
+      94FFB5A09AFFAF9891FEAD968FFFAC958DFEA9928BFFA7918AFFAA968FFFA48E
+      87FFA18C85FFA08A83FE9E8982FF00000000FFFEFFFFBE80ACFFC5ABB8FF6247
+      5BFFFBFEFEFFD0B9C4FFAF7CA5FFFDFCFFFFFDFFFEFF825372FF855277FFF7FE
+      FBFF9E698DFFBF80AEFFFFFEFFFFFEFFFFFFD47800FFD47800FFFFFFFFFFFFFF
+      FFFFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFEFCC
+      9FFFFAEEDFFFD47800FFD47800FFD47800FF0000000000000000C0C0C00000FF
+      FF00008080000000800000800000808000008080000080800000808080008080
+      800080000000000000000000000000000000BFA7A1EFB9A09AFFB79F98FFB69E
+      97FEFBF9F8FFFAF8F8FFAF9891FFAE9790FEAC968FFFBAA7A2FFFFFFFFFFAB97
+      91FFA48E87FFA28C86FFA18A83FEF8F7F710FCFFFFFFBE8FB0FF826482FF6635
+      5EFFF2F3F4FF6B4B61FFC58EB8FFB399A9FFF8FBF8FF6A3E5FFF68385CFFFFFC
+      FFFFA16991FFD29EC2FFFBFCFCFFFDFFFFFFD47800FFD47800FFFFFFFFFFFFFF
+      FFFFFFFFFFFFFAEEDFFFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFFDF7EFFFDF9A40FFD47800FFD47800FF000000000000000000FFFF0000FF
+      FF00008080000000800080808000808080008080800000800000008000008080
+      800080800000000000000000000000000000BDA59EFFBCA39CFFBAA29BFFB8A0
+      99FFB79F98FEFBF9F8FFFBF8F8FFB19A93FEBEABA5FFFFFFFFFFBBA8A3FFA993
+      8CFFA7918AFFA58F88FFA48E87FFC5B6B29FFCFFFFFFFFFBFFFFB988ACFF7947
+      6DFF623055FFF9E3F2FFBE92B7FFE2A8D1FF865677FFA06C91FFC28EB3FFAD76
+      9EFFC38EB7FFBAA5B3FFFFFFFFFFFFFFFFFFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFD98920FFFFFFFFFFD47800FFD47800FF00000000000000000000000000FF
+      FF0000FFFF0000808000C0C0C000808080000080000000800000008000008080
+      800080800000000000000000000000000000C1A8A1FEBFA69FFFBDA49DFFBCA3
+      9DFEB9A19AFFB8A099FEFBF9F8FFFBF8F8FFFFFFFFFFBEACA6FFAE9790FFAC95
+      8DFEAA948DFFA8928BFFA79189FEAB9590EEFFFFFFFFFCFEFCFFFFFBFCFFC69E
+      BBFF9D6B95FFA2668EFFA0678EFFC08CB5FFB985ADFFBA85ADFFC28BB4FF9A64
+      8CFFBB8AAAFFF8F7F6FFFFFFFFFFFFFFFFFFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFD47800FFFFFFFFFFD47800FFD47800FF000000000000000000000000C0C0
+      C00000FFFF0000808000C0C0C000808080008080800000800000808080000080
+      000000800000000000000000000000000000C3AAA3FFC1A8A1FFBFA7A0FFBEA6
+      9FFEBCA39DFFBAA29BFFC6B2ADFFFFFFFFFFFBF8F8FFB39C95FEB19992FFAF98
+      91FEAD968FFFAC958EFFAA938CFFA8918AFEFFFFFFFFFFFFFFFFFFFFFFFFFAFE
+      FDFFFFF6FFFFC184AFFFB182A9FFC185B2FFB580A9FFBE8FB6FFBC82ACFFC993
+      BBFFB689A3FFFFFFFFFFFFFFFFFFFFFFFFFFD47800FFDF9A40FFE4AA60FFD478
+      00FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FF000000000000000000000000C0C0
+      C00000FFFF000080800000008000808080008080800080808000008000000080
+      000080000000000000000000000000000000C6ADA6FFC4ABA4FFC2A9A2FFC0A8
+      A1FFBFA69FFFC9B6B0FFFFFFFFFFC6B2ADFFFBF9F8FFFBF8F8FFB39C95FFB29B
+      94FEB09992FFAE9790FFAC968FFFBAA8A1CFFFFFFFFFFFFFFFFFFFFFFFFFFEFE
+      FEFFFDFFFFFFFFF5FFFFA07696FFFFF7FFFF9B6691FFAA7FA1FFB28FA7FFB780
+      AAFF68435AFFFFFFFEFFFFFFFFFFFFFFFFFFD47800FFDF9940FFF7E6CFFFD478
+      00FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FF0000000000000000000000000000
+      000000FFFF0000FFFF0000808000808080008080800080808000008000000000
+      000000000000000000000000000000000000C8AFA8FFC7AEA6FFC5ACA5FFC4AB
+      A4FECDB9B3FFFFFFFFFFCAB6B0FFBCA39CFFBBA39CFEFBF9F8FFFBF9F8FFB59D
+      96FFB39B94FFB19A93FFAF9891FFE0D7D460FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFBFFFFAE7CA4FFC692BBFFC690BBFFBA85B0FFC18DB5FFBF8E
+      B4FFBB83ADFFFBFCFCFFFFFFFFFFFFFFFFFFD47800FFD47800FFFFFFFFFFD478
+      00FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFFFFFFFFFFFFF
+      FFFFFFFFFFFFFAEEDFFFD47800FFD47800FF0000000000000000000000000000
+      0000C0C0C00000FFFF0000808000000000000080000000800000008000000000
+      000000FFFF00000000000000000000000000DFCECB9FCAB0A9FFC9AFA8FEC7AE
+      A7FEFBFAFAFFCEBAB4FFC1A8A1FFBFA7A0FEBEA59EFEBBA39CFFFBF9F9FFBCA5
+      9FFFB59E97FFB49C95FFB29A94FF00000000FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFF8E6F3FFC18EB6FFBA82AFFFBA84AFFFBA82ADFFBB83AEFFB681
+      AAFFC08AB4FFCEB8C7FFFEFEFEFFFFFFFFFFD47800FFD47800FFEFCD9FFFF4DD
+      BFFFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFFFFFFFFFFFFFFFFFD47800FFD47800FF0000000000000000000000000000
+      000000000000C0C0C00000FFFF00000080000000000000000000000000000000
+      000000FFFF0000FFFF00000000000000000000000000CDB3ACFFCBB1AAFFC9B0
+      A9FFC7AEA7FFC5ACA5FFC4ABA4FEC1A8A1FFC0A8A0FEBEA69FFFBCA49DFFBAA2
+      9BFFB8A09AFFB79F98FFD6C8C48F00000000FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFAFFFFB380A9FFBB84AEFFBE89B4FFBC86B1FFCA94BFFFBD8B
+      B3FFB888B2FF6D485BFFFFFFFFFFFFFFFFFFD47800FFD47800FFD47800FFFDF7
+      EFFFF4DDBFFFD47800FFD47800FFD47800FFD47800FFD47800FFD98920FFFFFF
+      FFFFDC9130FFFFFFFFFFD47800FFD47800FF0000000000000000000000000000
+      00000000000000FFFF0000FFFF000080800000008000000000000000000000FF
+      FF0000FFFF0000FFFF00000000000000000000000000F8F5F420CDB4ACFFCCB2
+      ABFFCAB1A9FFC8AFA7FFC6ADA6FFC5ACA5FFC2A9A2FFC1A8A1FFBFA69FFFBEA5
+      9EFEBBA39CFFC2ACA8DF0000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFDFFFFFFF6F9F9FFCB98BEFFB27DA8FFBD88B3FFC08EB8FFC495BCFFC597
+      BCFFE0AFD8FFFFF7FFFFFFFFFFFFFFFFFFFFD47800FFD47800FFD47800FFD478
+      00FFF2D5AFFFFFFFFFFFF7E6CFFFE9BB80FFEFCC9FFFFFFFFFFFFFFFFFFFD989
+      20FFD47800FFFFFFFFFFD47800FFD47800FF00FFFF0000808000008080000080
+      8000008080000080800000FFFF00008080000080800000000000000000000000
+      000000FFFF0000FFFF0000000000000000000000000000000000F8F5F420CFB5
+      AEFFCDB4ACFECBB2ABFFC9B0A8FFC7AEA7FFC5ACA5FFC4ABA4FFC2A9A2FFC0A8
+      A1FEC7B1ABDF000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFEFEFEFFFFF1FEFFC894BDFFC69BC0FFCF9FC5FFC999BFFFC597
+      BBFF69475CFFFAFFFFFFFFFFFFFFFFFFFFFFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFDF9940FFE9BB80FFE7B370FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FF00FFFF0000FFFF0000FFFF0000FF
+      FF0000FFFF0000FFFF00C0C0C00000FFFF000080800000000000000000000000
+      00000000000000FFFF0000FFFF00C0C0C0000000000000000000000000000000
+      0000E3D5D090CEB4ADFFCCB2ABFFCBB1AAFEC8AFA8FFC6ADA6FFC5ACA5FFF6F3
+      F22000000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFF
+      FFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFCFDFFF5E8F4FFA38A98FFE9D2E1FFFFFD
+      FFFFFAFFFDFFFFFEFFFFFFFFFFFFFFFFFFFFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD47800FFD478
+      00FFD47800FFD47800FFD47800FFD47800FFC0C0C000C0C0C000C0C0C000C0C0
+      C000C0C0C000C0C0C000C0C0C000C0C0C00000FFFF0000000000000000000000
+      00000000000000FFFF0000FFFF0000000000FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
@@ -2765,12 +3038,16 @@ object MainForm: TMainForm
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00868686008080800080808000808080008080800080808000808080008686
       8600FFFFFF00FFFFFF00FFFFFF00FFFFFF00424D3E000000000000003E000000
-      2800000040000000600000000100010000000000000300000000000000000000
+      2800000040000000700000000100010000000000800300000000000000000000
       000000000000000000000000FFFFFF0000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000F81F0000000001FFE0070000000001FF
+      C0030000000081FF800100000000C20F000100000000C007000000000000C007
+      000000000000E007000000000000E007000000000000E007000000000000F017
+      000000000000F113000100000000F8E1800100000000F8638003000000000071
+      C007000000000078F00F00000000007900000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -2842,6 +3119,7 @@ object MainForm: TMainForm
       Caption = 'Save &As...'
       Dialog.Filter = 'Rich Text Files (*.RTF)|*.RTF|Text Files (*.TXT)|*.TXT'
       Hint = 'Save current file under a new name'
+      ImageIndex = 9
       OnAccept = FileSaveAs
     end
     object EditUndoCmd: TEditUndo
@@ -2958,5 +3236,22 @@ object MainForm: TMainForm
       OnExecute = SubscriptCmdExecute
       OnUpdate = SubscriptCmdUpdate
     end
+  end
+  object FindDialog1: TFindDialog
+    OnClose = FindDialog1Close
+    OnShow = FindDialog1Show
+    OnFind = FindDialog1Find
+    Left = 400
+    Top = 280
+  end
+  object Timer1: TTimer
+    Enabled = False
+    OnTimer = Timer1Timer
+    Left = 328
+    Top = 151
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 400
+    Top = 153
   end
 end

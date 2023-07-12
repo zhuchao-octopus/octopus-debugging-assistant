@@ -120,10 +120,11 @@ var
   );
 
 function GetDefaultLauguageStrByName(Name: String; Lang: String): String;
-procedure SetButtonCaptionLeftAlign(btn: TButton);
-
-procedure AdjustComponenAttribute(Form: TForm);
 function GetStyle(i: Integer): String;
+
+procedure SetButtonCaptionLeftAlign(btn: TButton);
+procedure AdjustComponenAttribute(Form: TForm);
+
 procedure AdjustSetStyle(Style: String);
 procedure AdjustComponentFont(Form: TForm; Font: TFont = nil);
 procedure LoadLaunguageFromFile(Form: TForm; Path: String);
@@ -135,6 +136,7 @@ function ByteToWideString2(const buff: pbyte; len: Integer): String; // 不要回车
 
 procedure WideStringToByte(str: String; var buff: array of byte);
 
+function FormatHexStr(hs: string; var buf: array of byte): string;
 function FormatHexStrToByte(sStr: string; var buffer: array of byte; out bCount: Integer): string;
 function FormatHexStrToByte2(sStr: string; var buffer: array of byte): Integer;
 function FormatHexStrToBuffer(sStr: string; var buffer: array of byte; out bCount: Integer): string;
@@ -159,17 +161,107 @@ procedure StrToBuffer(str: String; var buffer: array of byte);
 function checkIsHexStr(sStr: String): Boolean;
 
 function StrToEncode(str: string; AEncoding: TEncoding): TStringStream;
-function StringStreamToHexStr(ss:TStringStream):String;
+function StringStreamToHexStr(ss: TStringStream): String;
+
+function FormatHexToAscii(hs: string; var buf: array of byte): Integer;
+function CharToDigit(c: Char): byte;
+function DateToChar(d: byte): Char;
+function CharToByte(a, b: Char): byte;
+
+procedure StringToAssci(str: string; var buf: array of byte);
+
+function readFileToStream(FileName: String): TFileStream;
+function writeFileToStream(FileStream: TFileStream; buffer: array of byte; Len: Integer): Integer;
 
 implementation
 
-function StringStreamToHexStr(ss:TStringStream):String;
+function readFileToStream(FileName: String): TFileStream;
 var
-   i:Integer;
+  FileStream: TFileStream;
+begin
+  Result := nil;
+  try
+    FileStream := TFileStream.Create(FileName, fmOpenReadWrite or fmShareExclusive);
+    FileStream.Position := 0;
+    Result := FileStream;
+  except
+  end;
+end;
+
+function writeFileToStream(FileStream: TFileStream; buffer: array of byte; Len: Integer): Integer;
+begin
+  try
+    Result := FileStream.Write(buffer, Len);
+    // FileStream.Seek()
+  except
+  end;
+end;
+
+function DateToChar(d: byte): Char;
+begin
+  case d of
+    0 .. 9:
+      Result := Chr(Ord('0') + d);
+    10 .. 15:
+      Result := Chr(Ord('A') + d - 10);
+  else
+    Result := '0';
+  end;
+end;
+
+procedure StringToAssci(str: string; var buf: array of byte);
+var
+  i: Integer;
+begin
+  for i := 0 to sizeof(buf) - 1 do
+  begin
+    if i > Length(str) - 1 then
+      buf[i] := 0
+    else
+      buf[i] := Ord(str[i + 1]);
+  end;
+end;
+
+function FormatHexStr(hs: string; var buf: array of byte): string;
+var
+  i, Len: Word;
+begin
+  Result := '';
+  Len := (Length(hs) + 2) div 3;
+  ZeroMemory(@buf, Len * 2);
+
+  for i := 1 to Len do
+  begin
+    buf[i - 1] := CharToByte(hs[i * 3 - 2], hs[i * 3 - 1]);
+  end;
+  for i := 1 to Len do
+  begin
+    Result := Result + Format('%.02x ', [buf[i - 1]]);
+  end;
+end;
+
+function FormatHexToAscii(hs: string; var buf: array of byte): Integer;
+var
+  i, Len: Word;
+begin
+  Result := Length(hs);
+  Len := (Length(hs) + 2) div 3;
+  ZeroMemory(@buf, Len * 2);
+
+  for i := 1 to Len do
+  begin
+    buf[i - 1] := CharToByte(hs[i * 3 - 2], hs[i * 3 - 1]);
+  end;
+end;
+
+function StringStreamToHexStr(ss: TStringStream): String;
+var
+  i: Integer;
 begin
   for i := 0 to ss.Size - 1 do
     Result := Result + Format('%.2x ', [ss.Bytes[i]]);
 end;
+
 function StrToEncode(str: string; AEncoding: TEncoding): TStringStream;
 begin
   Result := TStringStream.Create(str, AEncoding);
@@ -572,14 +664,18 @@ end;
 
 function GetStyle(i: Integer): String;
 begin
-  Result := TStyleManager.StyleNames[i];
+  if (i >= 0) and (i <= High(TStyleManager.StyleNames)) then
+    Result := TStyleManager.StyleNames[i]
+  else
+    Result := '';
 end;
 
 procedure AdjustSetStyle(Style: String);
-// var
-// StyleName: string;
 begin
-  TStyleManager.SetStyle(Style);
+  try
+    TStyleManager.SetStyle(Style);
+  finally
+  end;
 end;
 
 procedure AdjustComponenAttribute(Form: TForm);
@@ -704,7 +800,7 @@ begin
       TTabSet(tmpComponent).Font := f;
     end;
 
-     if tmpComponent is TNoteBook then
+    if tmpComponent is TNoteBook then
     begin
       TNoteBook(tmpComponent).Font := f;
     end;

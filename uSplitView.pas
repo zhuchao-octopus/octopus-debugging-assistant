@@ -351,6 +351,7 @@ type
     procedure act_crcExecute(Sender: TObject);
     procedure FileOpenWithByteHexAccept(Sender: TObject);
     procedure CBSendCodePageChange(Sender: TObject);
+    procedure Memo5Change(Sender: TObject);
 
   private
     // StringGrid1_Col, StringGrid1_Row: Integer;
@@ -4254,6 +4255,11 @@ begin
     Memo1.Lines.Strings[Memo1.Lines.Count - 1] := Trim(str);
     INC(CommandIndex);
   end;
+
+end;
+
+procedure TSplitViewForm.Memo5Change(Sender: TObject);
+begin
 
 end;
 
