@@ -39,6 +39,8 @@ object FrmDockableController: TFrmDockableController
         Top = 0
         HelpContext = 1
         Caption = #22359#21457#36865
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel3: TPanel
           AlignWithMargins = True
           Left = 3
@@ -135,6 +137,8 @@ object FrmDockableController: TFrmDockableController
         Left = 0
         Top = 0
         Caption = 'Octopus '#21333#26465#21457#36865
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel12: TPanel
           AlignWithMargins = True
           Left = 3
@@ -202,6 +206,8 @@ object FrmDockableController: TFrmDockableController
         Left = 0
         Top = 0
         Caption = #21327#35758#36716#25442
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel10: TPanel
           AlignWithMargins = True
           Left = 3
@@ -356,6 +362,8 @@ object FrmDockableController: TFrmDockableController
         Left = 0
         Top = 0
         Caption = 'Graphic '
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Panel9: TPanel
           AlignWithMargins = True
           Left = 3

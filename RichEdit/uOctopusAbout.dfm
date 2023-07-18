@@ -3,7 +3,7 @@ object AboutBox: TAboutBox
   Top = 166
   BorderStyle = bsDialog
   Caption = 'About Octopus'
-  ClientHeight = 309
+  ClientHeight = 318
   ClientWidth = 611
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,10 +16,10 @@ object AboutBox: TAboutBox
   PixelsPerInch = 96
   TextHeight = 17
   object OKButton: TButton
-    Left = 526
+    Left = 492
     Top = 276
-    Width = 75
-    Height = 25
+    Width = 105
+    Height = 34
     Cancel = True
     Caption = 'OK'
     Default = True
@@ -48,7 +48,7 @@ object AboutBox: TAboutBox
         Top = 120
         Width = 92
         Height = 17
-        Caption = 'Memory in Use:'
+        Caption = 'Memory In Use:'
       end
       object Bevel1: TBevel
         Left = 182
@@ -984,21 +984,21 @@ object AboutBox: TAboutBox
       object PhysMem: TLabel
         Left = 427
         Top = 85
-        Width = 84
+        Width = 7
         Height = 17
         Caption = '0'
       end
       object FreeRes: TLabel
         Left = 285
         Top = 120
-        Width = 69
+        Width = 7
         Height = 17
         Caption = '0'
       end
       object Label5: TLabel
         Left = 182
         Top = 156
-        Width = 156
+        Width = 38
         Height = 17
         Caption = 'Label5'
       end
@@ -1012,11 +1012,22 @@ object AboutBox: TAboutBox
       object LinkLabel1: TLinkLabel
         Left = 270
         Top = 193
-        Width = 171
+        Width = 142
         Height = 21
         Caption = 'http://www.1234998.top'
         TabOrder = 0
         UseVisualStyle = True
+      end
+      object Button1: TButton
+        Left = 21
+        Top = 160
+        Width = 128
+        Height = 49
+        Caption = 'Found A New Version'
+        TabOrder = 1
+        Visible = False
+        WordWrap = True
+        OnClick = Button1Click
       end
     end
   end

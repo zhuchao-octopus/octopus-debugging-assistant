@@ -12,7 +12,7 @@ object SettingPagesDlg: TSettingPagesDlg
   Font.Height = -13
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poScreenCenter
+  Position = poMainFormCenter
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
@@ -37,7 +37,7 @@ object SettingPagesDlg: TSettingPagesDlg
       Align = alClient
       TabOrder = 0
       object TabSheet1: TTabSheet
-        Caption = 'Serial port setting'
+        Caption = 'Serial Port Setting'
         object Panel6: TPanel
           Left = 326
           Top = 0
@@ -49,41 +49,114 @@ object SettingPagesDlg: TSettingPagesDlg
           object Panel11: TPanel
             AlignWithMargins = True
             Left = 5
-            Top = 379
+            Top = 312
             Width = 740
-            Height = 161
+            Height = 228
             Margins.Left = 5
             Margins.Top = 2
             Margins.Right = 5
             Align = alTop
             TabOrder = 0
+            object Label112: TLabel
+              Left = 8
+              Top = 44
+              Width = 105
+              Height = 17
+              Caption = 'Background Color'
+            end
+            object Label113: TLabel
+              Left = 8
+              Top = 76
+              Width = 108
+              Height = 17
+              Caption = 'Content Text Color'
+            end
+            object Label114: TLabel
+              Left = 8
+              Top = 12
+              Width = 77
+              Height = 17
+              Caption = 'UI Language '
+            end
             object Button5: TButton
-              Left = 10
-              Top = 77
-              Width = 336
+              Left = 8
+              Top = 152
+              Width = 351
               Height = 34
               Caption = 'Clear internal cache '
               TabOrder = 0
               OnClick = Button5Click
             end
             object Button4: TButton
-              Left = 10
-              Top = 29
-              Width = 336
+              Left = 8
+              Top = 112
+              Width = 351
               Height = 34
               Caption = 'Open the log and the profile directory '
               TabOrder = 1
               OnClick = Button4Click
             end
             object Button6: TButton
-              Left = 520
-              Top = 32
-              Width = 131
-              Height = 57
-              Caption = 'test'
+              Left = 416
+              Top = 112
+              Width = 297
+              Height = 74
+              Caption = 'Repair or create the desktop shortcut '
               TabOrder = 2
-              Visible = False
               OnClick = Button6Click
+            end
+            object ColorBoxContentBG: TColorBox
+              Left = 118
+              Top = 40
+              Width = 241
+              Height = 22
+              DropDownCount = 30
+              TabOrder = 3
+            end
+            object ColorBoxText: TColorBox
+              Left = 118
+              Top = 73
+              Width = 241
+              Height = 22
+              DefaultColorColor = clWhite
+              Selected = clSilver
+              TabOrder = 4
+              OnChange = ColorBoxTextChange
+            end
+            object ComboBox8: TComboBox
+              Left = 118
+              Top = 8
+              Width = 241
+              Height = 25
+              Style = csDropDownList
+              ItemIndex = 0
+              TabOrder = 5
+              Text = 'ENGLISH'
+              OnChange = ComboBox8Change
+              Items.Strings = (
+                'ENGLISH'
+                #20013#25991#31616#20307)
+            end
+            object CheckBoxShortcutForExplorer: TCheckBox
+              Left = 416
+              Top = 8
+              Width = 289
+              Height = 17
+              Caption = 'Add a shortcut menu in System Explorer'
+              Checked = True
+              State = cbChecked
+              TabOrder = 6
+              OnClick = CheckBoxShortcutForExplorerClick
+            end
+            object CheckBoxDesktopShortcutMenu: TCheckBox
+              Left = 416
+              Top = 44
+              Width = 265
+              Height = 17
+              Caption = 'Add a shotcut menu item on desktop '
+              Checked = True
+              State = cbChecked
+              TabOrder = 7
             end
           end
           object Panel23: TPanel
@@ -173,86 +246,61 @@ object SettingPagesDlg: TSettingPagesDlg
               Caption = 'The main window background enables a transparent effect '
               TabOrder = 5
             end
+            object CheckBox2: TCheckBox
+              Left = 8
+              Top = 124
+              Width = 535
+              Height = 20
+              Caption = 
+                'The main window is always maintained at the top level of all the' +
+                ' windows'
+              TabOrder = 6
+            end
           end
           object Panel24: TPanel
             AlignWithMargins = True
             Left = 5
             Top = 174
             Width = 740
-            Height = 200
+            Height = 133
             Margins.Left = 5
             Margins.Top = 2
             Margins.Right = 5
             Align = alTop
             TabOrder = 2
-            object CheckBox2: TCheckBox
-              Left = 10
-              Top = 7
-              Width = 535
-              Height = 20
-              Caption = 
-                'The main window is always maintained at the top level of all the' +
-                ' windows'
-              TabOrder = 0
-            end
-            object CheckBox6: TCheckBox
-              Left = 10
-              Top = 34
+            object CheckBox33: TCheckBox
+              Left = 8
+              Top = 9
               Width = 495
               Height = 20
               Caption = 'Send and receive the record for additional time information'
-              TabOrder = 1
+              TabOrder = 0
             end
-            object CheckBox3: TCheckBox
-              Left = 10
-              Top = 61
+            object CheckBox34: TCheckBox
+              Left = 8
+              Top = 36
               Width = 519
               Height = 20
               Caption = 
                 'Send and receive records with additional year, month and day inf' +
                 'ormation'
-              TabOrder = 2
+              TabOrder = 1
             end
-            object CheckBox4: TCheckBox
-              Left = 10
-              Top = 89
+            object CheckBox35: TCheckBox
+              Left = 8
+              Top = 64
               Width = 423
               Height = 20
               Caption = 'The line number is shown before the data record'
-              TabOrder = 3
+              TabOrder = 2
             end
-            object CheckBox5: TCheckBox
-              Left = 10
-              Top = 116
+            object CheckBox36: TCheckBox
+              Left = 8
+              Top = 91
               Width = 423
               Height = 20
               Caption = 'Displays the data being sent by the serial port'
-              TabOrder = 4
-            end
-            object CheckBox1: TCheckBox
-              Left = 10
-              Top = 143
-              Width = 191
-              Height = 20
-              Caption = 'Create shortcuts on the desktop '
-              Checked = True
-              Enabled = False
-              State = cbChecked
-              TabOrder = 5
-            end
-            object ComboBox8: TComboBox
-              Left = 10
-              Top = 168
-              Width = 351
-              Height = 25
-              Style = csDropDownList
-              ItemIndex = 0
-              TabOrder = 6
-              Text = 'ENGLISH'
-              OnChange = ComboBox8Change
-              Items.Strings = (
-                'ENGLISH'
-                #20013#25991#31616#20307)
+              TabOrder = 3
             end
           end
         end
@@ -466,7 +514,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Height = 17
               Caption = 'The character set encoding format of receving'
             end
-            object CBCodePage: TComboBox
+            object CBReceivingCodePage: TComboBox
               Left = 5
               Top = 40
               Width = 295
@@ -474,15 +522,15 @@ object SettingPagesDlg: TSettingPagesDlg
               Style = csDropDownList
               ItemIndex = 0
               TabOrder = 0
-              Text = ' CP_ACP        { ANSI / GB2312  }'
+              Text = 'TEncoding.DEFAULT'
               Items.Strings = (
-                ' CP_ACP        { ANSI / GB2312  }'
-                ' CP_OEMCP   { OEM  code page }'
-                ' CP_MACCP   { MAC  code page }'
-                ' CP_SYMBOL  { SYMBOL translations }'
-                ' CP_UTF7       { UTF-7 translation }'
-                ' CP_UTF8       { UTF-8 translation }'
-                ' CP_ASCII      { ANSI / ASCII }')
+                'TEncoding.DEFAULT'
+                'TEncoding.ASCII.Encoding'
+                'TEncoding.ANSI.Encoding'
+                'TEncoding.UTF7.Encoding'
+                'TEncoding.UTF8.Encoding'
+                'TEncoding.Unicode.Encoding'
+                'TEncoding.BigEndianUnicode.Encoding')
             end
             object CBAlignmentMode: TComboBox
               Left = 5
@@ -520,7 +568,7 @@ object SettingPagesDlg: TSettingPagesDlg
         end
       end
       object TabSheet2: TTabSheet
-        Caption = 'network settings'
+        Caption = 'Network Settings'
       end
     end
   end
@@ -534,9 +582,9 @@ object SettingPagesDlg: TSettingPagesDlg
     ParentColor = True
     TabOrder = 1
     object Button1: TButton
-      Left = 952
+      Left = 922
       Top = 0
-      Width = 136
+      Width = 134
       Height = 34
       Caption = 'Close'
       ModalResult = 1
@@ -544,9 +592,9 @@ object SettingPagesDlg: TSettingPagesDlg
       OnClick = Button1Click
     end
     object Button2: TButton
-      Left = 809
+      Left = 759
       Top = 0
-      Width = 136
+      Width = 156
       Height = 34
       Caption = 'Save Settings '
       Font.Charset = DEFAULT_CHARSET
@@ -571,5 +619,14 @@ object SettingPagesDlg: TSettingPagesDlg
     OnTimer = Timer1Timer
     Left = 983
     Top = 110
+  end
+  object FontDialogConsole: TFontDialog
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clSilver
+    Font.Height = -19
+    Font.Name = #26032#23435#20307
+    Font.Style = []
+    Left = 983
+    Top = 234
   end
 end

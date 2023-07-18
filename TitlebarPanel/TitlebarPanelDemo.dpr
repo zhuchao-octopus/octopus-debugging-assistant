@@ -12,7 +12,6 @@ uses
   CPortSetup in '..\ComPort\CPortSetup.pas' {ComSetupFrm},
   CPortTrmSet in '..\ComPort\CPortTrmSet.pas' {ComTrmSetForm},
   OcProtocol in '..\OcProtocol.pas',
-  uGlobalFunction in '..\uGlobalFunction.pas',
   uControllerPanel in 'uControllerPanel.pas' {FrmControllerPanel},
   ClassTDockingHelper in 'DockForm\ClassTDockingHelper.pas',
   ClassTFormDockable in 'DockForm\ClassTFormDockable.pas',
@@ -25,7 +24,8 @@ uses
   ClassTTransparentForm in 'DockForm\ClassTTransparentForm.pas',
   DockExceptions in 'DockForm\DockExceptions.pas',
   IntfDockable in 'DockForm\IntfDockable.pas',
-  uDockableControllerPanel in 'uDockableControllerPanel.pas' {FrmDockableController};
+  uDockableControllerPanel in 'uDockableControllerPanel.pas' {FrmDockableController},
+  uOctopusFunction in '..\uOctopusFunction.pas';
 
 {$R *.res}
 

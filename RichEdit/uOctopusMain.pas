@@ -1,4 +1,4 @@
-unit uOctopusMain;
+Ôªøunit uOctopusMain;
 
 interface
 
@@ -11,10 +11,10 @@ uses
   IniFiles,
   OcComPortObj,
   Vcl.MyPageEdit,
-  uGlobalFunction, Vcl.OleCtrls, SHDocVw;
+  uOctopusFunction, Vcl.OleCtrls, SHDocVw;
 
 type
-  TMainForm = class(TForm)
+  TMainOctopusDebuggingDevelopmentForm = class(TForm)
     MainMenu: TMainMenu;
     FileNewItem: TMenuItem;
     FileOpenItem: TMenuItem;
@@ -44,7 +44,7 @@ type
     N6: TMenuItem;
     N7: TMenuItem;
     HelpAboutItem: TMenuItem;
-    miEditFont: TMenuItem;
+    EditFontItem: TMenuItem;
 
     FontDialog: TFontDialog;
     StandardToolBar1: TToolBar;
@@ -194,6 +194,42 @@ type
     N12: TMenuItem;
     ProblemFeedback1: TMenuItem;
     WelcomeAndHelp1: TMenuItem;
+    ToolButton17: TToolButton;
+    ToolButton18: TToolButton;
+    Encoding1: TMenuItem;
+    ASCIIItem: TMenuItem;
+    ANSIItem: TMenuItem;
+    BigEndianUnicodeEncodingItem: TMenuItem;
+    UnicodeEncodingItem: TMenuItem;
+    UTF7EncodingItem: TMenuItem;
+    UTF8EncodingItem: TMenuItem;
+    N13: TMenuItem;
+    ConverttoAnsi1: TMenuItem;
+    ConverttoUTF81: TMenuItem;
+    N14: TMenuItem;
+    CharacteSets1: TMenuItem;
+    DefaultItem: TMenuItem;
+    ConverttoUTF82: TMenuItem;
+    Search1: TMenuItem;
+    N15: TMenuItem;
+    PopupMenu1: TPopupMenu;
+    CloseTheDevice1: TMenuItem;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    MenuItem5: TMenuItem;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    N16: TMenuItem;
+    ShowLinesNumberItem: TMenuItem;
+    N17: TMenuItem;
+    HexModeItem: TMenuItem;
+    QuickTerminalCommandsItem: TMenuItem;
+    DownloadUpdate1: TMenuItem;
+    N18: TMenuItem;
+    PageSetting1: TMenuItem;
+    N19: TMenuItem;
 
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -206,7 +242,7 @@ type
     procedure FileSave(Sender: TObject);
     procedure FileSaveAs(Sender: TObject);
     procedure FilePrintAccept(Sender: TObject);
-    procedure HelpAbout(Sender: TObject);
+
     procedure SelectFont(Sender: TObject);
     procedure SelectFontBeforeExecute(Sender: TObject);
 
@@ -226,6 +262,7 @@ type
     procedure RichEditWordWrapItemClick(Sender: TObject);
     procedure SettingItem1Click(Sender: TObject);
 
+    procedure HelpAbout(Sender: TObject);
     procedure SkinsMenuClick(Sender: TObject);
     procedure StringGrid1KeyPress(Sender: TObject; var Key: Char);
     procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
@@ -280,6 +317,39 @@ type
     procedure DataEncryption1Click(Sender: TObject);
     procedure CRC1Click(Sender: TObject);
     procedure WelcomeAndHelp1Click(Sender: TObject);
+    procedure PageControl1Change(Sender: TObject);
+    procedure PageControl2Change(Sender: TObject);
+    procedure Encoding1Click(Sender: TObject);
+    procedure ConverttoUTF81Click(Sender: TObject);
+    procedure ConverttoAnsi1Click(Sender: TObject);
+    procedure CharacteSets1Click(Sender: TObject);
+    procedure DefaultItemClick(Sender: TObject);
+    procedure ASCIIItemClick(Sender: TObject);
+    procedure ANSIItemClick(Sender: TObject);
+    procedure UTF7EncodingItemClick(Sender: TObject);
+    procedure UTF8EncodingItemClick(Sender: TObject);
+    procedure BigEndianUnicodeEncodingItemClick(Sender: TObject);
+    procedure UnicodeEncodingItemClick(Sender: TObject);
+    procedure ConverttoUTF82Click(Sender: TObject);
+    procedure Search1Click(Sender: TObject);
+    procedure CloseTheDevice1Click(Sender: TObject);
+    procedure MenuItem2Click(Sender: TObject);
+    procedure MenuItem3Click(Sender: TObject);
+    procedure MenuItem4Click(Sender: TObject);
+    procedure MenuItem6Click(Sender: TObject);
+    procedure MenuItem7Click(Sender: TObject);
+    procedure ToolButton19Click(Sender: TObject);
+    procedure ShowLinesNumberItemClick(Sender: TObject);
+    procedure HexModeItemClick(Sender: TObject);
+    procedure FileSaveAsCmdBeforeExecute(Sender: TObject);
+    procedure RichEditMenuClick(Sender: TObject);
+    procedure QuickTerminalCommandsItemClick(Sender: TObject);
+    procedure DownloadUpdate1Click(Sender: TObject);
+    procedure SV_ROpened(Sender: TObject);
+    procedure SV_RClosed(Sender: TObject);
+    procedure FontDialogShow(Sender: TObject);
+    procedure PageSetting1Click(Sender: TObject);
+
   private
     OcComPortObj_Loop: TOcComPortObj;
     LoopingString: String;
@@ -292,30 +362,42 @@ type
     FCheck, FNoCheck: TBitmap;
     Fprogress, FprogressMax: Integer;
 
-    FFileName: string;
+    FFilePathName: string;
     FUpdating: Boolean;
     FDragOfs: Integer;
     FDragging: Boolean;
-    function CurrText: TTextAttributes;
-    procedure GetFontNames;
-    procedure SetFileName(const FileName: String);
-    procedure CheckFileSave;
-    procedure UpdateCursorPos;
 
-    procedure PerformFileOpen(const AFileName: string);
+    procedure ShowHint(Sender: TObject);
+
+    function CurrTextAttributes(): TTextAttributes;
+    procedure SynchroSetMyRichEditFont(MyRichEdit: TMyRichEdit; Style: Integer);
+    procedure SetMyRichEditFont(MyRichEdit: TMyRichEdit);
+    procedure SynchroFontDialog(MyRichEdit: TMyRichEdit; Style: Integer);
+
+    procedure GetFontNames();
+    procedure SetPathFileName(const FileName: String);
+    procedure CheckFileSave();
+    procedure UpdateCursorPos();
+
+    procedure PerformFileOpen(const AFileName: string); overload;
+    procedure PerformFileOpen(const AFileName: string; PageName: String); overload;
+    procedure LoadNewFileFromTo(PathFileName: String);
+    procedure LoadUntitledContent(MyRichEdit: TMyRichEdit; const AFileName: string);
+
     procedure SetModified(Value: Boolean);
+    procedure UpdateStatus(Value: String);
 
     function GetStringGridValidStr(sStr: String): String;
-    /// function GetSelectedDeviceName(): String;
     function GetCurrentPageName(): String;
     function GetCurrentDevice(): TOcComPortObj;
+    function SearchMemo(Memo: TMyRichEdit; const SearchString: string; Options: TFindOptions): Boolean;
 
+    procedure ShowSearchDialog();
     procedure CreateMyObjectPage(PageName: String; PageType: Integer);
     procedure InitAllUartDevices();
     procedure GetAndOpenADevices(OcComPortObj: TOcComPortObj); overload;
     procedure GetAndOpenADevices(DeviceName: String); overload;
     procedure GetAndRemoveDevices(DeviceName: String);
-    procedure LoadContent();
 
     procedure SkinsMenuOnClick(Sender: TObject);
     procedure InitSkinsMenu(ParentMenu: TMenuItem; OnClicEvent: TOnClicEvent);
@@ -331,6 +413,8 @@ type
 
     procedure InitMainUI();
     procedure AdjustUI();
+    procedure InitUserConfiguration();
+
     procedure UpdateUartToolBar();
     procedure UpdateMainMenu();
 
@@ -341,16 +425,17 @@ type
     procedure SaveProjectSetting(SavePrivate: Boolean);
     procedure LoadProjectSetting();
 
-    function SearchMemo(Memo: TMyRichEdit; const SearchString: string; Options: TFindOptions): Boolean;
     procedure ShowHideRLPanel(RL: Integer);
     procedure SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
     procedure SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
 
+    procedure AcceptCommandLine();
     procedure MyAppMsg(var Msg: TMsg; var Handled: Boolean);
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
     Procedure SystemMessage_WMMenuSelect(var Msg: TWMMenuSelect); message WM_SysCommand;
     procedure OcComPortObjCallBack(Count: Integer);
     Procedure SettingChangedCallBackFuntion(Obj: TObject);
+    procedure EventCallBackFuntion(Obj: TObject);
   end;
 
 const
@@ -358,22 +443,23 @@ const
   DATACOL: Integer = 2;
 
 var
-  MainForm: TMainForm;
+  MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm;
 
 implementation
 
 uses uOctopusAbout, RichEdit, Winapi.ShellAPI, System.UITypes, System.IOUtils, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj,
-  uSetting, math, OcProtocol, CPort, uMainSetting, uSMTP, MainFormUnit, uCRC,
-  Screenshot, uScreenMain;
+  uSetting, math, OcProtocol, CPort, uMainSetting, uSMTP, uEncryptionDecryption, uCRC,
+  Screenshot, uScreenMain, uCommand, uDownloader, uPageSetup;
 
 resourcestring
   sSaveChanges = 'Save changes to %s?';
-  sOverWrite = 'OK to overwrite %s';
+  sOverWrite = 'The file already exists, if you need to overwrite it %s';
   sUntitled = 'Untitled';
   sModified = 'Modified';
-  sColRowInfo = 'Line: %3d   Col: %3d';
-  sScrollPos = 'Scroll Pos: (%d, %d)';
+  sColRowInfo = 'Line: %3d  Col: %3d';
+  sScrollPos = 'Scroll Pos: %d, %d';
   sOpenLink = 'Open link: %s ?';
+  sSaved = 'The File Saved';
 
 const
   RulerAdj = 4 / 3;
@@ -401,7 +487,7 @@ begin
     dwcodelen := 10;
     HttpQueryInfo(hfile, HTTP_QUERY_STATUS_CODE, @dwcode, dwcodelen, dwindex);
     res := PChar(@dwcode);
-    Result := (res = '200') or (res = '302'); // 200,302Œ¥÷ÿ∂®Œª±Í÷æ
+    Result := (res = '200') or (res = '302'); // 200,302Œ¥ÔøΩÿ∂ÔøΩŒªÔøΩÔøΩ÷æ
     if Assigned(hfile) then
       InternetCloseHandle(hfile);
     InternetCloseHandle(hSession);
@@ -409,18 +495,16 @@ begin
 end;
 
 procedure DelayDelay(msec: Integer);
-// —” ±∫Ø ˝£¨msec   Œ™∫¡√Î(«ß∑÷÷Æ1√Î)
 var
   FirstTickCount: real;
 begin
   FirstTickCount := GetTickCount();
   FirstTickCount := FirstTickCount + msec;
   While FirstTickCount > GetTickCount() do
-    Application.ProcessMessages; // πÿº¸‘⁄’‚¿Ô
+    Application.ProcessMessages;
 end;
 
 procedure Delay(MSecs: Longint);
-// —” ±∫Ø ˝£¨MSecsµ•ŒªŒ™∫¡√Î(«ß∑÷÷Æ1√Î)
 var
   FirstTickCount, Now: Longint;
 begin
@@ -431,7 +515,7 @@ begin
   until (Now - FirstTickCount >= MSecs) or (Now < FirstTickCount);
 end;
 
-procedure TMainForm.ShowHideRLPanel(RL: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.ShowHideRLPanel(RL: Integer);
 begin
   if RL = 1 then
   begin
@@ -439,21 +523,21 @@ begin
       SV_R.Close
     else
     begin
-      if SV_R.OpenedWidth < 20 then
+      if SV_R.Width < 30 then
       begin
-        SV_R.OpenedWidth := 300;
+        SV_R.Width := 400;
       end;
       SV_R.Open;
     end;
   end;
 end;
 
-procedure TMainForm.SystemMessage_WMMenuSelect(var Msg: TWMMenuSelect);
+procedure TMainOctopusDebuggingDevelopmentForm.SystemMessage_WMMenuSelect(var Msg: TWMMenuSelect);
 begin
   inherited;
 end;
 
-procedure TMainForm.MyAppMsg(var Msg: TMsg; var Handled: Boolean);
+procedure TMainOctopusDebuggingDevelopmentForm.MyAppMsg(var Msg: TMsg; var Handled: Boolean);
 var
   OcComPortObj: TOcComPortObj;
   keyState: TKeyBoardState;
@@ -498,9 +582,9 @@ begin
         if (Msg.wParam = VK_ESCAPE) then
         begin
           OcComPortObj := Self.GetCurrentDevice();
-          if (OcComPortObj <> nil) and (OcComPortObj.LogMemo <> nil) and (OcComPortObj.LogMemo.Parent <> nil) then
+          if (OcComPortObj <> nil) then
           begin
-            OcComPortObj.LogMemo.ReadOnly := True;
+            OcComPortObj.SetLogComponentReadOnly(True);
           end;
 
           if SV_R.Opened then
@@ -520,74 +604,52 @@ begin
 
         if (Msg.wParam = VK_F3) or ((keyState[VK_LCONTROL] = 129) and (Msg.wParam = 70)) then
         begin
-          OcComPortObj := Self.GetCurrentDevice();
-          if ((OcComPortObj = nil) or (OcComPortObj.LogMemo = nil) or (OcComPortObj.LogMemo.Parent = nil)) and (CMyRichEdit <> nil) then
-          begin
-            with FindDialog1 do
-            begin
-              Left := Self.Left + 600;
-              Top := Self.Top + 150;
-              FindText := CMyRichEdit.SelText;
-              Execute;
-              Handled := True;
-            end;
-            exit;
-          end;
-
-          with FindDialog1 do
-          begin
-            Left := Self.Left + 600;
-            Top := Self.Top + 150;
-            FindText := OcComPortObj.LogMemo.SelText;
-            Execute;
-            Handled := True;
-          end;
+          ShowSearchDialog();
+          Handled := True;
         end;
-
       end; // WM_KEYDOWN:begin
     WM_KEYUP:
       begin
-        { if (Msg.wParam = VK_F1) then
-          begin
+        if (Msg.wParam = VK_F1) then
+        begin
           Handled := True;
-          end;
-          if Msg.wParam = VK_CONTROL then
-          begin
+        end;
+        if Msg.wParam = VK_CONTROL then
+        begin
           OcComPortObj := Self.GetCurrentDevice();
           if (OcComPortObj <> nil) then
           begin
-          OcComPortObj.MouseTextSelection := false;
-          OcComPortObj.StartFlushOutCackedString();
+            OcComPortObj.MouseTextSelection := false;
+            OcComPortObj.StartFlushOutCackedString();
           end;
-          end; }
+        end;
       end;
   end; // case   msg.message   of
 end;
 
-procedure TMainForm.FormCreate(Sender: TObject);
-var
-  OcComPortObj: TOcComPortObj;
+procedure TMainOctopusDebuggingDevelopmentForm.FormCreate(Sender: TObject);
+/// var
+/// OcComPortObj: TOcComPortObj;
 begin
   InitMainUI();
   InitSkinsMenu(SkinsMenu, SkinsMenuOnClick);
   InitStringGrid();
   InitUartsParameters();
+
   InitAllUartDevices();
+
   InitUartsMenu(COMMenu, COM1MenuItemOnClick);
   UpdateUartToolBar();
   LoadProjectSetting();
   SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, True);
 
+  InitUserConfiguration();
   DragAcceptFiles(Handle, True);
-  OcComPortObj := Self.GetCurrentDevice();
   Application.OnMessage := MyAppMsg;
 
-  if OcComPortObj <> nil then
-  begin
-  end;
 end;
 
-procedure TMainForm.FormResize(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FormResize(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -599,18 +661,20 @@ begin
   end;
 end;
 
-procedure TMainForm.FormShow(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FormShow(Sender: TObject);
 begin
-  AdjustUI();
+  AcceptCommandLine();
+  if SV_R.Opened then
+  begin
+    AdjustUI();
+  end
+  else
+  begin
+    Self.Splitter1.Visible := false;
+  end;
 end;
 
-procedure TMainForm.FormatToolBarMenuItem1Click(Sender: TObject);
-begin
-  StandardToolBar1.Visible := not StandardToolBar1.Visible;
-  FormatToolBarMenuItem1.Checked := StandardToolBar1.Visible;
-end;
-
-procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+procedure TMainOctopusDebuggingDevelopmentForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   try
     /// CheckFileSave;
@@ -622,38 +686,58 @@ begin
   end;
 end;
 
-procedure TMainForm.FormatToolBarMenuItem2Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.AcceptCommandLine();
+var
+  SelectedFile: string;
 begin
-  StandardToolBar2.Visible := not StandardToolBar2.Visible;
-  FormatToolBarMenuItem2.Checked := StandardToolBar2.Visible;
+  /// ShowMessage(getCommandLine());
+  SelectedFile := ParamStr(1); // Ëé∑ÂèñÂëΩ‰ª§Ë°åÂèÇÊï∞‰∏≠ÁöÑÁ¨¨‰∫å‰∏™ÂèÇÊï∞ÔºåÂç≥ÈÄâ‰∏≠ÁöÑÊñá‰ª∂Ë∑ØÂæÑ
+  if FileExists(SelectedFile) then
+  begin
+    LoadNewFileFromTo(SelectedFile);
+    Self.SV_R.Close;
+    Self.StandardToolBar1.Visible := True;
+    Self.StandardToolBar2.Visible := false;
+  end;
 end;
 
 /// ///////////////////////////////////////////////////////////////////////////////
 /// ///////////////////////////////////////////////////////////////////////////////
 /// richedit
-
-procedure TMainForm.LoadContent();
+procedure TMainOctopusDebuggingDevelopmentForm.ShowHint(Sender: TObject);
 begin
-  if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  if CMyRichEdit = nil then
-    exit;
-
-  UpdateCursorPos;
-  DragAcceptFiles(Handle, True);
-  RichEditChange(nil);
-
-  CMyRichEdit.SetFocus;
-  { Check if we should load a file from the command line, assuming the default file is not available }
-  if TFile.Exists('overview.rtf') then
-    PerformFileOpen('overview.rtf')
-  else if TFile.Exists('..\..\overview.rtf') then
-    PerformFileOpen('..\..\overview.rtf')
-  else if (ParamCount > 0) and TFile.Exists(ParamStr(1)) then
-    PerformFileOpen(ParamStr(1));
+  if Length(Application.Hint) > 0 then
+  begin
+    // StatusBar1.SimplePanel := True;
+    // StatusBar1.SimpleText := Application.Hint;
+    StatusBar1.Panels[1].Text := Application.Hint;
+  end;
+  // else StatusBar1.SimplePanel := False;
 end;
 
-procedure TMainForm.SelectionChange(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.LoadUntitledContent(MyRichEdit: TMyRichEdit; const AFileName: string);
+var
+  FileNameNoExt: String;
+begin
+  if MyRichEdit = nil then
+    exit;
+  /// UpdateCursorPos;
+  /// DragAcceptFiles(Handle, True);
+  /// RichEditChange(nil);
+  MyRichEdit.SetFocus;
+  /// Check if we should load a file from the command line, assuming the default file is not available
+  if TFile.Exists(AFileName) then
+  begin
+    MyRichEdit.LoadFrom(AFileName);
+    MyRichEdit.SetFocus;
+    FileNameNoExt := ExtractFileNameNoExt(AFileName);
+    PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
+    SetModified(false);
+    SetPathFileName(AFileName);
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.SelectionChange(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -671,7 +755,17 @@ begin
   end;
 end;
 
-procedure TMainForm.FGColorBoxChange(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RichEditChange(Sender: TObject);
+begin
+  if CMyRichEdit = nil then
+    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
+  if CMyRichEdit = nil then
+    exit;
+  SetModified(CMyRichEdit.Modified);
+  UpdateCursorPos;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FGColorBoxChange(Sender: TObject);
 var
   Color: TColor;
 begin
@@ -683,7 +777,7 @@ begin
   CMyRichEdit.SelAttributes.Color := Color;
 end;
 
-procedure TMainForm.BGColorBoxChange(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.BGColorBoxChange(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -692,8 +786,9 @@ begin
   CMyRichEdit.SelAttributes.BackColor := BGColorBox.Selected;
 end;
 
-function TMainForm.CurrText: TTextAttributes;
+function TMainOctopusDebuggingDevelopmentForm.CurrTextAttributes: TTextAttributes;
 begin
+  /// Result := nil;
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
@@ -704,12 +799,12 @@ begin
     Result := CMyRichEdit.DefAttributes;
 end;
 
-procedure TMainForm.RichEditorClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RichEditorClick(Sender: TObject);
 begin
   UpdateCursorPos;
 end;
 
-procedure TMainForm.RichEditorLinkClick(Sender: TCustomRichEdit; const URL: string; Button: TMouseButton);
+procedure TMainOctopusDebuggingDevelopmentForm.RichEditorLinkClick(Sender: TCustomRichEdit; const URL: string; Button: TMouseButton);
 begin
   if (Button = mbLeft) and (MessageDlg(Format(sOpenLink, [URL]), mtConfirmation, [mbYes, mbNo], 0) = mrYes) then
     ShellExecute(Handle, 'open', PChar(URL), nil, nil, SW_SHOWNORMAL)
@@ -721,7 +816,7 @@ begin
   Result := 1;
 end;
 
-procedure TMainForm.GetFontNames;
+procedure TMainOctopusDebuggingDevelopmentForm.GetFontNames;
 var
   DC: HDC;
 begin
@@ -731,13 +826,20 @@ begin
   FontName.Sorted := True;
 end;
 
-procedure TMainForm.SetFileName(const FileName: String);
+procedure TMainOctopusDebuggingDevelopmentForm.SetPathFileName(const FileName: String);
 begin
-  FFileName := FileName;
-  Caption := Format('%s - %s', [Application.Title, ExtractFileName(FileName)]);
+  FFilePathName := FileName;
+  Caption := Format('%s - %s', [Application.Title, FileName]);
+  /// ExtractFileName
+  StatusBar1.Panels[2].Text := FFilePathName;
 end;
 
-procedure TMainForm.CheckFileSave;
+procedure TMainOctopusDebuggingDevelopmentForm.CharacteSets1Click(Sender: TObject);
+begin
+  EditFontItem.Click;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.CheckFileSave;
 var
   SaveResp: Integer;
 begin
@@ -745,7 +847,7 @@ begin
     exit;
   if not CMyRichEdit.Modified then
     exit;
-  SaveResp := MessageDlg(Format(sSaveChanges, [FFileName]), mtConfirmation, mbYesNoCancel, 0);
+  SaveResp := MessageDlg(Format(sSaveChanges, [FFilePathName]), mtConfirmation, mbYesNoCancel, 0);
   case SaveResp of
     idYes:
       FileSave(Self);
@@ -757,7 +859,7 @@ begin
   end;
 end;
 
-procedure TMainForm.SubscriptCmdExecute(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SubscriptCmdExecute(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -766,7 +868,7 @@ begin
   CMyRichEdit.SelAttributes.Subscript := sstSubscript;
 end;
 
-procedure TMainForm.SubscriptCmdUpdate(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SubscriptCmdUpdate(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -775,7 +877,7 @@ begin
   (Sender as TAction).Checked := CMyRichEdit.SelAttributes.Subscript = sstSubscript;
 end;
 
-procedure TMainForm.SuperscriptCmdExecute(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SuperscriptCmdExecute(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -784,7 +886,7 @@ begin
   CMyRichEdit.SelAttributes.Subscript := sstSuperscript;
 end;
 
-procedure TMainForm.SuperscriptCmdUpdate(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SuperscriptCmdUpdate(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -793,123 +895,218 @@ begin
   (Sender as TAction).Checked := CMyRichEdit.SelAttributes.Subscript = sstSuperscript;
 end;
 
-procedure TMainForm.FileNew(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.PageControl1Change(Sender: TObject);
+var
+  MyRichEdit: TMyRichEdit;
+begin
+  /// showmessage(intTostr(PageControl1.ActivePageIndex));
+  MyRichEdit := Self.PageControl1.GetEdit(PageControl1.ActivePageIndex);
+  if MyRichEdit <> nil then
+  begin
+    Self.CMyRichEdit := MyRichEdit;
+    SynchroSetMyRichEditFont(MyRichEdit, MyRichEdit.FStyle);
+  end;
+  CommandFrm.OcComPortObj := Self.GetCurrentDevice();
+  Self.UpdateUartToolBar();
+  StatusBarPrintFileSize();
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.PageControl2Change(Sender: TObject);
+begin
+  AdjustUI();
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.PageSetting1Click(Sender: TObject);
+begin
+  /// CMyRichEdit.Paragraph.FirstIndent := 12;
+  /// CMyRichEdit.Paragraph.LeftIndent := 10;
+  /// SelectionChange(Sender);
+  PageSetupFrm.CMyRichEdit := Self.CMyRichEdit;
+  PageSetupFrm.Show();
+end;
+
+/// ÂàõÂª∫‰∏Ä‰∏™Á©∫ÁöÑÊú™ÂëΩÂêçÁöÑÊñáÊ°£
+procedure TMainOctopusDebuggingDevelopmentForm.FileNew(Sender: TObject);
 var
   PageIndex: Integer;
 begin
   CreateMyObjectPage(sUntitled, 0);
-  CMyRichEdit := PageControl1.GetEdit(PageIndex);
+  CMyRichEdit := PageControl1.GetEdit(sUntitled);
   if CMyRichEdit = nil then
     exit;
-  SetFileName(sUntitled);
-  CMyRichEdit.Lines.Clear;
-  CMyRichEdit.Modified := false;
-  SetModified(false);
+
+  LoadUntitledContent(CMyRichEdit, ExtractFilePath(Application.Exename) + '\' + sUntitled + '.rtf');
+  /// SetPathFileName(sUntitled);
+  /// CMyRichEdit.Clear();
+  /// CMyRichEdit.Modified := false;
+  /// SetModified(false);
 end;
 
-procedure TMainForm.PerformFileOpen(const AFileName: string);
+procedure TMainOctopusDebuggingDevelopmentForm.PerformFileOpen(const AFileName: string);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
     exit;
-  CMyRichEdit.Lines.LoadFromFile(AFileName);
-  SetFileName(AFileName);
+  CMyRichEdit.LoadFrom(AFileName);
+  SetPathFileName(AFileName);
   CMyRichEdit.SetFocus;
   CMyRichEdit.Modified := false;
   SetModified(false);
 end;
 
-procedure TMainForm.FileOpenAccept(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.PerformFileOpen(const AFileName: string; PageName: String);
+var
+  FileNameNoExt: String;
 begin
-  if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
+  CMyRichEdit := PageControl1.GetEdit(PageName);
   if CMyRichEdit = nil then
     exit;
-  PerformFileOpen(FileOpenCmd.Dialog.FileName);
-  CMyRichEdit.ReadOnly := ofReadOnly in FileOpenCmd.Dialog.Options;
+
+  CMyRichEdit.LoadFrom(AFileName);
+  SetPathFileName(AFileName);
+
+  FileNameNoExt := ExtractFileNameNoExt(AFileName);
+  PageControl1.SetPageName(FileNameNoExt, PageControl1.GetPageIndex(PageName));
+  CMyRichEdit.SetFocus;
+  CMyRichEdit.Modified := false;
+  SetModified(false);
 end;
 
-procedure TMainForm.FileOpenBeforeExecute(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.LoadNewFileFromTo(PathFileName: String);
+var
+  FileNameNoExt: String;
+  MyRichEdit: TMyRichEdit;
+  NewPageName: String;
+  /// PageIndex:Integer;
 begin
-  CheckFileSave;
+  FileNew(Self);
+  if PageControl1.GetActivePageName = sUntitled then
+  begin
+    MyRichEdit := PageControl1.LoadFileFrom(PathFileName, sUntitled);
+    if MyRichEdit <> nil then
+    begin
+      MyRichEdit.ReadOnly := ofReadOnly in FileOpenCmd.Dialog.Options;
+      MyRichEdit.SetFocus;
+      FileNameNoExt := ExtractFileNameNoExt(PathFileName);
+      PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
+      SetModified(false);
+      SetPathFileName(PathFileName);
+    end
+    else
+      UpdateStatus('Load file failed!');
+  end
+  else
+    UpdateStatus('Load file failed!');
 end;
 
-procedure TMainForm.FileSave(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FileOpenAccept(Sender: TObject);
+begin
+  LoadNewFileFromTo(FileOpenCmd.Dialog.FileName);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FileOpenBeforeExecute(Sender: TObject);
+begin
+  /// CheckFileSave;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FileSave(Sender: TObject);
 begin
   // if CMyRichEdit = nil then
   CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
     exit;
-  if (FFileName = sUntitled) or (FFileName = '') then
+
+  if FFilePathName <> '' then
+  begin
+    CMyRichEdit.SaveTo(FFilePathName);
+    CMyRichEdit.Modified := false;
+    SetModified(false);
+    UpdateStatus(sSaved);
+  end
+  else
+  /// if (FFilePathName = sUntitled) or (FFilePathName = '') then
   begin
     FileSaveAs(Sender);
   end
-  else
-  begin
-    CMyRichEdit.Lines.SaveToFile(FFileName);
-    CMyRichEdit.Modified := false;
-    SetModified(false);
-  end;
 end;
 
-procedure TMainForm.FileSaveAs(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FileSaveAs(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
+  FileNameNoExt: String;
 begin
   OcComPortObj := GetCurrentDevice();
-  if OcComPortObj = nil then
-  begin
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  end
-  else
-  begin
-    CMyRichEdit := OcComPortObj.LogMemo;
-    FileSaveAsCmd.Dialog.FileName := GetSystemDateTimeStampStr + '_' + OcComPortObj.Port + '.log';
-  end;
+  CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
 
   if CMyRichEdit = nil then
     exit;
 
+  if (OcComPortObj <> nil) then
+    FileSaveAsCmd.Dialog.FileName := SettingPagesDlg.OctopusCfgDir_LogFilePath + '\' + OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
+
   if FileSaveAsCmd.Dialog.FileName = '' then
+  begin
+    FileSaveAsItem.Click;
+    if FileSaveAsCmd.Dialog.FileName <> '' then
+    begin
+      SetPathFileName(FileSaveAsCmd.Dialog.FileName);
+      FileNameNoExt := ExtractFileNameNoExt(FileSaveAsCmd.Dialog.FileName);
+      PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
+    end;
     exit;
+  end;
 
   if FileExists(FileSaveAsCmd.Dialog.FileName) then
     if MessageDlg(Format(sOverWrite, [FileSaveAsCmd.Dialog.FileName]), mtConfirmation, mbYesNoCancel, 0) <> idYes then
       exit;
 
-  CMyRichEdit.Lines.SaveToFile(FileSaveAsCmd.Dialog.FileName);
-  SetFileName(FileSaveAsCmd.Dialog.FileName);
+  CMyRichEdit.SaveTo(FileSaveAsCmd.Dialog.FileName);
+  SetPathFileName(FileSaveAsCmd.Dialog.FileName);
   CMyRichEdit.Modified := false;
   SetModified(false);
+  UpdateStatus(sSaved);
 end;
 
-procedure TMainForm.FilePrintAccept(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FileSaveAsCmdBeforeExecute(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
+begin
+  OcComPortObj := GetCurrentDevice();
+  if (OcComPortObj <> nil) then
+    FileSaveAsCmd.Dialog.FileName := SettingPagesDlg.OctopusCfgDir_LogFilePath + OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FilePrintAccept(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
     exit;
-  CMyRichEdit.Print(FFileName);
+  CMyRichEdit.Print(FFilePathName);
 end;
 
-procedure TMainForm.SelectFont(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SelectFont(Sender: TObject);
 begin
-  if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
+  /// if CMyRichEdit = nil then
+  CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
     exit;
-  CurrText.Assign(FontDialog.Font);
+  if FontDialog.Execute then
+  begin
+    /// CurrTextAttributes.Assign(FontDialog.Font);
+    SetMyRichEditFont(CMyRichEdit);
+  end;
   SelectionChange(Self);
-  CMyRichEdit.SetFocus;
+  /// CMyRichEdit.SetFocus;
 end;
 
-procedure TMainForm.SelectFontBeforeExecute(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SelectFontBeforeExecute(Sender: TObject);
 begin
   FontDialog.Font.Assign(CMyRichEdit.SelAttributes);
 end;
 
-procedure TMainForm.FontSizeChange(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FontSizeChange(Sender: TObject);
 begin
   if FUpdating then
     exit;
@@ -917,17 +1114,22 @@ begin
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
     exit;
-  CurrText.Size := StrToInt(FontSize.Text);
+  CurrTextAttributes.Size := StrToInt(FontSize.Text);
 end;
 
-procedure TMainForm.FontNameChange(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FontDialogShow(Sender: TObject);
+begin
+  SynchroFontDialog(Self.CMyRichEdit, Self.CMyRichEdit.FStyle);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FontNameChange(Sender: TObject);
 begin
   if FUpdating then
     exit;
-  CurrText.Name := FontName.Items[FontName.ItemIndex];
+  CurrTextAttributes.Name := FontName.Items[FontName.ItemIndex];
 end;
 
-procedure TMainForm.UpdateCursorPos;
+procedure TMainOctopusDebuggingDevelopmentForm.UpdateCursorPos;
 var
   CharPos: TPoint;
 begin
@@ -943,15 +1145,23 @@ begin
   StatusBar1.Panels[1].Text := Format(sScrollPos, [CMyRichEdit.ScrollPosition.X, CMyRichEdit.ScrollPosition.Y]);
 end;
 
-procedure TMainForm.WMDropFiles(var Msg: TWMDropFiles);
+procedure TMainOctopusDebuggingDevelopmentForm.WMDropFiles(var Msg: TWMDropFiles);
 var
   CFileName: array [0 .. MAX_PATH] of Char;
+  FileNameNoExt: String;
 begin
   try
     if DragQueryFile(Msg.Drop, 0, CFileName, MAX_PATH) > 0 then
     begin
-      CheckFileSave;
-      PerformFileOpen(CFileName);
+      /// CheckFileSave;
+      { FileNew(Self);
+        if PageControl1.GetActivePageName = sUntitled then
+        begin
+        PerformFileOpen(CFileName);
+        FileNameNoExt := ExtractFileNameNoExt(CFileName);
+        PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
+        end; }
+      LoadNewFileFromTo(CFileName);
       Msg.Result := 0;
     end;
   finally
@@ -959,17 +1169,15 @@ begin
   end;
 end;
 
-procedure TMainForm.RichEditChange(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RichEditMenuClick(Sender: TObject);
 begin
   if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  if CMyRichEdit = nil then
-    exit;
-  SetModified(CMyRichEdit.Modified);
-  UpdateCursorPos;
+  begin
+    HexModeItem.Checked := CMyRichEdit.FHexadecimalMode;
+  end;
 end;
 
-procedure TMainForm.RichEditTransparentItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RichEditTransparentItemClick(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -979,7 +1187,7 @@ begin
   CMyRichEdit.Transparent := RichEditTransparentItem.Checked;
 end;
 
-procedure TMainForm.RichEditWordWrapItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RichEditWordWrapItemClick(Sender: TObject);
 begin
   if CMyRichEdit = nil then
     CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
@@ -987,88 +1195,293 @@ begin
     exit;
 
   RichEditWordWrapItem.Checked := not RichEditWordWrapItem.Checked;
+  CMyRichEdit.WordWrap := RichEditWordWrapItem.Checked;
+
   if RichEditWordWrapItem.Checked then
     CMyRichEdit.ScrollBars := ssVertical
   else
     CMyRichEdit.ScrollBars := ssBoth;
 end;
 
-procedure TMainForm.RightOperationPanel1Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RightOperationPanel1Click(Sender: TObject);
 begin
   RightOperationPanel1.Checked := not RightOperationPanel1.Checked;
 
   if RightOperationPanel1.Checked then
-    SV_R.Open
+  begin
+    if SV_R.Width < 30 then
+      SV_R.Width := 400;
+    Splitter1.Align := alLeft;
+    SV_R.Align := alRight;
+    SV_R.Placement := svpRight;
+    SV_R.Open;
+  end
   else
+  begin
     SV_R.Close;
+  end;
 end;
 
-procedure TMainForm.SetModified(Value: Boolean);
+procedure TMainOctopusDebuggingDevelopmentForm.SetModified(Value: Boolean);
 begin
   if Value then
     StatusBar1.Panels[1].Text := sModified
   else
-    StatusBar1.Panels[1].Text := '';
+    StatusBar1.Panels[1].Text := WEB_SITE;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.UpdateStatus(Value: String);
+begin
+  StatusBar1.Panels[1].Text := Value;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.SynchroSetMyRichEditFont(MyRichEdit: TMyRichEdit; Style: Integer);
+begin
+  if MyRichEdit = nil then
+    exit;
+  if Style = 1 then
+  begin
+    /// ÊéßÂà∂Âè∞È£éÊ†º
+    MyRichEdit.Color := SettingPagesDlg.ColorBoxContentBG.Selected;
+    MyRichEdit.Font := SettingPagesDlg.FontDialogConsole.Font;
+    FontDialog.Font := MyRichEdit.Font;
+    MyRichEdit.Transparent := false;
+    MyRichEdit.ParentColor := false;
+  end
+  else
+  /// ÊñáÊú¨ÁºñËæëÊ®°ÂºèÈªëÁôΩÈªòËÆ§
+  begin
+    MyRichEdit.Color := clWhite;
+    if MyRichEdit.PlainText then // Á∫ØÊñáÊú¨Â∫îÁî®ÂÖ®Â±ÄÂ≠ó‰Ωì
+    begin
+      /// FontDialog.Font.Color := clBlack;
+      MyRichEdit.Font := FontDialog.Font;
+    end;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.SetMyRichEditFont(MyRichEdit: TMyRichEdit);
+begin
+  if MyRichEdit = nil then
+    exit;
+  if MyRichEdit.FStyle = 1 then
+  begin
+    /// ÊéßÂà∂Âè∞È£éÊ†º
+    MyRichEdit.Color := SettingPagesDlg.ColorBoxContentBG.Selected;
+    MyRichEdit.Font := Self.FontDialog.Font;
+    MyRichEdit.Transparent := false;
+    MyRichEdit.ParentColor := false;
+    SettingPagesDlg.FontDialogConsole.Font := MyRichEdit.Font;
+    SettingPagesDlg.ColorBoxText.Selected := MyRichEdit.Font.Color;
+  end
+  else
+  /// ÊñáÊú¨ÁºñËæëÊ®°ÂºèÈªëÁôΩÈªòËÆ§
+  begin
+    MyRichEdit.Color := clWhite;
+    if MyRichEdit.PlainText then // Á∫ØÊñáÊú¨Â∫îÁî®ÂÖ®Â±ÄÂ≠ó‰Ωì
+    begin
+      /// FontDialog.Font.Color := clBlack;
+      MyRichEdit.Font := FontDialog.Font;
+    end;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.SynchroFontDialog(MyRichEdit: TMyRichEdit; Style: Integer);
+begin
+  if MyRichEdit = nil then
+    exit;
+  if MyRichEdit.FStyle = 1 then
+  begin
+    /// ÊéßÂà∂Âè∞È£éÊ†º
+    Self.FontDialog.Font := MyRichEdit.Font;
+  end
+  else
+  /// ÊñáÊú¨ÁºñËæëÊ®°ÂºèÈªëÁôΩÈªòËÆ§
+  begin
+    Self.FontDialog.Font := MyRichEdit.Font;
+  end;
 end;
 
 /// ///////////////////////////////////////////////////////////////////////////////
 /// ///////////////////////////////////////////////////////////////////////////////
 /// click event
-
-procedure TMainForm.ScreenshotTool1Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SV_RClosed(Sender: TObject);
 begin
-  WindowState := wsMinimized; // ◊Ó–°ªØ≥Ã–Ú¥∞ø⁄
-  Hide; // ∞—≥Ã–Ú≤ÿ∆¿¥
+  Splitter1.Visible := false;
+  Splitter1.Align := alNone;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.SV_ROpened(Sender: TObject);
+begin
+  Splitter1.Visible := True;
+  Splitter1.Align := alRight;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FormatToolBarMenuItem1Click(Sender: TObject);
+begin
+  StandardToolBar1.Visible := not StandardToolBar1.Visible;
+  FormatToolBarMenuItem1.Checked := StandardToolBar1.Visible;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FormatToolBarMenuItem2Click(Sender: TObject);
+begin
+  StandardToolBar2.Visible := not StandardToolBar2.Visible;
+  FormatToolBarMenuItem2.Checked := StandardToolBar2.Visible;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ShowLinesNumberItemClick(Sender: TObject);
+begin
+  // if (CMyRichEdit <> nil) and (not CMyRichEdit.FShowLinesNumber) then
+  // CMyRichEdit.ShowLinesNumber();
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.MenuItem2Click(Sender: TObject);
+begin
+  if CMyRichEdit <> nil then
+  begin
+    CMyRichEdit.CopyToClipboard;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.MenuItem3Click(Sender: TObject);
+begin
+  if CMyRichEdit <> nil then
+  begin
+    CMyRichEdit.PasteFromClipboard;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.MenuItem4Click(Sender: TObject);
+begin
+  if CMyRichEdit <> nil then
+  begin
+    CMyRichEdit.SelectAll;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.MenuItem6Click(Sender: TObject);
+begin
+  if CMyRichEdit <> nil then
+  begin
+    CMyRichEdit.Clear;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.MenuItem7Click(Sender: TObject);
+begin
+  if CMyRichEdit <> nil then
+  begin
+    FileSaveAsItem.Click;
+  end;
+
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.Search1Click(Sender: TObject);
+begin
+  ShowSearchDialog();
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ScreenshotTool1Click(Sender: TObject);
+begin
+  WindowState := wsMinimized;
+  Hide;
   sleep(100);
   ScreenshotFrm.MouseDownStart := True;
   ScreenshotFrm.MouseUpDone := True;
-  ScreenshotFrm.CopyScreenToBmp(ScreenshotFrm.Image1); // ≤∂◊Ω’˚∆¡Õº–ŒµΩform2÷–µƒimage1
-  WindowState := wsNormal; // ◊Ó–°ªØ≥Ã–Ú¥∞ø⁄
+  ScreenshotFrm.CopyScreenToBmp(ScreenshotFrm.Image1);
+  WindowState := wsNormal;
 
-  if ScreenshotFrm.ShowModal = mrOk then // ‘⁄form2÷–Ω¯––Õº∆¨≤√ºÙ
+  if ScreenshotFrm.ShowModal = mrOk then
   begin
     if ScreenshotFrm.ScreenShotBitmap <> nil then
     begin
-      // ScreenMainFrm.Image1.Picture.LoadFromClipboardFormat(CF_BITMAP, Clipboard.GetAsHandle(CF_BITMAP), 0);
       ScreenMainFrm.Image1.Picture.Assign(ScreenshotFrm.ScreenShotBitmap);
-      ScreenMainFrm.WindowState := wsNormal; // ∏¥‘≠¥∞ø⁄◊¥Ã¨
+      ScreenMainFrm.WindowState := wsNormal;
       // ScreenMainFrm.FilePath := FILE_DATA_ANN;
       // ScreenMainFrm.FileName := FStockDrawKLines.stock.GetLevelKey();
-      show();
-      ScreenMainFrm.show;
+      Show();
+      ScreenMainFrm.Show;
     end
     else
     begin
-      show();
+      Show();
     end;
   end;
 end;
 
-procedure TMainForm.ScreenshotTool2Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.ScreenshotTool2Click(Sender: TObject);
 begin
   ScreenMainFrm.WindowState := wsNormal;
-  ScreenMainFrm.show();
+  ScreenMainFrm.Show();
 end;
 
-procedure TMainForm.DataEncryption1Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.DataEncryption1Click(Sender: TObject);
 begin
-  DecryptEncryptFrm.show();
+  DecryptEncryptFrm.Show();
 end;
 
-procedure TMainForm.CRC1Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.DefaultItemClick(Sender: TObject);
 begin
-  CRCFrm.show();
+  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.Default);
 end;
 
-procedure TMainForm.ProblemFeedback1Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.DownloadUpdate1Click(Sender: TObject);
 begin
-  // »°œ˚◊Ó«∞∂Àœ‘ æ
+  DownloaderFrm.ShowModal();
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ASCIIItemClick(Sender: TObject);
+begin
+  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.ASCII);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ANSIItemClick(Sender: TObject);
+begin
+  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.ANSI);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.UTF7EncodingItemClick(Sender: TObject);
+begin
+  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.UTF7);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.UTF8EncodingItemClick(Sender: TObject);
+begin
+  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.UTF8);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.UnicodeEncodingItemClick(Sender: TObject);
+begin
+  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.Unicode);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.BigEndianUnicodeEncodingItemClick(Sender: TObject);
+begin
+  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.BigEndianUnicode);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.CRC1Click(Sender: TObject);
+begin
+  CRCFrm.Show();
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ProblemFeedback1Click(Sender: TObject);
+begin
   SetWindowPos(Handle, HWND_NOTOPMOST, Left, Top, Width, Height, 0);
   TopLevelMenuItem.Checked := false;
-  SubmitProblemFrm.show();
+  SubmitProblemFrm.Show();
 end;
 
-procedure TMainForm.Button100Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.QuickTerminalCommandsItemClick(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
+begin
+  OcComPortObj := Self.GetCurrentDevice();
+  CommandFrm.OcComPortObj := OcComPortObj;
+  CommandFrm.Show();
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.Button100Click(Sender: TObject);
 var
   s, ss: String;
   b: array of byte;
@@ -1086,7 +1499,7 @@ begin
   Memo2.Lines.Add(ss);
 end;
 
-procedure TMainForm.Button101Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button101Click(Sender: TObject);
 var
   str, s: String;
   buf: array [0 .. 1023] of byte;
@@ -1097,12 +1510,12 @@ begin
   Memo1.Lines.Append(ByteToWideString(@buf, Length(buf)));
 end;
 
-procedure TMainForm.Button102Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button102Click(Sender: TObject);
 begin
   Memo2.Clear;
 end;
 
-procedure TMainForm.Button103Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button103Click(Sender: TObject);
 var
   buffer: array [0 .. 255] of byte;
   ss: String;
@@ -1129,7 +1542,7 @@ begin
   OcComPortObj.FalconComSendData_MultiTimes(ss, 0);
 end;
 
-procedure TMainForm.Button104Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button104Click(Sender: TObject);
 var
   buffer: array [0 .. 255] of byte;
   ss: String;
@@ -1156,7 +1569,7 @@ begin
   OcComPortObj.FalconComSendData_MultiTimes(ss, 1);
 end;
 
-procedure TMainForm.Button105Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button105Click(Sender: TObject);
 var
   i, bLength: Integer;
   buffer: array [0 .. 20000] of byte;
@@ -1181,7 +1594,7 @@ begin
     Button105.Caption := Button105.Caption + ' ( ' + IntToStr(bLength) + ' ) Bytes';
 end;
 
-procedure TMainForm.Timer1Timer(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Timer1Timer(Sender: TObject);
 var
   sStr: string;
   i, j, Count, delayCount: Integer;
@@ -1207,7 +1620,7 @@ begin
         sStr := GetStringGridValidStr(StringGrid1.Cells[2, i]);
         Count := StrToInt(Trim(StringGrid1.Cells[4, i]));
         delayCount := StrToInt(Trim(StringGrid1.Cells[5, i]));
-        if Count = 0 then // ≤ªÕ£—≠ª∑∑¢ÀÕ
+        if Count = 0 then
         begin
           While (True) do
           begin
@@ -1239,8 +1652,8 @@ begin
   if Timer1.Tag <> 0 then
   begin
     Button201.Caption := 'Looping... ' + IntToStr(Button201.Tag);
-    Button201.Tag := Button201.Tag + 1; // ¥Û÷‹∆⁄—≠ª∑¥Œ ˝
-    Timer1.Enabled := True; // ºÃ–¯œ¬“ª∏ˆ¥Û÷‹∆⁄—≠ª∑
+    Button201.Tag := Button201.Tag + 1;
+    Timer1.Enabled := True;
   end
   else
   begin
@@ -1250,15 +1663,15 @@ begin
   end;
 end;
 
-procedure TMainForm.Button200Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button200Click(Sender: TObject);
 begin
   Timer1.Enabled := false;
   Timer1.Tag := 0;
 end;
 
-procedure TMainForm.Button201Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button201Click(Sender: TObject);
 var
-  i: Integer;
+  /// i: Integer;
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := Self.GetCurrentDevice(); // GetDeciceByFullName(self.GetCurrentDeviceName);
@@ -1277,7 +1690,7 @@ begin
 
   if (Timer1.Tag >= 1) or (Timer1.Enabled) then
   begin
-    MessageBox(Application.Handle, 'Looping, please stop it first£°', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    MessageBox(Application.Handle, 'Looping, please stop it firstÔøΩÔøΩ', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
   LoopingString := Button201.Caption;
@@ -1285,19 +1698,18 @@ begin
   begin
     Timer1.Enabled := false;
     Button201.Tag := 0;
-    /// ”√◊˜º∆ ˝¥Û—≠ª∑
-    /// Button201.Caption := '—≠ª∑∑¢ÀÕ—°÷–µƒƒ⁄»›';
+
     OcComPortObj_Loop := OcComPortObj;
     Timer1.Enabled := True;
   end;
 end;
 
-procedure TMainForm.Button300Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button300Click(Sender: TObject);
 begin
   Memo3.Clear;
 end;
 
-procedure TMainForm.Button301Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button301Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
   str: String;
@@ -1324,7 +1736,7 @@ begin
   end;
 
   SL := TStringList.Create;
-  // ExtractStrings([ ' '],   [],   PChar(str),   SL); ExtractStrings∫Ø ˝∑÷∏Ó◊÷∑˚¥Æ
+  // ExtractStrings([ ' '],   [],   PChar(str),   SL); ExtractStringsÔøΩÔøΩÔøΩÔøΩÔøΩ÷∏ÔøΩÔøΩ÷∑ÔøΩÔøΩÔøΩ
   AdressCount := FormatHexStrToByte2(Trim(ComboBox302.Text), Addressb);
   WantReadCount := StrToInt(Trim(ComboBox303.Text));
   str := '';
@@ -1369,7 +1781,7 @@ begin
   SL.Free;
 end;
 
-procedure TMainForm.Button302Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Button302Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
   FileStream: TFileStream;
@@ -1419,11 +1831,8 @@ begin
   end;
 
   ComboBox301.ItemIndex := 0;
-  /// octopus –≠“È∑¢ÀÕŒƒº˛
   ComboBox2.ItemIndex := Ord(OctopusProtocol);
-  /// …Ë÷√Ω” ’–≠“È
   ComboBox2.OnChange(Self);
-  /// …Ë÷√–≠“ÈΩ” ’∏Ò Ω
 
   if IsHexFile(FileNameLoaded) then
   begin
@@ -1445,17 +1854,17 @@ begin
   FileStream := nil;
 end;
 
-procedure TMainForm.FindDialog1Close(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FindDialog1Close(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := Self.GetCurrentDevice();
   if OcComPortObj <> nil then
     OcComPortObj.LogScrollMode := True;
-  Self.show;
+  Self.Show;
 end;
 
-procedure TMainForm.FindDialog1Find(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FindDialog1Find(Sender: TObject);
 var
   FindStr: String;
   OcComPortObj: TOcComPortObj;
@@ -1467,13 +1876,13 @@ begin
   with Sender as TFindDialog do
   begin
     FindStr := FindText;
-    if (OcComPortObj = nil) or (OcComPortObj.LogMemo = nil) or (OcComPortObj.LogMemo.Parent = nil) then
+    if (OcComPortObj = nil) or (OcComPortObj.LogObject = nil) or (OcComPortObj.LogObject.Parent = nil) then
     begin
       Memo := Self.CMyRichEdit;
     end
     else
     begin
-      Memo := OcComPortObj.LogMemo;
+      Memo := OcComPortObj.LogObject;
     end;
     if Memo = nil then
       exit;
@@ -1487,7 +1896,7 @@ begin
     begin
       if frDown in Options then
       begin
-        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the beginning of the file£ø')), PChar(Application.Title), MB_YESNO) = ID_YES then
+        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the beginning of the fileÔøΩÔøΩ')), PChar(Application.Title), MB_YESNO) = ID_YES then
         begin
           Memo.SelStart := 0;
           goto ReStart;
@@ -1495,7 +1904,7 @@ begin
       end
       else
       begin
-        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the end of the file£ø       ')), PChar(Application.Title), MB_YESNO) = ID_YES then
+        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the end of the fileÔøΩÔøΩ       ')), PChar(Application.Title), MB_YESNO) = ID_YES then
         begin
           Memo.SelStart := Memo.GetTextLen;
           goto ReStart;
@@ -1505,7 +1914,7 @@ begin
   end;
 end;
 
-procedure TMainForm.FindDialog1Show(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.FindDialog1Show(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
@@ -1515,7 +1924,7 @@ begin
   OcComPortObj.LogScrollMode := false;
 end;
 
-procedure TMainForm.WelcomeAndHelp1Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.WelcomeAndHelp1Click(Sender: TObject);
 var
   Types: Integer;
   str: String;
@@ -1529,9 +1938,9 @@ begin
   if Self.WebBrowser <> nil then
   begin
     Types := INTERNET_CONNECTION_MODEM + INTERNET_CONNECTION_LAN + INTERNET_CONNECTION_PROXY;
-    str := 'file:///' + ExtractFileDir(Application.Exename) + '\Octopus Software ®C ’¬”„¥Æø⁄÷˙ ÷.html';
+    str := 'file:///' + ExtractFileDir(Application.Exename) + '\Octopus Software.html';
     if CheckUrl('http://www.baidu.com') then
-    // if internetGetConnectedState(@types,0) then
+    /// if internetGetConnectedState(@types,0) then
     begin
       str := ByteToWideString(@testbuff, Length(testbuff));
     end;
@@ -1539,17 +1948,17 @@ begin
   end;
 end;
 
-procedure TMainForm.HelpAbout(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.HelpAbout(Sender: TObject);
 begin
   with TAboutBox.Create(Self) do
-  try
-    ShowModal;
-  finally
-    Free;
-  end;
+    try
+      ShowModal;
+    finally
+      Free;
+    end;
 end;
 
-procedure TMainForm.HelpMenuClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.HelpMenuClick(Sender: TObject);
 begin
   case SettingPagesDlg.ComboBox8.ItemIndex of
     0:
@@ -1565,54 +1974,103 @@ begin
   end;
 end;
 
-procedure TMainForm.EnglishMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.HexModeItemClick(Sender: TObject);
+/// var
+/// OcComPortObj: TOcComPortObj;
+begin
+  /// OcComPortObj := Self.GetCurrentDevice();
+  if CMyRichEdit <> nil then
+  begin
+    HexModeItem.Checked := not HexModeItem.Checked;
+    CMyRichEdit.SetHexadecimalMode(HexModeItem.Checked);
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.Encoding1Click(Sender: TObject);
+begin
+  DefaultItem.Checked := false;
+  ASCIIItem.Checked := false;
+  ANSIItem.Checked := false;
+  UTF7EncodingItem.Checked := false;
+  UTF8EncodingItem.Checked := false;
+  UnicodeEncodingItem.Checked := false;
+  BigEndianUnicodeEncodingItem.Checked := false;
+  if CMyRichEdit <> nil then
+  begin
+    if CMyRichEdit.Lines.Encoding = TEncoding.Default then
+      DefaultItem.Checked := True
+    else if CMyRichEdit.Lines.Encoding = TEncoding.ASCII then
+      ASCIIItem.Checked := True
+    else if CMyRichEdit.Lines.Encoding = TEncoding.ANSI then
+      ANSIItem.Checked := True
+    else if CMyRichEdit.Lines.Encoding = TEncoding.UTF7 then
+      UTF7EncodingItem.Checked := True
+    else if CMyRichEdit.Lines.Encoding = TEncoding.UTF8 then
+      UTF8EncodingItem.Checked := True
+    else if CMyRichEdit.Lines.Encoding = TEncoding.Unicode then
+      UnicodeEncodingItem.Checked := True
+    else if CMyRichEdit.Lines.Encoding = TEncoding.BigEndianUnicode then
+      BigEndianUnicodeEncodingItem.Checked := True
+    else
+      DefaultItem.Checked := True;
+  end
+  else
+    DefaultItem.Checked := True;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.EnglishMenuItemClick(Sender: TObject);
 begin
   SettingPagesDlg.LoadLaunguageFromFile(Self, SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini', false);
   SettingPagesDlg.ComboBox8.ItemIndex := 0;
 end;
 
-procedure TMainForm.ChineseMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.ChineseMenuItemClick(Sender: TObject);
 begin
   SettingPagesDlg.LoadLaunguageFromFile(Self, SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini', false);
   SettingPagesDlg.ComboBox8.ItemIndex := 1;
 end;
 
-procedure TMainForm.ViewMenuClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.CloseTheDevice1Click(Sender: TObject);
+begin
+  ToolButton13.Click;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ViewMenuClick(Sender: TObject);
 begin
   UpdateMainMenu();
 end;
 
-procedure TMainForm.LptatpMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.LptatpMenuItemClick(Sender: TObject);
 begin
   Self.PageControl1.TabPosition := tpTop;
 end;
 
-procedure TMainForm.LptabpMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.LptabpMenuItemClick(Sender: TObject);
 begin
   Self.PageControl1.TabPosition := tpBottom;
 end;
 
-procedure TMainForm.LptalpMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.LptalpMenuItemClick(Sender: TObject);
 begin
   Self.PageControl1.TabPosition := tpLeft;
 end;
 
-procedure TMainForm.RptatpMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RptatpMenuItemClick(Sender: TObject);
 begin
   Self.PageControl2.TabPosition := tpTop;
 end;
 
-procedure TMainForm.RptarpMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RptarpMenuItemClick(Sender: TObject);
 begin
   Self.PageControl2.TabPosition := tpRight;
 end;
 
-procedure TMainForm.RptabpMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.RptabpMenuItemClick(Sender: TObject);
 begin
   Self.PageControl2.TabPosition := tpBottom;
 end;
 
-procedure TMainForm.TopLevelMenuItemClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.TopLevelMenuItemClick(Sender: TObject);
 begin
   TopLevelMenuItem.Checked := not TopLevelMenuItem.Checked;
   if TopLevelMenuItem.Checked then
@@ -1625,24 +2083,26 @@ begin
   end;
 end;
 
-procedure TMainForm.SettingItem1Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SettingItem1Click(Sender: TObject);
 begin
-  SettingPagesDlg.ShowModal();
+  SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
+  ///SettingPagesDlg.ShowModal();
+  SettingPagesDlg.Show();
   InitUartsParameters();
   UpdateUartToolBar();
-  if SettingPagesDlg <> nil then
-  begin
-    Self.AlphaBlend := SettingPagesDlg.AlphaBlend;
-    Self.AlphaBlendValue := SettingPagesDlg.AlphaBlendValue;
-  end;
+  AlphaBlend := SettingPagesDlg.AlphaBlend;
+  AlphaBlendValue := SettingPagesDlg.AlphaBlendValue;
+
+  CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
+  SynchroSetMyRichEditFont(CMyRichEdit, CMyRichEdit.FStyle);
 end;
 
-procedure TMainForm.SettingItem2Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SettingItem2Click(Sender: TObject);
 begin
   SettingItem1.Click;
 end;
 
-procedure TMainForm.SkinsMenuClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SkinsMenuClick(Sender: TObject);
 var
   i: Integer;
 begin
@@ -1672,7 +2132,7 @@ begin
   end;
 end;
 
-procedure TMainForm.ToggleSwitchDeviceOnOffClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.ToggleSwitchDeviceOnOffClick(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
@@ -1681,12 +2141,25 @@ begin
   begin
     if ToggleSwitchDeviceOnOff.IsOn then
     begin
+      ComboBox1.OnChange(Self);
+      ComboBox2.OnChange(Self);
       SettingPagesDlg.openDevice(OcComPortObj);
       ToggleSwitchDeviceOnOff.ThumbColor := clRed;
     end
     else
     begin
       SettingPagesDlg.closeDevice(OcComPortObj);
+      ToggleSwitchDeviceOnOff.ThumbColor := clWindowText;
+    end;
+
+    if OcComPortObj.Connected then
+    begin
+      ToggleSwitchDeviceOnOff.State := tssOn;
+      ToggleSwitchDeviceOnOff.ThumbColor := clRed;
+    end
+    else
+    begin
+      ToggleSwitchDeviceOnOff.State := tssOff;
       ToggleSwitchDeviceOnOff.ThumbColor := clWindowText;
     end;
   end
@@ -1697,19 +2170,19 @@ begin
   end;
 end;
 
-procedure TMainForm.Splitter1Moved(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.Splitter1Moved(Sender: TObject);
 begin
   AdjustUI();
 end;
 
-procedure TMainForm.COM1MenuItemOnClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.COM1MenuItemOnClick(Sender: TObject);
 var
   PageName: String;
 begin
   GetAndOpenADevices(SettingPagesDlg.getDeciceByIndex((TMenuItem(Sender)).Tag));
 end;
 
-procedure TMainForm.ComboBox1Change(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.ComboBox1Change(Sender: TObject);
 var
   str: String;
   btl: Integer;
@@ -1724,30 +2197,54 @@ begin
   end;
 
   if (ComboBox1.ItemIndex <= MAX_BAUDRATE_INDEX) then // High(TBaudRate))
-  begin // ≈‰÷√ƒ⁄÷√≤®Ãÿ¬   1 .. 15
-    OcComPortObj.BaudRate := TBaudRate(ComboBox1.ItemIndex); // »°ƒ⁄÷√≤®Ãÿ¬ 
+  begin
+    OcComPortObj.BaudRate := TBaudRate(ComboBox1.ItemIndex);
     // OcComPortObj.BaudRateIndex := ComboBox1.ItemIndex;
   end
   else
-  begin // ≈‰÷√◊‘∂®“Â≤®Ãÿ¬ 
+  begin
     OcComPortObj.BaudRate := TBaudRate(0);
     OcComPortObj.CustomBaudRate := StrToInt(ComboBox1.Text);
   end;
 end;
 
-procedure TMainForm.ComboBox2Change(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.ComboBox2Change(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := Self.GetCurrentDevice();
-  if OcComPortObj = nil then // √ª”–…Ë±∏
+  if OcComPortObj = nil then
     exit;
   /// if (ComboBox2.ItemIndex = Ord(Graphic)) then
   /// OcComPortObj.FastLineSeries := self.CharInitSeries(True);
   OcComPortObj.ReceiveFormat := ComboBox2.ItemIndex;
 end;
 
-procedure TMainForm.ToolButton12Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.ConverttoAnsi1Click(Sender: TObject);
+begin
+  if CMyRichEdit <> nil then
+  begin
+    CMyRichEdit.ConvertEncoding(TEncoding.ANSI);
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ConverttoUTF81Click(Sender: TObject);
+begin
+  if CMyRichEdit <> nil then
+  begin
+    CMyRichEdit.ConvertEncoding(TEncoding.UTF8);
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ConverttoUTF82Click(Sender: TObject);
+begin
+  if CMyRichEdit <> nil then
+  begin
+    CMyRichEdit.ConvertToUTF8WithBOM();
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ToolButton12Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
@@ -1759,29 +2256,41 @@ begin
   end;
 end;
 
-procedure TMainForm.ToolButton13Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.ToolButton13Click(Sender: TObject);
 begin
   GetAndRemoveDevices(Self.GetCurrentPageName());
   UpdateUartToolBar();
 end;
 
-procedure TMainForm.ToolButton16Click(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.ToolButton16Click(Sender: TObject);
 begin
   SettingItem1.Click;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ToolButton19Click(Sender: TObject);
+begin
+
 end;
 
 /// ///////////////////////////////////////////////////////////////////////////////
 /// ///////////////////////////////////////////////////////////////////////////////
 /// init
-procedure TMainForm.InitMainUI();
+procedure TMainOctopusDebuggingDevelopmentForm.InitMainUI();
 begin
   ToggleSwitchDeviceOnOff.Height := 25;
   StandardToolBar2.Height := 33;
+  Application.Title := APPLICATION_TITLE_NAME;
+  Self.Caption := APPLICATION_TITLE_NAME;
+  Self.Icon := Application.Icon;
+  Application.OnHint := ShowHint;
+
   if SettingPagesDlg = nil then
   begin
     SettingPagesDlg := TSettingPagesDlg.Create(nil);
     SettingPagesDlg.SettingChangedCallBackFuntion := Self.SettingChangedCallBackFuntion;
   end;
+  Self.Caption := APPLICATION_TITLE_NAME + ' (' + SettingPagesDlg.VersionNumberStr + ')';
+
   CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   FileOpenCmd.Dialog.InitialDir := ExtractFilePath(ParamStr(0));
   FileSaveAsCmd.Dialog.InitialDir := FileOpenCmd.Dialog.InitialDir;
@@ -1789,20 +2298,12 @@ begin
   // SetFileName(sUntitled);
   GetFontNames;
   SelectionChange(Self);
-
-  if CMyRichEdit <> nil then
-  begin
-    CurrText.Name := string(DefFontData.Name);
-    CurrText.Size := -MulDiv(DefFontData.Height, 72, Screen.PixelsPerInch);
-    RichEditTransparentItem.Checked := CMyRichEdit.Transparent;
-    RichEditWordWrapItem.Checked := CMyRichEdit.ScrollBars = ssVertical;
-  end;
-
   UpdateMainMenu();
   AdjustUI();
+
 end;
 
-procedure TMainForm.UpdateMainMenu();
+procedure TMainOctopusDebuggingDevelopmentForm.UpdateMainMenu();
 begin
   FormatToolBarMenuItem1.Checked := StandardToolBar1.Visible;
   FormatToolBarMenuItem2.Checked := StandardToolBar2.Visible;
@@ -1828,9 +2329,12 @@ begin
     RptabpMenuItem.Checked := True;
   if Self.PageControl2.TabPosition = tpRight then
     RptarpMenuItem.Checked := True;
+
+  if (CMyRichEdit <> nil) then
+    ShowLinesNumberItem.Checked := CMyRichEdit.FShowLinesNumber;
 end;
 
-procedure TMainForm.AdjustUI();
+procedure TMainOctopusDebuggingDevelopmentForm.AdjustUI();
 begin
   Button100.Width := Memo1.Width;
   Button101.Width := Button100.Width;
@@ -1849,7 +2353,21 @@ begin
   Button301.Width := Button302.Width - Button300.Width - 2;
 end;
 
-procedure TMainForm.UpdateUartToolBar();
+procedure TMainOctopusDebuggingDevelopmentForm.InitUserConfiguration();
+begin
+  if (CMyRichEdit <> nil) then
+  begin
+    /// CurrText.Name := string(DefFontData.Name);
+    /// CurrText.Size := -MulDiv(DefFontData.Height, 72, Screen.PixelsPerInch);
+    /// CurrText.Name := FontDialog.Font.Name;
+    /// CurrText.Size := FontDialog.Font.Size;
+    RichEditTransparentItem.Checked := CMyRichEdit.Transparent;
+    RichEditWordWrapItem.Checked := CMyRichEdit.ScrollBars = ssVertical;
+    CMyRichEdit.WordWrap := RichEditWordWrapItem.Checked;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.UpdateUartToolBar();
 var
   OcComPortObj: TOcComPortObj;
 begin
@@ -1883,7 +2401,7 @@ begin
   end;
 end;
 
-procedure TMainForm.InitSkinsMenu(ParentMenu: TMenuItem; OnClicEvent: TOnClicEvent);
+procedure TMainOctopusDebuggingDevelopmentForm.InitSkinsMenu(ParentMenu: TMenuItem; OnClicEvent: TOnClicEvent);
 var
   i: Integer;
   MenuItem: TMenuItem;
@@ -1899,7 +2417,7 @@ begin
   end;
 end;
 
-procedure TMainForm.SkinsMenuOnClick(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SkinsMenuOnClick(Sender: TObject);
 var
   str: String;
 begin;
@@ -1918,7 +2436,7 @@ end;
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// StringGridL
-function TMainForm.GetStringGridValidStr(sStr: String): String;
+function TMainOctopusDebuggingDevelopmentForm.GetStringGridValidStr(sStr: String): String;
 var
   strstr: String;
   Pos: Integer;
@@ -1937,7 +2455,7 @@ begin
     Result := Trim(strstr)
 end;
 
-procedure TMainForm.InitStringGrid();
+procedure TMainOctopusDebuggingDevelopmentForm.InitStringGrid();
 var
   bmp: TBitmap;
   i: Integer;
@@ -1978,7 +2496,7 @@ begin
 
   StringGrid1.RowCount := 520;
   StringGrid1.DefaultRowHeight := 28;
-  StringGrid1.ColCount := 7;
+  StringGrid1.ColCount := 6;
   StringGrid1.ColWidths[0] := 50;
   StringGrid1.ColWidths[1] := 50;
   StringGrid1.ColWidths[2] := 300;
@@ -1988,13 +2506,13 @@ begin
   StringGrid1.FixedCols := 2;
   StringGrid1.FixedRows := 1;
 
-  StringGrid1.Cells[0, 0] := 'STRING';
+  StringGrid1.Cells[0, 0] := 'TEXT';
   StringGrid1.Cells[1, 0] := 'BYTE';
-  StringGrid1.Cells[2, 0] := 'Content For Sending';
+  StringGrid1.Cells[2, 0] := 'CONTENT FOR SENDING';
 
-  StringGrid1.Cells[4, 0] := 'Loop';
+  StringGrid1.Cells[4, 0] := 'LOOP';
   StringGrid1.Cells[5, 0] := 'MS';
-  StringGrid1.Cells[6, 0] := 'Comments';
+  /// StringGrid1.Cells[6, 0] := 'Comments';
   StringGrid1.Align := alClient;
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
@@ -2008,7 +2526,7 @@ begin
 
 end;
 
-procedure TMainForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
 begin
   try
     if (ACol = CHECKCOL) and (ARow > 0) then
@@ -2030,7 +2548,7 @@ begin
   end;
 end;
 
-procedure TMainForm.StringGrid1FixedCellClick(Sender: TObject; ACol, ARow: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1FixedCellClick(Sender: TObject; ACol, ARow: Integer);
 var
   str: String;
   OcComPortObj: TOcComPortObj;
@@ -2038,9 +2556,9 @@ begin
   if ARow <= 0 then
   begin
     // if ACol = 0 then
-    // MessageBox(Application.Handle, PChar('’‚“ª¡–∑¢ÀÕ◊÷∑˚¥Æ'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    // MessageBox(Application.Handle, PChar('ÔøΩÔøΩ“ªÔøΩ–∑ÔøΩÔøΩÔøΩÔøΩ÷∑ÔøΩÔøΩÔøΩ'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     // if ACol = 1 then
-    // MessageBox(Application.Handle, PChar('’‚“ª¡–∑¢ÀÕ◊÷Ω⁄£® Æ¡˘Ω¯÷∆£©'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    // MessageBox(Application.Handle, PChar('ÔøΩÔøΩ“ªÔøΩ–∑ÔøΩÔøΩÔøΩÔøΩ÷Ω⁄£ÔøΩ ÆÔøΩÔøΩÔøΩÔøΩÔøΩ∆£ÔøΩ'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
@@ -2070,7 +2588,7 @@ begin
   end;
 end;
 
-procedure TMainForm.StringGrid1KeyPress(Sender: TObject; var Key: Char);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1KeyPress(Sender: TObject; var Key: Char);
 begin
   if (StringGrid1.Col = 4) or (StringGrid1.Col = 5) then
   begin
@@ -2079,7 +2597,7 @@ begin
   end;
 end;
 
-procedure TMainForm.StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   StringGrid1_Col, StringGrid1_Row: Integer;
 begin
@@ -2091,7 +2609,7 @@ begin
     StringGrid1.Col := DATACOL;
 end;
 
-procedure TMainForm.StringGrid1MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   StringGrid1_Col, StringGrid1_Row: Integer;
 begin
@@ -2100,25 +2618,25 @@ begin
     StringGrid1.Col := DATACOL;
 end;
 
-procedure TMainForm.StringGrid1MouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1MouseWheelDown(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
   if StringGrid1.Col <> 2 then
     StringGrid1.Col := 2;
   // Handled:=true;
 end;
 
-procedure TMainForm.StringGrid1MouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1MouseWheelUp(Sender: TObject; Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
   if StringGrid1.Col <> 2 then
     StringGrid1.Col := 2;
 end;
 
-procedure TMainForm.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
 begin
   // StringGrid1.MouseToCell(X, Y, StringGrid1_Col, StringGrid1_Row);
   with StringGrid1 do
   begin
-    if ACol = CHECKCOL then // ∂‡—°œÓ¡–≤ª±‡º≠≤ª—°÷–
+    if ACol = CHECKCOL then
     begin
       Options := Options - [goEditing];
       Options := Options + [goRowSelect];
@@ -2135,7 +2653,7 @@ begin
   end;
 end;
 
-procedure TMainForm.StringGridSelectCell(ACol, ARow: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.StringGridSelectCell(ACol, ARow: Integer);
 var
   GridRect: TGridRect;
 begin
@@ -2165,7 +2683,7 @@ begin
   StringGrid1.EndUpdate;
 end;
 
-procedure TMainForm.StringGridSave();
+procedure TMainOctopusDebuggingDevelopmentForm.StringGridSave();
 var
   Octopusini: TIniFile;
   s: String;
@@ -2184,7 +2702,7 @@ begin
   end;
 end;
 
-procedure TMainForm.StringGridLoad();
+procedure TMainOctopusDebuggingDevelopmentForm.StringGridLoad();
 var
   Octopusini: TIniFile;
   s: String;
@@ -2206,19 +2724,19 @@ end;
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// uart
-procedure TMainForm.InitUartsParameters();
-var
-  i: Integer;
+procedure TMainOctopusDebuggingDevelopmentForm.InitUartsParameters();
+/// var
+/// i: Integer;
 begin
   // Self.ComboBoxEx1.Images := SettingPagesDlg.ComboBoxEx1.Images;
   // Self.ComboBoxEx1.Items := SettingPagesDlg.ComboBoxEx1.Items;
 
   Self.ComboBox1.Items := SettingPagesDlg.ComboBox1.Items;
-  /// Self.ComboBox1.Items.Delete(0); // …æµÙ◊‘∂®“Â≤®Ãÿ¬ 
+  /// Self.ComboBox1.Items.Delete(0); // …æÔøΩÔøΩÔøΩ‘∂ÔøΩÔøΩÂ≤®ÔøΩÔøΩÔøΩÔøΩ
   Self.ComboBox2.Items := SettingPagesDlg.ComboBox7.Items;
 end;
 
-procedure TMainForm.InitUartsMenu(ParentMenu: TMenuItem; OnClicEvent: TOnClicEvent);
+procedure TMainOctopusDebuggingDevelopmentForm.InitUartsMenu(ParentMenu: TMenuItem; OnClicEvent: TOnClicEvent);
 var
   i: Integer;
   MenuItem: TMenuItem;
@@ -2247,7 +2765,7 @@ end;
 /// Result := ComboBoxEx1.Items[ComboBoxEx1.ItemIndex];
 /// end;
 
-function TMainForm.GetCurrentPageName(): String;
+function TMainOctopusDebuggingDevelopmentForm.GetCurrentPageName(): String;
 begin
   if Self.PageControl1.PageCount > 0 then
     Result := Self.PageControl1.GetActivePageName
@@ -2255,7 +2773,7 @@ begin
     Result := '';
 end;
 
-function TMainForm.GetCurrentDevice(): TOcComPortObj;
+function TMainOctopusDebuggingDevelopmentForm.GetCurrentDevice(): TOcComPortObj;
 var
   OcComPortObj: TOcComPortObj;
   ActivePageName: String;
@@ -2265,76 +2783,57 @@ begin
   Result := OcComPortObj;
 end;
 
-procedure TMainForm.GetAndOpenADevices(DeviceName: String);
+procedure TMainOctopusDebuggingDevelopmentForm.GetAndRemoveDevices(DeviceName: String);
 var
   OcComPortObj: TOcComPortObj;
-  PageIndex: Integer;
+  ActivePageIndex: Integer;
 begin
   OcComPortObj := SettingPagesDlg.GetDeciceByFullName(DeviceName);
-  if OcComPortObj = nil then
-    exit;
-
-  CreateMyObjectPage(OcComPortObj.ComportFullName, 0);
-  OcComPortObj.LogMemo := PageControl1.GetEdit(OcComPortObj.ComportFullName);
-  OcComPortObj.CallBackFun := OcComPortObjCallBack;
-  if not OcComPortObj.Connected then
+  if OcComPortObj <> nil then
   begin
-    SettingPagesDlg.openDevice(OcComPortObj);
-    Self.UpdateUartToolBar();
+    SettingPagesDlg.closeDevice(DeviceName);
   end;
-end;
-
-procedure TMainForm.GetAndOpenADevices(OcComPortObj: TOcComPortObj);
-var
-  PageIndex: Integer;
-begin
-  if OcComPortObj = nil then
-    exit;
-
-  CreateMyObjectPage(OcComPortObj.ComportFullName, 0);
-  OcComPortObj.LogMemo := PageControl1.GetEdit(OcComPortObj.ComportFullName);
-  OcComPortObj.CallBackFun := OcComPortObjCallBack;
-
-  if not OcComPortObj.Connected then
-  begin
-    SettingPagesDlg.openDevice(OcComPortObj);
-    Self.UpdateUartToolBar();
-  end;
-end;
-
-procedure TMainForm.GetAndRemoveDevices(DeviceName: String);
-var
-  OcComPortObj: TOcComPortObj;
-begin
-  OcComPortObj := SettingPagesDlg.GetDeciceByFullName(DeviceName);
-  if OcComPortObj = nil then
-    exit;
-
-  SettingPagesDlg.closeDevice(DeviceName);
+  ActivePageIndex := PageControl1.ActivePageIndex;
   PageControl1.DeletePage(DeviceName);
+  ActivePageIndex := Max(0, PageControl1.PageCount - 1);
+  PageControl1.ActivePageIndex := ActivePageIndex;
   CMyRichEdit := nil;
 end;
 
-procedure TMainForm.InitAllUartDevices();
+procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(DeviceName: String);
 var
-  i: Integer;
   OcComPortObj: TOcComPortObj;
+  PageIndex: Integer;
 begin
-  WelcomeAndHelp1.Click;
-  for i := 0 to SettingPagesDlg.ComboBoxEx1.Items.Count - 1 do
+  OcComPortObj := SettingPagesDlg.GetDeciceByFullName(DeviceName);
+  if OcComPortObj = nil then
+    exit;
+  GetAndOpenADevices(OcComPortObj);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(OcComPortObj: TOcComPortObj);
+var
+  PageIndex: Integer;
+  MyRichEdit: TMyRichEdit;
+begin
+  if OcComPortObj = nil then
+    exit;
+  CreateMyObjectPage(OcComPortObj.ComportFullName, 0);
+  MyRichEdit := PageControl1.GetEdit(OcComPortObj.ComportFullName);
+  MyRichEdit.FStyle := 1;
+  OcComPortObj.SetLogComponent(MyRichEdit);
+  OcComPortObj.SetMsgCallbackFunction(OcComPortObjCallBack);
+  OcComPortObj.SetCacheComponent(Self);
+  OcComPortObj.SaveLog(SettingPagesDlg.OctopusCfgDir_LogFilePath);
+  SynchroSetMyRichEditFont(MyRichEdit, MyRichEdit.FStyle);
+  if not OcComPortObj.Connected then
   begin
-    OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
-    if OcComPortObj = nil then
-      exit;
-    CreateMyObjectPage(OcComPortObj.ComportFullName, 0);
-    OcComPortObj.LogMemo := PageControl1.GetEdit(OcComPortObj.ComportFullName);
-    ShowStartComments(OcComPortObj);
-    if i >= 10 then
-      break;
+    SettingPagesDlg.openDevice(OcComPortObj);
+    Self.UpdateUartToolBar();
   end;
 end;
 
-procedure TMainForm.CreateMyObjectPage(PageName: String; PageType: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.CreateMyObjectPage(PageName: String; PageType: Integer);
 var
   MyRichEdit: TMyRichEdit;
   PageIndex: Integer;
@@ -2349,6 +2848,21 @@ begin
     begin
       MyRichEdit.OnClick := Self.RichEditorClick;
       MyRichEdit.OnLinkClick := Self.RichEditorLinkClick;
+      MyRichEdit.PopupMenu := Self.PopupMenu1;
+      MyRichEdit.PlainText := false;
+      MyRichEdit.ParentFont := false;
+      MyRichEdit.SpellChecking := True;
+      /// Ëøô‰∏™Â±ûÊÄßÂè™Âú®Memo„ÄÅRichEditÂíåDBMemoÁªÑ‰ª∂‰∏≠‰ΩøÁî®„ÄÇÈÄöÂ∏∏Âú®ÂàáÊç¢ÂΩìÂâçÁÑ¶ÁÇπÊéß‰ª∂Êó∂ÔºåÊàë‰ª¨ÈÄöÂ∏∏‰ΩøÁî®TabÈîÆ„ÄÇ
+      /// ‰ΩÜÂú®‰∏äËø∞‰∏âÁßçÁªÑ‰ª∂‰∏≠ÔºåÁºñËæëÊñáÊú¨Êó∂Â∏∏Áî®TabÈîÆÊù•Ë∑≥ËøáËã•Âπ≤‰∏™Á©∫Ê†º‰ΩøÊñáÊú¨ÂØπÈΩêÔºåËøôÊó∂Â∞±‰ºöÊúâÂÜ≤Á™Å„ÄÇ
+      /// ÊâÄ‰ª•Â∫îÂ∞ÜWantTabsËÆæÁΩÆ‰∏∫TrueÔºåËøôÊ†∑Â≠êÂú®ÁªÑ‰ª∂ÂÜÖÂ∞±ÂèØ‰ª•‰ΩøÁî®TabÈîÆÊù•ÁºñËæëÊñáÊú¨„ÄÇ
+      MyRichEdit.WantTabs := True;
+      /// ÈúÄË¶ÅÂõûËΩ¶ÈîÆÔºåÂê¶ÂàôÊó†Ê≥ïÂõûËΩ¶Êç¢Ë°å
+      MyRichEdit.WantReturns := True;
+      /// Áî®‰∫éËÆæÂÆöMomoÁªÑ‰ª∂ÊòØÂê¶ÂÖ∑ÊúâËá™Âä®ÊäòË°åÂäüËÉΩ„ÄÇ
+      MyRichEdit.WordWrap := false;
+
+      MyRichEdit.OnChange := nil;
+      MyRichEdit.OnSelectionChange := Self.SelectionChange;
     end;
   end;
   if (PageType = 1) and (WebBrowser = nil) then
@@ -2357,20 +2871,63 @@ begin
   end;
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.InitAllUartDevices();
+var
+  i: Integer;
+  OcComPortObj: TOcComPortObj;
+  MyRichEdit: TMyRichEdit;
+begin
+  WelcomeAndHelp1.Click;
+  if ParamStr(1) <> '' then
+    exit;
+  /// Â§ñÈÉ®ÂèÇÊï∞ÂêØÂä®Ôºå‰Ωú‰∏∫ÊñáÊú¨ÁºñËæëÂô®Âô®‰ΩøÁî®Ôºå‰∏çÈúÄË¶ÅÊâìÂºÄÁ´ØÂè£
+
+  for i := 0 to SettingPagesDlg.ComboBoxEx1.Items.Count - 1 do
+  begin
+    OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
+    if OcComPortObj = nil then
+      exit;
+    CreateMyObjectPage(OcComPortObj.ComportFullName, 0);
+    MyRichEdit := PageControl1.GetEdit(OcComPortObj.ComportFullName);
+    MyRichEdit.FStyle := 1;
+    OcComPortObj.SetLogComponent(MyRichEdit);
+    OcComPortObj.SetMsgCallbackFunction(OcComPortObjCallBack);
+    OcComPortObj.SetCacheComponent(Self);
+
+    ShowStartComments(OcComPortObj);
+    SynchroSetMyRichEditFont(MyRichEdit, MyRichEdit.FStyle);
+
+    OcComPortObj.SaveLog(SettingPagesDlg.OctopusCfgDir_LogFilePath);
+    if i >= 5 then
+      break;
+  end;
+
+end;
+
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// uart call back
-procedure TMainForm.OcComPortObjCallBack(Count: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.OcComPortObjCallBack(Count: Integer);
 begin
   StatusBarPrintFileSize();
 end;
 
-Procedure TMainForm.SettingChangedCallBackFuntion(Obj: TObject);
+Procedure TMainOctopusDebuggingDevelopmentForm.SettingChangedCallBackFuntion(Obj: TObject);
 begin
   UpdateUartToolBar();
 end;
 
-procedure TMainForm.StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.EventCallBackFuntion(Obj: TObject);
+begin
+  try
+    StatusBar1.Panels[1].Text := 'error!';
+    TMyRichEdit(Obj).Font := FontDialog.Font;
+    TMyRichEdit(Obj).SelStart := MaxInt;
+  finally
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
 begin
   StatusBar1.Panels[1].Style := psOwnerDraw;
   Self.Fprogress := progress;
@@ -2378,7 +2935,7 @@ begin
   StatusBar1.Repaint;
 end;
 
-procedure TMainForm.StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
+procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
 var
   X: Integer;
   str: String;
@@ -2411,12 +2968,12 @@ begin
       end;
     end;
   Except
-    showmessage('Œ¥÷™¥ÌŒÛ£°£°');
+    showmessage('unknow error!');
   end;
 
 end;
 
-procedure TMainForm.StatusBarPrintFileSize();
+procedure TMainOctopusDebuggingDevelopmentForm.StatusBarPrintFileSize();
 var
   OcComPortObj: TOcComPortObj;
 begin
@@ -2424,37 +2981,43 @@ begin
   if (OcComPortObj = nil) then
     exit;
   StatusBar1.Panels.BeginUpdate;
-  if (OcComPortObj.LogMemo <> nil) and (OcComPortObj.Connected) then
+  if (OcComPortObj.LogObject <> nil) then /// and (OcComPortObj.Connected)
   begin
 
-    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes | ' +
-      'Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + IntToStr(Length(OcComPortObj.LogMemo.Text)) + ' Bytes | ' + 'Line: ' +
-      IntToStr(OcComPortObj.LogMemo.CaretPos.Y) + ' | ' + 'Lines: ' + IntToStr(OcComPortObj.LogMemo.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
+    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port +
+    ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes' +
+    ' | Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes' +
+    ' | Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes' +
+    ' | Total: ' + IntToStr(Length(OcComPortObj.LogObject.Text)) + ' Bytes' +
+    ' | Line: ' +  IntToStr(OcComPortObj.LogObject.CaretPos.Y)  +
+    ' | Lines: ' + IntToStr(OcComPortObj.LogObject.Lines.Count) +
+    ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
+
     // StatusBar1.Panels.EndUpdate;
   end
   else
   begin
-    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes | ' +
-      'Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + IntToStr(Length(Memo1.Text)) + ' Bytes | ' + 'Line: ' + IntToStr(Memo1.CaretPos.Y) + ' | ' + 'Lines: ' +
-      IntToStr(Memo1.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
+    /// StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes | ' + 'Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes | ' +
+    /// 'Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes | ' + 'Total: ' + IntToStr(Length(Memo1.Text)) + ' Bytes | ' + 'Line: ' + IntToStr(Memo1.CaretPos.Y) + ' | ' + 'Lines: ' +
+    /// IntToStr(Memo1.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
   end;
   StatusBar1.Panels.EndUpdate;
-  StatusBar1.Update;
-  Application.ProcessMessages;
+  ///StatusBar1.Update;
+  ///Application.ProcessMessages;
 end;
 
-procedure TMainForm.ShowStartComments(OcComPortObj: TOcComPortObj);
+procedure TMainOctopusDebuggingDevelopmentForm.ShowStartComments(OcComPortObj: TOcComPortObj);
 begin
   OcComPortObj.DebugLog('#################################################################');
   // OcComPortObj.DebugLog(APPLICATION_TITLE + FVersionNumberStr);
   OcComPortObj.DebugLog('Octopus Serial Port Debugging And Development Assistant ' + FVersionNumberStr);
-  OcComPortObj.DebugLog('Home Page :' + WEB_SITE + ' ');
-  // OcComPortObj.DebugLog('Function  :' + 'ESC°¢F1°¢F2°¢F3');
+  OcComPortObj.DebugLog('Home Page: ' + WEB_SITE + ' ');
+  // OcComPortObj.DebugLog('Function  :' + 'ESCÔøΩÔøΩF1ÔøΩÔøΩF2ÔøΩÔøΩF3');
   OcComPortObj.DebugLog('#################################################################');
+  OcComPortObj.DebugLog('' + OcComPortObj.ComportFullName + ' ');
 end;
 
-// œÓƒø≈‰÷√£¨»´æ÷≈‰÷√
-procedure TMainForm.SaveProjectSetting(SavePrivate: Boolean);
+procedure TMainOctopusDebuggingDevelopmentForm.SaveProjectSetting(SavePrivate: Boolean);
 var
   Octopusini: TIniFile;
   s: String;
@@ -2475,7 +3038,7 @@ begin
       for i := 1 to StringGrid1.RowCount - 1 do
       begin
         Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', StringGrid1.Cells[2, i]);
-        Octopusini.WriteString('MyCustData', IntToStr(i) + '_6', StringGrid1.Cells[6, i]);
+        /// Octopusini.WriteString('MyCustData', IntToStr(i) + '_6', StringGrid1.Cells[6, i]);
       end;
 
       if SkinMenuItem <> nil then
@@ -2483,27 +3046,32 @@ begin
       else
         str := TStyleManager.StyleNames[0];
 
-      Octopusini.WriteString('MyPreference', 'THEME_SKIN', str);
-      Octopusini.WriteString('MyPreference', 'CONTENT_FONTNAME', FontName.Text);
-      Octopusini.WriteInteger('MyPreference', 'CONTENT_FONTSIZE', UpDown1.Position);
-      /// Octopusini.WriteInteger('MyPreference', 'FONTCOLOR', Memo1.Font.Color);
-      /// Octopusini.WriteInteger('MyPreference', 'BACKGROUNDCOLOR', Memo1.Color);
       Octopusini.WriteBool('MyPreference', 'CHINESEUI', ChineseMenuItem.Checked);
       Octopusini.WriteBool('MyPreference', 'ALPHABLEND', Self.AlphaBlend);
       Octopusini.WriteBool('MyPreference', 'SVR_OPEN', SV_R.Opened);
       Octopusini.WriteInteger('MyPreference', 'SVR_WIDTH', SV_R.Width);
 
-      Octopusini.WriteString('MyPreference', 'MAINUIFONTNAME', MainForm.Font.Name);
-      Octopusini.WriteInteger('MyPreference', 'MAINUIFONTSIZE', MainForm.Font.Size);
-      Octopusini.WriteInteger('MyPreference', 'MAINUIFONTCOLOR', MainForm.Font.Color);
+      Octopusini.WriteString('MyPreference', 'MAINUIFONTNAME', MainOctopusDebuggingDevelopmentForm.Font.Name);
+      Octopusini.WriteInteger('MyPreference', 'MAINUIFONTSIZE', MainOctopusDebuggingDevelopmentForm.Font.Size);
+      Octopusini.WriteInteger('MyPreference', 'MAINUIFONTCOLOR', MainOctopusDebuggingDevelopmentForm.Font.Color);
 
       Octopusini.WriteBool('MyPreference', 'StandardToolBar1', StandardToolBar1.Visible);
       Octopusini.WriteBool('MyPreference', 'StandardToolBar2', StandardToolBar2.Visible);
       Octopusini.WriteInteger('MyPreference', 'PageControl1', Ord(Self.PageControl1.TabPosition));
       Octopusini.WriteInteger('MyPreference', 'PageControl2', Ord(Self.PageControl2.TabPosition));
+      Octopusini.WriteInteger('MyPreference', 'PageControl2ActivePageIndex', Ord(Self.PageControl2.ActivePageIndex));
 
       Octopusini.WriteString('Configuration', 'VERSIONNUMBER64', FVersionNumberStr);
+      Octopusini.WriteString('Configuration', 'THEME_SKIN', str);
 
+      Octopusini.WriteString('Configuration', 'CONTENT_FONTNAME', FontDialog.Font.Name);
+      Octopusini.WriteInteger('Configuration', 'CONTENT_FONTSIZE', FontDialog.Font.Size);
+      Octopusini.WriteInteger('Configuration', 'CONTENT_FONTCOLOR', FontDialog.Font.Color);
+
+      /// Octopusini.WriteInteger('Configuration', 'CONTENT_BACKGROUNDCOLOR', SettingPagesDlg.ColorBoxContent.Selected);
+
+      Octopusini.WriteBool('Configuration', 'APPLICATION_EXPLORER_MENU_ITEM', SettingPagesDlg.CheckBoxShortcutForExplorer.Checked);
+      Octopusini.WriteBool('Configuration', 'APPLICATION_DESKTOP_MENU_ITEM', SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked);
     end;
   finally
     Octopusini.Free;
@@ -2511,7 +3079,7 @@ begin
 
 end;
 
-procedure TMainForm.LoadProjectSetting();
+procedure TMainOctopusDebuggingDevelopmentForm.LoadProjectSetting();
 var
   Octopusini: TIniFile;
   s: string;
@@ -2530,15 +3098,12 @@ begin
     for i := 1 to StringGrid1.RowCount - 1 do
     begin
       StringGrid1.Cells[2, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_2', '');
-      StringGrid1.Cells[6, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_6', '');
+      /// StringGrid1.Cells[6, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_6', '');
     end;
 
     FThemeSkinName := Octopusini.ReadString('MyPreference', 'THEME_SKIN', TStyleManager.StyleNames[0]);
     SV_R.Width := Octopusini.ReadInteger('MyPreference', 'SVR_WIDTH', SV_R.Width);
     SV_R.Opened := Octopusini.ReadBool('MyPreference', 'SVR_OPEN', false);
-
-    FontName.Text := Octopusini.ReadString('MyPreference', 'CONTENT_FONTNAME', '–¬ÀŒÃÂ');
-    UpDown1.Position := Octopusini.ReadInteger('MyPreference', 'CONTENT_FONTSIZE', 14);
 
     StandardToolBar1.Visible := Octopusini.ReadBool('MyPreference', 'StandardToolBar1', false);
     StandardToolBar2.Visible := Octopusini.ReadBool('MyPreference', 'StandardToolBar2', True);
@@ -2547,9 +3112,20 @@ begin
     i := Octopusini.ReadInteger('MyPreference', 'PageControl2', 1);
     PageControl2.TabPosition := TTabPosition(i);
 
+    i := Octopusini.ReadInteger('MyPreference', 'PageControl2ActivePageIndex', 0);
+    PageControl2.ActivePageIndex := i;
+
     b := Octopusini.ReadBool('MyPreference', 'CHINESEUI', false);
     if (b) then
       SettingPagesDlg.ComboBox8.ItemIndex := 1;
+
+    FontDialog.Font.Name := Octopusini.ReadString('Configuration', 'CONTENT_FONTNAME', 'Êñ∞ÂÆã‰Ωì');
+    FontDialog.Font.Size := Octopusini.ReadInteger('Configuration', 'CONTENT_FONTSIZE', 14);
+    FontDialog.Font.Color := Octopusini.ReadInteger('Configuration', 'CONTENT_FONTCOLOR', clBlack);
+    FGColorBox.Selected := FontDialog.Font.Color;
+
+    SettingPagesDlg.CheckBoxShortcutForExplorer.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_EXPLORER_MENU_ITEM', True);
+    SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_DESKTOP_MENU_ITEM', True);
 
     if FThemeSkinName <> '' then
       AdjustSetStyle(FThemeSkinName);
@@ -2558,51 +3134,34 @@ begin
   end;
 end;
 
-{ µ⁄“ª∏ˆ≤Œ ˝ «“™Ω®¡¢øÏΩ›∑Ω ΩµƒŒƒº˛, ’‚ «±ÿ–Îµƒ; ∆‰À˚∂º «ø…—°≤Œ ˝ }
-{ µ⁄∂˛∏ˆ≤Œ ˝ «øÏΩ›∑Ω Ω√˚≥∆, »± ° π”√≤Œ ˝“ªµƒŒƒº˛√˚ }
-{ µ⁄»˝∏ˆ≤Œ ˝ «÷∏∂®ƒøµƒŒƒº˛º–, »± °ƒøµƒ «◊¿√Ê; »Áπ˚”–µ⁄Àƒ∏ˆ≤Œ ˝, ∏√≤Œ ˝Ω´±ª∫ˆ¬‘ }
-{ µ⁄Àƒ∏ˆ≤Œ ˝ «”√≥£ ˝µƒ∑Ω Ω÷∏∂®ƒøµƒŒƒº˛º–; ∏√œµ¡–≥£ ˝∂®“Â‘⁄ ShlObj µ•‘™, CSIDL_ ¥ÚÕ∑ }
-// CreateShortcut(Application.ExeName, '', '', CSIDL_PROGRAMS);
-// CreateShortcut(Application.ExeName, '', 'C:/');
-function CreateShortcut(Exe: string; Lnk: string = ''; Dir: string = ''; ID: Integer = -1): Boolean;
+procedure TMainOctopusDebuggingDevelopmentForm.ShowSearchDialog();
 var
-  IObj: IUnknown;
-  ILnk: IShellLink;
-  IPFile: IPersistFile;
-  PIDL: PItemIDList;
-  InFolder: array [0 .. MAX_PATH] of Char;
-  LinkFileName: WideString;
+  OcComPortObj: TOcComPortObj;
 begin
-  Result := false;
-  if not FileExists(Exe) then
-    exit;
-  if Lnk = '' then
-    Lnk := ChangeFileExt(ExtractFileName(Exe), '');
-  IObj := CreateComObject(CLSID_ShellLink);
-  ILnk := IObj as IShellLink;
-  ILnk.SetPath(PChar(Exe));
-  ILnk.SetWorkingDirectory(PChar(ExtractFilePath(Exe)));
-  if (Dir = '') and (ID = -1) then
-    ID := CSIDL_DESKTOP;
-  if ID > -1 then
+  OcComPortObj := Self.GetCurrentDevice();
+  if (OcComPortObj <> nil) and (OcComPortObj.LogObject <> nil) then
   begin
-    SHGetSpecialFolderLocation(0, ID, PIDL);
-    SHGetPathFromIDList(PIDL, InFolder);
-    LinkFileName := Format('%s/%s.lnk', [InFolder, Lnk]);
+    with FindDialog1 do
+    begin
+      Left := Self.Left + 600;
+      Top := Self.Top + 150;
+      FindText := OcComPortObj.LogObject.SelText;
+      Execute;
+    end;
   end
-  else
+  else if (CMyRichEdit <> nil) then
   begin
-    Dir := ExcludeTrailingPathDelimiter(Dir);
-    if not DirectoryExists(Dir) then
-      exit;
-    LinkFileName := Format('%s/%s.lnk', [Dir, Lnk]);
+    with FindDialog1 do
+    begin
+      Left := Self.Left + 600;
+      Top := Self.Top + 150;
+      FindText := CMyRichEdit.SelText;
+      Execute;
+    end;
   end;
-  IPFile := IObj as IPersistFile;
-  if IPFile.Save(PWideChar(LinkFileName), false) = 0 then
-    Result := True;
 end;
 
-function TMainForm.SearchMemo(Memo: TMyRichEdit; const SearchString: string; Options: TFindOptions): Boolean;
+function TMainOctopusDebuggingDevelopmentForm.SearchMemo(Memo: TMyRichEdit; const SearchString: string; Options: TFindOptions): Boolean;
 var
   Size: Integer;
   // StringSearchOptions:TStringSearchOptions;
@@ -2645,7 +3204,7 @@ begin
   end;
 end;
 
-procedure TMainForm.SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
+procedure TMainOctopusDebuggingDevelopmentForm.SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
 var
   SL: TStringList;
   i: Integer;
@@ -2679,17 +3238,17 @@ begin
   Data[0] := $FF;
   Data[1] := $0A;
 
-  Data[2] := OCCOMPROTOCAL_INBOOT; // Ω¯»ÎbootLAOD
+  Data[2] := OCCOMPROTOCAL_INBOOT; // ÔøΩÔøΩÔøΩÔøΩbootLAOD
   Data[3] := $00;
 
   Data[4] := $00;
 
-  Data[5] := $00; //  ˝æ›≥§∂»
-  Data[6] := $00; //  ˝æ›≥§∂»
+  Data[5] := $00; // ÔøΩÔøΩÔøΩ›≥ÔøΩÔøΩÔøΩ
+  Data[6] := $00; // ÔøΩÔøΩÔøΩ›≥ÔøΩÔøΩÔøΩ
 
-  Data[7] := $00; //  ˝æ›
-  Data[8] := $00; //  ˝æ›
-  pPOcComPack := @Data[0]; //  µº ∑¢ÀÕµƒ ±∫Ú≥§∂»≤ª∞¸¿®CRC
+  Data[7] := $00; // ÔøΩÔøΩÔøΩÔøΩ
+  Data[8] := $00; // ÔøΩÔøΩÔøΩÔøΩ
+  pPOcComPack := @Data[0]; //  µÔøΩ ∑ÔøΩÔøΩÕµÔøΩ ±ÔøΩÚ≥§∂»≤ÔøΩÔøΩÔøΩÔøΩÔøΩCRC
 
   bStatusOK := True;
   bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
@@ -2720,7 +3279,7 @@ begin
     end;
 
     // OcComPortObj.Log('test ' + str);
-    if str = ':00000001FF' then // Ω· ¯±Íº«
+    if str = ':00000001FF' then // ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ
     begin
       Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
       Data[5] := 6;
@@ -2740,38 +3299,38 @@ begin
       break;
     end;
 
-    tempstr := Copy(str, 2, 2); //  ˝æ›≥§∂»
+    tempstr := Copy(str, 2, 2); // ÔøΩÔøΩÔøΩ›≥ÔøΩÔøΩÔøΩ
     FormatHexStrToBuffer(tempstr, &Data[5], bCount);
-    iLength := Data[5]; // œ»∂¡≥ˆ”––ß∏∫‘ÿ,≤ª∞¸¿®CRC
-    Data[5] := 4 { 32 Flashµÿ÷∑ } + iLength; // ”––ß ˝æ›µƒ≥§∂»
+    iLength := Data[5]; // ÔøΩ»∂ÔøΩÔøΩÔøΩÔøΩÔøΩ–ßÔøΩÔøΩÔøΩÔøΩ,ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩCRC
+    Data[5] := 4 { 32 FlashÔøΩÔøΩ÷∑ } + iLength; // ÔøΩÔøΩ–ßÔøΩÔøΩÔøΩ›µƒ≥ÔøΩÔøΩÔøΩ
 
-    dataType := Copy(str, 8, 2); //  ˝æ›¿‡–Õ
-    if dataType = '04' then // ¿©’πµƒ∏ﬂŒªµÿ÷∑
+    dataType := Copy(str, 8, 2); // ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ
+    if dataType = '04' then // ÔøΩÔøΩ’πÔøΩƒ∏ÔøΩŒªÔøΩÔøΩ÷∑
     begin
-      tempstr := Copy(str, 10, iLength * 2); //  ˝æ›
+      tempstr := Copy(str, 10, iLength * 2); // ÔøΩÔøΩÔøΩÔøΩ
       FormatHexStrToBuffer(tempstr, &Data[7], bCount);
       baseAddress := MakeDWord(MakeWord(Data[7], Data[8]), 0);
       bb4 := Data[7];
       bb3 := Data[8];
-      // OcComPortObj.Log('Other Data£∫'+str);
+      // OcComPortObj.Log('Other DataÔøΩÔøΩ'+str);
     end
     else if dataType = '00' then
     begin
-      tempstr := Copy(str, 4, 4); //  ˝æ›µÿ÷∑
-      FormatHexStrToBuffer(tempstr, &Data[9], bCount); // 9°¢10
+      tempstr := Copy(str, 4, 4); // ÔøΩÔøΩÔøΩ›µÔøΩ÷∑
+      FormatHexStrToBuffer(tempstr, &Data[9], bCount); // 9ÔøΩÔøΩ10
 
-      tempstr := Copy(str, 10, iLength * 2 + 2); //  ˝æ› º”2∏ˆ◊÷∑˚Œ™CRC“ª∏ˆ◊÷Ω⁄
-      FormatHexStrToBuffer(tempstr, &Data[11], bCount); // buffer¿Ô√Ê∞¸¿®CRC
+      tempstr := Copy(str, 10, iLength * 2 + 2); // ÔøΩÔøΩÔøΩÔøΩ ÔøΩÔøΩ2ÔøΩÔøΩÔøΩ÷∑ÔøΩŒ™CRC“ªÔøΩÔøΩÔøΩ÷ΩÔøΩ
+      FormatHexStrToBuffer(tempstr, &Data[11], bCount); // bufferÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩCRC
 
       Data[7] := bb4;
       Data[8] := bb3;
 
       fileSent := fileSent + iLength;
-      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // º∆À„sum≤ª“™À„…œcrc
+      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // ÔøΩÔøΩÔøΩÔøΩsumÔøΩÔøΩ“™ÔøΩÔøΩÔøΩÔøΩcrc
 
       // Memo2.Lines.Append(FormatBufferToHexStr(&Data[11], iLength));
 
-      pPOcComPack := @Data[0]; //  µº ∑¢ÀÕµƒ ±∫Ú≥§∂»≤ª∞¸¿®CRC
+      pPOcComPack := @Data[0]; //  µÔøΩ ∑ÔøΩÔøΩÕµÔøΩ ±ÔøΩÚ≥§∂»≤ÔøΩÔøΩÔøΩÔøΩÔøΩCRC
       bStatusOK := True;
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
 
@@ -2781,7 +3340,7 @@ begin
     end
     else
     begin
-      // OcComPortObj.Log('Other Data£∫'+str);
+      // OcComPortObj.Log('Other DataÔøΩÔøΩ'+str);
     end;
   end; // for
 
@@ -2798,7 +3357,7 @@ FINISHED_OVER:
   SL.Free;
 end;
 
-procedure TMainForm.SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
+procedure TMainOctopusDebuggingDevelopmentForm.SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
 var
   // SL: TStringList;
   // i: Integer;
@@ -2844,20 +3403,20 @@ begin
   Data[0] := $FF;
   Data[1] := $0A;
 
-  Data[2] := OCCOMPROTOCAL_INBOOT; // Ω¯»ÎbootLAOD
+  Data[2] := OCCOMPROTOCAL_INBOOT; // ÔøΩÔøΩÔøΩÔøΩbootLAOD
   Data[3] := $00;
 
   Data[4] := $00;
 
-  Data[5] := $00; //  ˝æ›≥§∂»≤ª∞¸¿® ˝æ›∞¸Õ∑∫Õ∫Û√ÊµƒΩ· ¯Œª/CRC
-  Data[6] := $00; //  ˝æ›≥§∂»≤ª∞¸¿® ˝æ›∞¸Õ∑∫Õ∫Û√ÊµƒΩ· ¯Œª/CRC
-  //  µÃÂ
-  Data[7] := $00; //  ˝æ›
-  Data[8] := $00; //  ˝æ›
-  Data[9] := $00; //  ˝æ›
-  Data[10] := $00; //  ˝æ›
-  // Ω¯»ÎBOOT LOLOAD MODE
-  pPOcComPack := @Data[0]; //  µº ∑¢ÀÕµƒ ±∫Ú≥§∂»≤ª∞¸¿®CRC
+  Data[5] := $00; // ÔøΩÔøΩÔøΩ›≥ÔøΩÔøΩ»≤ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ›∞ÔøΩÕ∑ÔøΩÕ∫ÔøΩÔøΩÔøΩƒΩÔøΩÔøΩÔøΩŒª/CRC
+  Data[6] := $00; // ÔøΩÔøΩÔøΩ›≥ÔøΩÔøΩ»≤ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ›∞ÔøΩÕ∑ÔøΩÕ∫ÔøΩÔøΩÔøΩƒΩÔøΩÔøΩÔøΩŒª/CRC
+  //  µÔøΩÔøΩ
+  Data[7] := $00; // ÔøΩÔøΩÔøΩÔøΩ
+  Data[8] := $00; // ÔøΩÔøΩÔøΩÔøΩ
+  Data[9] := $00; // ÔøΩÔøΩÔøΩÔøΩ
+  Data[10] := $00; // ÔøΩÔøΩÔøΩÔøΩ
+  // ÔøΩÔøΩÔøΩÔøΩBOOT LOLOAD MODE
+  pPOcComPack := @Data[0]; //  µÔøΩ ∑ÔøΩÔøΩÕµÔøΩ ±ÔøΩÚ≥§∂»≤ÔøΩÔøΩÔøΩÔøΩÔøΩCRC
   bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
   if not bStatusOK then
   begin
@@ -2865,7 +3424,6 @@ begin
     exit;
   end;
 
-  // ◊º±∏¥´ ‰ ˝æ›
   try
     tempstr := Trim(ComboBox302.Text);
     FormatHexStrToBuffer(tempstr, &Data[7], bCount);
@@ -2891,7 +3449,6 @@ begin
       IntToBuffer(MemoryStream.Size, &Data[7], 2);
       IntToBuffer(checksum, &Data[9], 4);
       pPOcComPack := @Data[0];
-      // Õ®÷™∑¢ÀÕÕÍ≥…
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
       DelayDelay(30);
       OcComPortObj.LogBuff('file size:', &Data[7], 2);
@@ -2899,17 +3456,16 @@ begin
       break;
     end;
 
-    Data[5] := 4 { 32 Flashµÿ÷∑ } + iLength; // ”––ß ˝æ›≥§∂»≤ª∞¸¿® ˝æ›∞¸Õ∑∫Õ∫Û√ÊµƒΩ· ¯Œª/CRC
+    Data[5] := 4 { 32 FlashÔøΩÔøΩ÷∑ } + iLength; // ÔøΩÔøΩ–ßÔøΩÔøΩÔøΩ›≥ÔøΩÔøΩ»≤ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ›∞ÔøΩÕ∑ÔøΩÕ∫ÔøΩÔøΩÔøΩƒΩÔøΩÔøΩÔøΩŒª/CRC
 
     // if dataType = '00' then
     begin
       IntToBuffer(baseAddress, &Data[7], 4);
-      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // º∆À„sum
-      pPOcComPack := @Data[0]; //  µº ∑¢ÀÕµƒ ±∫Ú≥§∂»≤ª∞¸¿®CRC
+      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // ÔøΩÔøΩÔøΩÔøΩsum
+      pPOcComPack := @Data[0]; //  µÔøΩ ∑ÔøΩÔøΩÕµÔøΩ ±ÔøΩÚ≥§∂»≤ÔøΩÔøΩÔøΩÔøΩÔøΩCRC
 
-      // ∑¢ÀÕ ˝æ›
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
-      // OcComPortObj.LogBuff('>', Data, Data[5] + 7 + 1); //  ˝æ› µÃÂ≥§∂»+∞¸Õ∑+CRC
+      // OcComPortObj.LogBuff('>', Data, Data[5] + 7 + 1); // ÔøΩÔøΩÔøΩÔøΩ µÔøΩÂ≥§ÔøΩÔøΩ+ÔøΩÔøΩÕ∑+CRC
 
       fileSent := fileSent + iLength;
       StatusBar1DrawProgress(fileSent, MemoryStream.Size);

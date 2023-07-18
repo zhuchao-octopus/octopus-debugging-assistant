@@ -244,7 +244,7 @@ var
 
 implementation
 
-uses uGlobalFunction;
+uses uOctopusFunction;
 
 function readFileToStream(FileName: String): TFileStream;
 var

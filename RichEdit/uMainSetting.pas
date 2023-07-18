@@ -9,7 +9,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.ImageList,
-
+  System.Math,
   Vcl.Graphics,
   Vcl.Forms,
   Vcl.Dialogs,
@@ -24,7 +24,7 @@ uses
   Vcl.Menus,
   Vcl.Grids,
   Vcl.Mask,
-
+  Registry,
   GlobalFunctions,
   OcComPortObj;
 
@@ -50,12 +50,10 @@ type
     CheckBox8: TCheckBox;
     CheckBox7: TCheckBox;
     Panel24: TPanel;
-    CheckBox2: TCheckBox;
-    CheckBox6: TCheckBox;
-    CheckBox3: TCheckBox;
-    CheckBox4: TCheckBox;
-    CheckBox5: TCheckBox;
-    CheckBox1: TCheckBox;
+    CheckBox33: TCheckBox;
+    CheckBox34: TCheckBox;
+    CheckBox35: TCheckBox;
+    CheckBox36: TCheckBox;
     Panel17: TPanel;
     Panel3: TPanel;
     Button3: TButton;
@@ -76,7 +74,7 @@ type
     ComboBox1: TComboBox;
     ComboBox7: TComboBox;
     Panel20: TPanel;
-    CBCodePage: TComboBox;
+    CBReceivingCodePage: TComboBox;
     CBAlignmentMode: TComboBox;
     Label109: TLabel;
     CBSendCodePage: TComboBox;
@@ -87,8 +85,17 @@ type
     Timer1: TTimer;
     Button5: TButton;
     Button4: TButton;
-    ComboBox8: TComboBox;
     Button6: TButton;
+    CheckBox2: TCheckBox;
+    ColorBoxContentBG: TColorBox;
+    ColorBoxText: TColorBox;
+    Label112: TLabel;
+    Label113: TLabel;
+    ComboBox8: TComboBox;
+    Label114: TLabel;
+    CheckBoxShortcutForExplorer: TCheckBox;
+    CheckBoxDesktopShortcutMenu: TCheckBox;
+    FontDialogConsole: TFontDialog;
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxEx1Change(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -102,14 +109,17 @@ type
     procedure ComboBox8Change(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure CheckBoxShortcutForExplorerClick(Sender: TObject);
+    procedure ColorBoxTextChange(Sender: TObject);
   private
     { Private declarations }
     procedure WMDeviceChange(var Msg: TMessage); message WM_DEVICECHANGE;
   public
     { Public declarations }
+
     OcComPortList: TStringList;
     OctopusCfgDir: String;
-    OctopusCfgDir_LogFileName: String;
+    OctopusCfgDir_LogFilePath: String;
     VersionNumberStr: String;
     WindowsVersion: String;
 
@@ -132,30 +142,43 @@ type
     function openDevice(DeviceFullName: String): TOcComPortObj; overload;
     function openDevice(DeviceFullName: String; LogMemo: TMyRichEdit): TOcComPortObj; overload;
     function openDeviceRandom(): TOcComPortObj;
+    /// function getLogPathName();
 
-    procedure closeDevice(DeviceFullName: String); overload;
-    procedure closeDevice(OcComPortObj: TOcComPortObj); overload;
+    procedure CloseDevice(DeviceFullName: String); overload;
+    procedure CloseDevice(OcComPortObj: TOcComPortObj); overload;
 
-    procedure FalconLoadCfg();
+    /// procedure FalconLoadCfg();
     procedure SaveDeviceSetting(OcComPortObj: TOcComPortObj);
+    procedure LoadDeviceSetting(OcComPortObj: TOcComPortObj);
+
     procedure SaveAllComPortLogData(DoClose: Boolean);
-    procedure ApplyCodePageSetting();
-    procedure updateOcComPortObjAtrribute(OcComPortObj: TOcComPortObj = nil);
+    procedure ApplyCodePageSetting(OcComPortObj: TOcComPortObj);
+    procedure ApplyOcComPortObjAtrribute(OcComPortObj: TOcComPortObj);
 
     procedure LoadLaunguageFromFile(Form: TForm; Path: String; Create: Boolean);
     procedure LoadOrCreateLaunguageFromFile(Form: TForm; Create: Boolean);
+
   end;
+
+const
+  APPLICATION_TITLE_NAME = 'Octopus Serial Port Debugging and Development Assistant';
+  APPLICATION_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
+  UPGRADING_URL = 'http://47.106.172.94:8090/zhuchao/octopus/devices/getDeviceInfor';
 
 var
   SettingPagesDlg: TSettingPagesDlg;
 
+function ExtractFileNameNoExt(FilePathName: String): String;
 function GetSystemDateTimeStampStr(): string;
+function CreateShortcut(Exe: string; Lnk: string = ''; Dir: string = ''; ID: Integer = -1): Boolean;
+procedure AddExplorerContextMenu(const MenuName, PathFileName, FileType: string);
+procedure RemoveExplorerContextMenu(const MenuName: string);
 
 implementation
 
 {$R *.dfm}
 
-uses ocPcDeviceMgt, IniFiles, uGlobalFunction, CPort, CPortCtl, uDeviceThread;
+uses ocPcDeviceMgt, IniFiles, uOctopusFunction, CPort, CPortCtl, uDeviceThread, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj;
 
 function GetSystemDateTimeStampStr(): string;
 var
@@ -321,21 +344,20 @@ var
   j: TRECEIVE_FORMAT;
   i: Integer;
   CheckDeviceThreak: TCheckDeviceThreak;
+  OcComPortObj: TOcComPortObj;
 begin
   if OcComPortList = nil then
     OcComPortList := TStringList.Create;
   OctopusCfgDir := ExtractFilePath(Application.Exename) + '\';
 
   SetCurrentDir(OctopusCfgDir);
-  OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR + GetSystemDateTimeStampStr();
+  OctopusCfgDir_LogFilePath := OctopusCfgDir + LOG_DIR;
   if not DirectoryExists(OctopusCfgDir) then
     CreateDir(OctopusCfgDir);
   if not DirectoryExists(OctopusCfgDir + CONFIGURATION_DIR) then
     CreateDir(OctopusCfgDir + CONFIGURATION_DIR);
-  if not DirectoryExists(OctopusCfgDir + LOG_DIR) then
+  if not DirectoryExists(OctopusCfgDir_LogFilePath) then
     CreateDir(OctopusCfgDir + LOG_DIR);
-
-  updateSystemDevicesList();
 
   ComComboBox := TComComboBox.Create(self);
   ComComboBox.Parent := self;
@@ -381,12 +403,20 @@ begin
   begin
     ComboBox7.Items.Add(RECEIVE_FORMAT_String[j]);
   end;
-
   ComboBox7.ItemIndex := 0;
-
-  VersionNumberStr := GetBuildInfo(Application.Exename);
-  WindowsVersion := GetWIndowsVersion();
-  ComboBoxEx1Change(self); // 刷新到默认串口设置界面
+  /// ////////////////////////////////////////////////////////////////////////////
+  updateSystemDevicesList();
+  for i := 0 to ComboBoxEx1.Items.Count - 1 do
+  begin
+    ComboBoxEx1.ItemIndex := i;
+    ComboBoxEx1Change(self); // 刷新到默认串口设置界面
+    OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
+    if OcComPortObj <> nil then
+    begin
+      ApplyOcComPortObjAtrribute(OcComPortObj);
+      ApplyCodePageSetting(OcComPortObj);
+    end;
+  end;
 
   try
     CheckDeviceThreak := TCheckDeviceThreak.Create(True);
@@ -396,11 +426,27 @@ begin
   finally
   end;
 
+  VersionNumberStr := GetBuildInfo(Application.Exename);
+  WindowsVersion := GetWIndowsVersion();
+
+  if CheckBoxShortcutForExplorer.Checked then
+  begin
+    AddExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME, Application.Exename, '*');
+
+  end;
+  if CheckBoxDesktopShortcutMenu.Checked then
+  begin
+    CreateShortcut(Application.Exename, ApplicatonShortcutName);
+  end;
+
 end;
 
 procedure TSettingPagesDlg.FormShow(Sender: TObject);
 begin
   SettingPagesDlg.LoadOrCreateLaunguageFromFile(self, True);
+  ComboBoxEx1Change(self); // 刷新到默认串口设置界面
+  /// ShowMessage(getCommandLine());
+  SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, 0);
 end;
 
 procedure TSettingPagesDlg.ComboBoxEx1Change(Sender: TObject);
@@ -431,9 +477,19 @@ begin
   ComboBox6.ItemIndex := ord(OcComPortObj.SendFormat);
   ComboBox7.ItemIndex := ord(OcComPortObj.ReceiveFormat);
 
-  CBCodePage.ItemIndex := OcComPortObj.CodePage;
+  CBReceivingCodePage.ItemIndex := OcComPortObj.CodePage;
   CBSendCodePage.ItemIndex := OcComPortObj.SendCodeFormat;
   CBAlignmentMode.ItemIndex := OcComPortObj.HexModeFormatCount;
+
+  CheckBox33.Checked := OcComPortObj.ShowTime;
+  CheckBox34.Checked := OcComPortObj.ShowDate;
+  CheckBox35.Checked := OcComPortObj.ShowLineNumber;
+  CheckBox36.Checked := OcComPortObj.ShowSendedLog;
+end;
+
+procedure TSettingPagesDlg.ColorBoxTextChange(Sender: TObject);
+begin
+  self.FontDialogConsole.Font.Color := ColorBoxText.Selected;
 end;
 
 procedure TSettingPagesDlg.ComboBox1Change(Sender: TObject);
@@ -530,12 +586,8 @@ begin
 end;
 
 procedure TSettingPagesDlg.Button6Click(Sender: TObject);
-var
-  Image: TBitmap;
 begin
-  Image := TBitmap.Create;
-  self.ComboBoxEx1.Images.GetBitmap(35, Image);
-  Image.SaveToFile('comport.ico');
+  CreateShortcut(Application.Exename, ApplicatonShortcutName);
 end;
 
 procedure TSettingPagesDlg.Button4Click(Sender: TObject);
@@ -544,9 +596,14 @@ begin
 end;
 
 procedure TSettingPagesDlg.Button2Click(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
 begin
-  updateOcComPortObjAtrribute();
-  ApplyCodePageSetting();
+  OcComPortObj := getCurrentDevice();
+  if OcComPortObj = nil then
+    exit;
+  ApplyOcComPortObjAtrribute(OcComPortObj);
+  ApplyCodePageSetting(OcComPortObj);
   AlphaBlendValue := UpDown1.Position;
   AlphaBlend := CheckBox7.Checked;
   Timer1.Enabled := CheckBox8.Checked;
@@ -598,7 +655,7 @@ begin
     if (OcComPortObj <> nil) and (ActionType = DBT_DEVICEREMOVECOMPLETE) then
     begin
       if OcComPortObj.Connected then
-        closeDevice(OcComPortObj);
+        CloseDevice(OcComPortObj);
       if Assigned(SettingChangedCallBackFuntion) then
         SettingChangedCallBackFuntion(OcComPortObj);
     end;
@@ -619,16 +676,10 @@ begin
       begin
         OcComPortObj := TOcComPortObj.Create(self, DevideNameList.Strings[i]);
         OcComPortList.AddObject(DevideNameList.Strings[i], OcComPortObj);
-        // 导入设备配置信息
+        /// 导入设备配置信息
         S := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
-        OcComPortObj.LoadSettings(stIniFile, S); // 保存设备配置到S文件
-        try
-          IniFile := TIniFile.Create(S);
-          OcComPortObj.ReceiveFormat := IniFile.ReadInteger('', 'ReceiveFormat', 0);
-          OcComPortObj.SendFormat := IniFile.ReadInteger('', 'SendFormat', 0);
-        finally
-          IniFile.Free;
-        end;
+        OcComPortObj.LoadSettings(stIniFile, S);
+        LoadDeviceSetting(OcComPortObj);
       end;
     end;
     ComboBoxEx1.ItemsEx.EndUpdate;
@@ -713,7 +764,7 @@ begin
   end;
 end;
 
-procedure TSettingPagesDlg.closeDevice(DeviceFullName: String);
+procedure TSettingPagesDlg.CloseDevice(DeviceFullName: String);
 var
   OcComPortObj: TOcComPortObj;
   i: Integer;
@@ -729,15 +780,49 @@ begin
   OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
   if (OcComPortObj <> nil) and (OcComPortObj.Connected) then
   begin
-    OcComPortObj.closeDevice();
+    OcComPortObj.CloseDevice();
   end;
 end;
 
-procedure TSettingPagesDlg.closeDevice(OcComPortObj: TOcComPortObj);
+procedure TSettingPagesDlg.CheckBoxShortcutForExplorerClick(Sender: TObject);
+begin
+  if CheckBoxShortcutForExplorer.Checked then
+    AddExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME, Application.Exename, '*')
+  else
+    RemoveExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME);
+end;
+
+procedure TSettingPagesDlg.CloseDevice(OcComPortObj: TOcComPortObj);
 begin
   if (OcComPortObj <> nil) and (OcComPortObj.Connected) then
   begin
-    OcComPortObj.closeDevice();
+    OcComPortObj.CloseDevice();
+  end;
+end;
+
+function TSettingPagesDlg.openDevice(OcComPortObj: TOcComPortObj): Boolean;
+var
+  i: Integer;
+begin
+  Result := false;
+  if OcComPortObj = nil then
+    exit;
+  if OcComPortObj.Connected then
+    exit;
+
+  try
+    OcComPortObj.Open;
+    Result := True;
+    OcComPortObj.status := 1;
+  Except
+    // OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    Result := false;
+    OcComPortObj.status := 1;
+    // MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    exit;
+  end;
+  if not OcComPortObj.Connected then
+  begin
   end;
 end;
 
@@ -761,60 +846,8 @@ begin
   if OcComPortObj = nil then
     exit;
 
-  /// updateOcComPortObjAtrribute(OcComPortObj);
-
-  /// OcComPortObj.ClearLog;
-  /// OcComPortObj.ClearInternalBuff();
-
-  OcComPortObj.StringInternelCache.Parent := self; // 设置大量极限数据的缓冲MEMO
-  OcComPortObj.StringInternelCache.DoubleBuffered := True;
-
-  try
-    OcComPortObj.Open;
-    Result := OcComPortObj;
-  Except
-    // OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
-    Result := nil;
-    // MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
-    exit;
-  end;
-  if not OcComPortObj.Connected then
-  begin
-  end;
-end;
-
-function TSettingPagesDlg.openDevice(OcComPortObj: TOcComPortObj): Boolean;
-var
-  i: Integer;
-begin
-  Result := false;
-  if OcComPortObj = nil then
-    exit;
-  if OcComPortObj.Connected then
-    exit;
-
-  /// OcComPortObj.ClearLog;
-  /// OcComPortObj.ClearInternalBuff();
-
-  OcComPortObj.StringInternelCache.Parent := self; // 设置大量极限数据的缓冲MEMO
-  OcComPortObj.StringInternelCache.DoubleBuffered := True;
-
-  try
-    OcComPortObj.Open;
-    /// OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log'); // 打开的时候创建日志文件
-    Result := True;
-    OcComPortObj.status := 1;
-  Except
-    // OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
-    Result := false;
-    OcComPortObj.status := 1;
-    // MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
-    exit;
-  end;
-  if not OcComPortObj.Connected then
-  begin
-  end;
-
+  OcComPortObj.SetLogComponent(LogMemo);
+  openDevice(OcComPortObj);
 end;
 
 function TSettingPagesDlg.openDeviceRandom(): TOcComPortObj;
@@ -823,38 +856,12 @@ begin
   // Result := openDevice(Result);
 end;
 
-procedure TSettingPagesDlg.FalconLoadCfg();
-var
-  Octopusini: TIniFile;
-  S: string;
-  i: Integer;
-
-begin
-  Octopusini := nil;
-  if not DirectoryExists(OctopusCfgDir) then
-    exit;
-  S := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
-  if (not FileExists(S)) then
-    exit;
-  try
-    Octopusini := TIniFile.Create(S);
-
-  finally
-    Octopusini.Free;
-  end;
-end;
-
 procedure TSettingPagesDlg.SaveAllComPortLogData(DoClose: Boolean);
 var
   i: Integer;
   OcComPortObj: TOcComPortObj;
-  // Octopusini: TIniFile;
-  // S: String;
 begin
-  // S := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
   try
-    // Octopusini := TIniFile.Create(S);
-
     for i := 0 to OcComPortList.Count - 1 do
     begin
       OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
@@ -862,7 +869,7 @@ begin
       begin
         if OcComPortObj.Connected then
         begin
-          OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log');
+          OcComPortObj.SaveLog(OctopusCfgDir_LogFilePath);
           if (DoClose) then
           begin
             OcComPortObj.Free;
@@ -871,7 +878,6 @@ begin
       end;
     end;
   finally
-    // Octopusini.Free;
   end;
 end;
 
@@ -879,78 +885,105 @@ procedure TSettingPagesDlg.SaveDeviceSetting(OcComPortObj: TOcComPortObj);
 var
   S: String;
   Octopusini: TIniFile;
+
+  function getObjectID(str: String): String;
+  begin
+    Result := 'OBJECT_' + UpperCase(str);
+  end;
+
 begin
   if OcComPortObj = nil then
     exit;
   try
-    OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log'); // 打开的时候创建日志文件
     S := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
     OcComPortObj.StoreSettings(stIniFile, S);
     Octopusini := TIniFile.Create(S);
+
     // Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
-    Octopusini.WriteInteger('', 'SendFormat', ComboBox6.ItemIndex);
-    Octopusini.WriteInteger('', 'ReceiveFormat', ComboBox7.ItemIndex);
+    Octopusini.WriteInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
+    Octopusini.WriteInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
+
+    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox33.Name), CheckBox33.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox34.Name), CheckBox34.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox35.Name), CheckBox35.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox36.Name), CheckBox36.Checked);
+
+    /// Octopusini.WriteInt64(OcComPortObj.ComportFullName, getObjectID(ColorBoxContentBG.Name), ColorBoxContentBG.Selected);
+    /// Octopusini.WriteInt64(OcComPortObj.ComportFullName, getObjectID(ColorBoxText.Name), ColorBoxText.Selected);
+    Octopusini.WriteString('Configuration', 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
+    Octopusini.WriteInteger('Configuration', 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
+    Octopusini.WriteInteger('Configuration', 'CONTENT_FONTCOLOR', FontDialogConsole.Font.Color);
+    Octopusini.WriteInteger('Configuration', 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
   finally
     Octopusini.Free;
   end;
 end;
 
-procedure TSettingPagesDlg.updateOcComPortObjAtrribute(OcComPortObj: TOcComPortObj = nil);
+procedure TSettingPagesDlg.LoadDeviceSetting(OcComPortObj: TOcComPortObj);
 var
-  CodePage: Integer;
-begin
-  if OcComPortObj = nil then
-    OcComPortObj := getDeciceByFullName(getCurrentDeviceName());
+  Octopusini: TIniFile;
+  S: string;
+  i: Integer;
 
-  if OcComPortObj = nil then
+  function getObjectID(str: String): String;
   begin
+    Result := 'OBJECT_' + UpperCase(str);
+  end;
+
+begin
+  Octopusini := nil;
+  if not DirectoryExists(OctopusCfgDir) then
     exit;
-  end;
+  S := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
+  if (not FileExists(S)) then
+    exit;
 
-  OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil,
-    CheckBox3.Checked, CheckBox6.Checked, CheckBox4.Checked, CheckBox5.Checked, True);
+  try
+    Octopusini := TIniFile.Create(S);
+    CheckBox33.Checked := Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckBox33.Name), false);
+    CheckBox34.Checked := Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckBox34.Name), false);
+    CheckBox35.Checked := Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckBox35.Name), false);
+    CheckBox36.Checked := Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckBox36.Name), false);
 
-  case CBAlignmentMode.ItemIndex of
-    0:
-      OcComPortObj.HexModeFormatCount := 16;
-    1:
-      OcComPortObj.HexModeFormatCount := 32;
-    2:
-      OcComPortObj.HexModeFormatCount := 0;
-  else
-    OcComPortObj.HexModeFormatCount := 0;
-  end;
+    ComboBox6.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
+    ComboBox7.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
 
-  case CBCodePage.ItemIndex of
-    0:
-      CodePage := 0;
-    1:
-      CodePage := 1;
-    2:
-      CodePage := 2;
-    3:
-      CodePage := 42;
-    4:
-      CodePage := CP_UTF7;
-    5:
-      CodePage := CP_UTF8;
-  else
-    CodePage := 0;
+    /// ColorBoxContentBG.Selected := Octopusini.ReadInt64(OcComPortObj.ComportFullName, getObjectID(ColorBoxContentBG.Name), ColorBoxContentBG.Selected);
+    /// ColorBoxText.Selected := Octopusini.ReadInt64(OcComPortObj.ComportFullName, getObjectID(ColorBoxText.Name), ColorBoxText.Selected);
+    FontDialogConsole.Font.Charset := TFontCharset(DEFAULT_CHARSET);
+    FontDialogConsole.Font.Name := Octopusini.ReadString(OcComPortObj.ComportFullName, 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
+    FontDialogConsole.Font.Size := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
+    FontDialogConsole.Font.Color := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_FONTCOLOR', FontDialogConsole.Font.Color);
+    ColorBoxContentBG.Selected := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
+
+    if ColorBoxContentBG.Selected = clBlack then
+    begin
+      ColorBoxText.Selected := clSilver;
+      FontDialogConsole.Font.Color := clSilver;
+    end;
+
+    OcComPortObj.SendFormat := Max(ComboBox6.ItemIndex, 0);
+    OcComPortObj.ReceiveFormat := Max(ComboBox7.ItemIndex, 0);
+    ComboBox6.ItemIndex := OcComPortObj.SendFormat;
+    ComboBox7.ItemIndex := OcComPortObj.ReceiveFormat;
+
+    OcComPortObj.ShowTime := CheckBox33.Checked;
+    OcComPortObj.ShowDate := CheckBox34.Checked;
+    OcComPortObj.ShowLineNumber := CheckBox35.Checked;
+    OcComPortObj.ShowSendedLog := CheckBox36.Checked;
+  finally
+    Octopusini.Free;
   end;
-  OcComPortObj.CodePage := CodePage;
 end;
 
-procedure TSettingPagesDlg.ApplyCodePageSetting();
+procedure TSettingPagesDlg.ApplyOcComPortObjAtrribute(OcComPortObj: TOcComPortObj);
 var
-  OcComPortObj: TOcComPortObj;
   CodePage: Integer;
 begin
-
-  OcComPortObj := getDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if OcComPortObj = nil then
-  begin
     exit;
-  end;
+  OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil,
+    CheckBox33.Checked, CheckBox34.Checked, CheckBox35.Checked, CheckBox36.Checked, True);
 
   case CBAlignmentMode.ItemIndex of
     0:
@@ -963,29 +996,67 @@ begin
     OcComPortObj.HexModeFormatCount := 0;
   end;
 
-  case CBCodePage.ItemIndex of
+end;
+
+procedure TSettingPagesDlg.ApplyCodePageSetting(OcComPortObj: TOcComPortObj);
+var
+  CodePage: Integer;
+begin
+  if OcComPortObj = nil then
+    exit;
+
+  /// CP_ACP { ANSI / GB2312 }
+  /// CP_OEMCP { OEM  code page }
+  /// CP_MACCP { MAC  code page }
+  /// CP_SYMBOL { SYMBOL translations }
+  /// CP_UTF7 { UTF-7 translation }
+  /// CP_UTF8 { UTF-8 translation }
+  /// CP_ASCII { ANSI / ASCII }
+
+  /// TEncoding.DEFAULT
+  /// TEncoding.ASCII.Encoding
+  /// TEncoding.ANSI.Encoding
+  /// TEncoding.UTF7.Encoding
+  /// TEncoding.UTF8.Encoding
+  /// TEncoding.Unicode.Encoding
+  /// TEncoding.BigEndianUnicode.Encoding
+
+  CodePage := 0;
+  OcComPortObj.CompatibleUnicode := false;
+  case CBReceivingCodePage.ItemIndex of
     0:
-      CodePage := 0;
+      CodePage := TEncoding.Default.CodePage; // 0;
     1:
-      CodePage := 1;
+      CodePage := TEncoding.ASCII.CodePage; // 1;
     2:
-      CodePage := 2;
+      CodePage := TEncoding.ANSI.CodePage; // 2;
     3:
-      CodePage := 42;
+      CodePage := TEncoding.UTF7.CodePage; // 42;
     4:
-      CodePage := CP_UTF7;
+      begin
+        OcComPortObj.CompatibleUnicode := True;
+        CodePage := TEncoding.UTF8.CodePage;
+      end;
     5:
-      CodePage := CP_UTF8;
-  else
-    CodePage := 0;
+      begin
+        OcComPortObj.CompatibleUnicode := True;
+        CodePage := TEncoding.Unicode.CodePage;
+      end;
+    6:
+      begin
+        OcComPortObj.CompatibleUnicode := True;
+        CodePage := TEncoding.BigEndianUnicode.CodePage;
+      end;
   end;
 
-  OcComPortObj.SendCodeFormat := CBSendCodePage.ItemIndex;
-  OcComPortObj.ShowTime := CheckBox6.Checked;
-  OcComPortObj.ShowDate := CheckBox3.Checked;
-  OcComPortObj.ShowLineNumber := CheckBox4.Checked;
-  OcComPortObj.ShowSendedLog := CheckBox5.Checked;
   OcComPortObj.CodePage := CodePage;
+  OcComPortObj.SendCodeFormat := CBSendCodePage.ItemIndex;
+
+  OcComPortObj.ShowTime := CheckBox33.Checked;
+  OcComPortObj.ShowDate := CheckBox34.Checked;
+  OcComPortObj.ShowLineNumber := CheckBox35.Checked;
+  OcComPortObj.ShowSendedLog := CheckBox36.Checked;
+
 end;
 
 procedure TSettingPagesDlg.LoadOrCreateLaunguageFromFile(Form: TForm; Create: Boolean);
@@ -1093,6 +1164,114 @@ begin
   finally
     if IniFiles <> nil then
       IniFiles.Free;
+  end;
+end;
+
+function ExtractFileNameNoExt(FilePathName: String): String;
+Var
+  FileWithExtString: String;
+  FileExtString: String;
+  LenExt: Integer;
+  LenNameWithExt: Integer;
+Begin
+  FileWithExtString := ExtractFileName(FilePathName);
+  LenNameWithExt := Length(FileWithExtString);
+  FileExtString := ExtractFileExt(FilePathName);
+  LenExt := Length(FileExtString);
+  If LenExt = 0 Then
+  Begin
+    Result := FileWithExtString;
+  End
+  Else
+  Begin
+    Result := Copy(FileWithExtString, 1, (LenNameWithExt - LenExt));
+  End;
+End;
+
+{ 第一个参数是要建立快捷方式的文件, 这是必须的; 其他都是可选参数 }
+{ 第二个参数是快捷方式名称, 缺省使用参数一的文件名 }
+{ 第三个参数是指定目的文件夹, 缺省目的是桌面; 如果有第四个参数, 该参数将被忽略 }
+{ 第四个参数是用常数的方式指定目的文件夹; 该系列常数定义在 ShlObj 单元, CSIDL_ 打头 }
+// CreateShortcut(Application.ExeName, '', '', CSIDL_PROGRAMS);
+// CreateShortcut(Application.ExeName, '', 'C:/');
+function CreateShortcut(Exe: string; Lnk: string = ''; Dir: string = ''; ID: Integer = -1): Boolean;
+var
+  IObj: IUnknown;
+  ILnk: IShellLink;
+  IPFile: IPersistFile;
+  PIDL: PItemIDList;
+  InFolder: array [0 .. MAX_PATH] of Char;
+  LinkFileName: WideString;
+begin
+  Result := false;
+  if not FileExists(Exe) then
+    exit;
+  if Lnk = '' then
+    Lnk := ChangeFileExt(ExtractFileName(Exe), '');
+  IObj := CreateComObject(CLSID_ShellLink);
+  ILnk := IObj as IShellLink;
+  ILnk.SetPath(PChar(Exe));
+  ILnk.SetWorkingDirectory(PChar(ExtractFilePath(Exe)));
+  if (Dir = '') and (ID = -1) then
+    ID := CSIDL_DESKTOP;
+  if ID > -1 then
+  begin
+    SHGetSpecialFolderLocation(0, ID, PIDL);
+    SHGetPathFromIDList(PIDL, InFolder);
+    LinkFileName := Format('%s/%s.lnk', [InFolder, Lnk]);
+  end
+  else
+  begin
+    Dir := ExcludeTrailingPathDelimiter(Dir);
+    if not DirectoryExists(Dir) then
+      exit;
+    LinkFileName := Format('%s/%s.lnk', [Dir, Lnk]);
+  end;
+  IPFile := IObj as IPersistFile;
+  if IPFile.Save(PWideChar(LinkFileName), false) = 0 then
+    Result := True;
+end;
+
+procedure AddExplorerContextMenu(const MenuName, PathFileName, FileType: string);
+var
+  /// Reg: TRegistry;
+  fileName: String;
+  icon: String;
+begin
+  /// HKEY_LOCAL_MACHINE\Software\Classes
+  fileName := 'OctopusSoftware'; // ExtractFileNameNoExt(PathFileName);
+  icon := ExtractFilePath(PathFileName) + 'DefaultIcon.ico';
+  with TRegistry.Create do
+    try
+      RootKey := HKEY_CURRENT_USER;
+      if OpenKey('\Software\Classes\*\shell\' + fileName, True) then
+        WriteString('', MenuName);
+      if OpenKey('\Software\Classes\*\shell\' + fileName + '\command', True) then
+        WriteString('', PathFileName + ' "%1"');
+
+      if OpenKey('\Software\Classes\*\shell\' + fileName + '\DefaultIcon', True) then
+        WriteString('', icon);
+    finally
+      Free;
+    end;
+  SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+end;
+
+procedure RemoveExplorerContextMenu(const MenuName: string);
+begin
+  with TRegistry.Create do
+  begin
+    try
+      RootKey := HKEY_CURRENT_USER;
+
+      // 删除菜单项及其子键
+      DeleteKey('\Software\Classes\*\shell\' + MenuName);
+
+      // 刷新资源管理器以使更改生效
+      SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+    finally
+      Free;
+    end;
   end;
 end;
 

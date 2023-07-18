@@ -220,11 +220,9 @@ object FrmMain: TFrmMain
             '  end;')
           ParentFont = False
           ParentShowHint = False
-          ReadOnly = True
-          ScrollBars = ssBoth
           ShowHint = False
           TabOrder = 0
-          WantTabs = True
+          WantReturns = False
         end
         object BitBtn1: TBitBtn
           Left = 680
@@ -234,6 +232,16 @@ object FrmMain: TFrmMain
           Caption = 'BitBtn1'
           TabOrder = 1
           OnClick = BitBtn1Click
+        end
+        object Memo2: TMemo
+          Left = 168
+          Top = 96
+          Width = 587
+          Height = 321
+          Lines.Strings = (
+            'Memo2')
+          TabOrder = 2
+          WantReturns = False
         end
       end
       object TPage

@@ -148,7 +148,6 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\OcProtocol.pas"/>
-        <DCCReference Include="..\uGlobalFunction.pas"/>
         <DCCReference Include="uControllerPanel.pas">
             <Form>FrmControllerPanel</Form>
             <FormType>dfm</FormType>
@@ -183,6 +182,7 @@
             <Form>FrmDockableController</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\uOctopusFunction.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

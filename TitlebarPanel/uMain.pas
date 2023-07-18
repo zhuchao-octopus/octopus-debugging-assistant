@@ -78,6 +78,7 @@ type
     CustomizeActionBars1: TCustomizeActionBars;
     BitBtn1: TBitBtn;
     Timer1: TTimer;
+    Memo2: TMemo;
 
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -124,7 +125,7 @@ implementation
 
 uses
   Vcl.GraphUtil, Vcl.Themes, System.Types, System.Math, Winapi.GDIPAPI,
-  Winapi.GDIPOBJ, uSetting, uGlobalFunction, uControllerPanel, OcComPortObj,
+  Winapi.GDIPOBJ, uSetting, uOctopusFunction, uControllerPanel, OcComPortObj,
   DockExceptions,
   ClassTFormDockable,
   ClassTFormDockHostTabs,

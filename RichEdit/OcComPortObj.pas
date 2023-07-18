@@ -79,10 +79,11 @@ type
     FSendFormat: integer; // h
     FSendCodeFormat: integer;
     FReceiveFormat: integer; // i
-    FLogMemo: TMyRichEdit; // j
+    FLogObject: TMyRichEdit; // j
     FShowDate: Boolean;
     FShowTime: Boolean;
     FShowLineNumber: Boolean;
+    /// 永远为false,已抛弃
     FShowSendingLog: Boolean;
     FHexModeWithString: Boolean; // o
     FHexModeFormatCount: integer;
@@ -138,22 +139,24 @@ type
     Constructor Create(AOwner: TComponent; DeviceName: String);
     destructor Destroy; override;
     // procedure OcComPortObjInit(OcComPortObjPara: TOcComPortObjPara);
-    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMyRichEdit; k, l, m, N, o: Boolean);
-    procedure ClearInternalBuff(id: integer = 100);
+    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
 
     function getCMDStr(): String;
-    procedure SaveLog(FullLogFilePath: String);
-    procedure Log(const Msg: string); // log data
+    function IsLogBottom(): Boolean;
+    procedure log(const Msg: string); // log data
     procedure DebugLog(const Msg: string);
     procedure LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
-
     procedure LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
-    function IsLogBottom(): Boolean;
-
     procedure ClearLog();
+    procedure ClearInternalBuff(id: integer = 100);
 
-    // property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
-    property LogMemo: TMyRichEdit read FLogMemo write FLogMemo;
+    procedure SaveLog(FullLogFilePath: String);
+    procedure SetLogComponent(Component: TMyRichEdit);
+    procedure SetLogComponentReadOnly(ReadOnly: Boolean);
+    procedure SetCacheComponent(AOwner: TWinControl);
+    procedure SetMsgCallbackFunction(CallBackFun: TCallBackFun);
+    /// property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
+    property LogObject: TMyRichEdit read FLogObject write FLogObject;
     property StringInternelCache: TMemo read FStringInternalMemo write FStringInternalMemo;
     property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
     property ProtocolCallBackFun: TProtocolCallBackFun read FProtocolCallBackFun write FProtocolCallBackFun;
@@ -175,10 +178,9 @@ type
     property NeedCRC16: Boolean read FNeedCRC16 write FNeedCRC16 default false;
     property ShowSendedLog: Boolean read FShowSendingLog write FShowSendingLog;
     property ShowDate: Boolean read FShowDate write FShowDate;
-    property ShowLineNumber: Boolean read FShowLineNumber write FShowLineNumber;
+    property ShowLineNumber: Boolean read FShowLineNumber write FShowLineNumber default false;
     property ShowTime: Boolean read FShowTime write FShowTime;
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode default True;
-    // property BaudRateIndex: integer read FBaudRateIndex write FBaudRateIndex;
     property MouseTextSelection: Boolean read FMouseTextSelection write FMouseTextSelection;
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
     property ComPortFullName: String read FComPortFullName write FComPortFullName;
@@ -189,7 +191,6 @@ type
     function FalconComSendData_MultiTimes(str: string; SendFormat: integer): Bool;
     function FalconComSendData_SentString(str: string): integer;
 
-    procedure SendProtocolACK(); // 发送ACK
     function WaitProtocolACK(ACK: integer; timeOut: integer): Boolean;
     function WaitProtocolACK2(ACKBuffer: array of Byte; bCount: integer; timeOut: integer): Boolean;
 
@@ -200,6 +201,8 @@ type
     function SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: integer): Boolean;
 
     function GetPacks(): integer;
+    procedure SendProtocolACK(); // 发送ACK
+
     procedure PrintReceivedProtocolData(Index: integer);
     procedure PrintProtocolPack(flag: String; OcComPack: POcComPack);
     procedure RequestProtocolConnection(); // 发送连接请求
@@ -244,7 +247,7 @@ var
 
 implementation
 
-uses uGlobalFunction;
+uses uOctopusFunction;
 
 function readFileToStream(FileName: String): TFileStream;
 var
@@ -511,8 +514,8 @@ begin
         end
         else }
       begin
-        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count) + s;
-        FOcComPortObj.LogMemo.Lines.Append(s);
+        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.FLogObject.Lines.Count) + s;
+        FOcComPortObj.FLogObject.log(s);
       end;
 
       { // s := FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex];
@@ -566,7 +569,7 @@ begin
               s := Format(f, [Trim(s)]);
               s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1], FOcComPortObj.FHexModeFormatCount);
             end;
-            FOcComPortObj.Log(s);
+            FOcComPortObj.log(s);
             s := ''; // 这时J 的值无意义
           end;
         end; //
@@ -607,7 +610,7 @@ begin
             s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
             end; }
 
-          FOcComPortObj.Log(s); // 打印出所有数据,输出最终数据
+          FOcComPortObj.log(s); // 打印出所有数据,输出最终数据
           s := '';
         end;
 
@@ -663,11 +666,11 @@ begin
   self.FComPortFullName := Trim(DeviceName);
   self.Port := FalconGetComPort(DeviceName);
   // self.LogMemo := TMemo.Create(nil);
-  if self.LogMemo <> nil then
+  if self.FLogObject <> nil then
   begin
-    self.LogMemo.ScrollBars := ssBoth;
-    self.LogMemo.ReadOnly := True;
-    self.LogMemo.DoubleBuffered := True;
+    self.FLogObject.ScrollBars := ssBoth;
+    self.FLogObject.ReadOnly := True;
+    self.FLogObject.DoubleBuffered := True;
   end;
   // self.LogMemo.Parent.DoubleBuffered:=true;
   // self.LogMemo.Parent.Parent.DoubleBuffered:=true;
@@ -751,8 +754,39 @@ end;
   FOcComPortObjPara.HexModeWithString := self.FHexModeWithString;
   Result := FOcComPortObjPara;
   end; }
+procedure TOcComPortObj.SetLogComponent(Component: TMyRichEdit);
+begin
+  self.FLogObject := Component;
+  self.FLogObject.ReadOnly := True;
+  self.FLogObject.DoubleBuffered := True;
 
-procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMyRichEdit; k, l, m, N, o: Boolean);
+  /// FLogObject.OnKeyPress := self.KeyPress;
+  FLogObject.OnKeyDown := self.KeyDown;
+  FLogObject.OnKeyUp := self.KeyUp;
+
+  FLogObject.OnMouseDown := self.MouseDown;
+  FLogObject.OnMouseMove := self.MouseMove;
+  FLogObject.OnMouseUp := self.MouseUp;
+end;
+
+procedure TOcComPortObj.SetLogComponentReadOnly(ReadOnly: Boolean);
+begin
+  if (FLogObject <> nil) and (FLogObject.Parent <> nil) then
+    self.FLogObject.ReadOnly := ReadOnly;
+end;
+
+procedure TOcComPortObj.SetCacheComponent(AOwner: TWinControl);
+begin
+  StringInternelCache.Parent := AOwner;
+  StringInternelCache.DoubleBuffered := True;
+end;
+
+procedure TOcComPortObj.SetMsgCallbackFunction(CallBackFun: TCallBackFun);
+begin
+  self.CallBackFun := CallBackFun;
+end;
+
+procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
 var
   threadsuspended: Boolean;
   // oldi:integer;
@@ -805,25 +839,14 @@ begin
 
   if j <> nil then
   begin
-    if self.FLogMemo <> j then
-    begin
-      // self.FLogMemo.Free;
-      self.FLogMemo := j;
-    end;
   end;
 
-  self.FShowDate := k;
-  self.FShowTime := l;
-  self.FShowLineNumber := m;
-  self.FShowSendingLog := N;
-  self.FHexModeWithString := o;
+  self.FShowTime := time;
+  self.FShowDate := date;
 
-  LogMemo.OnKeyDown := self.KeyDown;
-  LogMemo.OnKeyUp := self.KeyUp;
-  LogMemo.OnKeyPress := self.KeyPress;
-  LogMemo.OnMouseDown := self.MouseDown;
-  LogMemo.OnMouseMove := self.MouseMove;
-  LogMemo.OnMouseUp := self.MouseUp;
+  self.FShowLineNumber := line;
+  self.FShowSendingLog := log;
+  self.FHexModeWithString := o;
   FNeedNewLine := True;
 end;
 
@@ -860,9 +883,9 @@ end;
 
 procedure TOcComPortObj.ClearLog;
 begin
-  if (LogMemo <> nil) and self.LogMemo.Showing then
+  if (FLogObject <> nil) and self.FLogObject.Showing then
   begin
-    self.LogMemo.Clear;
+    self.FLogObject.Clear;
     self.FComProcessedCount := 0;
     self.FComReceiveCount := 0;
     self.FComSentCount := 0;
@@ -898,7 +921,7 @@ begin
     begin
       str := Format(f, [Trim(str)]);
       str := str + ByteToWideString2(@Buff[i - HexModeFormatCount + 1], HexModeFormatCount);
-      Log(flag + str);
+      log(flag + str);
       str := '';
       j := 0;
     end;
@@ -906,40 +929,41 @@ begin
 
   str := Format(f, [Trim(str)]);
   str := str + ByteToWideString2(@Buff[Count - j], j);
-  Log(flag + str);
+  log(flag + str);
 end;
 
-procedure TOcComPortObj.Log(const Msg: string);
+procedure TOcComPortObj.log(const Msg: string);
 var
   i, PreLogLinesCount: Int64;
   str: String;
   isBottom: Boolean;
 begin
-  if (LogMemo = nil) or (LogMemo.Parent = nil) or (not self.Connected) then
+  if (FLogObject = nil) or (FLogObject.Parent = nil) or (not self.Connected) then
   begin
     // MessageBox(Application.Handle, 'No device is found,please open a device.', Pchar(Application.Title), MB_ICONINFORMATION + MB_OK);
     Exit;
   end;
 
   isBottom := IsLogBottom();
-  PreLogLinesCount := LogMemo.Lines.Count;
+  PreLogLinesCount := FLogObject.Lines.Count;
 
-  LogMemo.Lines.BeginUpdate;
-  LogMemo.Lines.Append(Msg);
+  FLogObject.Lines.BeginUpdate;
+  FLogObject.log(Msg);
 
   if FShowLineNumber or FShowDate or FShowTime then
   begin
-    for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do
+    for i := PreLogLinesCount to FLogObject.Lines.Count - 1 do
     begin
-      str := GetLineNumberDateTimeStamp(i) + LogMemo.Lines.Strings[i];
-      LogMemo.Lines.Strings[i] := str;
+      str := GetLineNumberDateTimeStamp(i) + FLogObject.Lines.Strings[i];
+      /// LogMemo.Lines.Strings[i] := str;
+      FLogObject.LogLine(str, i);
     end;
   end;
 
-  LogMemo.Lines.EndUpdate;
+  FLogObject.Lines.EndUpdate;
 
   if FLogScrollMode and isBottom then
-    LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+    FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
   if Assigned(FCallBackFun) then
     FCallBackFun();
 end;
@@ -950,7 +974,7 @@ end;
 // appendMod = true 起新行
 procedure TOcComPortObj.LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
 begin
-  if (LogMemo = nil) or (LogMemo.Parent = nil) or (not self.Connected) then
+  if (FLogObject = nil) or (FLogObject.Parent = nil) or (not self.Connected) then
   begin
     Exit;
   end;
@@ -960,14 +984,14 @@ begin
     begin
       // BeginUpdate memo控件不会滚动更新垂直滚动条不会自动滑动
       // 但是光标会在最新输入点
-      LogMemo.Lines.BeginUpdate;
-      LogMemo.Lines.Add(Msg);
-      LogMemo.Lines.EndUpdate;
+      FLogObject.Lines.BeginUpdate;
+      FLogObject.log(Msg);
+      FLogObject.Lines.EndUpdate;
     end
     else
     begin // bottomMod 底部跟踪模式
       // 垂直滚动条自动滚动到最地下
-      LogMemo.Lines.Add(Msg);
+      FLogObject.log(Msg);
     end;
   end
   else
@@ -975,13 +999,15 @@ begin
     if (not bottomMod) then
     begin
       // BeginUpdate memo控件不会滚动更新垂直滚动条不会自动滑动
-      LogMemo.Lines.BeginUpdate;
-      LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + Msg;
-      LogMemo.Lines.EndUpdate;
+      FLogObject.Lines.BeginUpdate;
+      /// LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + Msg;
+      FLogObject.LogEndLine(Msg);
+      FLogObject.Lines.EndUpdate;
     end
     else
     begin // bottomMod 底部跟踪模式
-      LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + Msg;
+      /// LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + Msg;
+      FLogObject.LogEndLine(Msg);
     end;
   end;
 end;
@@ -992,26 +1018,28 @@ var
   str: String;
   isBottom: Boolean;
 begin
-  if (LogMemo = nil) or (LogMemo.Parent = nil) then
+  if (FLogObject = nil) or (FLogObject.Parent = nil) then
     Exit;
   isBottom := IsLogBottom();
-  PreLogLinesCount := LogMemo.Lines.Count;
-  LogMemo.Lines.BeginUpdate;
-  LogMemo.Lines.Append(Msg);
+  PreLogLinesCount := FLogObject.Lines.Count;
+  FLogObject.Lines.BeginUpdate;
+  /// LogMemo.Lines.Append(Msg);
+  FLogObject.log(Msg);
 
   if FShowLineNumber or FShowDate or FShowTime then
   begin
-    for i := PreLogLinesCount to LogMemo.Lines.Count - 1 do
+    for i := PreLogLinesCount to FLogObject.Lines.Count - 1 do
     begin
-      str := GetLineNumberDateTimeStamp(i) + LogMemo.Lines.Strings[i];
-      LogMemo.Lines.Strings[i] := str;
+      str := GetLineNumberDateTimeStamp(i) + FLogObject.Lines.Strings[i];
+      /// LogMemo.Lines.Strings[i] := str;
+      FLogObject.LogLine(str, i);
     end;
   end;
 
-  LogMemo.Lines.EndUpdate;
+  FLogObject.Lines.EndUpdate;
 
   if FLogScrollMode and isBottom then
-    LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+    FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
   if Assigned(FCallBackFun) then
     FCallBackFun();
 end;
@@ -1023,9 +1051,11 @@ var
   SF: TScrollInfo;
   currentPos: integer;
 begin
+  if FLogObject = nil then
+    Exit;
   SF.fMask := SIF_ALL;
   SF.cbSize := SizeOf(SF);
-  GetScrollInfo(LogMemo.Handle, SB_VERT, SF);
+  GetScrollInfo(FLogObject.Handle, SB_VERT, SF);
   currentPos := SF.nPos + SF.nPage;
   Result := false;
   if currentPos >= SF.nMax - 20 then
@@ -1046,13 +1076,13 @@ begin
       self.Write(Buffer, Count);
       FComSentCount := FComSentCount + Count;
     except
-      Log('Sorry Write to device fail!!');
+      log('Sorry Write to device fail!!');
       Exit;
     end;
   end
   else
   begin
-    Log('Device was closed,please open a device.');
+    log('Device was closed,please open a device.');
     Exit;
   end;
 end;
@@ -1076,9 +1106,9 @@ begin
           if FShowSendingLog then
           begin
             if FReceiveFormat = 1 then
-              Log(SEND_FLAG + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
+              log(SEND_FLAG + tempstr) // 十六进制接收采用单行LOG 的方式，会自起新行。
             else
-              Log(SEND_FLAG + str); // new ling in memo for receive data 发送字符串,后面自带换行
+              log(SEND_FLAG + str); // new ling in memo for receive data 发送字符串,后面自带换行
           end;
 
           try
@@ -1088,13 +1118,13 @@ begin
             FComSentCount := FComSentCount + bLength;
           except
             Result := false;
-            Log('Sorry Write to device fail!!');
+            log('Sorry Write to device fail!!');
             Exit;
           end;
         end
         else
         begin
-          Log('Device was closed,please open a device.');
+          log('Device was closed,please open a device.');
           Exit;
         end;
       end;
@@ -1105,19 +1135,19 @@ begin
         begin
           s := FormatHexStrToByte(Trim(str), buf, bLength);
           if FShowSendingLog then
-            Log(SEND_FLAG + s); // Log(''); // new line prepare to receive
+            log(SEND_FLAG + s); // Log(''); // new line prepare to receive
 
           try
             self.Write(buf, bLength);
             FComSentCount := FComSentCount + bLength;
           except
-            Log('Sorry Write to device fail!!');
+            log('Sorry Write to device fail!!');
             Exit;
           end;
         end
         else
         begin
-          Log('Device was closed,please open a device.');
+          log('Device was closed,please open a device.');
           Exit;
         end;
       end;
@@ -1169,13 +1199,13 @@ begin
             FComSentCount := FComSentCount + Length(str);
           except
             Result := false;
-            Log('Sorry Write to device fail!!');
+            log('Sorry Write to device fail!!');
             Exit;
           end;
         end
         else
         begin
-          Log('Device was closed,please open a device.');
+          log('Device was closed,please open a device.');
           Exit;
         end;
         // exit;
@@ -1191,13 +1221,13 @@ begin
             self.Write(buf, bLength);
             FComSentCount := FComSentCount + bLength;
           except
-            Log('Sorry Write to device fail!!');
+            log('Sorry Write to device fail!!');
             Exit;
           end;
         end
         else
         begin
-          Log('Device was closed,please open a device.');
+          log('Device was closed,please open a device.');
           Exit;
         end;
       end;
@@ -1220,6 +1250,7 @@ var
 begin
   Result := True;
   bLength := 0;
+  FMouseTextSelection := false;
   case SendFormat of
     Ord(S_ASCIIFormat): // send string ascci char
       begin
@@ -1227,7 +1258,7 @@ begin
         if self.Connected then
         begin
           if FShowSendingLog then
-            Log(SEND_FLAG + str);
+            log(SEND_FLAG + str);
 
           try
             // self.writestr(str);
@@ -1235,13 +1266,13 @@ begin
             FComSentCount := FComSentCount + bLength;
           except
             Result := false;
-            Log('Sorry Write to device fail!!');
+            log('Sorry Write to device fail!!');
             Exit;
           end;
         end
         else
         begin
-          Log('Device was closed,please open a device.');
+          log('Device was closed,please open a device.');
           Exit;
         end;
       end;
@@ -1252,19 +1283,19 @@ begin
         begin
           s := FormatHexStrToByte(Trim(str), buf, bLength);
           if FShowSendingLog then
-            Log(SEND_FLAG + s);
+            log(SEND_FLAG + s);
 
           try
             self.Write(buf, bLength);
             FComSentCount := FComSentCount + bLength;
           except
-            Log('Sorry Write to device fail!!');
+            log('Sorry Write to device fail!!');
             Exit;
           end;
         end
         else
         begin
-          Log('Device was closed,please open a device.');
+          log('Device was closed,please open a device.');
           Exit;
         end;
       end;
@@ -1295,7 +1326,7 @@ VAR
   ss: TStringStream;
 begin
   Result := 0;
-  case self.SendCodeFormat of
+  case self.FSendCodeFormat of
     0:
       begin
         self.writestr(str);
@@ -1471,7 +1502,7 @@ begin
         ReadUnicodeString(FComReceiveString, Count) // 可以读中文
       else
         ReadStr(FComReceiveString, Count);
-      // 兼容 \R
+      // 兼容 \R 字符的索引从1开始也即是>=1
       if (Pos(#$D#$A, FComReceiveString) <= 0) and (Count <= 2048) then
       begin
         if (Pos(#$A, FComReceiveString) > 0) then
@@ -1527,7 +1558,8 @@ begin
       end;
       // 统计处理数量
       FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
-      FLastLineStr := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
+      FLastLineStr := self.FLogObject.GetLastLine();
+      /// LogMemo.Lines.Strings[LogMemo.Lines.Count - 1];
     end;
   end
   /// ///////////////////////////////////////////////////////////////////////////
@@ -1646,8 +1678,8 @@ FUNCTION_END:
   begin
     if (FLogScrollMode) and (Length(FComReceiveString) > 0) and isBottom then
     begin
-      LogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
-      LogMemo.Perform(WM_HSCROLL, SB_LEFT, 0);
+      FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+      FLogObject.Perform(WM_HSCROLL, SB_LEFT, 0);
     end;
   end;
 end;
@@ -1695,11 +1727,11 @@ begin
     INC(reTryCount);
     if reTryCount > 10 then // >=11
     begin
-      Log('No ack from device transmit failed!');
+      log('No ack from device transmit failed!');
       Result := false;
       Exit;
     end;
-    Log('Time Out Try ... ' + IntToStr(reTryCount));
+    log('Time Out Try ... ' + IntToStr(reTryCount));
     if (not Connected) then
     begin
       break;
@@ -1899,7 +1931,7 @@ begin
     else
       str := Trim(str) + '   ' + ByteToWideString2(@OcComPack.data, OcComPack.Length)
   end;
-  Log(str);
+  log(str);
 end;
 
 procedure TOcComPortObj.PrintReceivedProtocolData(Index: integer);
@@ -1926,7 +1958,7 @@ begin
     begin
       str := str + Format('%.02x ', [self.FOcComProtocal.GetPackByIndex(i).data[j]]);
     end;
-    self.Log(str);
+    self.log(str);
 
     { v := FOcComProtocal.GetBytesValue(i);
       if (v > 65525) then
@@ -1942,11 +1974,20 @@ procedure TOcComPortObj.SaveLog(FullLogFilePath: String);
 begin
   if FullLogFilePath <> '' then
   begin
-    self.LogMemo.Lines.SaveToFile(FullLogFilePath);
-    FullLogFileName := FullLogFilePath;
+    if (ExtractFileExt(FullLogFilePath) = '') or (DirectoryExists(FullLogFilePath)) then
+    begin
+      FLogObject.SaveTo(FullLogFilePath + '\' + Self.ComPortFullName + '.log');
+      FullLogFileName := FullLogFilePath;
+    end
+    else
+    begin
+      FLogObject.SaveTo(FullLogFilePath);
+      FullLogFileName := FullLogFilePath;
+    end;
   end
   else if FullLogFileName <> '' then
-    self.LogMemo.Lines.SaveToFile(FullLogFileName);
+    /// self.LogMemo.Lines.SaveToFile(FullLogFileName);
+    FLogObject.SaveTo(FullLogFileName);
 end;
 
 function TOcComPortObj.GetPacks: integer;
@@ -1960,7 +2001,7 @@ var
   jh: integer;
   my: integer;
 begin
-  LastStr := Trim(LogMemo.Lines.Strings[LogMemo.Lines.Count - 1]);
+  LastStr := Trim(FLogObject.GetLastLine());
   jh := Pos('#', LastStr);
   my := Pos('$', LastStr);
   if jh > 0 then
@@ -1989,15 +2030,15 @@ begin
   begin
     Exit;
   end;
-  CurrentLine := LogMemo.CaretPos.Y; // 光标所在的行
+  CurrentLine := FLogObject.CaretPos.Y; // 光标所在的行
 
   if (Key = #13) then
   begin
 
     FCommadLineStr := getCMDStr();
-    if LogMemo.ReadOnly or (Trim(FCommadLineStr) = '') then
+    if FLogObject.ReadOnly or (Trim(FCommadLineStr) = '') then
     begin
-      LogMemo.ReadOnly := false;
+      FLogObject.ReadOnly := false;
       FalconComSendData_Terminal(' ', self.FSendFormat);
       FCommadLineStr := '';
       Key := #0;
@@ -2027,14 +2068,14 @@ begin
   if (Key = #9) then
   begin
     FCommadLineStr := getCMDStr();
-    LastStr := LogMemo.Lines.Strings[CurrentLine];
+    LastStr := FLogObject.GetLine(CurrentLine);
     cmd := Trim(FCommadLineStr) + Key;
     if cmd = Key then
     begin
       Key := #0;
       Exit; // 只有tab
     end;
-    Log('');
+    log('');
     FalconComSendData_Terminal(cmd, self.FSendFormat);
     FPreCommadLineStr := FCommadLineStr;
     FCommadLineStr := '';
@@ -2044,8 +2085,8 @@ begin
 
   if Key = #8 then // 删除
   begin
-    CurrentLine := LogMemo.CaretPos.Y;
-    LastStr := LogMemo.Lines.Strings[CurrentLine];
+    CurrentLine := FLogObject.CaretPos.Y;
+    LastStr := FLogObject.GetLine(CurrentLine);
     Len := Length(Trim(FLastLineStr));
     i := Pos(Trim(FCommadLineStr), LastStr);
     j := Pos(Trim(FPreCommadLineStr), LastStr);
@@ -2062,7 +2103,7 @@ begin
 
     if (j > 0) then // 最后一行有回显
     begin
-      LastStr := LogMemo.Lines.Strings[CurrentLine];
+      LastStr := FLogObject.GetLine(CurrentLine);
       delete(FPreCommadLineStr, Length(FPreCommadLineStr), Length(FPreCommadLineStr));
     end
     // 当前输入
@@ -2101,59 +2142,60 @@ begin
   MaskedKeyState := Shift * [ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle, ssDouble, ssTouch, ssPen, ssCommand];
   if (Key <> VK_RETURN) and (Key <> VK_PRIOR) and (Key <> VK_NEXT) and (Key <> VK_HOME) and (Key <> VK_END) and (MaskedKeyState = []) then
   begin
-    FLogMemo.SelStart := Length(LogMemo.Text);
-    FLogMemo.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+    FLogObject.SelStart := MaxInt;
+    /// Length(FLogObject.Text);
+    FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
   end;
 
-  if (Key = VK_LEFT) or (Key = 38) OR (Key = 39) OR (Key = 40) then // 方向键回溯历史
-  BEGIN
-    CurrentLine := LogMemo.Lines.Count - 1; // LogMemo.CaretPos.y;
-    LastStr := LogMemo.Lines.Strings[CurrentLine];
+  { if (Key = VK_LEFT) or (Key = 38) OR (Key = 39) OR (Key = 40) then // 方向键回溯历史
+    BEGIN
+    CurrentLine := FLogObject.Lines.Count - 1; // LogMemo.CaretPos.y;
+    LastStr := FLogObject.GetLine(CurrentLine);
     i := Pos(FCommadLineStr, LastStr);
     j := Pos(FPreCommadLineStr, LastStr);
 
     if (FCommandHistoryIndex <= 0) and (FCommandHistory.Count > 0) then
-      FCommandHistoryIndex := FCommandHistory.Count - 1
+    FCommandHistoryIndex := FCommandHistory.Count - 1
     else
-      FCommandHistoryIndex := 0;
+    FCommandHistoryIndex := 0;
 
     if (FCommandHistory.Count <= 0) then
     begin
-      Key := 0;
-      Exit;
+    Key := 0;
+    Exit;
     end;
 
     if (Length(LastStr) > Length(FLastLineStr)) then
-      delete(LastStr, Length(FLastLineStr) + 1, Length(LastStr) - Length(FLastLineStr));
+    delete(LastStr, Length(FLastLineStr) + 1, Length(LastStr) - Length(FLastLineStr));
 
     if (i > 1) then
     begin
-      LogMemo.Lines.Strings[CurrentLine] := LastStr + FCommandHistory.Strings[FCommandHistoryIndex];
+    FLogObject.Lines.Strings[CurrentLine] := LastStr + FCommandHistory.Strings[FCommandHistoryIndex];
     end
     else if (j > 1) then
     begin
-      LogMemo.Lines.Strings[CurrentLine] := LastStr + FCommandHistory.Strings[FCommandHistoryIndex];
+    FLogObject.Lines.Strings[CurrentLine] := LastStr + FCommandHistory.Strings[FCommandHistoryIndex];
     end
     else if (FPreCommadLineStr <> '') then
     begin
-      LogMemo.Lines.Strings[CurrentLine] := LastStr + FCommandHistory.Strings[FCommandHistoryIndex];
+    FLogObject.Lines.Strings[CurrentLine] := LastStr + FCommandHistory.Strings[FCommandHistoryIndex];
     end
     else
     begin
-      LogMemo.Lines.Strings[CurrentLine] := LastStr + FCommandHistory.Strings[FCommandHistoryIndex];
+    FLogObject.Lines.Strings[CurrentLine] := LastStr + FCommandHistory.Strings[FCommandHistoryIndex];
     end;
 
     FCommandHistoryIndex := FCommandHistoryIndex - 1;
     Key := 0;
     Exit;
-  END;
+    END; }
 
   if (Shift = [ssCtrl]) then
   begin
     if (Key = $43) then // Control+VK_C
     begin
       cmdbuf[0] := $03;
-      if (self.Connected) and (Trim(LogMemo.SelText) = '') then
+      if (self.Connected) and (Trim(FLogObject.SelText) = '') then
         self.FalconComSendBuffer(cmdbuf, 1)
     end
     else if (Key = 70) then // Control+VK_F
@@ -2171,8 +2213,8 @@ begin
 
   if (Key = $1B) then // ESC
   begin
-    if not self.LogMemo.ReadOnly then
-      FLogMemo.ReadOnly := True;
+    if not self.FLogObject.ReadOnly then
+      FLogObject.ReadOnly := True;
     FMouseTextSelection := false;
   end;
 end;
@@ -2274,7 +2316,7 @@ begin
           buf := buf + string(Buffer);
         until (BytesRead < ReadBufferSize);
         // When expression returns True, the repeat statement terminates.
-        Log(buf);
+        log(buf);
 
       end;
     finally
@@ -2283,7 +2325,7 @@ begin
       CloseHandle(ProcessInfo.hProcess);
       CloseHandle(ProcessInfo.hThread);
       CloseHandle(ReadPipe);
-      Log(CmdDir + '>');
+      log(CmdDir + '>');
       ExitThread(4);
     end;
   end;
@@ -2295,7 +2337,7 @@ begin
     FComUIHandleThread.Suspended := True;
     close();
   except
-    Log('Can not close  ' + FComPortFullName);
+    log('Can not close  ' + FComPortFullName);
   end;
   status := 0;
 end;

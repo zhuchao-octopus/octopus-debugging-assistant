@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/07/15 18:17:31.000.241,=D:\lenovo\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2023/07/15 18:19:34.000.850,F:\DelphiProjects\OCTOPUS\RichEdit\Downloader.dproj=D:\lenovo\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2023/07/15 18:20:03.000.314,=F:\DelphiProjects\OCTOPUS\RichEdit\uDownloadsManager.pas</Transaction>
+    <Transaction>2023/07/15 18:20:03.000.256,=F:\DelphiProjects\OCTOPUS\RichEdit\uDownloader.pas</Transaction>
+    <Transaction>2023/07/15 18:20:50.000.681,=F:\DelphiProjects\ZSBWM\PUBLIC\GlabalSession.pas</Transaction>
+    <Transaction>2023/07/15 18:20:50.000.727,=F:\DelphiProjects\ZSBWM\PUBLIC\GlobalFunctions.pas</Transaction>
+    <Transaction>2023/07/15 18:20:50.000.758,=F:\DelphiProjects\ZSBWM\PUBLIC\GlobalTypeConst.pas</Transaction>
+    <Transaction>2023/07/15 18:20:50.000.789,=F:\DelphiProjects\ZSBWM\PUBLIC\MessageQueue.pas</Transaction>
+    <Transaction>2023/07/15 18:21:18.000.292,=F:\DelphiProjects\ZSBWM\POWERENGINE\DataEngine.pas</Transaction>
+    <Transaction>2023/07/17 09:15:23.000.898,=F:\DelphiProjects\OCTOPUS\uOctopusFunction.pas</Transaction>
+  </Transactions>
+</BorlandProject>

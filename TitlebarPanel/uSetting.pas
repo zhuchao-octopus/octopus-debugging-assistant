@@ -105,7 +105,7 @@ implementation
 
 {$R *.dfm}
 
-uses ocPcDeviceMgt, IniFiles, uGlobalFunction, CPort, CPortCtl;
+uses ocPcDeviceMgt, IniFiles, uOctopusFunction, CPort, CPortCtl;
 
 function GetSystemDateTimeStampStr(): string;
 var

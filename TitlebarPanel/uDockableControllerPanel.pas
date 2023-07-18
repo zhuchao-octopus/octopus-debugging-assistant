@@ -101,7 +101,7 @@ implementation
 
 {$R *.dfm}
 
-uses uSetting, uGlobalFunction;
+uses uSetting, uOctopusFunction;
 
 function TFrmDockableController.GetStringGridValidStr(sStr: String): String;
 var

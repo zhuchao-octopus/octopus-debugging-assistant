@@ -22,6 +22,8 @@ type
     FRegion: String;
     FComments: String;
     procedure RSAPublicEncrypt(str: String);
+  public
+    procedure SetComments(Const Comments: String);
   protected
     procedure Execute; override;
   end;
@@ -68,9 +70,13 @@ uses NetInterface, GlobalFunctions, IniFiles;
 { TCheckDeviceThreak }
 
 procedure TCheckDeviceThreak.RSAPublicEncrypt(str: String);
-
 begin
 
+end;
+
+procedure TCheckDeviceThreak.SetComments(Const Comments: String);
+begin
+  Self.FComments := Comments;
 end;
 
 procedure TCheckDeviceThreak.Execute;
@@ -92,7 +98,7 @@ begin
     Octopusini := TIniFile.Create(ConfigFileName);
     timeStamp := DateTimeToLongWord(Now(), 240); // 一天只登记一次
     timeStamp2 := Octopusini.ReadInt64('', 'TIMESTAMP', 0);
-    if (timeStamp = timeStamp2) then
+    if (timeStamp = timeStamp2) and (FComments <> '') then
       Exit;
 
     if FClient = nil then
@@ -123,9 +129,9 @@ begin
     cParam.Add('region=' + FRegion);
     cParam.Add('comments=' + FComments);
 
-    //s := RSATestForm.PublicEncrypt(cParam.ToString);
-    //URL2 := 'http://47.106.172.94:8090/zhuchao/octopus/devices/testCheckRSA?str=' + s;
-    //LResponse := FClient.Get(URL);
+    // s := RSATestForm.PublicEncrypt(cParam.ToString);
+    // URL2 := 'http://47.106.172.94:8090/zhuchao/octopus/devices/testCheckRSA?str=' + s;
+    // LResponse := FClient.Get(URL);
 
     if (timeStamp = timeStamp2) then
       Exit;
@@ -139,6 +145,8 @@ begin
       cParam.Free;
     if Octopusini <> nil then
       Octopusini.Free;
+    FComments := '';
+    Self.Terminate;
   end;
 
 end;
