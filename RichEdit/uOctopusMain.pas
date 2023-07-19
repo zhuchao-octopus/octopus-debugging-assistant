@@ -2278,8 +2278,8 @@ procedure TMainOctopusDebuggingDevelopmentForm.InitMainUI();
 begin
   ToggleSwitchDeviceOnOff.Height := 25;
   StandardToolBar2.Height := 33;
-  Application.Title := APPLICATION_TITLE_NAME;
-  Self.Caption := APPLICATION_TITLE_NAME;
+  Application.Title := OCTOPUS_APPLICATION_TITLE_NAME;
+  Self.Caption := OCTOPUS_APPLICATION_TITLE_NAME;
   Self.Icon := Application.Icon;
   Application.OnHint := ShowHint;
 
@@ -2288,7 +2288,7 @@ begin
     SettingPagesDlg := TSettingPagesDlg.Create(nil);
     SettingPagesDlg.SettingChangedCallBackFuntion := Self.SettingChangedCallBackFuntion;
   end;
-  Self.Caption := APPLICATION_TITLE_NAME + ' (' + SettingPagesDlg.VersionNumberStr + ')';
+  Self.Caption := OCTOPUS_APPLICATION_TITLE_NAME + ' (' + SettingPagesDlg.VersionNumberStr + ')';
 
   CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   FileOpenCmd.Dialog.InitialDir := ExtractFilePath(ParamStr(0));

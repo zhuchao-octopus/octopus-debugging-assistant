@@ -24,6 +24,7 @@ Const
   OCTOPUS_UPGRADING_URL = 'http://47.106.172.94:8090/zhuchao/octopus/devices/getDeviceInfor';
   OCTOPUS_APPLICATION_TITLE_NAME = 'Octopus Serial Port Debugging and Development Assistant';
   OCTOPUS_DEBUGGING_AND_DEVELOPMENT_CLASSNAME = 'TMainOctopusDebuggingDevelopmentForm';
+  APPLICATION_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
 
 {$IFDEF CPU64BITS}
   ApplicatonShortcutName = 'Octopus Serial Development Assistant'; // for 64 bit;

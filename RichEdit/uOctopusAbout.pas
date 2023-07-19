@@ -105,7 +105,7 @@ var
   /// URL: String;
   DownloadObject: TDownloadObject;
 begin
-  DownloadObject := TDownloadObject.Create(UPGRADING_URL);
+  DownloadObject := TDownloadObject.Create(OCTOPUS_UPGRADING_URL);
   DownloadObject.OnThreadData := DownLoadObjectDataEvent;
   DownloadObject.StartPost();
 end;
