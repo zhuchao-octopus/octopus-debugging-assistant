@@ -325,7 +325,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 50
       Height = 22
-      Hint = 'OnOff'
+      Hint = 'OnOff switch for device'
       ShowStateCaption = False
       TabOrder = 2
       OnClick = ToggleSwitchDeviceOnOffClick
@@ -357,6 +357,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object ToolButton16: TToolButton
       Left = 478
       Top = 0
+      Hint = 'Setting of device'
       Caption = 'ToolButton16'
       ImageIndex = 29
       OnClick = ToolButton16Click

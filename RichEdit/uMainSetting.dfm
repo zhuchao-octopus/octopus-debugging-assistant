@@ -60,9 +60,9 @@ object SettingPagesDlg: TSettingPagesDlg
             object Label112: TLabel
               Left = 8
               Top = 44
-              Width = 105
+              Width = 109
               Height = 17
-              Caption = 'Background Color'
+              Caption = 'Back ground Color'
             end
             object Label113: TLabel
               Left = 8
@@ -81,7 +81,7 @@ object SettingPagesDlg: TSettingPagesDlg
             object Button5: TButton
               Left = 8
               Top = 152
-              Width = 351
+              Width = 356
               Height = 34
               Caption = 'Clear internal cache '
               TabOrder = 0
@@ -90,7 +90,7 @@ object SettingPagesDlg: TSettingPagesDlg
             object Button4: TButton
               Left = 8
               Top = 112
-              Width = 351
+              Width = 356
               Height = 34
               Caption = 'Open the log and the profile directory '
               TabOrder = 1
@@ -106,7 +106,7 @@ object SettingPagesDlg: TSettingPagesDlg
               OnClick = Button6Click
             end
             object ColorBoxContentBG: TColorBox
-              Left = 118
+              Left = 123
               Top = 40
               Width = 241
               Height = 22
@@ -114,7 +114,7 @@ object SettingPagesDlg: TSettingPagesDlg
               TabOrder = 3
             end
             object ColorBoxText: TColorBox
-              Left = 118
+              Left = 123
               Top = 73
               Width = 241
               Height = 22
@@ -124,7 +124,7 @@ object SettingPagesDlg: TSettingPagesDlg
               OnChange = ColorBoxTextChange
             end
             object ComboBox8: TComboBox
-              Left = 118
+              Left = 123
               Top = 8
               Width = 241
               Height = 25

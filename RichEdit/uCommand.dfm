@@ -4,7 +4,7 @@ object CommandFrm: TCommandFrm
   BorderStyle = bsDialog
   Caption = 'Quick Terminal Commands'
   ClientHeight = 39
-  ClientWidth = 484
+  ClientWidth = 605
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +19,7 @@ object CommandFrm: TCommandFrm
     AlignWithMargins = True
     Left = 10
     Top = 3
-    Width = 464
+    Width = 585
     Height = 27
     Margins.Left = 10
     Margins.Right = 10
@@ -32,8 +32,6 @@ object CommandFrm: TCommandFrm
     ParentFont = False
     TabOrder = 0
     OnKeyPress = ComboBox1KeyPress
-    ExplicitLeft = 0
-    ExplicitTop = 0
-    ExplicitWidth = 789
+    ExplicitWidth = 464
   end
 end

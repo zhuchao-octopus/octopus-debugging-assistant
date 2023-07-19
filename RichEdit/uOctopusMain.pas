@@ -425,7 +425,8 @@ type
     procedure SaveProjectSetting(SavePrivate: Boolean);
     procedure LoadProjectSetting();
 
-    procedure ShowHideRLPanel(RL: Integer);
+    procedure ShowHideRLPanel(RL: Integer = 1); overload;
+    procedure ShowHideRLPanel(OpenClose: Boolean; RL: Integer = 1); overload;
     procedure SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
     procedure SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
 
@@ -515,6 +516,27 @@ begin
   until (Now - FirstTickCount >= MSecs) or (Now < FirstTickCount);
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.ShowHideRLPanel(OpenClose: Boolean; RL: Integer = 1);
+begin
+  if RL = 1 then
+  begin
+    if not OpenClose then
+    begin
+      SV_R.Close;
+    end
+    else
+    begin
+      if SV_R.Width < 30 then
+        SV_R.Width := 400;
+      Splitter1.Align := alLeft;
+      SV_R.Align := alRight;
+      SV_R.Placement := svpRight;
+      SV_R.Open;
+      AdjustUI();
+    end;
+  end;
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.ShowHideRLPanel(RL: Integer);
 begin
   if RL = 1 then
@@ -528,6 +550,7 @@ begin
         SV_R.Width := 400;
       end;
       SV_R.Open;
+      AdjustUI();
     end;
   end;
 end;
@@ -567,8 +590,6 @@ begin
 
         if (Msg.wParam = VK_F1) then
         begin
-          // Memo1.SetFocus;
-          Handled := True;
           ShowHideRLPanel(1);
           Handled := True;
         end;
@@ -587,17 +608,8 @@ begin
             OcComPortObj.SetLogComponentReadOnly(True);
           end;
 
-          if SV_R.Opened then
-          begin
-            SV_R.Close;
-            Handled := True;
-            exit;
-          end;
-          if (not SV_R.Opened) then
-          begin
-            SV_R.Open;
-            Handled := True;
-          end;
+          ShowHideRLPanel(1);
+          Handled := True;
         end;
 
         GetKeyboardstate(keyState);
@@ -1206,20 +1218,7 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.RightOperationPanel1Click(Sender: TObject);
 begin
   RightOperationPanel1.Checked := not RightOperationPanel1.Checked;
-
-  if RightOperationPanel1.Checked then
-  begin
-    if SV_R.Width < 30 then
-      SV_R.Width := 400;
-    Splitter1.Align := alLeft;
-    SV_R.Align := alRight;
-    SV_R.Placement := svpRight;
-    SV_R.Open;
-  end
-  else
-  begin
-    SV_R.Close;
-  end;
+  ShowHideRLPanel(RightOperationPanel1.Checked);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SetModified(Value: Boolean);
@@ -2086,7 +2085,7 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.SettingItem1Click(Sender: TObject);
 begin
   SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
-  ///SettingPagesDlg.ShowModal();
+  /// SettingPagesDlg.ShowModal();
   SettingPagesDlg.Show();
   InitUartsParameters();
   UpdateUartToolBar();
@@ -2981,17 +2980,13 @@ begin
   if (OcComPortObj = nil) then
     exit;
   StatusBar1.Panels.BeginUpdate;
-  if (OcComPortObj.LogObject <> nil) then /// and (OcComPortObj.Connected)
+  if (OcComPortObj.LogObject <> nil) then
+  /// and (OcComPortObj.Connected)
   begin
 
-    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port +
-    ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes' +
-    ' | Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes' +
-    ' | Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes' +
-    ' | Total: ' + IntToStr(Length(OcComPortObj.LogObject.Text)) + ' Bytes' +
-    ' | Line: ' +  IntToStr(OcComPortObj.LogObject.CaretPos.Y)  +
-    ' | Lines: ' + IntToStr(OcComPortObj.LogObject.Lines.Count) +
-    ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
+    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes' + ' | Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes' +
+      ' | Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes' + ' | Total: ' + IntToStr(Length(OcComPortObj.LogObject.Text)) + ' Bytes' + ' | Line: ' +
+      IntToStr(OcComPortObj.LogObject.CaretPos.Y) + ' | Lines: ' + IntToStr(OcComPortObj.LogObject.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
 
     // StatusBar1.Panels.EndUpdate;
   end
@@ -3002,8 +2997,8 @@ begin
     /// IntToStr(Memo1.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
   end;
   StatusBar1.Panels.EndUpdate;
-  ///StatusBar1.Update;
-  ///Application.ProcessMessages;
+  /// StatusBar1.Update;
+  /// Application.ProcessMessages;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ShowStartComments(OcComPortObj: TOcComPortObj);

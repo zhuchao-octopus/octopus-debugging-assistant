@@ -630,7 +630,7 @@ begin
       end;
     end // hex
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////Graphic
-    else if self.FOcComPortObj.FReceiveFormat = Ord(Graphic) then
+    else if (FOcComPortObj.FReceiveFormat = Ord(Graphic)) and (FOcComPortObj.FastLineSeries <> nil) then
     begin
       if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
       begin // 有数据处理数据
@@ -1584,7 +1584,7 @@ begin
     end;
   end
   /// //////////////////////////////////////////////////////////////////////////
-  else if FReceiveFormat = Ord(Graphic) then // receive as Graphic
+  else if (FReceiveFormat = Ord(Graphic)) and (FastLineSeries <> nil) then // receive as Graphic
   begin
     ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
     self.FComHandleThread_Wait := True;
@@ -1976,7 +1976,7 @@ begin
   begin
     if (ExtractFileExt(FullLogFilePath) = '') or (DirectoryExists(FullLogFilePath)) then
     begin
-      FLogObject.SaveTo(FullLogFilePath + '\' + Self.ComPortFullName + '.log');
+      FLogObject.SaveTo(FullLogFilePath + '\' + self.ComPortFullName + '.log');
       FullLogFileName := FullLogFilePath;
     end
     else

@@ -37,7 +37,7 @@ begin
     if (OcComPortObj <> nil) and (OcComPortObj.Connected) then
     begin
       Command := Trim(ComboBox1.Text);
-      OcComPortObj.FalconComSendData_SentString(Command);
+      OcComPortObj.FalconComSendData_Terminal(Command,0);
       if ComboBox1.Items.IndexOf(Command) < 0 then
       begin
         ComboBox1.Items.Add(Command);
