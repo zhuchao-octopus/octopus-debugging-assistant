@@ -59,7 +59,7 @@ type
     CopyButton: TToolButton;
     PasteButton: TToolButton;
     ToolButton7: TToolButton;
-    FontName: TComboBox;
+    ComBoBoxFontName: TComboBox;
     FontSize: TEdit;
     ToolButton8: TToolButton;
     UpDown1: TUpDown;
@@ -230,6 +230,10 @@ type
     N18: TMenuItem;
     PageSetting1: TMenuItem;
     N19: TMenuItem;
+    N20: TMenuItem;
+    CancelItem: TMenuItem;
+    N21: TMenuItem;
+    ToolButton19: TToolButton;
 
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -246,15 +250,16 @@ type
     procedure SelectFont(Sender: TObject);
     procedure SelectFontBeforeExecute(Sender: TObject);
 
-    procedure FontSizeChange(Sender: TObject);
-    procedure FontNameChange(Sender: TObject);
-
     procedure RichEditChange(Sender: TObject);
     procedure RichEditTransparentItemClick(Sender: TObject);
     procedure RichEditorLinkClick(Sender: TCustomRichEdit; const URL: string; Button: TMouseButton);
     procedure RichEditorClick(Sender: TObject);
+
+    procedure FontSizeChange(Sender: TObject);
+    procedure ComBoBoxFontNameChange(Sender: TObject);
     procedure FGColorBoxChange(Sender: TObject);
     procedure BGColorBoxChange(Sender: TObject);
+
     procedure SuperscriptCmdExecute(Sender: TObject);
     procedure SuperscriptCmdUpdate(Sender: TObject);
     procedure SubscriptCmdExecute(Sender: TObject);
@@ -349,6 +354,7 @@ type
     procedure SV_RClosed(Sender: TObject);
     procedure FontDialogShow(Sender: TObject);
     procedure PageSetting1Click(Sender: TObject);
+    procedure CancelItemClick(Sender: TObject);
 
   private
     OcComPortObj_Loop: TOcComPortObj;
@@ -367,10 +373,11 @@ type
     FDragOfs: Integer;
     FDragging: Boolean;
 
+    procedure StopLoopSending();
     procedure ShowHint(Sender: TObject);
 
     function CurrTextAttributes(): TTextAttributes;
-    procedure SynchroSetMyRichEditFont(MyRichEdit: TMyRichEdit; Style: Integer);
+    procedure SynchroSetMyRichEditFont(MyRichEdit: TComponent);
     procedure SetMyRichEditFont(MyRichEdit: TMyRichEdit);
     procedure SynchroFontDialog(MyRichEdit: TMyRichEdit; Style: Integer);
 
@@ -390,9 +397,10 @@ type
     function GetStringGridValidStr(sStr: String): String;
     function GetCurrentPageName(): String;
     function GetCurrentDevice(): TOcComPortObj;
-    function SearchMemo(Memo: TMyRichEdit; const SearchString: string; Options: TFindOptions): Boolean;
 
+    function SearchTextFrom(Component: TComponent; const SearchString: string; Options: TFindOptions): Boolean;
     procedure ShowSearchDialog();
+
     procedure CreateMyObjectPage(PageName: String; PageType: Integer);
     procedure InitAllUartDevices();
     procedure GetAndOpenADevices(OcComPortObj: TOcComPortObj); overload;
@@ -520,7 +528,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.ShowHideRLPanel(OpenClose: Boolea
 begin
   if RL = 1 then
   begin
-    if not OpenClose then
+    if OpenClose = false then
     begin
       SV_R.Close;
     end
@@ -745,7 +753,7 @@ begin
     FileNameNoExt := ExtractFileNameNoExt(AFileName);
     PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
     SetModified(false);
-    SetPathFileName(AFileName);
+    /// SetPathFileName(AFileName);
   end;
 end;
 
@@ -758,7 +766,7 @@ begin
   try
     FUpdating := True;
     FontSize.Text := IntToStr(CMyRichEdit.SelAttributes.Size);
-    FontName.Text := CMyRichEdit.SelAttributes.Name;
+    ComBoBoxFontName.Text := CMyRichEdit.SelAttributes.Name;
     FGColorBox.Selected := CMyRichEdit.SelAttributes.Color;
     BGColorBox.Selected := CMyRichEdit.SelAttributes.BackColor;
     UpdateCursorPos();
@@ -777,25 +785,78 @@ begin
   UpdateCursorPos;
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.FontSizeChange(Sender: TObject);
+var
+  Component: TComponent;
+begin
+  Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  if Component is TMemo then
+  begin
+    TMemo(Component).Font.Size := StrToInt(FontSize.Text);
+    exit;
+  end;
+  if Component is TMyRichEdit then
+  begin
+    if FUpdating then
+      exit;
+    if CMyRichEdit = nil then
+      CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
+    if CMyRichEdit = nil then
+      exit;
+    CurrTextAttributes.Size := StrToInt(FontSize.Text);
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.ComBoBoxFontNameChange(Sender: TObject);
+var
+  Component: TComponent;
+  FontName: String;
+begin
+  FontName := Trim(ComBoBoxFontName.Items[ComBoBoxFontName.ItemIndex]);
+  Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  if Component is TMemo then
+  begin
+    if FontName <> '' then
+      TMemo(Component).Font.Name := FontName;
+    exit;
+  end;
+  if Component is TMyRichEdit then
+  begin
+    if FUpdating then
+      exit;
+    if FontName <> '' then
+      CurrTextAttributes.Name := FontName;
+  end;
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.FGColorBoxChange(Sender: TObject);
 var
-  Color: TColor;
+  Component: TComponent;
 begin
-  if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  if CMyRichEdit = nil then
-    exit;
-  Color := FGColorBox.Selected;
-  CMyRichEdit.SelAttributes.Color := Color;
+  Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  if Component is TMemo then
+  begin
+    TMemo(Component).Font.Color := FGColorBox.Selected;
+  end;
+  if Component is TMyRichEdit then
+  begin
+    TMyRichEdit(Component).SelAttributes.Color := FGColorBox.Selected;
+  end;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.BGColorBoxChange(Sender: TObject);
+var
+  Component: TComponent;
 begin
-  if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  if CMyRichEdit = nil then
-    exit;
-  CMyRichEdit.SelAttributes.BackColor := BGColorBox.Selected;
+  Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  if Component is TMemo then
+  begin
+    TMemo(Component).Color := BGColorBox.Selected;
+  end;
+  if Component is TMyRichEdit then
+  begin
+    TMyRichEdit(Component).SelAttributes.BackColor := BGColorBox.Selected;
+  end;
 end;
 
 function TMainOctopusDebuggingDevelopmentForm.CurrTextAttributes: TTextAttributes;
@@ -833,9 +894,9 @@ var
   DC: HDC;
 begin
   DC := GetDC(0);
-  EnumFonts(DC, nil, @EnumFontsProc, Pointer(FontName.Items));
+  EnumFonts(DC, nil, @EnumFontsProc, Pointer(ComBoBoxFontName.Items));
   ReleaseDC(0, DC);
-  FontName.Sorted := True;
+  ComBoBoxFontName.Sorted := True;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SetPathFileName(const FileName: String);
@@ -844,6 +905,10 @@ begin
   Caption := Format('%s - %s', [Application.Title, FileName]);
   /// ExtractFileName
   StatusBar1.Panels[2].Text := FFilePathName;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.CancelItemClick(Sender: TObject);
+begin;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.CharacteSets1Click(Sender: TObject);
@@ -909,15 +974,23 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.PageControl1Change(Sender: TObject);
 var
-  MyRichEdit: TMyRichEdit;
+  Component: TComponent;
 begin
   /// showmessage(intTostr(PageControl1.ActivePageIndex));
-  MyRichEdit := Self.PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  if MyRichEdit <> nil then
+  Component := Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  if Component is TMyRichEdit then
   begin
-    Self.CMyRichEdit := MyRichEdit;
-    SynchroSetMyRichEditFont(MyRichEdit, MyRichEdit.FStyle);
+    CMyRichEdit := TMyRichEdit(Component);
+    SynchroSetMyRichEditFont(Component);
   end;
+  if Component is TMyMemo then
+  begin
+    Self.ComBoBoxFontName.ItemIndex := Self.ComBoBoxFontName.Items.IndexOf(TMyMemo(Component).Font.Name);
+    Self.FontSize.Text := IntToStr(TMyMemo(Component).Font.Size);
+    FGColorBox.Selected := TMyMemo(Component).Font.Color;
+    BGColorBox.Selected := SettingPagesDlg.ColorBoxContentBG.Selected;
+  end;
+
   CommandFrm.OcComPortObj := Self.GetCurrentDevice();
   Self.UpdateUartToolBar();
   StatusBarPrintFileSize();
@@ -972,6 +1045,7 @@ var
   FileNameNoExt: String;
 begin
   CMyRichEdit := PageControl1.GetEdit(PageName);
+
   if CMyRichEdit = nil then
     exit;
 
@@ -1024,12 +1098,11 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FileSave(Sender: TObject);
 begin
-  // if CMyRichEdit = nil then
   CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
     exit;
 
-  if FFilePathName <> '' then
+  if (FFilePathName <> '') then
   begin
     CMyRichEdit.SaveTo(FFilePathName);
     CMyRichEdit.Modified := false;
@@ -1100,7 +1173,6 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SelectFont(Sender: TObject);
 begin
-  /// if CMyRichEdit = nil then
   CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
     exit;
@@ -1118,27 +1190,9 @@ begin
   FontDialog.Font.Assign(CMyRichEdit.SelAttributes);
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.FontSizeChange(Sender: TObject);
-begin
-  if FUpdating then
-    exit;
-  if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  if CMyRichEdit = nil then
-    exit;
-  CurrTextAttributes.Size := StrToInt(FontSize.Text);
-end;
-
 procedure TMainOctopusDebuggingDevelopmentForm.FontDialogShow(Sender: TObject);
 begin
   SynchroFontDialog(Self.CMyRichEdit, Self.CMyRichEdit.FStyle);
-end;
-
-procedure TMainOctopusDebuggingDevelopmentForm.FontNameChange(Sender: TObject);
-begin
-  if FUpdating then
-    exit;
-  CurrTextAttributes.Name := FontName.Items[FontName.ItemIndex];
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UpdateCursorPos;
@@ -1183,7 +1237,7 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.RichEditMenuClick(Sender: TObject);
 begin
-  if CMyRichEdit = nil then
+  if CMyRichEdit <> nil then
   begin
     HexModeItem.Checked := CMyRichEdit.FHexadecimalMode;
   end;
@@ -1191,8 +1245,7 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.RichEditTransparentItemClick(Sender: TObject);
 begin
-  if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
+  CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
   if CMyRichEdit = nil then
     exit;
   RichEditTransparentItem.Checked := not RichEditTransparentItem.Checked;
@@ -1234,28 +1287,19 @@ begin
   StatusBar1.Panels[1].Text := Value;
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.SynchroSetMyRichEditFont(MyRichEdit: TMyRichEdit; Style: Integer);
+procedure TMainOctopusDebuggingDevelopmentForm.SynchroSetMyRichEditFont(MyRichEdit: TComponent);
 begin
   if MyRichEdit = nil then
     exit;
-  if Style = 1 then
+  if MyRichEdit is TMemo then
   begin
-    /// 控制台风格
-    MyRichEdit.Color := SettingPagesDlg.ColorBoxContentBG.Selected;
-    MyRichEdit.Font := SettingPagesDlg.FontDialogConsole.Font;
-    FontDialog.Font := MyRichEdit.Font;
-    MyRichEdit.Transparent := false;
-    MyRichEdit.ParentColor := false;
-  end
-  else
-  /// 文本编辑模式黑白默认
+    TMemo(MyRichEdit).Color := SettingPagesDlg.ColorBoxContentBG.Selected;
+    TMemo(MyRichEdit).Font := SettingPagesDlg.FontDialogConsole.Font;
+    TMemo(MyRichEdit).ParentColor := false;
+  end;
+  if MyRichEdit is TMyRichEdit then
   begin
-    MyRichEdit.Color := clWhite;
-    if MyRichEdit.PlainText then // 纯文本应用全局字体
-    begin
-      /// FontDialog.Font.Color := clBlack;
-      MyRichEdit.Font := FontDialog.Font;
-    end;
+    TMyRichEdit(MyRichEdit).Color := clWhite;
   end;
 end;
 
@@ -1593,15 +1637,28 @@ begin
     Button105.Caption := Button105.Caption + ' ( ' + IntToStr(bLength) + ' ) Bytes';
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.StopLoopSending();
+begin
+  Button200.Caption := 'Loop Stopped';
+  Button201.Caption := LoopingString;
+  OcComPortObj_Loop := nil;
+  Timer1.Tag := 0;
+  Timer1.Enabled := false;
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.Timer1Timer(Sender: TObject);
 var
   sStr: string;
   i, j, Count, delayCount: Integer;
-  OcComPortObj: TOcComPortObj;
+  /// OcComPortObj: TOcComPortObj;
 begin
 
   if (OcComPortObj_Loop = nil) or (not OcComPortObj_Loop.Connected) then
+  begin
+    StopLoopSending();
     exit;
+  end;
+
   Timer1.Tag := 1;
   Timer1.Enabled := false;
   Button200.Caption := 'Stop Looping';
@@ -1623,7 +1680,8 @@ begin
         begin
           While (True) do
           begin
-            OcComPortObj.FalconComSendData_MultiTimes(sStr, OcComPortObj.SendFormat);
+            if (OcComPortObj_Loop <> nil) then
+              OcComPortObj_Loop.FalconComSendData_MultiTimes(sStr, OcComPortObj_Loop.SendFormat);
             Delay(delayCount);
             if Timer1.Tag = 0 then
               break;
@@ -1633,7 +1691,8 @@ begin
         begin
           for j := 0 to Count - 1 do
           begin
-            OcComPortObj.FalconComSendData_MultiTimes(sStr, OcComPortObj.SendFormat);
+            if (OcComPortObj_Loop <> nil) then
+              OcComPortObj_Loop.FalconComSendData_MultiTimes(sStr, OcComPortObj_Loop.SendFormat);
             Delay(delayCount);
             if Timer1.Tag = 0 then
               break;
@@ -1645,10 +1704,10 @@ begin
         continue;
       end;
     end;
-
   end; // for
 
-  if Timer1.Tag <> 0 then
+  if (Timer1.Tag <> 0) and ((SettingPagesDlg.UpDown3.Position > (Button201.Tag + 1)) or (SettingPagesDlg.UpDown3.Position <= 0)) then
+  /// TSettingPagesDlg
   begin
     Button201.Caption := 'Looping... ' + IntToStr(Button201.Tag);
     Button201.Tag := Button201.Tag + 1;
@@ -1656,21 +1715,17 @@ begin
   end
   else
   begin
-    Button200.Caption := 'Loop Stopped';
-    Button201.Caption := LoopingString;
-    OcComPortObj_Loop := nil;
+    StopLoopSending();
   end;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.Button200Click(Sender: TObject);
 begin
-  Timer1.Enabled := false;
-  Timer1.Tag := 0;
+  StopLoopSending();
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.Button201Click(Sender: TObject);
 var
-  /// i: Integer;
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := Self.GetCurrentDevice(); // GetDeciceByFullName(self.GetCurrentDeviceName);
@@ -1689,7 +1744,7 @@ begin
 
   if (Timer1.Tag >= 1) or (Timer1.Enabled) then
   begin
-    MessageBox(Application.Handle, 'Looping, please stop it first��', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    MessageBox(Application.Handle, 'Looping, please stop it first!', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
   LoopingString := Button201.Caption;
@@ -1867,7 +1922,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.FindDialog1Find(Sender: TObject);
 var
   FindStr: String;
   OcComPortObj: TOcComPortObj;
-  Memo: TMyRichEdit;
+  Component: TComponent;
   bRet: Boolean;
 Label ReStart;
 begin
@@ -1877,35 +1932,41 @@ begin
     FindStr := FindText;
     if (OcComPortObj = nil) or (OcComPortObj.LogObject = nil) or (OcComPortObj.LogObject.Parent = nil) then
     begin
-      Memo := Self.CMyRichEdit;
+      Component := Self.CMyRichEdit;
     end
     else
     begin
-      Memo := OcComPortObj.LogObject;
+      Component := OcComPortObj.LogObject;
     end;
-    if Memo = nil then
-      exit;
-    if Memo.Parent = nil then
+    if Component = nil then
       exit;
 
   ReStart:
-    bRet := SearchMemo(Memo, FindStr, Options);
+    bRet := SearchTextFrom(Component, FindStr, Options);
 
     if bRet = false then
     begin
       if frDown in Options then
       begin
-        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the beginning of the file��')), PChar(Application.Title), MB_YESNO) = ID_YES then
+        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the beginning of the file')), PChar(Application.Title), MB_YESNO) = ID_YES then
         begin
-          Memo.SelStart := 0;
+          if Component is TMyMemo then
+            TMyMemo(Component).SelStart := 0;
+          if Component is TMyRichEdit then
+            TMyRichEdit(Component).SelStart := 0;
+
           goto ReStart;
         end;
       end
       else
       begin
-        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the end of the file��       ')), PChar(Application.Title), MB_YESNO) = ID_YES then
+        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the end of the file')), PChar(Application.Title), MB_YESNO) = ID_YES then
         begin
-          Memo.SelStart := Memo.GetTextLen;
+          if Component is TMyMemo then
+            TMyMemo(Component).SelStart := TMyMemo(Component).GetTextLen;
+          if Component is TMyRichEdit then
+            TMyRichEdit(Component).SelStart := TMyRichEdit(Component).GetTextLen;
+
           goto ReStart;
         end;
       end;
@@ -1974,11 +2035,11 @@ begin
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.HexModeItemClick(Sender: TObject);
-/// var
-/// OcComPortObj: TOcComPortObj;
+var
+  Component: TComponent;
 begin
-  /// OcComPortObj := Self.GetCurrentDevice();
-  if CMyRichEdit <> nil then
+  Component := Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  if Component is TMyRichEdit then
   begin
     HexModeItem.Checked := not HexModeItem.Checked;
     CMyRichEdit.SetHexadecimalMode(HexModeItem.Checked);
@@ -2037,6 +2098,8 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.ViewMenuClick(Sender: TObject);
 begin
   UpdateMainMenu();
+
+  QuickTerminalCommandsItem.Checked := CommandFrm.Showing;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.LptatpMenuItemClick(Sender: TObject);
@@ -2083,17 +2146,21 @@ begin
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SettingItem1Click(Sender: TObject);
+var
+  Component: TComponent;
 begin
   SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
-  /// SettingPagesDlg.ShowModal();
-  SettingPagesDlg.Show();
+  SettingPagesDlg.ShowModal();
+  /// SettingPagesDlg.Show();
+  ///
+  ///
   InitUartsParameters();
   UpdateUartToolBar();
   AlphaBlend := SettingPagesDlg.AlphaBlend;
   AlphaBlendValue := SettingPagesDlg.AlphaBlendValue;
 
-  CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  SynchroSetMyRichEditFont(CMyRichEdit, CMyRichEdit.FStyle);
+  Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  SynchroSetMyRichEditFont(Component);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SettingItem2Click(Sender: TObject);
@@ -2268,7 +2335,11 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ToolButton19Click(Sender: TObject);
 begin
-
+  ShowHideRLPanel(false);
+  CommandFrm.OcComPortObj := Self.GetCurrentDevice();
+  CommandFrm.Show();
+  CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 10;
+  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2;
 end;
 
 /// ///////////////////////////////////////////////////////////////////////////////
@@ -2419,15 +2490,21 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.SkinsMenuOnClick(Sender: TObject);
 var
   str: String;
+  /// Component:TComponent;
 begin;
   // TStyleManager.SetStyle(TMenuItem(Sender).Caption);
   str := GetStyle(TMenuItem(Sender).Tag);
+  /// Component:=Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
   if str <> '' then
   begin
     // for i := Low(TStyleManager.StyleNames) to High(TStyleManager.StyleNames) do
     SkinMenuItem := TMenuItem(Sender);
     FThemeSkinName := str;
+    /// if Component is TMyMemo  then
+    /// TMyMemo(Component).Visible:=false;
+
     AdjustSetStyle(str);
+    /// AdjustSetStyle(str);
     TMenuItem(Sender).Checked := True;
   end;
 end;
@@ -2633,22 +2710,27 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
 begin
   // StringGrid1.MouseToCell(X, Y, StringGrid1_Col, StringGrid1_Row);
-  with StringGrid1 do
-  begin
-    if ACol = CHECKCOL then
+  try
+    with StringGrid1 do
     begin
-      Options := Options - [goEditing];
-      Options := Options + [goRowSelect];
-      CanSelect := false;
-      // Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',False ' + boolToStr(CanSelect));
-    end
-    else
-    begin
-      CanSelect := True;
-      Options := Options + [goEditing];
-      Options := Options - [goRowSelect];
-      // Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',True ' + boolToStr(CanSelect));
+      if ACol = CHECKCOL then
+      begin
+        if Options * [goEditing] <> [] then
+          Options := Options - [goEditing];
+        Options := Options + [goRowSelect];
+        CanSelect := false;
+        // Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',False ' + boolToStr(CanSelect));
+      end
+      else
+      begin
+        CanSelect := True;
+        Options := Options + [goEditing];
+        if Options * [goRowSelect] <> [] then
+          Options := Options - [goRowSelect];
+        // Memo1.Lines.Add(IntToStr(ACol) + ',' + IntToStr(ARow) + ',True ' + boolToStr(CanSelect));
+      end;
     end;
+  Except
   end;
 end;
 
@@ -2813,18 +2895,20 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(OcComPortObj: TOcComPortObj);
 var
   PageIndex: Integer;
-  MyRichEdit: TMyRichEdit;
+  MyRichEdit: TMyMemo;
 begin
   if OcComPortObj = nil then
     exit;
-  CreateMyObjectPage(OcComPortObj.ComportFullName, 0);
-  MyRichEdit := PageControl1.GetEdit(OcComPortObj.ComportFullName);
+  CreateMyObjectPage(OcComPortObj.ComportFullName, 2);
+  MyRichEdit := PageControl1.GetMemo(OcComPortObj.ComportFullName);
   MyRichEdit.FStyle := 1;
   OcComPortObj.SetLogComponent(MyRichEdit);
   OcComPortObj.SetMsgCallbackFunction(OcComPortObjCallBack);
-  OcComPortObj.SetCacheComponent(Self);
+
+  OcComPortObj.SetCacheComponent(SettingPagesDlg.PanelInternalCacheContainner);
+
   OcComPortObj.SaveLog(SettingPagesDlg.OctopusCfgDir_LogFilePath);
-  SynchroSetMyRichEditFont(MyRichEdit, MyRichEdit.FStyle);
+  SynchroSetMyRichEditFont(MyRichEdit);
   if not OcComPortObj.Connected then
   begin
     SettingPagesDlg.openDevice(OcComPortObj);
@@ -2832,17 +2916,53 @@ begin
   end;
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.InitAllUartDevices();
+var
+  i: Integer;
+  OcComPortObj: TOcComPortObj;
+  MyRichEdit: TMyMemo;
+begin
+  WelcomeAndHelp1.Click;
+  if ParamStr(1) <> '' then
+    exit;
+  /// 外部参数启动，作为文本编辑器器使用，不需要打开端口
+
+  for i := 0 to SettingPagesDlg.ComboBoxEx1.Items.Count - 1 do
+  begin
+    OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
+    if OcComPortObj = nil then
+      exit;
+    CreateMyObjectPage(OcComPortObj.ComportFullName, 2);
+    MyRichEdit := PageControl1.GetMemo(OcComPortObj.ComportFullName);
+    MyRichEdit.FStyle := 1;
+    OcComPortObj.SetLogComponent(MyRichEdit);
+    OcComPortObj.SetMsgCallbackFunction(OcComPortObjCallBack);
+
+    OcComPortObj.SetCacheComponent(SettingPagesDlg.PanelInternalCacheContainner);
+
+    ShowStartComments(OcComPortObj);
+    SynchroSetMyRichEditFont(MyRichEdit);
+
+    OcComPortObj.SaveLog(SettingPagesDlg.OctopusCfgDir_LogFilePath);
+    if i >= 5 then
+      break;
+  end;
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.CreateMyObjectPage(PageName: String; PageType: Integer);
 var
   MyRichEdit: TMyRichEdit;
   PageIndex: Integer;
+  Component: TComponent;
 begin
   PageControl1.CreatePage(PageName, PageType);
   PageIndex := PageControl1.GetPageIndex(PageName);
+  Component := PageControl1.GetComponent(PageIndex);
   PageControl1.ActivePageIndex := PageIndex;
-  if PageType = 0 then
+
+  if Component is TMyRichEdit then
   begin
-    MyRichEdit := PageControl1.GetEdit(PageName);
+    MyRichEdit := TMyRichEdit(Component);
     if MyRichEdit <> nil then
     begin
       MyRichEdit.OnClick := Self.RichEditorClick;
@@ -2864,43 +2984,16 @@ begin
       MyRichEdit.OnSelectionChange := Self.SelectionChange;
     end;
   end;
+
   if (PageType = 1) and (WebBrowser = nil) then
   begin
     WebBrowser := PageControl1.GetWebBrowser(PageName);
   end;
-end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.InitAllUartDevices();
-var
-  i: Integer;
-  OcComPortObj: TOcComPortObj;
-  MyRichEdit: TMyRichEdit;
-begin
-  WelcomeAndHelp1.Click;
-  if ParamStr(1) <> '' then
-    exit;
-  /// 外部参数启动，作为文本编辑器器使用，不需要打开端口
-
-  for i := 0 to SettingPagesDlg.ComboBoxEx1.Items.Count - 1 do
+  if Component is TMyMemo then
   begin
-    OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
-    if OcComPortObj = nil then
-      exit;
-    CreateMyObjectPage(OcComPortObj.ComportFullName, 0);
-    MyRichEdit := PageControl1.GetEdit(OcComPortObj.ComportFullName);
-    MyRichEdit.FStyle := 1;
-    OcComPortObj.SetLogComponent(MyRichEdit);
-    OcComPortObj.SetMsgCallbackFunction(OcComPortObjCallBack);
-    OcComPortObj.SetCacheComponent(Self);
-
-    ShowStartComments(OcComPortObj);
-    SynchroSetMyRichEditFont(MyRichEdit, MyRichEdit.FStyle);
-
-    OcComPortObj.SaveLog(SettingPagesDlg.OctopusCfgDir_LogFilePath);
-    if i >= 5 then
-      break;
+    /// TMyMemo(Component).OnClick := Self.RichEditorClick;
   end;
-
 end;
 
 /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3007,7 +3100,6 @@ begin
   // OcComPortObj.DebugLog(APPLICATION_TITLE + FVersionNumberStr);
   OcComPortObj.DebugLog('Octopus Serial Port Debugging And Development Assistant ' + FVersionNumberStr);
   OcComPortObj.DebugLog('Home Page: ' + WEB_SITE + ' ');
-  // OcComPortObj.DebugLog('Function  :' + 'ESC��F1��F2��F3');
   OcComPortObj.DebugLog('#################################################################');
   OcComPortObj.DebugLog('' + OcComPortObj.ComportFullName + ' ');
 end;
@@ -3156,46 +3248,74 @@ begin
   end;
 end;
 
-function TMainOctopusDebuggingDevelopmentForm.SearchMemo(Memo: TMyRichEdit; const SearchString: string; Options: TFindOptions): Boolean;
+function TMainOctopusDebuggingDevelopmentForm.SearchTextFrom(Component: TComponent; const SearchString: string; Options: TFindOptions): Boolean;
 var
   Size: Integer;
-  // StringSearchOptions:TStringSearchOptions;
   buffer, p: PChar;
 begin
   Result := false;
   if Length(SearchString) = 0 then
     exit;
+  if Component is TMyMemo then
+  begin
+    Size := TMemo(Component).GetTextLen;
+    if (Size = 0) then
+      exit;
 
-  Size := Memo.GetTextLen;
-  // Size := Length(Memo.Text);
-  if (Size = 0) then
-    exit;
+    buffer := System.SysUtils.StrAlloc(Size + 1);
+    try
+      TMemo(Component).GetTextBuf(buffer, Size + 1);
+      if frDown in Options then
+        p := SearchBuf(buffer, Size, TMemo(Component).SelStart, TMemo(Component).SelLength, SearchString, [soDown])
+      else
+        p := SearchBuf(buffer, Size, TMemo(Component).SelStart, TMemo(Component).SelLength, SearchString, []);
 
-  buffer := System.SysUtils.StrAlloc(Size + 1);
-  try
-    Memo.GetTextBuf(buffer, Size + 1);
+      if (frMatchCase in Options) then
+        p := SearchBuf(buffer, Size, TMemo(Component).SelStart, TMemo(Component).SelLength, SearchString, [soMatchCase]);
 
-    if frDown in Options then
-      p := SearchBuf(buffer, Size, Memo.SelStart, Memo.SelLength, SearchString, [soDown])
-    else
-      p := SearchBuf(buffer, Size, Memo.SelStart, Memo.SelLength, SearchString, []);
+      if (frWholeWord in Options) then
+        p := SearchBuf(buffer, Size, TMemo(Component).SelStart, TMemo(Component).SelLength, SearchString, [soWholeWord]);
 
-    if (frMatchCase in Options) then
-      p := SearchBuf(buffer, Size, Memo.SelStart, Memo.SelLength, SearchString, [soMatchCase]);
-
-    if (frWholeWord in Options) then
-      p := SearchBuf(buffer, Size, Memo.SelStart, Memo.SelLength, SearchString, [soWholeWord]);
-
-    // P := SearchBuf(Buffer, Size, Memo.SelStart, Memo.SelLength, SearchString,StringSearchOptions);
-    if p <> nil then
-    begin
-      Memo.SelStart := p - buffer;
-      Memo.SelLength := Length(SearchString);
-      Result := True;
+      if p <> nil then
+      begin
+        TMemo(Component).SelStart := p - buffer;
+        TMemo(Component).SelLength := Length(SearchString);
+        Result := True;
+      end;
+    finally
+      System.SysUtils.StrDispose(buffer);
     end;
+  end;
 
-  finally
-    System.SysUtils.StrDispose(buffer);
+  if Component is TMyRichEdit then
+  begin
+    Size := TMyRichEdit(Component).GetTextLen;
+    if (Size = 0) then
+      exit;
+
+    buffer := System.SysUtils.StrAlloc(Size + 1);
+    try
+      TMyRichEdit(Component).GetTextBuf(buffer, Size + 1);
+      if frDown in Options then
+        p := SearchBuf(buffer, Size, TMyRichEdit(Component).SelStart, TMyRichEdit(Component).SelLength, SearchString, [soDown])
+      else
+        p := SearchBuf(buffer, Size, TMyRichEdit(Component).SelStart, TMyRichEdit(Component).SelLength, SearchString, []);
+
+      if (frMatchCase in Options) then
+        p := SearchBuf(buffer, Size, TMyRichEdit(Component).SelStart, TMyRichEdit(Component).SelLength, SearchString, [soMatchCase]);
+
+      if (frWholeWord in Options) then
+        p := SearchBuf(buffer, Size, TMyRichEdit(Component).SelStart, TMyRichEdit(Component).SelLength, SearchString, [soWholeWord]);
+
+      if p <> nil then
+      begin
+        TMyRichEdit(Component).SelStart := p - buffer;
+        TMyRichEdit(Component).SelLength := Length(SearchString);
+        Result := True;
+      end;
+    finally
+      System.SysUtils.StrDispose(buffer);
+    end;
   end;
 end;
 

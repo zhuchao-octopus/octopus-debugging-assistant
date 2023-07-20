@@ -6,30 +6,16 @@ uses
   System.SysUtils, System.StrUtils, Winapi.Windows, Winapi.Messages, Winapi.RichEdit, System.Classes, Vcl.Graphics, Vcl.Controls,
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus, Vcl.ComCtrls, Vcl.ClipBrd,
   Vcl.ToolWin, Vcl.ActnList, System.Actions, System.ImageList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
-  Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes, SHDocVw;
+  Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes, SHDocVw, SyncObjs;
 
 type
-  TEventCallBackFuntion = Procedure(Obj: TObject) of object;
+  TEventCallBackFuntion = Procedure(Msg: String) of object;
 
-  TMyPanel = class(TPanel)
-  private
-    FDragOrigin: TPoint;
-    FSizeRect: TRect;
-    LineHeight: Integer;
-    LinesCount: Integer;
-    x, y: Integer;
-  protected
-    procedure Paint; override;
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; x, y: Integer); override;
-    procedure MouseMove(Shift: TShiftState; x, y: Integer); override;
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; x, y: Integer); override;
-  end;
-
-  TMyRichEdit = class(TRichEdit)
+  TMyMemo = class(TMemo)
   private
     FTAG: String;
     FSourceBytes: TBytes;
-    /// LineNumbersPanel: TMyPanel;
+    FLock: TCriticalSection; // 用于线程同步的临界区对象
   protected
   public
     FStyle: Integer;
@@ -39,6 +25,48 @@ type
     FShowLinesNumber: Boolean;
     EventCallBackFuntion: TEventCallBackFuntion;
 
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    function GetLastLine(): String;
+    function GetLine(Line: Integer): String;
+
+    procedure Clear();
+    procedure Log(const Msg: String);
+    procedure LogLine(const Msg: String; Line: Integer);
+    procedure LogEndLine(const Msg: String);
+    procedure LogBuffer(const Buffer: array of Byte; Count: Integer);
+
+    procedure SaveTo(const FileName: String); overload;
+    procedure SaveTo(const FileName: String; Encoding: TEncoding); overload;
+    procedure LoadFrom(FileName: String); overload;
+    procedure LoadFrom(FileName: String; Encoding: TEncoding); overload;
+    procedure ConvertEncoding(TargetEncoding: TEncoding);
+    procedure ConvertToUTF8WithBOM();
+    procedure ConvertEncoding3(TargetEncoding: TEncoding);
+    procedure SetDefaultFormat();
+    procedure SetHexadecimalMode(); overload;
+    procedure SetHexadecimalMode(HexMode: Boolean); overload;
+  published
+  end;
+
+  TMyRichEdit = class(TRichEdit)
+  private
+    FTAG: String;
+    FSourceBytes: TBytes;
+    FLock: TCriticalSection; // 用于线程同步的临界区对象
+  protected
+  public
+    FStyle: Integer;
+    FEncoding: TEncoding;
+    FFileName: String;
+    FHexadecimalMode: Boolean;
+    FShowLinesNumber: Boolean;
+    EventCallBackFuntion: TEventCallBackFuntion;
+
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
     function GetRichEditText(RichEdit: TRichEdit): WideString; overload;
     function GetRichEditText(RichEdit: TRichEdit; AnsiCodePage: UINT): AnsiString; overload;
 
@@ -46,9 +74,9 @@ type
     function GetLine(Line: Integer): String;
 
     procedure Clear();
-    procedure Log(const MSG: String);
-    procedure LogLine(const MSG: String; Line: Integer);
-    procedure LogEndLine(const MSG: String);
+    procedure Log(const Msg: String);
+    procedure LogLine(const Msg: String; Line: Integer);
+    procedure LogEndLine(const Msg: String);
     procedure LogBuffer(const Buffer: array of Byte; Count: Integer);
 
     procedure SaveTo(const FileName: String); overload;
@@ -62,6 +90,7 @@ type
     procedure SetDefaultFormat();
     procedure SetHexadecimalMode(); overload;
     procedure SetHexadecimalMode(HexMode: Boolean); overload;
+
   published
   end;
 
@@ -77,12 +106,19 @@ type
     procedure DeletePageComponent(Index: Integer); overload;
     procedure SetPageName(PageName: String; PageIndex: Integer);
 
-    procedure Log(MSG: String; Index: Integer);
-    procedure Clear(Index: Integer);
+    procedure Log(Msg: String; Index: Integer);
+    /// procedure Clear(Index: Integer);
     procedure FreeAll();
 
     function GetEdit(Index: Integer): TMyRichEdit; overload;
     function GetEdit(PageName: String): TMyRichEdit; overload;
+
+    function GetMemo(Index: Integer): TMyMemo; overload;
+    function GetMemo(PageName: String): TMyMemo; overload;
+
+    function GetComponent(Index: Integer): TComponent; overload;
+    function GetComponent(PageName: String): TComponent; overload;
+
     function GetWebBrowser(Index: Integer): TWebBrowser; overload;
     function GetWebBrowser(PageName: String): TWebBrowser; overload;
 
@@ -102,75 +138,327 @@ implementation
 
 uses DataEngine;
 
-procedure TMyPanel.Paint;
-var
-  i: Integer;
+/// //////////////////////////////////////////////////////////////////////////////
+/// //////////////////////////////////////////////////////////////////////////////
+/// Memo
+constructor TMyMemo.Create(AOwner: TComponent);
 begin
-  /// inherited;
-  // Draw a sizing grip on the Canvas property
-  // There's a size-grip glyph in the Marlett font,
-  // so try the Canvas.TextOut method in combination
-  // with the Canvas.Font property.
-  // 设置Panel的宽度与RichEdit的行号列相匹配
-  Self.LinesCount := Self.LinesCount + 10;
-  /// Width := Canvas.TextWidth('9999') + 5;
-  // 逐行绘制行号
-  for i := 1 to Self.LinesCount do
-    Caption := Caption + IntToStr(i) + #13;
-
-  LineHeight := Canvas.TextHeight('123456789');
-  Canvas.Brush.Color := clBtnFace;
-  Canvas.FillRect(ClientRect);
-  Canvas.TextOut(2, -y div LineHeight * LineHeight, Caption);
+  inherited Create(AOwner);
+  FLock := TCriticalSection.Create;
 end;
 
-procedure TMyPanel.MouseDown(Button: TMouseButton; Shift: TShiftState; x, y: Integer);
+destructor TMyMemo.Destroy;
 begin
-
+  FLock.Free;
+  inherited Destroy;
 end;
 
-procedure TMyPanel.MouseMove(Shift: TShiftState; x, y: Integer);
+procedure TMyMemo.Clear();
 begin
-
-end;
-
-procedure TMyPanel.MouseUp(Button: TMouseButton; Shift: TShiftState; x, y: Integer);
-begin
-
-end;
-
-/// ////////////////////////////////////////////////////////////////////////////
-/// ////////////////////////////////////////////////////////////////////////////
-procedure TMyRichEdit.Clear();
-begin
-  Self.Lines.Clear;
-end;
-
-procedure TMyRichEdit.Log(const MSG: String);
-begin
+  FLock.Enter;
   try
-    Self.Lines.Append(MSG);
-  Except
-    /// ShowMessage('This error message is due to ??');
-    if Assigned(EventCallBackFuntion) then
-      EventCallBackFuntion(Self);
+    Self.Lines.Clear;
+  finally
+    FLock.Leave;
   end;
 end;
 
-procedure TMyRichEdit.LogLine(const MSG: String; Line: Integer);
+procedure TMyMemo.Log(const Msg: String);
 begin
-  if (Self.Lines.Count > 0) and (Line >= 0) and (Line < Self.Lines.Count) then
-    Lines.Strings[Line] := MSG
-  else
-    Log(MSG);
+  FLock.Enter;
+  try
+    try
+      Self.Lines.Append(Msg);
+    Except
+      on E: Exception do
+      begin
+        if Assigned(EventCallBackFuntion) then
+          EventCallBackFuntion(E.Message);
+      end;
+    end;
+  finally
+    FLock.Leave;
+  end;
 end;
 
-procedure TMyRichEdit.LogEndLine(const MSG: String);
+procedure TMyMemo.LogLine(const Msg: String; Line: Integer);
+begin
+  if (Self.Lines.Count > 0) and (Line >= 0) and (Line < Self.Lines.Count) then
+  begin
+    FLock.Enter;
+    try
+      Lines.Strings[Line] := Msg;
+    finally
+      FLock.Leave;
+    end;
+  end
+  else
+    Log(Msg);
+end;
+
+procedure TMyMemo.LogEndLine(const Msg: String);
 begin
   if Lines.Count > 0 then
-    Lines.Strings[Lines.Count - 1] := Lines.Strings[Lines.Count - 1] + MSG
+  begin
+    FLock.Enter;
+    try
+      Lines.Strings[Lines.Count - 1] := Lines.Strings[Lines.Count - 1] + Msg;
+    finally
+      FLock.Leave;
+    end;
+  end
   else
-    Log(MSG);
+    Log(Msg);
+end;
+
+procedure TMyMemo.LogBuffer(const Buffer: array of Byte; Count: Integer);
+var
+  i: Integer;
+  str: String;
+begin
+  str := '';
+  for i := 0 to Count - 1 do
+  begin
+    str := str + Format('%.02x ', [Buffer[i]]);
+    if ((i + 1) mod 16) = 0 then
+    begin
+      Log(str);
+      str := '';
+    end;
+  end;
+  if str <> '' then
+    Log(str);
+end;
+
+function TMyMemo.GetLastLine(): String;
+begin
+  try
+    if Lines.Count > 0 then
+      Result := Lines.Strings[Lines.Count - 1]
+    else
+      Result := '';
+  finally
+    FLock.Leave;
+  end;
+end;
+
+function TMyMemo.GetLine(Line: Integer): String;
+begin
+  Result := '';
+  FLock.Enter;
+  try
+    if (Line < 0) or (Line >= Lines.Count) then
+      Result := ''
+    else
+      Result := Lines.Strings[Line];
+  finally
+    FLock.Leave;
+  end;
+end;
+
+procedure TMyMemo.SaveTo(const FileName: String);
+begin
+  Lines.SaveToFile(FileName);
+  Self.FFileName := FileName;
+end;
+
+procedure TMyMemo.SaveTo(const FileName: String; Encoding: TEncoding);
+begin
+  Lines.SaveToFile(FileName, Encoding);
+  Self.FFileName := FileName;
+end;
+
+procedure TMyMemo.LoadFrom(FileName: String);
+begin
+  if FileExists(FileName) then
+  begin
+    Self.Lines.LoadFromFile(FileName);
+    Self.FFileName := FileName;
+  end
+  else if FileExists(Self.FFileName) then
+  begin
+    Self.Lines.LoadFromFile(Self.FFileName);
+  end
+  else
+  begin
+    /// ConvertEncoding(Self.Lines.Encoding);
+  end;
+end;
+
+procedure TMyMemo.LoadFrom(FileName: String; Encoding: TEncoding);
+begin
+  if FileExists(FileName) then
+  begin
+    try
+      Self.Lines.LoadFromFile(FileName, Encoding);
+    Except
+    end;
+    Self.FFileName := FileName;
+  end;
+end;
+
+procedure TMyMemo.ConvertEncoding(TargetEncoding: TEncoding);
+var
+  SourceBytes, TargetBytes: TBytes;
+  SourceEncoding: TEncoding;
+begin
+  SourceEncoding := Self.Lines.Encoding;
+  // 将Memo控件中的文本内容转换为源编码格式的字节序列
+  SourceBytes := SourceEncoding.GetBytes(Text);
+
+  // 将源编码格式的字节序列转换为目标编码格式的字节序列
+  TargetBytes := TEncoding.Convert(SourceEncoding, TargetEncoding, SourceBytes);
+
+  // 将目标编码格式的字节序列转换为字符串，并更新Memo控件的内容
+  Text := TargetEncoding.GetString(TargetBytes);
+end;
+
+procedure TMyMemo.ConvertToUTF8WithBOM();
+var
+  UTF8Encoding: TEncoding;
+  BOM: TBytes;
+  TextBytes: TBytes;
+begin
+  // 创建UTF-8编码和BOM字节序列
+  UTF8Encoding := TEncoding.UTF8;
+  BOM := TEncoding.UTF8.GetPreamble;
+
+  // 将UTF-8编码的文本转换为字节序列
+  TextBytes := TEncoding.UTF8.GetBytes(Text);
+
+  // 合并BOM和文本字节序列
+  Text := UTF8Encoding.GetString(BOM + TextBytes);
+end;
+
+procedure TMyMemo.ConvertEncoding3(TargetEncoding: TEncoding);
+var
+  ss: TStringStream;
+begin
+  ss := TStringStream.Create(Text, TargetEncoding);
+  Lines.LoadFromStream(ss);
+  /// ss.Free;
+end;
+
+procedure TMyMemo.SetDefaultFormat();
+begin
+  Font.Charset := TFontCharset(DEFAULT_CHARSET);
+  Font.Name := '新宋体';
+  Font.Size := 14;
+  SelStart := MaxInt;
+
+  WantReturns := false;
+  HideSelection := false;
+  ParentFont := false;
+end;
+
+procedure TMyMemo.SetHexadecimalMode();
+var
+  SourceEncoding: TEncoding;
+  /// i: Integer;
+begin
+  SourceEncoding := Self.Lines.Encoding;
+  // 将Memo控件中的文本内容转换为源编码格式的字节序列
+  FSourceBytes := SourceEncoding.GetBytes(Text);
+  Self.Clear;
+  LogBuffer(FSourceBytes, Length(FSourceBytes));
+  DataEngineManager.Remove2(FTAG);
+end;
+
+procedure TMyMemo.SetHexadecimalMode(HexMode: Boolean);
+begin
+  FTAG := 'SetHexadecimalMode';
+  if (not Self.FHexadecimalMode) and (HexMode) then
+  begin
+    FHexadecimalMode := true;
+    if not DataEngineManager.Exist2(FTAG, nil) then
+      DataEngineManager.DoAction(FTAG, SetHexadecimalMode);
+  end;
+
+  if (not HexMode) then
+  begin
+    LoadFrom('');
+    FHexadecimalMode := false;
+  end;
+end;
+
+/// ////////////////////////////////////////////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
+/// RichEdit
+constructor TMyRichEdit.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FLock := TCriticalSection.Create;
+end;
+
+destructor TMyRichEdit.Destroy;
+begin
+  FLock.Free;
+  inherited Destroy;
+end;
+
+procedure TMyRichEdit.Clear();
+begin
+  FLock.Enter;
+  try
+    Self.Lines.Clear;
+  finally
+    FLock.Leave;
+  end;
+end;
+
+procedure TMyRichEdit.Log(const Msg: String);
+begin
+
+  FLock.Enter;
+  try
+    try
+      Self.Lines.Append(Msg);
+    Except
+      on E: Exception do
+      begin
+        if Assigned(EventCallBackFuntion) then
+          EventCallBackFuntion(E.Message);
+      end;
+    end;
+  finally
+    FLock.Leave;
+  end;
+
+  /// Except
+  /// ShowMessage('This error message is due to ??');
+  /// if Assigned(EventCallBackFuntion) then
+  /// EventCallBackFuntion(Self);
+  /// end;
+end;
+
+procedure TMyRichEdit.LogLine(const Msg: String; Line: Integer);
+begin
+  if (Self.Lines.Count > 0) and (Line >= 0) and (Line < Self.Lines.Count) then
+  begin
+    FLock.Enter;
+    try
+      Lines.Strings[Line] := Msg;
+    finally
+      FLock.Leave;
+    end;
+  end
+  else
+    Log(Msg);
+end;
+
+procedure TMyRichEdit.LogEndLine(const Msg: String);
+begin
+  if Lines.Count > 0 then
+  begin
+    FLock.Enter;
+    try
+      Lines.Strings[Lines.Count - 1] := Lines.Strings[Lines.Count - 1] + Msg;
+    finally
+      FLock.Leave;
+    end;
+  end
+  else
+    Log(Msg);
 end;
 
 procedure TMyRichEdit.LogBuffer(const Buffer: array of Byte; Count: Integer);
@@ -194,19 +482,28 @@ end;
 
 function TMyRichEdit.GetLastLine(): String;
 begin
-  if Lines.Count > 0 then
-    Result := Lines.Strings[Lines.Count - 1]
-  else
-    Result := '';
+  try
+    if Lines.Count > 0 then
+      Result := Lines.Strings[Lines.Count - 1]
+    else
+      Result := '';
+  finally
+    FLock.Leave;
+  end;
 end;
 
 function TMyRichEdit.GetLine(Line: Integer): String;
 begin
   Result := '';
-  if (Line < 0) or (Line >= Lines.Count) then
-    Result := ''
-  else
-    Result := Lines.Strings[Line];
+  FLock.Enter;
+  try
+    if (Line < 0) or (Line >= Lines.Count) then
+      Result := ''
+    else
+      Result := Lines.Strings[Line];
+  finally
+    FLock.Leave;
+  end;
 end;
 
 procedure TMyRichEdit.SaveTo(const FileName: String);
@@ -541,6 +838,7 @@ procedure TMyPageEdit.CreatePage(PageName: String; PageType: Integer);
 var
   NewTab: TTabSheet;
   NewRichEdit: TMyRichEdit;
+  MyMemo: TMyMemo;
   WebBrowser: TWebBrowser;
   // f: TFont;
 begin
@@ -578,9 +876,9 @@ begin
         NewRichEdit.LineNumbersPanel.SetParentDoubleBuffered(true);
         NewRichEdit.LineNumbersPanel.y:= NewRichEdit.Top; }
     end;
-  end;
+  end
 
-  if PageType = 1 then
+  else if PageType = 1 then
   begin
     if GetPageByName(PageName) = nil then
     begin
@@ -593,6 +891,30 @@ begin
       WebBrowser.Align := alClient;
       WebBrowser.silent := true; // 屏蔽脚本错误
       FRichEditList.Add(WebBrowser);
+    end;
+  end
+
+  else if PageType = 2 then
+  begin
+    if GetPageByName(PageName) = nil then
+    begin
+      NewTab := TTabSheet.Create(Self);
+      NewTab.PageControl := Self;
+      NewTab.Caption := PageName;
+
+      MyMemo := TMyMemo.Create(NewTab);
+      MyMemo.Parent := NewTab;
+      MyMemo.Align := alClient;
+      MyMemo.BorderStyle := bsNone;
+      MyMemo.ScrollBars := ssBoth;
+      MyMemo.DoubleBuffered := true;
+      MyMemo.FDoubleBuffered := true;
+      MyMemo.FDoubleBufferedSaved := true;
+      MyMemo.ParentDoubleBuffered := true;
+      MyMemo.SetDefaultFormat();
+      MyMemo.FStyle := 1;
+      /// 文本风格样式，TMemo只有黑白风格
+      FRichEditList.Add(MyMemo);
     end;
   end;
 
@@ -656,16 +978,67 @@ begin
   end;
 end;
 
-procedure TMyPageEdit.Log(MSG: String; Index: Integer);
+function TMyPageEdit.GetMemo(Index: Integer): TMyMemo;
 var
-  NewRichEdit: TMyRichEdit;
+  tmpComponent: TComponent;
 begin
+  Result := nil;
+  if FRichEditList = nil then
+    Exit;
+  if Index >= FRichEditList.Count then
+    Exit;
+  if Index < 0 then
+    Exit;
+  tmpComponent := FRichEditList.Items[Index];
+  if tmpComponent is TMyMemo then
+    Result := TMyMemo(tmpComponent);
+end;
+
+function TMyPageEdit.GetMemo(PageName: String): TMyMemo;
+var
+  NewTab: TTabSheet;
+begin
+  Result := nil;
+  NewTab := GetPageByName(PageName);
+  if NewTab <> nil then
+  begin
+    Result := GetMemo(NewTab.PageIndex);
+  end;
+end;
+
+function TMyPageEdit.GetComponent(Index: Integer): TComponent;
+begin
+  Result := nil;
+  if FRichEditList = nil then
+    Exit;
+  if Index >= FRichEditList.Count then
+    Exit;
+  if Index < 0 then
+    Exit;
+  Result := FRichEditList.Items[Index];
+end;
+
+function TMyPageEdit.GetComponent(PageName: String): TComponent;
+var
+  TabSheet: TTabSheet;
+begin
+  Result := nil;
+  TabSheet := GetPageByName(PageName);
+  if TabSheet <> nil then
+  begin
+    Result := GetComponent(TabSheet.PageIndex);
+  end;
+end;
+{ procedure TMyPageEdit.Log(Msg: String; Index: Integer);
+  var
+  NewRichEdit: TTextControl;
+  begin
   NewRichEdit := GetEdit(Index);
   if NewRichEdit <> nil then
   begin
-    NewRichEdit.Lines.Append(MSG);
+  NewRichEdit.Log(Msg);
   end;
-end;
+  end; }
 
 function TMyPageEdit.GetPageName(Index: Integer): String;
 begin
@@ -681,16 +1054,16 @@ begin
   Result := Self.ActivePage.Caption;
 end;
 
-procedure TMyPageEdit.Clear(Index: Integer);
-var
-  NewRichEdit: TMyRichEdit;
-begin
+{ procedure TMyPageEdit.Clear(Index: Integer);
+  var
+  NewRichEdit: TTextControl;
+  begin
   NewRichEdit := GetEdit(Index);
   if NewRichEdit <> nil then
   begin
-    NewRichEdit.Clear;
+  NewRichEdit.Clear;
   end;
-end;
+  end; }
 
 function TMyPageEdit.GetWebBrowser(Index: Integer): TWebBrowser;
 var
@@ -726,7 +1099,6 @@ begin
   if Result <> nil then
   begin
     Result.LoadFrom(PathFileName);
-    Result.Modified := false;
   end;
 end;
 
@@ -738,6 +1110,17 @@ begin
   begin
   end;
   FRichEditList.Clear;
+end;
+
+procedure TMyPageEdit.Log(Msg: String; Index: Integer);
+var
+  Component: TComponent;
+begin
+  Component := GetComponent(Index);
+  if Component is TMyMemo then
+  begin
+    TMyMemo(Component).Log(Msg);
+  end;
 end;
 
 end.

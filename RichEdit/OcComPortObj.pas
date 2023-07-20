@@ -79,7 +79,7 @@ type
     FSendFormat: integer; // h
     FSendCodeFormat: integer;
     FReceiveFormat: integer; // i
-    FLogObject: TMyRichEdit; // j
+    FLogObject: TMyMemo; // TMyRichEdit; // j
     FShowDate: Boolean;
     FShowTime: Boolean;
     FShowLineNumber: Boolean;
@@ -143,22 +143,25 @@ type
 
     function getCMDStr(): String;
     function IsLogBottom(): Boolean;
-    procedure log(const Msg: string); // log data
-    procedure DebugLog(const Msg: string);
+    procedure Log(const Msg: string); // log data
     procedure LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
     procedure LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
+    procedure DebugLog(const Msg: string);
     procedure ClearLog();
     procedure ClearInternalBuff(id: integer = 100);
 
     procedure SaveLog(FullLogFilePath: String);
-    procedure SetLogComponent(Component: TMyRichEdit);
+    procedure SetLogComponent(Component: TMyMemo);
     procedure SetLogComponentReadOnly(ReadOnly: Boolean);
     procedure SetCacheComponent(AOwner: TWinControl);
     procedure SetMsgCallbackFunction(CallBackFun: TCallBackFun);
+
     /// property OcComPortObjPara: TOcComPortObjPara read GetConfiguration write FOcComPortObjPara;
-    property LogObject: TMyRichEdit read FLogObject write FLogObject;
+    property LogObject: TMyMemo read FLogObject write FLogObject;
     property StringInternelCache: TMemo read FStringInternalMemo write FStringInternalMemo;
+
     property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
+
     property ProtocolCallBackFun: TProtocolCallBackFun read FProtocolCallBackFun write FProtocolCallBackFun;
     property ComReceiveCount: Int64 read FComReceiveCount;
     property ComProcessedCount: Int64 read FComProcessedCount;
@@ -754,7 +757,7 @@ end;
   FOcComPortObjPara.HexModeWithString := self.FHexModeWithString;
   Result := FOcComPortObjPara;
   end; }
-procedure TOcComPortObj.SetLogComponent(Component: TMyRichEdit);
+procedure TOcComPortObj.SetLogComponent(Component: TMyMemo);
 begin
   self.FLogObject := Component;
   self.FLogObject.ReadOnly := True;
@@ -778,6 +781,9 @@ end;
 procedure TOcComPortObj.SetCacheComponent(AOwner: TWinControl);
 begin
   StringInternelCache.Parent := AOwner;
+  StringInternelCache.Align := alClient;
+  StringInternelCache.ReadOnly := True;
+  /// StringInternelCache.Color:=clBlack;
   StringInternelCache.DoubleBuffered := True;
 end;
 
@@ -896,6 +902,42 @@ begin
   end;
 end;
 
+procedure TOcComPortObj.Log(const Msg: string);
+var
+  i, PreLogLinesCount: Int64;
+  str: String;
+  isBottom: Boolean;
+begin
+  if (FLogObject = nil) or (FLogObject.Parent = nil) or (not self.Connected) then
+  begin
+    // MessageBox(Application.Handle, 'No device is found,please open a device.', Pchar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    Exit;
+  end;
+
+  isBottom := IsLogBottom();
+  PreLogLinesCount := FLogObject.Lines.Count;
+
+  FLogObject.Lines.BeginUpdate;
+  FLogObject.log(Msg);
+
+  if FShowLineNumber or FShowDate or FShowTime then
+  begin
+    for i := PreLogLinesCount to FLogObject.Lines.Count - 1 do
+    begin
+      str := GetLineNumberDateTimeStamp(i) + FLogObject.Lines.Strings[i];
+      /// LogMemo.Lines.Strings[i] := str;
+      FLogObject.LogLine(str, i);
+    end;
+  end;
+
+  FLogObject.Lines.EndUpdate;
+
+  if FLogScrollMode and isBottom then
+    FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
+  if Assigned(FCallBackFun) then
+    FCallBackFun();
+end;
+
 procedure TOcComPortObj.LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
 var
   str: String;
@@ -930,42 +972,6 @@ begin
   str := Format(f, [Trim(str)]);
   str := str + ByteToWideString2(@Buff[Count - j], j);
   log(flag + str);
-end;
-
-procedure TOcComPortObj.log(const Msg: string);
-var
-  i, PreLogLinesCount: Int64;
-  str: String;
-  isBottom: Boolean;
-begin
-  if (FLogObject = nil) or (FLogObject.Parent = nil) or (not self.Connected) then
-  begin
-    // MessageBox(Application.Handle, 'No device is found,please open a device.', Pchar(Application.Title), MB_ICONINFORMATION + MB_OK);
-    Exit;
-  end;
-
-  isBottom := IsLogBottom();
-  PreLogLinesCount := FLogObject.Lines.Count;
-
-  FLogObject.Lines.BeginUpdate;
-  FLogObject.log(Msg);
-
-  if FShowLineNumber or FShowDate or FShowTime then
-  begin
-    for i := PreLogLinesCount to FLogObject.Lines.Count - 1 do
-    begin
-      str := GetLineNumberDateTimeStamp(i) + FLogObject.Lines.Strings[i];
-      /// LogMemo.Lines.Strings[i] := str;
-      FLogObject.LogLine(str, i);
-    end;
-  end;
-
-  FLogObject.Lines.EndUpdate;
-
-  if FLogScrollMode and isBottom then
-    FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
-  if Assigned(FCallBackFun) then
-    FCallBackFun();
 end;
 
 /// /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1022,10 +1028,9 @@ begin
     Exit;
   isBottom := IsLogBottom();
   PreLogLinesCount := FLogObject.Lines.Count;
-  FLogObject.Lines.BeginUpdate;
-  /// LogMemo.Lines.Append(Msg);
-  FLogObject.log(Msg);
 
+  FLogObject.Lines.BeginUpdate;
+  FLogObject.log(Msg);
   if FShowLineNumber or FShowDate or FShowTime then
   begin
     for i := PreLogLinesCount to FLogObject.Lines.Count - 1 do
@@ -1035,7 +1040,6 @@ begin
       FLogObject.LogLine(str, i);
     end;
   end;
-
   FLogObject.Lines.EndUpdate;
 
   if FLogScrollMode and isBottom then
@@ -1189,9 +1193,11 @@ begin
           try
             if (Length(str) > 0) and (str[Length(str)] = #9) then
             begin
+              /// 水平制表符
             end
             else
             begin
+              // 0x0D CR (carriage return) 回车键
               str := str + #13;
             end;
 
@@ -2131,21 +2137,21 @@ begin
 end;
 
 procedure TOcComPortObj.KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-var
-  cmdbuf: array [0 .. 1] of Byte;
-  CurrentLine: integer;
-  // thid: Dword;
-  i, j: integer;
-  LastStr: String;
-  MaskedKeyState: TShiftState;
+/// var
+/// cmdbuf: array [0 .. 1] of Byte;
+/// CurrentLine: integer;
+// thid: Dword;
+/// i, j: integer;
+/// LastStr: String;
+/// MaskedKeyState: TShiftState;
 begin
-  MaskedKeyState := Shift * [ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle, ssDouble, ssTouch, ssPen, ssCommand];
-  if (Key <> VK_RETURN) and (Key <> VK_PRIOR) and (Key <> VK_NEXT) and (Key <> VK_HOME) and (Key <> VK_END) and (MaskedKeyState = []) then
-  begin
+  { MaskedKeyState := Shift * [ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle, ssDouble, ssTouch, ssPen, ssCommand];
+    if (Key <> VK_RETURN) and (Key <> VK_PRIOR) and (Key <> VK_NEXT) and (Key <> VK_HOME) and (Key <> VK_END) and (MaskedKeyState = []) then
+    begin
     FLogObject.SelStart := MaxInt;
     /// Length(FLogObject.Text);
     FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
-  end;
+    end; }
 
   { if (Key = VK_LEFT) or (Key = 38) OR (Key = 39) OR (Key = 40) then // 方向键回溯历史
     BEGIN
@@ -2190,13 +2196,13 @@ begin
     Exit;
     END; }
 
-  if (Shift = [ssCtrl]) then
-  begin
+  { if (Shift = [ssCtrl]) then
+    begin
     if (Key = $43) then // Control+VK_C
     begin
-      cmdbuf[0] := $03;
-      if (self.Connected) and (Trim(FLogObject.SelText) = '') then
-        self.FalconComSendBuffer(cmdbuf, 1)
+    cmdbuf[0] := $03;
+    if (self.Connected) and (Trim(FLogObject.SelText) = '') then
+    self.FalconComSendBuffer(cmdbuf, 1)
     end
     else if (Key = 70) then // Control+VK_F
     begin
@@ -2204,7 +2210,7 @@ begin
     else if (Key = $56) then // Control+VK_V
     begin
     end;
-  end;
+    end; }
 
   if (Shift = [ssCtrl]) then
   begin

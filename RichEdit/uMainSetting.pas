@@ -96,6 +96,10 @@ type
     CheckBoxShortcutForExplorer: TCheckBox;
     CheckBoxDesktopShortcutMenu: TCheckBox;
     FontDialogConsole: TFontDialog;
+    Label115: TLabel;
+    Edit3: TEdit;
+    UpDown3: TUpDown;
+    PanelInternalCacheContainner: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxEx1Change(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -140,7 +144,7 @@ type
 
     function openDevice(OcComPortObj: TOcComPortObj): Boolean; overload;
     function openDevice(DeviceFullName: String): TOcComPortObj; overload;
-    function openDevice(DeviceFullName: String; LogMemo: TMyRichEdit): TOcComPortObj; overload;
+    function openDevice(DeviceFullName: String; LogMemo: TMyMemo): TOcComPortObj; overload;
     function openDeviceRandom(): TOcComPortObj;
 
     procedure CloseDevice(DeviceFullName: String); overload;
@@ -498,7 +502,7 @@ begin
   SettingPagesDlg.LoadOrCreateLaunguageFromFile(self, True);
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
   /// ShowMessage(getCommandLine());
-  SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, 0);
+  ///SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, 0);
 end;
 
 procedure TSettingPagesDlg.ComboBoxEx1Change(Sender: TObject);
@@ -816,7 +820,7 @@ begin
   openDevice(DeviceFullName, nil);
 end;
 
-function TSettingPagesDlg.openDevice(DeviceFullName: String; LogMemo: TMyRichEdit): TOcComPortObj;
+function TSettingPagesDlg.openDevice(DeviceFullName: String; LogMemo: TMyMemo): TOcComPortObj;
 var
   OcComPortObj: TOcComPortObj;
   i: Integer;

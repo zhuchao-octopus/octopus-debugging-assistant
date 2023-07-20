@@ -3,23 +3,30 @@ object CommandFrm: TCommandFrm
   Top = 0
   BorderStyle = bsDialog
   Caption = 'Quick Terminal Commands'
-  ClientHeight = 39
-  ClientWidth = 605
+  ClientHeight = 63
+  ClientWidth = 637
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -12
-  Font.Name = 'Segoe UI'
+  Font.Height = -13
+  Font.Name = 'Default'
   Font.Style = []
   Position = poMainFormCenter
   OnShow = FormShow
   PixelsPerInch = 96
-  TextHeight = 15
+  TextHeight = 17
+  object Label1: TLabel
+    Left = 10
+    Top = 36
+    Width = 253
+    Height = 17
+    Caption = 'Press the enter key to send it automatically '
+  end
   object ComboBox1: TComboBox
     AlignWithMargins = True
     Left = 10
     Top = 3
-    Width = 585
+    Width = 617
     Height = 27
     Margins.Left = 10
     Margins.Right = 10
@@ -32,6 +39,26 @@ object CommandFrm: TCommandFrm
     ParentFont = False
     TabOrder = 0
     OnKeyPress = ComboBox1KeyPress
-    ExplicitWidth = 464
+    Items.Strings = (
+      'Control+C')
+    ExplicitWidth = 585
+  end
+  object Button1: TButton
+    Left = 450
+    Top = 33
+    Width = 85
+    Height = 25
+    Caption = 'Send As Text'
+    TabOrder = 1
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 542
+    Top = 33
+    Width = 85
+    Height = 25
+    Caption = 'Send As Byte'
+    TabOrder = 2
+    OnClick = Button2Click
   end
 end

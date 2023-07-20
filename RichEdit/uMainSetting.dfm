@@ -10,7 +10,7 @@ object SettingPagesDlg: TSettingPagesDlg
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -13
-  Font.Name = 'Segoe UI'
+  Font.Name = 'Default'
   Font.Style = []
   Position = poMainFormCenter
   OnCreate = FormCreate
@@ -110,6 +110,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 40
               Width = 241
               Height = 22
+              Selected = clWindow
               DropDownCount = 30
               TabOrder = 3
             end
@@ -119,7 +120,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Width = 241
               Height = 22
               DefaultColorColor = clWhite
-              Selected = clSilver
+              Selected = clWindowText
               TabOrder = 4
               OnChange = ColorBoxTextChange
             end
@@ -172,21 +173,30 @@ object SettingPagesDlg: TSettingPagesDlg
             TabOrder = 1
             object Label111: TLabel
               Left = 8
-              Top = 93
+              Top = 86
               Width = 231
               Height = 17
               Caption = 'Automatic save time interval of seconds'
             end
             object Label110: TLabel
               Left = 8
-              Top = 34
+              Top = 31
               Width = 344
               Height = 17
               Caption = 'Transparency, the smaller the value is, the more refreshing '
             end
+            object Label115: TLabel
+              Left = 8
+              Top = 144
+              Width = 365
+              Height = 17
+              Caption = 
+                'List of the number of cycles, and zero indicates an infinite loo' +
+                'p'
+            end
             object Edit1: TEdit
-              Left = 370
-              Top = 31
+              Left = 384
+              Top = 27
               Width = 90
               Height = 25
               Color = clScrollBar
@@ -195,8 +205,8 @@ object SettingPagesDlg: TSettingPagesDlg
               Text = '238'
             end
             object UpDown1: TUpDown
-              Left = 460
-              Top = 31
+              Left = 474
+              Top = 27
               Width = 16
               Height = 25
               Associate = Edit1
@@ -206,8 +216,8 @@ object SettingPagesDlg: TSettingPagesDlg
               TabOrder = 1
             end
             object UpDown2: TUpDown
-              Left = 460
-              Top = 89
+              Left = 474
+              Top = 78
               Width = 16
               Height = 25
               Associate = Edit2
@@ -218,8 +228,8 @@ object SettingPagesDlg: TSettingPagesDlg
               OnChanging = UpDown2Changing
             end
             object Edit2: TEdit
-              Left = 370
-              Top = 89
+              Left = 384
+              Top = 78
               Width = 90
               Height = 25
               Hint = #21333#20301#31186
@@ -232,7 +242,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object CheckBox8: TCheckBox
               Left = 8
-              Top = 63
+              Top = 57
               Width = 305
               Height = 20
               Caption = 'Data is automatically saved to a local file'
@@ -248,13 +258,31 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object CheckBox2: TCheckBox
               Left = 8
-              Top = 124
+              Top = 116
               Width = 535
               Height = 20
               Caption = 
                 'The main window is always maintained at the top level of all the' +
                 ' windows'
               TabOrder = 6
+            end
+            object Edit3: TEdit
+              Left = 384
+              Top = 136
+              Width = 90
+              Height = 25
+              NumbersOnly = True
+              TabOrder = 7
+              Text = '0'
+            end
+            object UpDown3: TUpDown
+              Left = 474
+              Top = 136
+              Width = 16
+              Height = 25
+              Associate = Edit3
+              Max = 1000
+              TabOrder = 8
             end
           end
           object Panel24: TPanel
@@ -582,7 +610,7 @@ object SettingPagesDlg: TSettingPagesDlg
     ParentColor = True
     TabOrder = 1
     object Button1: TButton
-      Left = 922
+      Left = 954
       Top = 0
       Width = 134
       Height = 34
@@ -608,6 +636,14 @@ object SettingPagesDlg: TSettingPagesDlg
       TabOrder = 1
       OnClick = Button2Click
     end
+    object PanelInternalCacheContainner: TPanel
+      Left = 18
+      Top = 0
+      Width = 308
+      Height = 34
+      Caption = 'Pane lInternal Cache Containner'
+      TabOrder = 2
+    end
   end
   object ImageList1: TImageList
     Left = 983
@@ -622,7 +658,7 @@ object SettingPagesDlg: TSettingPagesDlg
   end
   object FontDialogConsole: TFontDialog
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clSilver
+    Font.Color = clBlack
     Font.Height = -19
     Font.Name = #26032#23435#20307
     Font.Style = []
