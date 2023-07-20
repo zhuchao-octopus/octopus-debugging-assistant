@@ -392,7 +392,8 @@ type
     procedure LoadUntitledContent(MyRichEdit: TMyRichEdit; const AFileName: string);
 
     procedure SetModified(Value: Boolean);
-    procedure UpdateStatus(Value: String);
+    procedure UpdateStatus(Value: String); overload;
+    procedure UpdateStatus(Value: String; Index: Integer); overload;
 
     function GetStringGridValidStr(sStr: String): String;
     function GetCurrentPageName(): String;
@@ -540,7 +541,7 @@ begin
       SV_R.Align := alRight;
       SV_R.Placement := svpRight;
       SV_R.Open;
-      AdjustUI();
+      /// AdjustUI();
     end;
   end;
 end;
@@ -558,7 +559,7 @@ begin
         SV_R.Width := 400;
       end;
       SV_R.Open;
-      AdjustUI();
+      /// AdjustUI();
     end;
   end;
 end;
@@ -664,7 +665,7 @@ begin
   SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, True);
 
   InitUserConfiguration();
-  DragAcceptFiles(Handle, True);
+
   Application.OnMessage := MyAppMsg;
 
 end;
@@ -692,6 +693,7 @@ begin
   begin
     Self.Splitter1.Visible := false;
   end;
+  DragAcceptFiles(Handle, True);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -700,7 +702,6 @@ begin
     /// CheckFileSave;
     Self.PageControl1.FreeAll;
     SaveProjectSetting(True);
-
   except
     CanClose := false;
   end;
@@ -744,12 +745,12 @@ begin
   /// UpdateCursorPos;
   /// DragAcceptFiles(Handle, True);
   /// RichEditChange(nil);
-  MyRichEdit.SetFocus;
+  /// MyRichEdit.SetFocus;
   /// Check if we should load a file from the command line, assuming the default file is not available
   if TFile.Exists(AFileName) then
   begin
     MyRichEdit.LoadFrom(AFileName);
-    MyRichEdit.SetFocus;
+    /// MyRichEdit.SetFocus;
     FileNameNoExt := ExtractFileNameNoExt(AFileName);
     PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
     SetModified(false);
@@ -901,6 +902,11 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SetPathFileName(const FileName: String);
 begin
+  if FileName = '' then
+  begin
+    Caption := Format('%s', [Application.Title]);
+    exit;
+  end;
   FFilePathName := FileName;
   Caption := Format('%s - %s', [Application.Title, FileName]);
   /// ExtractFileName
@@ -989,6 +995,7 @@ begin
     Self.FontSize.Text := IntToStr(TMyMemo(Component).Font.Size);
     FGColorBox.Selected := TMyMemo(Component).Font.Color;
     BGColorBox.Selected := SettingPagesDlg.ColorBoxContentBG.Selected;
+    UpdateStatus(WEB_SITE, 0);
   end;
 
   CommandFrm.OcComPortObj := Self.GetCurrentDevice();
@@ -1035,7 +1042,7 @@ begin
     exit;
   CMyRichEdit.LoadFrom(AFileName);
   SetPathFileName(AFileName);
-  CMyRichEdit.SetFocus;
+  /// CMyRichEdit.SetFocus;
   CMyRichEdit.Modified := false;
   SetModified(false);
 end;
@@ -1054,7 +1061,7 @@ begin
 
   FileNameNoExt := ExtractFileNameNoExt(AFileName);
   PageControl1.SetPageName(FileNameNoExt, PageControl1.GetPageIndex(PageName));
-  CMyRichEdit.SetFocus;
+  /// CMyRichEdit.SetFocus;
   CMyRichEdit.Modified := false;
   SetModified(false);
 end;
@@ -1073,7 +1080,7 @@ begin
     if MyRichEdit <> nil then
     begin
       MyRichEdit.ReadOnly := ofReadOnly in FileOpenCmd.Dialog.Options;
-      MyRichEdit.SetFocus;
+      /// MyRichEdit.SetFocus;
       FileNameNoExt := ExtractFileNameNoExt(PathFileName);
       PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
       SetModified(false);
@@ -1287,6 +1294,11 @@ begin
   StatusBar1.Panels[1].Text := Value;
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.UpdateStatus(Value: String; Index: Integer);
+begin
+  StatusBar1.Panels[Index].Text := Value;
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.SynchroSetMyRichEditFont(MyRichEdit: TComponent);
 begin
   if MyRichEdit = nil then
@@ -1358,6 +1370,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.SV_ROpened(Sender: TObject);
 begin
   Splitter1.Visible := True;
   Splitter1.Align := alRight;
+  AdjustUI();
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormatToolBarMenuItem1Click(Sender: TObject);
@@ -2153,7 +2166,6 @@ begin
   SettingPagesDlg.ShowModal();
   /// SettingPagesDlg.Show();
   ///
-  ///
   InitUartsParameters();
   UpdateUartToolBar();
   AlphaBlend := SettingPagesDlg.AlphaBlend;
@@ -2366,7 +2378,7 @@ begin
   FileSaveAsCmd.Dialog.InitialDir := FileOpenCmd.Dialog.InitialDir;
   FVersionNumberStr := GetBuildInfo(Application.Exename);
   // SetFileName(sUntitled);
-  GetFontNames;
+  GetFontNames();
   SelectionChange(Self);
   UpdateMainMenu();
   AdjustUI();
@@ -2879,6 +2891,8 @@ begin
   ActivePageIndex := Max(0, PageControl1.PageCount - 1);
   PageControl1.ActivePageIndex := ActivePageIndex;
   CMyRichEdit := nil;
+  SetPathFileName('');
+  UpdateStatus('', 2);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(DeviceName: String);
@@ -3102,6 +3116,8 @@ begin
   OcComPortObj.DebugLog('Home Page: ' + WEB_SITE + ' ');
   OcComPortObj.DebugLog('#################################################################');
   OcComPortObj.DebugLog('' + OcComPortObj.ComportFullName + ' ');
+
+  UpdateStatus(WEB_SITE, 0);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SaveProjectSetting(SavePrivate: Boolean);
@@ -3120,11 +3136,13 @@ begin
     if SavePrivate then
     begin
       s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
-
       Octopusini := TIniFile.Create(s);
+
       for i := 1 to StringGrid1.RowCount - 1 do
       begin
-        Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', StringGrid1.Cells[2, i]);
+        str := Trim(StringGrid1.Cells[2, i]);
+        if str <> '' then
+          Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', str);
         /// Octopusini.WriteString('MyCustData', IntToStr(i) + '_6', StringGrid1.Cells[6, i]);
       end;
 
@@ -3133,32 +3151,31 @@ begin
       else
         str := TStyleManager.StyleNames[0];
 
-      Octopusini.WriteBool('MyPreference', 'CHINESEUI', ChineseMenuItem.Checked);
-      Octopusini.WriteBool('MyPreference', 'ALPHABLEND', Self.AlphaBlend);
-      Octopusini.WriteBool('MyPreference', 'SVR_OPEN', SV_R.Opened);
-      Octopusini.WriteInteger('MyPreference', 'SVR_WIDTH', SV_R.Width);
+      Octopusini.WriteBool('MyPreference', 'APPLICATION_CHINESE_LANG', ChineseMenuItem.Checked);
+      Octopusini.WriteString('MyPreference', 'APPLICATION_THEME_SKIN_NAME', str);
 
-      Octopusini.WriteString('MyPreference', 'MAINUIFONTNAME', MainOctopusDebuggingDevelopmentForm.Font.Name);
-      Octopusini.WriteInteger('MyPreference', 'MAINUIFONTSIZE', MainOctopusDebuggingDevelopmentForm.Font.Size);
-      Octopusini.WriteInteger('MyPreference', 'MAINUIFONTCOLOR', MainOctopusDebuggingDevelopmentForm.Font.Color);
+      Octopusini.WriteBool('MyPreference', 'APPLICATION_ALPHA_BLEND', Self.AlphaBlend);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_ALPHA_VALUE', Self.AlphaBlendValue);
 
-      Octopusini.WriteBool('MyPreference', 'StandardToolBar1', StandardToolBar1.Visible);
-      Octopusini.WriteBool('MyPreference', 'StandardToolBar2', StandardToolBar2.Visible);
-      Octopusini.WriteInteger('MyPreference', 'PageControl1', Ord(Self.PageControl1.TabPosition));
-      Octopusini.WriteInteger('MyPreference', 'PageControl2', Ord(Self.PageControl2.TabPosition));
-      Octopusini.WriteInteger('MyPreference', 'PageControl2ActivePageIndex', Ord(Self.PageControl2.ActivePageIndex));
+      Octopusini.WriteBool('MyPreference', 'APPLICATION_SVR_STATUS', SV_R.Opened);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_SVR_WIDTH', SV_R.Width);
 
-      Octopusini.WriteString('Configuration', 'VERSIONNUMBER64', FVersionNumberStr);
-      Octopusini.WriteString('Configuration', 'THEME_SKIN', str);
+      Octopusini.WriteString('MyPreference', 'APPLICATION_MAINUI_FONTNAME', MainOctopusDebuggingDevelopmentForm.Font.Name);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_MAINUI_FONTSIZE', MainOctopusDebuggingDevelopmentForm.Font.Size);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_MAINUI_FONTCOLOR', MainOctopusDebuggingDevelopmentForm.Font.Color);
+      Octopusini.WriteString('MyPreference', 'APPLICATION_CONTENT_FONTNAME', FontDialog.Font.Name);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_CONTENT_FONTSIZE', FontDialog.Font.Size);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_CONTENT_FONTCOLOR', FontDialog.Font.Color);
 
-      Octopusini.WriteString('Configuration', 'CONTENT_FONTNAME', FontDialog.Font.Name);
-      Octopusini.WriteInteger('Configuration', 'CONTENT_FONTSIZE', FontDialog.Font.Size);
-      Octopusini.WriteInteger('Configuration', 'CONTENT_FONTCOLOR', FontDialog.Font.Color);
+      Octopusini.WriteBool('MyPreference', 'APPLICATION_STANDART_TOOLBAR1', StandardToolBar1.Visible);
+      Octopusini.WriteBool('MyPreference', 'APPLICATION_STANDART_TOOLBAR2', StandardToolBar2.Visible);
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_PAGECONTROL1', Ord(Self.PageControl1.TabPosition));
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_PAGECONTROL2', Ord(Self.PageControl2.TabPosition));
+      Octopusini.WriteInteger('MyPreference', 'APPLICATION_PAGECONTROL2_DEFAULT_INDEX', Ord(Self.PageControl2.ActivePageIndex));
 
-      /// Octopusini.WriteInteger('Configuration', 'CONTENT_BACKGROUNDCOLOR', SettingPagesDlg.ColorBoxContent.Selected);
-
-      Octopusini.WriteBool('Configuration', 'APPLICATION_EXPLORER_MENU_ITEM', SettingPagesDlg.CheckBoxShortcutForExplorer.Checked);
-      Octopusini.WriteBool('Configuration', 'APPLICATION_DESKTOP_MENU_ITEM', SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked);
+      Octopusini.WriteBool('Configuration', 'APPLICATION_MENU_ITEM_EXPLORER', SettingPagesDlg.CheckBoxShortcutForExplorer.Checked);
+      Octopusini.WriteBool('Configuration', 'APPLICATION_MENU_ITEM_DESKTOP', SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked);
+      /// Octopusini.WriteString('Configuration', 'APPLICATION_VERSIONNUMBER64', FVersionNumberStr);
     end;
   finally
     Octopusini.Free;
@@ -3188,31 +3205,33 @@ begin
       /// StringGrid1.Cells[6, i] := Octopusini.ReadString('MyCustData', IntToStr(i) + '_6', '');
     end;
 
-    FThemeSkinName := Octopusini.ReadString('MyPreference', 'THEME_SKIN', TStyleManager.StyleNames[0]);
-    SV_R.Width := Octopusini.ReadInteger('MyPreference', 'SVR_WIDTH', SV_R.Width);
-    SV_R.Opened := Octopusini.ReadBool('MyPreference', 'SVR_OPEN', false);
-
-    StandardToolBar1.Visible := Octopusini.ReadBool('MyPreference', 'StandardToolBar1', false);
-    StandardToolBar2.Visible := Octopusini.ReadBool('MyPreference', 'StandardToolBar2', True);
-    i := Octopusini.ReadInteger('MyPreference', 'PageControl1', 1);
-    PageControl1.TabPosition := TTabPosition(i);
-    i := Octopusini.ReadInteger('MyPreference', 'PageControl2', 1);
-    PageControl2.TabPosition := TTabPosition(i);
-
-    i := Octopusini.ReadInteger('MyPreference', 'PageControl2ActivePageIndex', 0);
-    PageControl2.ActivePageIndex := i;
-
-    b := Octopusini.ReadBool('MyPreference', 'CHINESEUI', false);
+    b := Octopusini.ReadBool('MyPreference', 'APPLICATION_CHINESE_LANG', false);
     if (b) then
       SettingPagesDlg.ComboBox8.ItemIndex := 1;
 
-    FontDialog.Font.Name := Octopusini.ReadString('Configuration', 'CONTENT_FONTNAME', '新宋体');
-    FontDialog.Font.Size := Octopusini.ReadInteger('Configuration', 'CONTENT_FONTSIZE', 14);
-    FontDialog.Font.Color := Octopusini.ReadInteger('Configuration', 'CONTENT_FONTCOLOR', clBlack);
-    FGColorBox.Selected := FontDialog.Font.Color;
+    FThemeSkinName := Octopusini.ReadString('MyPreference', 'APPLICATION_THEME_SKIN_NAME', TStyleManager.StyleNames[0]);
 
-    SettingPagesDlg.CheckBoxShortcutForExplorer.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_EXPLORER_MENU_ITEM', True);
-    SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_DESKTOP_MENU_ITEM', True);
+    SV_R.Opened := Octopusini.ReadBool('MyPreference', 'APPLICATION_SVR_STATUS', false);
+    SV_R.Width := Octopusini.ReadInteger('MyPreference', 'APPLICATION_SVR_WIDTH', SV_R.Width);
+
+    StandardToolBar1.Visible := Octopusini.ReadBool('MyPreference', 'APPLICATION_STANDART_TOOLBAR1', false);
+    StandardToolBar2.Visible := Octopusini.ReadBool('MyPreference', 'APPLICATION_STANDART_TOOLBAR2', True);
+
+    i := Octopusini.ReadInteger('MyPreference', 'APPLICATION_PAGECONTROL1', 1);
+    PageControl1.TabPosition := TTabPosition(i);
+    i := Octopusini.ReadInteger('MyPreference', 'APPLICATION_PAGECONTROL2', 1);
+    PageControl2.TabPosition := TTabPosition(i);
+
+    i := Octopusini.ReadInteger('MyPreference', 'APPLICATION_PAGECONTROL2_DEFAULT_INDEX', 0);
+    PageControl2.ActivePageIndex := i;
+
+    /// FontDialog.Font.Name := Octopusini.ReadString('Configuration', 'CONTENT_FONTNAME', '新宋体');
+    /// FontDialog.Font.Size := Octopusini.ReadInteger('Configuration', 'CONTENT_FONTSIZE', 14);
+    /// FontDialog.Font.Color := Octopusini.ReadInteger('Configuration', 'CONTENT_FONTCOLOR', clBlack);
+    /// FGColorBox.Selected := FontDialog.Font.Color;
+
+    SettingPagesDlg.CheckBoxShortcutForExplorer.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_MENU_ITEM_EXPLORER', True);
+    SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_MENU_ITEM_DESKTOP', True);
 
     if FThemeSkinName <> '' then
       AdjustSetStyle(FThemeSkinName);

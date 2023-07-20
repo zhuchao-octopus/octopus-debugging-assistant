@@ -147,7 +147,6 @@ object SettingPagesDlg: TSettingPagesDlg
               Checked = True
               State = cbChecked
               TabOrder = 6
-              OnClick = CheckBoxShortcutForExplorerClick
             end
             object CheckBoxDesktopShortcutMenu: TCheckBox
               Left = 416

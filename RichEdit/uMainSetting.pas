@@ -113,7 +113,6 @@ type
     procedure ComboBox8Change(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button6Click(Sender: TObject);
-    procedure CheckBoxShortcutForExplorerClick(Sender: TObject);
     procedure ColorBoxTextChange(Sender: TObject);
   private
     { Private declarations }
@@ -502,7 +501,7 @@ begin
   SettingPagesDlg.LoadOrCreateLaunguageFromFile(self, True);
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
   /// ShowMessage(getCommandLine());
-  ///SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, 0);
+  /// SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, 0);
 end;
 
 procedure TSettingPagesDlg.ComboBoxEx1Change(Sender: TObject);
@@ -622,7 +621,14 @@ begin
   AlphaBlend := CheckBox7.Checked;
   Timer1.Enabled := CheckBox8.Checked;
   SaveDeviceSetting(self.getCurrentDevice);
-  /// Close;
+
+  if CheckBoxShortcutForExplorer.Checked then
+    AddExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME, Application.Exename, '*')
+  else
+    RemoveExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME);
+
+  if CheckBoxDesktopShortcutMenu.Checked then
+    CreateShortcut(Application.Exename, ApplicatonShortcutName);
 end;
 
 procedure TSettingPagesDlg.Button3Click(Sender: TObject);
@@ -676,14 +682,6 @@ end;
 procedure TSettingPagesDlg.ColorBoxTextChange(Sender: TObject);
 begin
   self.FontDialogConsole.Font.Color := ColorBoxText.Selected;
-end;
-
-procedure TSettingPagesDlg.CheckBoxShortcutForExplorerClick(Sender: TObject);
-begin
-  if CheckBoxShortcutForExplorer.Checked then
-    AddExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME, Application.Exename, '*')
-  else
-    RemoveExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME);
 end;
 
 function TSettingPagesDlg.getDeciceByPort(Port: string): TOcComPortObj;
@@ -863,7 +861,6 @@ begin
     OcComPortObj.StoreSettings(stIniFile, S);
     Octopusini := TIniFile.Create(S);
 
-    // Octopusini.WriteInteger('', 'BaudRateIndex', ComboBox1.ItemIndex);
     Octopusini.WriteInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
     Octopusini.WriteInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
 
@@ -872,12 +869,11 @@ begin
     Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox35.Name), CheckBox35.Checked);
     Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox36.Name), CheckBox36.Checked);
 
-    /// Octopusini.WriteInt64(OcComPortObj.ComportFullName, getObjectID(ColorBoxContentBG.Name), ColorBoxContentBG.Selected);
-    /// Octopusini.WriteInt64(OcComPortObj.ComportFullName, getObjectID(ColorBoxText.Name), ColorBoxText.Selected);
     Octopusini.WriteString('Configuration', 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
     Octopusini.WriteInteger('Configuration', 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
-    Octopusini.WriteInteger('Configuration', 'CONTENT_FONTCOLOR', FontDialogConsole.Font.Color);
+    Octopusini.WriteInteger('Configuration', 'CONTENT_FONTCOLOR', ColorBoxText.Selected);
     Octopusini.WriteInteger('Configuration', 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
+    /// Octopusini.WriteInteger('Configuration', 'CONTENT_TEXTCOLOR', ColorBoxText.Selected);
   finally
     Octopusini.Free;
   end;
@@ -912,18 +908,17 @@ begin
     ComboBox6.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
     ComboBox7.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
 
-    /// ColorBoxContentBG.Selected := Octopusini.ReadInt64(OcComPortObj.ComportFullName, getObjectID(ColorBoxContentBG.Name), ColorBoxContentBG.Selected);
-    /// ColorBoxText.Selected := Octopusini.ReadInt64(OcComPortObj.ComportFullName, getObjectID(ColorBoxText.Name), ColorBoxText.Selected);
     FontDialogConsole.Font.Charset := TFontCharset(DEFAULT_CHARSET);
     FontDialogConsole.Font.Name := Octopusini.ReadString(OcComPortObj.ComportFullName, 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
     FontDialogConsole.Font.Size := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
     FontDialogConsole.Font.Color := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_FONTCOLOR', FontDialogConsole.Font.Color);
-    ColorBoxContentBG.Selected := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
+    ColorBoxText.Selected := FontDialogConsole.Font.Color;
 
+    ColorBoxContentBG.Selected := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
     if ColorBoxContentBG.Selected = clBlack then
     begin
-      ColorBoxText.Selected := clSilver;
       FontDialogConsole.Font.Color := clSilver;
+      ColorBoxText.Selected := FontDialogConsole.Font.Color;
     end;
 
     OcComPortObj.SendFormat := Max(ComboBox6.ItemIndex, 0);

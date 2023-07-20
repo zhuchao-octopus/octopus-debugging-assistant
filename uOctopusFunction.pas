@@ -19,6 +19,7 @@ Const
   CONFIGURATION_DIR = '\Setting\';
   LOG_DIR = '\Logs\';
   WEB_SITE = 'http://www.1234998.cn';
+  WEB_SITE2 = 'http://1234998.cn';
 
   DEFAULT_WEBSITE_ADDRESS = 'http://www.1234998.top';
   OCTOPUS_UPGRADING_URL = 'http://47.106.172.94:8090/zhuchao/octopus/devices/getDeviceInfor';
