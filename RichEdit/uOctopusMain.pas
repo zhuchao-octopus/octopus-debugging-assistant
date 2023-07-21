@@ -1549,8 +1549,8 @@ begin
   OcComPortObj := Self.GetCurrentDevice();
   CommandFrm.OcComPortObj := OcComPortObj;
   CommandFrm.Show();
-  CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 15;
-  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 20;
+  CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 30;
+  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 5;
   Self.StandardToolBar1.Visible := false;
   Self.StandardToolBar2.Visible := True;
 end;
@@ -1617,7 +1617,7 @@ begin
   end;
   if (not OcComPortObj.Connected) then
   begin
-    /// Log0('No device is found,please open a device.');
+   OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
     /// MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
@@ -1638,13 +1638,13 @@ begin
   OcComPortObj := Self.GetCurrentDevice(); // GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if (OcComPortObj = nil) then
   begin
-    /// Log0('No device is found,please open a device.');
+    /// Log('No device is found,please open a device.');
     /// MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
   if (not OcComPortObj.Connected) then
   begin
-    /// Log0('No device is found,please open a device.');
+    OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
     /// MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
@@ -1825,7 +1825,7 @@ begin
   end;
   if (not OcComPortObj.Connected) then
   begin
-    // Log0('No device is found,please open a device.');
+   OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
     /// MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
@@ -2191,7 +2191,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.SettingItem1Click(Sender: TObject
 var
   Component: TComponent;
 begin
-  ///SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
+  /// SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
   SettingPagesDlg.ShowModal();
   /// SettingPagesDlg.Show();
   ///
@@ -2444,8 +2444,8 @@ begin
   if Self.PageControl2.TabPosition = tpRight then
     RptarpMenuItem.Checked := True;
 
-  ///if (CMyRichEdit <> nil) then
-  ///  ShowLinesNumberItem.Checked := CMyRichEdit.FShowLinesNumber;
+  /// if (CMyRichEdit <> nil) then
+  /// ShowLinesNumberItem.Checked := CMyRichEdit.FShowLinesNumber;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.AdjustUI();
@@ -2691,6 +2691,7 @@ begin
   end;
   if not OcComPortObj.Connected then
   begin
+    OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
     /// MessageBox(Application.Handle, PChar('No device!! You need to open a device,please use F1 to get help'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;

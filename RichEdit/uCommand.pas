@@ -58,6 +58,8 @@ begin
       else
         OcComPortObj.FalconComSendData_Terminal(Command, 0);
 
+      OcComPortObj.NotifyCallBack();
+
       if ComboBox1.Items.IndexOf(Command) < 0 then
         ComboBox1.Items.Add(Command);
 
@@ -67,19 +69,11 @@ begin
     end
     else if (OcComPortObj <> nil) then
     begin
-      OcComPortObj.DebugLog('Open a device ...');
+      OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
     end;
 
   end;
 
-end;
-
-procedure TCommandFrm.Button1Click(Sender: TObject);
-var
-  Key: Char;
-begin
-  Key := #13;
-  ComboBox1KeyPress(nil, Key);
 end;
 
 procedure TCommandFrm.Button2Click(Sender: TObject);
@@ -89,19 +83,26 @@ var
   bLength: Integer;
   BytesWritten: Cardinal;
 begin
-
-  if (not OcComPortObj.Connected) then
+  if (OcComPortObj <> nil) and (OcComPortObj.Connected) then
   begin
-    /// Log0('No device is found,please open a device.');
-    /// MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
-    exit;
+    Command := Trim(ComboBox1.Text);
+    OcComPortObj.FalconComSendData_MultiTimes(Command, 1);
+    OcComPortObj.NotifyCallBack();
+    if ComboBox1.Items.IndexOf(Command) < 0 then
+      ComboBox1.Items.Add(Command);
+  end
+  else if (OcComPortObj <> nil) then
+  begin
+    OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
   end;
+end;
 
-  Command := Trim(ComboBox1.Text);
-  OcComPortObj.FalconComSendData_MultiTimes(Command, 1);
-
-  if ComboBox1.Items.IndexOf(Command) < 0 then
-    ComboBox1.Items.Add(Command);
+procedure TCommandFrm.Button1Click(Sender: TObject);
+var
+  Key: Char;
+begin
+  Key := #13;
+  ComboBox1KeyPress(nil, Key);
 end;
 
 end.

@@ -143,7 +143,7 @@ type
 
     function getCMDStr(): String;
     function IsLogBottom(): Boolean;
-    procedure Log(const Msg: string); // log data
+    procedure log(const Msg: string); // log data
     procedure LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
     procedure LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
     procedure DebugLog(const Msg: string);
@@ -209,6 +209,8 @@ type
     procedure PrintReceivedProtocolData(Index: integer);
     procedure PrintProtocolPack(flag: String; OcComPack: POcComPack);
     procedure RequestProtocolConnection(); // 发送连接请求
+
+    procedure NotifyCallBack();
 
     procedure CloseDevice();
     procedure Free();
@@ -902,7 +904,7 @@ begin
   end;
 end;
 
-procedure TOcComPortObj.Log(const Msg: string);
+procedure TOcComPortObj.log(const Msg: string);
 var
   i, PreLogLinesCount: Int64;
   str: String;
@@ -2335,6 +2337,12 @@ begin
       ExitThread(4);
     end;
   end;
+end;
+
+procedure TOcComPortObj.NotifyCallBack();
+begin
+  if Assigned(FCallBackFun) then
+    FCallBackFun();
 end;
 
 procedure TOcComPortObj.CloseDevice();

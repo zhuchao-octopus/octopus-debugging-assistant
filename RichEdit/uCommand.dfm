@@ -41,7 +41,6 @@ object CommandFrm: TCommandFrm
     OnKeyPress = ComboBox1KeyPress
     Items.Strings = (
       'Control+C')
-    ExplicitWidth = 585
   end
   object Button1: TButton
     Left = 450
