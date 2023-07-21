@@ -1617,7 +1617,7 @@ begin
   end;
   if (not OcComPortObj.Connected) then
   begin
-   OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
+    OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
     /// MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
@@ -1825,7 +1825,7 @@ begin
   end;
   if (not OcComPortObj.Connected) then
   begin
-   OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
+    OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
     /// MessageBox(Application.Handle, 'No device is found,please open a device.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
