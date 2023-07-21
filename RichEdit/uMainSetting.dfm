@@ -640,7 +640,7 @@ object SettingPagesDlg: TSettingPagesDlg
       Top = 0
       Width = 308
       Height = 34
-      Caption = 'Pane lInternal Cache Containner'
+      Caption = 'Pane Internal Cache Containner'
       TabOrder = 2
     end
   end
