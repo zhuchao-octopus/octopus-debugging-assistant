@@ -57,6 +57,7 @@ type
     FTAG: String;
     FSourceBytes: TBytes;
     FLock: TCriticalSection; // 用于线程同步的临界区对象
+    FPrevTimestamp: TDateTime;
   protected
   public
     FStyle: Integer;
@@ -74,7 +75,7 @@ type
 
     function GetLastLine(): String;
     function GetLine(Line: Integer): String;
-
+    function IsModifiedByExternal(): Boolean;
     procedure Clear();
     procedure Log(const Msg: String);
     procedure LogLine(const Msg: String; Line: Integer);
@@ -457,7 +458,6 @@ begin
   // PrintDialog1 := TPrintDialog.Create(Application);
   // if PrintDialog1.Execute then
 
-
   With Printer do
   begin
     BeginDoc; // 另存的打印的文件名 如何实现  默认为 .jnt
@@ -624,6 +624,18 @@ begin
   end;
 end;
 
+function TMyRichEdit.IsModifiedByExternal(): Boolean;
+var
+  CurrentTimestamp: TDateTime;
+begin
+  CurrentTimestamp := FileAge(Self.FFileName);
+  if CurrentTimestamp <> FPrevTimestamp then
+  begin
+    /// ShowMessage('The file has been modified externally.');
+    // Do something in response to the external modification
+  end;
+end;
+
 procedure TMyRichEdit.SaveTo(const FileName: String);
 var
   ext: String;
@@ -641,6 +653,7 @@ begin
 
   Lines.SaveToFile(FileName);
   Self.FFileName := FileName;
+  Self.FPrevTimestamp := FileAge(FileName);
 end;
 
 procedure TMyRichEdit.SaveTo(const FileName: String; Encoding: TEncoding);
@@ -660,6 +673,7 @@ begin
 
   Lines.SaveToFile(FileName, Encoding);
   Self.FFileName := FileName;
+  Self.FPrevTimestamp := FileAge(FileName);
 end;
 
 procedure TMyRichEdit.LoadFrom(FileName: String);
