@@ -384,6 +384,7 @@ type
     procedure GetFontNames();
     procedure SetPathFileName(const FileName: String);
     procedure CheckFileSave();
+    procedure SaveLog(Component: TComponent; PathFileName: String);
     procedure UpdateCursorPos();
 
     procedure PerformFileOpen(const AFileName: string); overload;
@@ -716,7 +717,7 @@ begin
   if FileExists(SelectedFile) then
   begin
     LoadNewFileFromTo(SelectedFile);
-    Self.SV_R.Close;
+    ShowHideRLPanel(false);
     Self.StandardToolBar1.Visible := True;
     Self.StandardToolBar2.Visible := false;
   end;
@@ -1103,18 +1104,42 @@ begin
   /// CheckFileSave;
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.FileSave(Sender: TObject);
+procedure TMainOctopusDebuggingDevelopmentForm.SaveLog(Component: TComponent; PathFileName: String);
 begin
-  CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  if CMyRichEdit = nil then
+  if Component = nil then
     exit;
+  if Component is TMyRichEdit then
+  begin
+    TMyRichEdit(Component).SaveTo(PathFileName);
+    TMyRichEdit(Component).Modified := false;
+    SetModified(false);
+    UpdateStatus(sSaved);
+  end;
+  if Component is TMyMemo then
+  begin
+    TMyMemo(Component).SaveTo(PathFileName);
+    UpdateStatus(sSaved);
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FileSaveAsCmdBeforeExecute(Sender: TObject);
+var
+  OcComPortObj: TOcComPortObj;
+begin
+  OcComPortObj := GetCurrentDevice();
+  if (OcComPortObj <> nil) then
+    FileSaveAsCmd.Dialog.FileName := OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.FileSave(Sender: TObject);
+var
+  tmpComponent: TComponent;
+begin
+  tmpComponent := PageControl1.GetComponent(PageControl1.ActivePageIndex);
 
   if (FFilePathName <> '') then
   begin
-    CMyRichEdit.SaveTo(FFilePathName);
-    CMyRichEdit.Modified := false;
-    SetModified(false);
-    UpdateStatus(sSaved);
+    SaveLog(tmpComponent, FFilePathName);
   end
   else
   /// if (FFilePathName = sUntitled) or (FFilePathName = '') then
@@ -1127,25 +1152,26 @@ procedure TMainOctopusDebuggingDevelopmentForm.FileSaveAs(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
   FileNameNoExt: String;
+  tmpComponent: TComponent;
 begin
+  tmpComponent := PageControl1.GetComponent(PageControl1.ActivePageIndex);
   OcComPortObj := GetCurrentDevice();
-  CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-
-  if CMyRichEdit = nil then
+  /// if (OcComPortObj <> nil) then
+  /// FileSaveAsCmd.Dialog.FileName := OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
+  if not(tmpComponent is TCustomMemo) then
+  begin
+    ShowMessage('Unable not save the current document, please switch to another page!');
     exit;
-
-  if (OcComPortObj <> nil) then
-    FileSaveAsCmd.Dialog.FileName := SettingPagesDlg.OctopusCfgDir_LogFilePath + '\' + OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
-
+  end;
   if FileSaveAsCmd.Dialog.FileName = '' then
   begin
     FileSaveAsItem.Click;
-    if FileSaveAsCmd.Dialog.FileName <> '' then
-    begin
+    { if FileSaveAsCmd.Dialog.FileName <> '' then
+      begin
       SetPathFileName(FileSaveAsCmd.Dialog.FileName);
       FileNameNoExt := ExtractFileNameNoExt(FileSaveAsCmd.Dialog.FileName);
       PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
-    end;
+      end; }
     exit;
   end;
 
@@ -1153,29 +1179,23 @@ begin
     if MessageDlg(Format(sOverWrite, [FileSaveAsCmd.Dialog.FileName]), mtConfirmation, mbYesNoCancel, 0) <> idYes then
       exit;
 
-  CMyRichEdit.SaveTo(FileSaveAsCmd.Dialog.FileName);
+  SaveLog(tmpComponent, FileSaveAsCmd.Dialog.FileName);
   SetPathFileName(FileSaveAsCmd.Dialog.FileName);
-  CMyRichEdit.Modified := false;
-  SetModified(false);
-  UpdateStatus(sSaved);
-end;
-
-procedure TMainOctopusDebuggingDevelopmentForm.FileSaveAsCmdBeforeExecute(Sender: TObject);
-var
-  OcComPortObj: TOcComPortObj;
-begin
-  OcComPortObj := GetCurrentDevice();
-  if (OcComPortObj <> nil) then
-    FileSaveAsCmd.Dialog.FileName := SettingPagesDlg.OctopusCfgDir_LogFilePath + OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
+  FileNameNoExt := ExtractFileNameNoExt(FileSaveAsCmd.Dialog.FileName);
+  PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FilePrintAccept(Sender: TObject);
+var
+  tmpComponent: TComponent;
 begin
-  if CMyRichEdit = nil then
-    CMyRichEdit := PageControl1.GetEdit(PageControl1.ActivePageIndex);
-  if CMyRichEdit = nil then
-    exit;
-  CMyRichEdit.Print(FFilePathName);
+  tmpComponent := PageControl1.GetComponent(PageControl1.ActivePageIndex);
+
+  if tmpComponent is TMyRichEdit then
+    TMyRichEdit(tmpComponent).Print(FFilePathName);
+
+  if tmpComponent is TMyMemo then
+    TMyMemo(tmpComponent).Print(nil, FFilePathName);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SelectFont(Sender: TObject);
@@ -1535,6 +1555,10 @@ begin
   OcComPortObj := Self.GetCurrentDevice();
   CommandFrm.OcComPortObj := OcComPortObj;
   CommandFrm.Show();
+  CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 15;
+  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 20;
+  Self.StandardToolBar1.Visible := false;
+  Self.StandardToolBar2.Visible := True;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.Button100Click(Sender: TObject);
@@ -1639,7 +1663,7 @@ begin
     // ss := FormatHexStrToByte(ss, buffer,bLength);
     ss := FormatHexStrToBuffer(ss, buffer, bLength);
   except
-    showmessage('There are too many datas to fomat!!!!!!!!!!');
+    ShowMessage('There are too many datas to fomat!!!!!!!!!!');
   end;
 
   Memo2.Text := ss;
@@ -2348,13 +2372,14 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ToolButton19Click(Sender: TObject);
 begin
-  ShowHideRLPanel(false);
+  {ShowHideRLPanel(false);
   CommandFrm.OcComPortObj := Self.GetCurrentDevice();
   CommandFrm.Show();
   CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 15;
-  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2+20;
+  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 20;
   Self.StandardToolBar1.Visible := false;
-  Self.StandardToolBar2.Visible := True;
+  Self.StandardToolBar2.Visible := True;}
+  QuickTerminalCommandsItem.Click;
 end;
 
 /// ///////////////////////////////////////////////////////////////////////////////
@@ -3077,7 +3102,7 @@ begin
       end;
     end;
   Except
-    showmessage('unknow error!');
+    ShowMessage('unknow error!');
   end;
 
 end;

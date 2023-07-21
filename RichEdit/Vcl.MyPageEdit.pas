@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.StrUtils, Winapi.Windows, Winapi.Messages, Winapi.RichEdit, System.Classes, Vcl.Graphics, Vcl.Controls,
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus, Vcl.ComCtrls, Vcl.ClipBrd,
   Vcl.ToolWin, Vcl.ActnList, System.Actions, System.ImageList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
-  Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes, SHDocVw, SyncObjs;
+  Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes, SHDocVw, SyncObjs, Vcl.Printers;
 
 type
   TEventCallBackFuntion = Procedure(Msg: String) of object;
@@ -47,6 +47,8 @@ type
     procedure SetDefaultFormat();
     procedure SetHexadecimalMode(); overload;
     procedure SetHexadecimalMode(HexMode: Boolean); overload;
+    procedure Print(TitleStr: string = 'No Title'); overload;
+    procedure Print(UserPrinter: TPrinter; TitleStr: string = 'No Title'); overload;
   published
   end;
 
@@ -378,6 +380,122 @@ begin
   begin
     LoadFrom('');
     FHexadecimalMode := false;
+  end;
+end;
+
+procedure TMyMemo.Print(TitleStr: string);
+var
+  Left: Integer;
+  Top: Integer;
+  i, j, X, Y: Integer; // PageHeight,
+  PagesStr: String;
+  posX, posY, Posx1, posY1: Integer;
+  PrintDialog1: TPrintDialog;
+begin
+  Left := 500;
+  Top := 800;
+  Y := Top; // 40
+  X := Left; // 80
+  j := 1;
+  PrintDialog1 := TPrintDialog.Create(Application);
+  if PrintDialog1.Execute then
+    With Printer do
+    begin
+      BeginDoc; // 另存的打印的文件名 如何实现  默认为 .jnt
+      Canvas.Font := Font;
+      // -------------------------------------------------------------------------
+      // 打印文件名的标题
+      // TitleStr:='无标题';
+      posX := (PageWidth div 2) - Length(TitleStr) * 50; // x+1800;
+      posY := (PageHeight * 6) div 100;
+
+      // 第N页的标题
+      PagesStr := Format('第 %d 页', [Printer.PageNumber]);
+      Posx1 := (PageWidth div 2) - Length(PagesStr) * 50;
+      posY1 := (PageHeight * 92) div 100;
+      // -------------------------------------------------------------------------
+      for i := 0 to Lines.Count - 1 do
+      begin
+        Canvas.TextOut(X, Y, Lines[i]); // TextOut(Left,Top,string);
+        Y := Y + Font.Size * 10; // Memo.Font.Size*10为行间距 第1行与第2行的间距,2和3,3与4,...
+
+        if (Y > PageHeight - Top) then
+        begin
+          Canvas.TextOut(posX, posY, TitleStr);
+          for j := 1 to Printer.PageNumber do
+          begin
+            PagesStr := Format('第 %d 页', [j]);
+            Canvas.TextOut(Posx1, posY1, PagesStr);
+            Application.ProcessMessages;
+          end;
+          NewPage;
+          Y := Top;
+        end;
+      end;
+      Canvas.TextOut(posX, posY, TitleStr);
+      Canvas.TextOut(Posx1, posY1, Format('第 %d 页', [j]));
+      // Form1.Label1.Caption:=System.Concat(' 正在打印',#13#10,TitleStr,#13#10,Format('第 %d 页',[j]));
+      EndDoc;
+      // Form1.Caption:= Format('x = %d y = %d Width = %d Height = %d ',[x,y,PageWidth,Pageheight]);
+    end;
+end;
+
+procedure TMyMemo.Print(UserPrinter: TPrinter; TitleStr: string);
+var
+  Left: Integer;
+  Top: Integer;
+  i, j, X, Y: Integer; // PageHeight,
+  PagesStr: String;
+  posX, posY, Posx1, posY1: Integer;
+  // PrintDialog1: TPrintDialog;
+begin
+  Left := 500;
+  Top := 800;
+  Y := Top; // 40
+  X := Left; // 80
+  j := 1;
+  // PrintDialog1 := TPrintDialog.Create(Application);
+  // if PrintDialog1.Execute then
+
+
+  With Printer do
+  begin
+    BeginDoc; // 另存的打印的文件名 如何实现  默认为 .jnt
+    Canvas.Font := Font;
+    // -------------------------------------------------------------------------
+    // 打印文件名的标题
+    // TitleStr:='无标题';
+    posX := (PageWidth div 2) - Length(TitleStr) * 50; // x+1800;
+    posY := (PageHeight * 6) div 100;
+
+    // 第N页的标题
+    PagesStr := Format('第 %d 页', [Printer.PageNumber]);
+    Posx1 := (PageWidth div 2) - Length(PagesStr) * 50;
+    posY1 := (PageHeight * 92) div 100;
+    // -------------------------------------------------------------------------
+    for i := 0 to Lines.Count - 1 do
+    begin
+      Canvas.TextOut(X, Y, Lines[i]); // TextOut(Left,Top,string);
+      Y := Y + Font.Size * 10; // Memo.Font.Size*10为行间距 第1行与第2行的间距,2和3,3与4,...
+
+      if (Y > PageHeight - Top) then
+      begin
+        Canvas.TextOut(posX, posY, TitleStr);
+        for j := 1 to Printer.PageNumber do
+        begin
+          PagesStr := Format('第 %d 页', [j]);
+          Canvas.TextOut(Posx1, posY1, PagesStr);
+          Application.ProcessMessages;
+        end;
+        NewPage;
+        Y := Top;
+      end;
+    end;
+    Canvas.TextOut(posX, posY, TitleStr);
+    Canvas.TextOut(Posx1, posY1, Format('第 %d 页', [j]));
+    // Form1.Label1.Caption:=System.Concat(' 正在打印',#13#10,TitleStr,#13#10,Format('第 %d 页',[j]));
+    EndDoc;
+    // Form1.Caption:= Format('x = %d y = %d Width = %d Height = %d ',[x,y,PageWidth,Pageheight]);
   end;
 end;
 
