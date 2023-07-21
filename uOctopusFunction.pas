@@ -18,7 +18,10 @@ Const
   E_MAIL = 'Octopus@1234998.cn';
   CONFIGURATION_DIR = '\Setting\';
   LOG_DIR = '\Logs\';
+
   WEB_SITE = 'http://www.1234998.cn';
+  WEB_SITE1 = 'http://www.1234998.top';
+
   WEB_SITE2 = 'http://1234998.cn';
 
   DEFAULT_WEBSITE_ADDRESS = 'http://www.1234998.top';

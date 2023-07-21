@@ -613,14 +613,16 @@ var
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := getCurrentDevice();
-  if OcComPortObj = nil then
-    exit;
-  ApplyOcComPortObjAtrribute(OcComPortObj);
-  ApplyCodePageSetting(OcComPortObj);
+  if OcComPortObj <> nil then
+  begin
+    ApplyOcComPortObjAtrribute(OcComPortObj);
+    ApplyCodePageSetting(OcComPortObj);
+    SaveDeviceSetting(self.getCurrentDevice);
+    Timer1.Enabled := CheckBox8.Checked;
+  end;
+
   AlphaBlendValue := UpDown1.Position;
   AlphaBlend := CheckBox7.Checked;
-  Timer1.Enabled := CheckBox8.Checked;
-  SaveDeviceSetting(self.getCurrentDevice);
 
   if CheckBoxShortcutForExplorer.Checked then
     AddExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME, Application.Exename, '*')
@@ -1083,6 +1085,10 @@ begin
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
         tmpComponent := Form.Components[i];
+
+        if tmpComponent is TForm then
+          TForm(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE_TButton', getMsgID(TForm(tmpComponent).Name), TForm(tmpComponent).Caption);
+
         if tmpComponent is TButton then
           TButton(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name), TButton(tmpComponent).Caption);
 
@@ -1117,12 +1123,19 @@ begin
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
         tmpComponent := Form.Components[i];
+
+        if tmpComponent is TForm then
+          IniFiles.WriteString('LANGUAGE_TButton', getMsgID(TForm(tmpComponent).Name), TForm(tmpComponent).Caption);
+
         if tmpComponent is TButton then
           IniFiles.WriteString('LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name), TButton(tmpComponent).Caption);
+
         if tmpComponent is TCheckBox then
           IniFiles.WriteString('LANGUAGE_TCheckBox', getMsgID(TCheckBox(tmpComponent).Name), TCheckBox(tmpComponent).Caption);
+
         if tmpComponent is TLabel then
           IniFiles.WriteString('LANGUAGE_TLabel', getMsgID(TLabel(tmpComponent).Name), TLabel(tmpComponent).Caption);
+
         if tmpComponent is TMenuItem then
         begin
           if TMenuItem(tmpComponent).Caption <> '-' then

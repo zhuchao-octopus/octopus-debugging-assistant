@@ -459,7 +459,7 @@ implementation
 
 uses uOctopusAbout, RichEdit, Winapi.ShellAPI, System.UITypes, System.IOUtils, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj,
   uSetting, math, OcProtocol, CPort, uMainSetting, uSMTP, uEncryptionDecryption, uCRC,
-  Screenshot, uScreenMain, uCommand, uDownloader, uPageSetup;
+  Screenshot, uScreenMain, uCommand, uDownloader, uDownloadsManager, uPageSetup;
 
 resourcestring
   sSaveChanges = 'Save changes to %s?';
@@ -2012,8 +2012,9 @@ begin
   begin
     Types := INTERNET_CONNECTION_MODEM + INTERNET_CONNECTION_LAN + INTERNET_CONNECTION_PROXY;
     str := 'file:///' + ExtractFileDir(Application.Exename) + '\Octopus Software.html';
-    if CheckUrl('http://www.baidu.com') then
+    /// if CheckUrl('http://www.baidu.com') then
     /// if internetGetConnectedState(@types,0) then
+    if DownloadObjectsManager.IsNetworkAvailable then
     begin
       str := ByteToWideString(@testbuff, Length(testbuff));
     end;
@@ -2350,8 +2351,10 @@ begin
   ShowHideRLPanel(false);
   CommandFrm.OcComPortObj := Self.GetCurrentDevice();
   CommandFrm.Show();
-  CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 10;
-  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2;
+  CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 15;
+  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2+20;
+  Self.StandardToolBar1.Visible := false;
+  Self.StandardToolBar2.Visible := True;
 end;
 
 /// ///////////////////////////////////////////////////////////////////////////////
@@ -3049,7 +3052,7 @@ begin
   try
     if (Panel.Index = 1) and (Fprogress = 0) and (FprogressMax = 0) then
     begin
-      str := 'http://www.1234998.top';
+      str := WEB_SITE;
       with StatusBar1.Canvas do
       begin
         Brush.Color := clMenuBar;
@@ -3235,6 +3238,10 @@ begin
 
     if FThemeSkinName <> '' then
       AdjustSetStyle(FThemeSkinName);
+
+    Self.AlphaBlend := Octopusini.ReadBool('MyPreference', 'APPLICATION_ALPHA_BLEND', false);
+    Self.AlphaBlendValue := Octopusini.ReadInteger('MyPreference', 'APPLICATION_ALPHA_VALUE', 238);
+
   finally
     Octopusini.Free;
   end;

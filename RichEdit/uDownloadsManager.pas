@@ -69,7 +69,6 @@ type
 
   TDownloadObjects = class
   private
-
   protected
   public
     FFromURL: string;
@@ -92,8 +91,15 @@ type
     property OnThreadData: TDownloadThreadDataEvent write FOnThreadData;
   end;
 
-  /// var
-  /// DownloadObjects: TDownloadObjects;
+  TDownloadObjectsManager = class
+  private
+  protected
+  public
+    function IsNetworkAvailable: Boolean;
+  end;
+
+var
+  DownloadObjectsManager: TDownloadObjectsManager;
 
 implementation
 
@@ -262,11 +268,11 @@ var
   FBrand: String;
   FCustomer: String;
   FMAC: String;
-  ///FIP: String;
-  ///FAppVersion: String;
-  ///FFwVersion: String;
-  ///FRegion: String;
-  ///FComments: String;
+  /// FIP: String;
+  /// FAppVersion: String;
+  /// FFwVersion: String;
+  /// FRegion: String;
+  /// FComments: String;
   LCancel: Boolean;
 begin
   { Place thread code here }
@@ -499,10 +505,51 @@ begin
 
 end;
 
+/// /////////////////////////////////////////////////////////////////////////////
+///
+function TDownloadObjectsManager.IsNetworkAvailable: Boolean;
+var
+  HttpClient: THTTPClient;
+  Response: IHTTPResponse;
+begin
+  HttpClient := THTTPClient.Create;
+  Result := false;
+  try
+    try
+      Response := HttpClient.Get('http://www.baidu.com');
+      // Handle the response here, e.g., check the StatusCode and Content of the response
+      if Response.StatusCode = 200 then
+      begin
+        // Successful response
+        // Do something with Response.ContentAsString
+        Result := true;
+      end
+      else if (Response.StatusCode >= 500) and (Response.StatusCode < 600) then
+      begin
+        // Handle server errors (status codes in the 500 range)
+        /// Result:=False;
+      end
+      else
+      begin
+        // Handle other status codes
+      end;
+    except
+      on E: Exception do
+      begin
+        // Handle exceptions, e.g., network disconnection, unexpected errors, etc.
+      end;
+    end;
+  finally
+    HttpClient.Free;
+  end;
+end;
+
 initialization
 
-/// DownloadsManager := TDownloadObjects.Create;
+DownloadObjectsManager := TDownloadObjectsManager.Create;
 
 finalization
+
+DownloadObjectsManager.Free;
 
 end.
