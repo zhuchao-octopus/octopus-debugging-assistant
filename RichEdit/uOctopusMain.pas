@@ -222,7 +222,7 @@ type
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     N16: TMenuItem;
-    ShowLinesNumberItem: TMenuItem;
+    QuickTextEditingModeItem: TMenuItem;
     N17: TMenuItem;
     HexModeItem: TMenuItem;
     QuickTerminalCommandsItem: TMenuItem;
@@ -344,7 +344,7 @@ type
     procedure MenuItem6Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
     procedure ToolButton19Click(Sender: TObject);
-    procedure ShowLinesNumberItemClick(Sender: TObject);
+    procedure QuickTextEditingModeItemClick(Sender: TObject);
     procedure HexModeItemClick(Sender: TObject);
     procedure FileSaveAsCmdBeforeExecute(Sender: TObject);
     procedure RichEditMenuClick(Sender: TObject);
@@ -716,8 +716,8 @@ begin
   SelectedFile := ParamStr(1); // 获取命令行参数中的第二个参数，即选中的文件路径
   if FileExists(SelectedFile) then
   begin
-    LoadNewFileFromTo(SelectedFile);
     ShowHideRLPanel(false);
+    LoadNewFileFromTo(SelectedFile);
     Self.StandardToolBar1.Visible := True;
     Self.StandardToolBar2.Visible := false;
   end;
@@ -1405,12 +1405,6 @@ begin
   FormatToolBarMenuItem2.Checked := StandardToolBar2.Visible;
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.ShowLinesNumberItemClick(Sender: TObject);
-begin
-  // if (CMyRichEdit <> nil) and (not CMyRichEdit.FShowLinesNumber) then
-  // CMyRichEdit.ShowLinesNumber();
-end;
-
 procedure TMainOctopusDebuggingDevelopmentForm.MenuItem2Click(Sender: TObject);
 begin
   if CMyRichEdit <> nil then
@@ -1559,6 +1553,16 @@ begin
   CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 20;
   Self.StandardToolBar1.Visible := false;
   Self.StandardToolBar2.Visible := True;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.QuickTextEditingModeItemClick(Sender: TObject);
+begin
+  if CommandFrm.Showing then
+    CommandFrm.Close;
+
+  Self.StandardToolBar1.Visible := True;
+  Self.StandardToolBar2.Visible := false;
+  FileNewButton.Click;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.Button100Click(Sender: TObject);
@@ -2187,7 +2191,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.SettingItem1Click(Sender: TObject
 var
   Component: TComponent;
 begin
-  SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
+  ///SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
   SettingPagesDlg.ShowModal();
   /// SettingPagesDlg.Show();
   ///
@@ -2372,13 +2376,13 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ToolButton19Click(Sender: TObject);
 begin
-  {ShowHideRLPanel(false);
-  CommandFrm.OcComPortObj := Self.GetCurrentDevice();
-  CommandFrm.Show();
-  CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 15;
-  CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 20;
-  Self.StandardToolBar1.Visible := false;
-  Self.StandardToolBar2.Visible := True;}
+  { ShowHideRLPanel(false);
+    CommandFrm.OcComPortObj := Self.GetCurrentDevice();
+    CommandFrm.Show();
+    CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 15;
+    CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 20;
+    Self.StandardToolBar1.Visible := false;
+    Self.StandardToolBar2.Visible := True; }
   QuickTerminalCommandsItem.Click;
 end;
 
@@ -2440,8 +2444,8 @@ begin
   if Self.PageControl2.TabPosition = tpRight then
     RptarpMenuItem.Checked := True;
 
-  if (CMyRichEdit <> nil) then
-    ShowLinesNumberItem.Checked := CMyRichEdit.FShowLinesNumber;
+  ///if (CMyRichEdit <> nil) then
+  ///  ShowLinesNumberItem.Checked := CMyRichEdit.FShowLinesNumber;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.AdjustUI();
@@ -3174,13 +3178,13 @@ begin
         /// Octopusini.WriteString('MyCustData', IntToStr(i) + '_6', StringGrid1.Cells[6, i]);
       end;
 
-      if SkinMenuItem <> nil then
-        str := GetStyle(TMenuItem(SkinMenuItem).Tag)
-      else
-        str := TStyleManager.StyleNames[0];
+      /// if SkinMenuItem <> nil then
+      /// str := GetStyle(TMenuItem(SkinMenuItem).Tag)
+      /// else
+      /// str := TStyleManager.StyleNames[0];
 
       Octopusini.WriteBool('MyPreference', 'APPLICATION_CHINESE_LANG', ChineseMenuItem.Checked);
-      Octopusini.WriteString('MyPreference', 'APPLICATION_THEME_SKIN_NAME', str);
+      Octopusini.WriteString('MyPreference', 'APPLICATION_THEME_SKIN_NAME', FThemeSkinName);
 
       Octopusini.WriteBool('MyPreference', 'APPLICATION_ALPHA_BLEND', Self.AlphaBlend);
       Octopusini.WriteInteger('MyPreference', 'APPLICATION_ALPHA_VALUE', Self.AlphaBlendValue);

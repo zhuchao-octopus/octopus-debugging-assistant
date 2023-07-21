@@ -2075,10 +2075,9 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
         Caption = 'Quick Terminal Commands'
         OnClick = QuickTerminalCommandsItemClick
       end
-      object ShowLinesNumberItem: TMenuItem
-        Caption = 'Show Lines Number'
-        Enabled = False
-        OnClick = ShowLinesNumberItemClick
+      object QuickTextEditingModeItem: TMenuItem
+        Caption = 'Quick Text Editing Mode'
+        OnClick = QuickTextEditingModeItemClick
       end
     end
     object Encoding1: TMenuItem
