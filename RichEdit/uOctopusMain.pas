@@ -2354,12 +2354,19 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.ToolButton12Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
+  Component: TComponent;
 begin
   OcComPortObj := Self.GetCurrentDevice();
   if OcComPortObj <> nil then
   begin
     OcComPortObj.ClearLog();
     OcComPortObj.ClearInternalBuff();
+    exit;
+  end;
+  Component := Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
+  if Component is TMyRichEdit then
+  begin
+    TMyRichEdit(Component).Clear;
   end;
 end;
 
@@ -2534,19 +2541,12 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.SkinsMenuOnClick(Sender: TObject);
 var
   str: String;
-  /// Component:TComponent;
 begin;
-  // TStyleManager.SetStyle(TMenuItem(Sender).Caption);
   str := GetStyle(TMenuItem(Sender).Tag);
-  /// Component:=Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
   if str <> '' then
   begin
-    // for i := Low(TStyleManager.StyleNames) to High(TStyleManager.StyleNames) do
     SkinMenuItem := TMenuItem(Sender);
     FThemeSkinName := str;
-    /// if Component is TMyMemo  then
-    /// TMyMemo(Component).Visible:=false;
-
     AdjustSetStyle(str);
     /// AdjustSetStyle(str);
     TMenuItem(Sender).Checked := True;

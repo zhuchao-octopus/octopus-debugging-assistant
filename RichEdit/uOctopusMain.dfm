@@ -268,6 +268,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     Width = 1205
     Height = 33
     BorderWidth = 2
+    ButtonHeight = 25
     Color = clBtnFace
     Images = ToolbarImages
     ParentColor = False
@@ -326,7 +327,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Left = 389
       Top = 0
       Width = 50
-      Height = 22
+      Height = 25
       Hint = 'OnOff switch for device'
       ShowStateCaption = False
       TabOrder = 2
@@ -3334,7 +3335,9 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object FileSaveAsCmd: TFileSaveAs
       Category = 'File'
       Caption = 'Save &As...'
-      Dialog.Filter = 'Rich Text Files (*.RTF)|*.RTF|Text Files (*.TXT)|*.TXT'
+      Dialog.Filter = 
+        'Rich Text Files (*.rtf)|*.rtf|Text Files (*.txt)|*.txt|Log Files' +
+        ' (*.log)|*.log'
       Hint = 'Save current file under a new name'
       ImageIndex = 9
       BeforeExecute = FileSaveAsCmdBeforeExecute
