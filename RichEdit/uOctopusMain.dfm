@@ -268,7 +268,6 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     Width = 1205
     Height = 33
     BorderWidth = 2
-    ButtonHeight = 25
     Color = clBtnFace
     Images = ToolbarImages
     ParentColor = False
@@ -327,7 +326,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Left = 389
       Top = 0
       Width = 50
-      Height = 25
+      Height = 22
       Hint = 'OnOff switch for device'
       ShowStateCaption = False
       TabOrder = 2

@@ -1553,13 +1553,14 @@ begin
   CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 5;
   Self.StandardToolBar1.Visible := false;
   Self.StandardToolBar2.Visible := True;
+  ShowHideRLPanel(false);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.QuickTextEditingModeItemClick(Sender: TObject);
 begin
   if CommandFrm.Showing then
     CommandFrm.Close;
-
+  ShowHideRLPanel(false);
   Self.StandardToolBar1.Visible := True;
   Self.StandardToolBar2.Visible := false;
   FileNewButton.Click;
@@ -2390,7 +2391,11 @@ begin
     CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 20;
     Self.StandardToolBar1.Visible := false;
     Self.StandardToolBar2.Visible := True; }
-  QuickTerminalCommandsItem.Click;
+
+  if CommandFrm.Showing then
+    CommandFrm.Close
+  else
+    QuickTerminalCommandsItem.Click;
 end;
 
 /// ///////////////////////////////////////////////////////////////////////////////
