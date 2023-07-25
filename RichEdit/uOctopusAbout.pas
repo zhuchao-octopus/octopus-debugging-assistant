@@ -98,6 +98,7 @@ begin
   Button1.Enabled := False;
   DownloaderFrm.Show();
 
+  Close();
 end;
 
 procedure TAboutBox.CheckNewVersion();

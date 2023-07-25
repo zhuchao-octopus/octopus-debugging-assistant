@@ -997,6 +997,11 @@ begin
     FGColorBox.Selected := TMyMemo(Component).Font.Color;
     BGColorBox.Selected := SettingPagesDlg.ColorBoxContentBG.Selected;
     UpdateStatus(WEB_SITE, 0);
+  end
+  else
+  begin
+    if CommandFrm.Showing then
+      CommandFrm.Close;
   end;
 
   CommandFrm.OcComPortObj := Self.GetCurrentDevice();
@@ -1547,6 +1552,12 @@ var
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := Self.GetCurrentDevice();
+  if OcComPortObj = nil then
+  begin
+    Self.PageControl1.ActivePageIndex := Self.PageControl1.GetAMemoIndex();
+    OcComPortObj := Self.GetCurrentDevice();
+  end;
+
   CommandFrm.OcComPortObj := OcComPortObj;
   CommandFrm.Show();
   CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 30;

@@ -63,6 +63,15 @@ object DownloaderFrm: TDownloaderFrm
         Width = 4
         Height = 17
       end
+      object Label6: TLabel
+        Left = 24
+        Top = 296
+        Width = 617
+        Height = 17
+        Caption = 
+          'The old version of the software will not be deleted after upgrad' +
+          'ing. You can delete it manually or keep it'
+      end
       object ProgressBar1: TProgressBar
         Left = 24
         Top = 13
@@ -123,8 +132,8 @@ object DownloaderFrm: TDownloaderFrm
         TabOrder = 6
       end
       object Button1: TButton
-        Left = 368
-        Top = 296
+        Left = 704
+        Top = 176
         Width = 75
         Height = 25
         Caption = 'Button1'
@@ -133,8 +142,8 @@ object DownloaderFrm: TDownloaderFrm
         OnClick = Button1Click
       end
       object Button2: TButton
-        Left = 184
-        Top = 296
+        Left = 704
+        Top = 207
         Width = 75
         Height = 25
         Caption = 'Button2'

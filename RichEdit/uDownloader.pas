@@ -27,6 +27,7 @@ type
     Label5: TLabel;
     Button1: TButton;
     Button2: TButton;
+    Label6: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure ButtonUpgradeClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -159,19 +160,22 @@ begin
         Memo1.Lines.Add('FilePath:  ' + updateFilePath);
         DownloadUrl := StringReplace(updateFilePath, '"', '', [rfReplaceAll, rfIgnoreCase]);
         DownloadUrl := StringReplace(DownloadUrl, '\', '', [rfReplaceAll, rfIgnoreCase]);
-        Memo1.Lines.Append(' ');
+
+        LDownLoadFileName := DownloadObjects.GetLocalFilePathName(DownloadUrl, ExtractFilePath(Application.Exename));
+        Memo1.Lines.Append('Prepare to download to '+ LDownLoadFileName);
+        Memo1.Lines.Append('Prepare to download in pieces...........');
+
         /// if CompareVersion('100', appVersion) then
         if CompareVersion(GetBuildInfo(Application.Exename), appVersion) then
         begin
           /// Memo1.Lines[i + StartLine] := 'Downloading: ' + DownloadObject.FilePathName;
-          // DownloadObject.StartDownload(DownloadUrl,  ExtractFilePath(Application.Exename));
+          /// DownloadObject.StartDownload(DownloadUrl,  ExtractFilePath(Application.Exename));
           for I := 0 to DownloadObjects.FNumThreads - 1 do
             Memo1.Lines.Append(' ');
           /// Memo1.Lines.Append('Downloading: ' + IntToStr(AReadCount) + '/' + IntToStr(AContentLength) + ' Speed' + IntToStr(ASpeed) + '%');
           /// ButtonUpgrade.Enabled := true;
           Memo1.Perform(EM_SCROLL, SB_TOP, 0);
 
-          LDownLoadFileName := DownloadObjects.GetLocalFilePathName(DownloadUrl, ExtractFilePath(Application.Exename));
           ///if FileExists(LDownLoadFileName) then
           ///begin
             ///if MessageBox(Self.Handle, 'Download is complete, do you want to start it now?', 'do you want to start it now?', MB_OKCANCEL or MB_ICONQUESTION) = IDCANCEL then
@@ -223,10 +227,9 @@ begin
       ButtonUpgrade.Enabled := true;
       if FileExists(TDownloadObjects(Sender).FToPathFileName) then
       begin
-        /// showmessage('The download is complete, please confirm that the latest file name is called ' + TDownloadsManager(Sender).FToFileName);
-        Memo1.Lines.Append('The download is complete, please confirm that the latest file name is called ' + TDownloadObjects(Sender).FToPathFileName);
+        Memo1.Lines.Append('The downloading is complete, please confirm that the latest file name is called ' + TDownloadObjects(Sender).FToPathFileName);
 
-        if MessageBox(Self.Handle, 'Download is complete, do you want to start it now?', 'do you want to start it now?', MB_OKCANCEL or MB_ICONQUESTION) = IDOK then
+        if MessageBox(Self.Handle, 'The program has successfully completed the download and upgrade, do you want to start it now?', 'do you want to start it now?', MB_OKCANCEL or MB_ICONQUESTION) = IDOK then
         begin
           ExecuteExternalProgram(TDownloadObjects(Sender).FToPathFileName);
           /// Application.Terminate;

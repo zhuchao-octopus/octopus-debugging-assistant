@@ -18,7 +18,7 @@ uses
   uOctopusFunction in '..\uOctopusFunction.pas',
   OcComPortObj in 'OcComPortObj.pas',
   Vcl.MyPageEdit in 'Vcl.MyPageEdit.pas',
-  uDeviceThread in '..\uDeviceThread.pas',
+  uDeviceMaintence in '..\uDeviceMaintence.pas',
   Mail4Delphi.Intf in '..\..\ZSBWM\SMTP\Mail4Delphi.Intf.pas',
   Mail4Delphi in '..\..\ZSBWM\SMTP\Mail4Delphi.pas',
   uSetting in '..\..\ZSBWM\SMTP\uSetting.pas' {ConfigurationFrm},

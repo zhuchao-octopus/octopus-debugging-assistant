@@ -1,4 +1,4 @@
-unit uDeviceThread;
+unit uDeviceMaintence;
 
 interface
 
@@ -6,7 +6,7 @@ uses
   System.SysUtils, System.Classes, System.Net.HttpClient;
 
 type
-  TCheckDeviceThreak = class(TThread)
+  TMaintenanceOfEquipment = class(TThread)
     ApplicationFileName: String;
     ConfigFileName: String;
   private
@@ -31,6 +31,9 @@ type
 const
   publickey =
     'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDoJ+0689QiXNJKQvROY/lOOcrlCzB9xfNipHdD9xaK7sZb1EcKJQJAl5mqyWz4fWgGAEjrqVPSrkGPgqEpCej1J1VNAx3E4Ig40ZQbl5EAgxo0W36+jQkklKjgcAoVvuhWovAZjcPqfmAUljGfQu8PlbZ8fE4AjHIHikQy88Cy2wIDAQAB';
+
+var
+  MaintenanceOfEquipment: TMaintenanceOfEquipment;
 
 implementation
 
@@ -69,17 +72,17 @@ uses NetInterface, GlobalFunctions, IniFiles;
 
 { TCheckDeviceThreak }
 
-procedure TCheckDeviceThreak.RSAPublicEncrypt(str: String);
+procedure TMaintenanceOfEquipment.RSAPublicEncrypt(str: String);
 begin
 
 end;
 
-procedure TCheckDeviceThreak.SetComments(Const Comments: String);
+procedure TMaintenanceOfEquipment.SetComments(Const Comments: String);
 begin
-  Self.FComments := Comments;
+  Self.FComments := Comments; // 记录错误
 end;
 
-procedure TCheckDeviceThreak.Execute;
+procedure TMaintenanceOfEquipment.Execute;
 var
   URL, URL2: string;
   LResponse: IHTTPResponse;
@@ -97,9 +100,12 @@ begin
   try
     Octopusini := TIniFile.Create(ConfigFileName);
     timeStamp := DateTimeToLongWord(Now(), 240); // 一天只登记一次
-    timeStamp2 := Octopusini.ReadInt64('', 'TIMESTAMP', 0);
-    if (timeStamp = timeStamp2) and (FComments <> '') then
-      Exit;
+    timeStamp2 := Octopusini.ReadInt64('CONFIGURATION', 'TIMESTAMP', 0);
+    if (timeStamp = timeStamp2) then // 同一天
+    begin
+      if (FComments = '') then // 没有错误登记
+        Exit;
+    end;
 
     if FClient = nil then
       FClient := THTTPClient.Create;
@@ -133,11 +139,15 @@ begin
     // URL2 := 'http://47.106.172.94:8090/zhuchao/octopus/devices/testCheckRSA?str=' + s;
     // LResponse := FClient.Get(URL);
 
-    if (timeStamp = timeStamp2) then
-      Exit;
+    /// if (timeStamp = timeStamp2) then
+    /// Exit;
     URL := 'http://47.106.172.94:8090/zhuchao/octopus/devices/testCheck';
-    s := FClient.Post(URL, cParam).ContentAsString;
-    Octopusini.WriteInt64('', 'TIMESTAMP', timeStamp);
+    try
+      s := FClient.Post(URL, cParam).ContentAsString;
+      Octopusini.WriteInt64('CONFIGURATION', 'TIMESTAMP', timeStamp);
+    except
+    end;
+
   finally
     if FClient <> nil then
       FClient.Free;
@@ -150,5 +160,13 @@ begin
   end;
 
 end;
+
+initialization
+
+MaintenanceOfEquipment := TMaintenanceOfEquipment.Create(true);
+
+finalization
+
+/// MaintenanceOfEquipment.Free;
 
 end.

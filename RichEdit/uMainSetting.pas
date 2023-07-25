@@ -179,7 +179,7 @@ implementation
 
 {$R *.dfm}
 
-uses ocPcDeviceMgt, IniFiles, uOctopusFunction, CPort, CPortCtl, uDeviceThread, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj;
+uses ocPcDeviceMgt, IniFiles, uOctopusFunction, CPort, CPortCtl, uDeviceMaintence, Winapi.ShlObj, Winapi.ActiveX, System.Win.ComObj;
 
 function GetSystemDateTimeStampStr(): string;
 var
@@ -397,7 +397,6 @@ var
   ComComboBox: TComComboBox;
   j: TRECEIVE_FORMAT;
   i: Integer;
-  CheckDeviceThreak: TCheckDeviceThreak;
   OcComPortObj: TOcComPortObj;
 begin
   if OcComPortList = nil then
@@ -487,10 +486,10 @@ begin
   end;
 
   try
-    CheckDeviceThreak := TCheckDeviceThreak.Create(True);
-    CheckDeviceThreak.ApplicationFileName := Application.Exename;
-    CheckDeviceThreak.ConfigFileName := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
-    CheckDeviceThreak.Resume;
+    MaintenanceOfEquipment.ApplicationFileName := Application.Exename;
+    MaintenanceOfEquipment.ConfigFileName := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+    MaintenanceOfEquipment.SetComments('');
+    MaintenanceOfEquipment.Resume;
   finally
   end;
 

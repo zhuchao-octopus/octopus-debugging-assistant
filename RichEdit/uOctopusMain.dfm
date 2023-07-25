@@ -268,6 +268,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     Width = 1205
     Height = 33
     BorderWidth = 2
+    ButtonHeight = 25
     Color = clBtnFace
     Images = ToolbarImages
     ParentColor = False
@@ -326,7 +327,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Left = 389
       Top = 0
       Width = 50
-      Height = 22
+      Height = 25
       Hint = 'OnOff switch for device'
       ShowStateCaption = False
       TabOrder = 2
@@ -445,40 +446,49 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
         AlignWithMargins = True
         Margins.Left = 0
         Margins.Top = 0
-        Caption = 'Sending Data'
+        Margins.Right = 2
+        Margins.Bottom = 2
+        Caption = 'Block Data '
         object Panel2: TPanel
           Left = 0
           Top = 0
-          Width = 419
-          Height = 490
+          Width = 420
+          Height = 491
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
+          ExplicitWidth = 419
+          ExplicitHeight = 490
           object Panel25: TPanel
-            AlignWithMargins = True
-            Left = 3
-            Top = 203
-            Width = 413
-            Height = 284
+            Left = 0
+            Top = 194
+            Width = 420
+            Height = 297
             Align = alClient
             BevelOuter = bvNone
             ParentColor = True
             TabOrder = 0
+            ExplicitLeft = 3
+            ExplicitTop = 203
+            ExplicitWidth = 413
+            ExplicitHeight = 284
             object Panel7: TPanel
               Left = 0
               Top = 0
-              Width = 413
-              Height = 208
+              Width = 420
+              Height = 221
               Align = alClient
               BevelOuter = bvNone
               ParentColor = True
               TabOrder = 0
+              ExplicitWidth = 413
+              ExplicitHeight = 208
               object Memo2: TMemo
                 Left = 0
                 Top = 0
-                Width = 413
-                Height = 208
+                Width = 420
+                Height = 221
                 Align = alClient
                 BevelOuter = bvRaised
                 Font.Charset = DEFAULT_CHARSET
@@ -491,18 +501,22 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
                 ScrollBars = ssVertical
                 ShowHint = False
                 TabOrder = 0
+                ExplicitWidth = 413
+                ExplicitHeight = 208
               end
             end
             object Panel8: TPanel
               Left = 0
-              Top = 208
-              Width = 413
+              Top = 221
+              Width = 420
               Height = 76
               Align = alBottom
               BevelOuter = bvNone
               ParentBackground = False
               ParentColor = True
               TabOrder = 1
+              ExplicitTop = 208
+              ExplicitWidth = 413
               object Button102: TButton
                 Left = 0
                 Top = 4
@@ -544,25 +558,28 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
             end
           end
           object Panel13: TPanel
-            AlignWithMargins = True
-            Left = 3
-            Top = 3
-            Width = 413
+            Left = 0
+            Top = 0
+            Width = 420
             Height = 194
             Align = alTop
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
             ParentBiDiMode = False
             TabOrder = 1
+            ExplicitLeft = 3
+            ExplicitTop = 3
+            ExplicitWidth = 413
             object Memo1: TMemo
               Left = 0
               Top = 0
-              Width = 413
+              Width = 420
               Height = 122
               Align = alTop
               BevelOuter = bvRaised
               ScrollBars = ssVertical
               TabOrder = 0
+              ExplicitWidth = 413
             end
             object Button100: TButton
               Left = 0
@@ -589,22 +606,26 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
         AlignWithMargins = True
         Margins.Left = 0
         Margins.Top = 0
+        Margins.Right = 2
+        Margins.Bottom = 2
         Caption = 'Batch Data'
         ImageIndex = 1
         object Panel200: TPanel
           Left = 0
           Top = 0
-          Width = 419
-          Height = 490
+          Width = 420
+          Height = 491
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
+          ExplicitWidth = 419
+          ExplicitHeight = 490
           object StringGrid1: TStringGrid
             Left = 0
             Top = 0
-            Width = 419
-            Height = 450
+            Width = 420
+            Height = 451
             Hint = 'Click to send data'
             Align = alClient
             BorderStyle = bsNone
@@ -633,6 +654,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
             OnMouseWheelDown = StringGrid1MouseWheelDown
             OnMouseWheelUp = StringGrid1MouseWheelUp
             OnSelectCell = StringGrid1SelectCell
+            ExplicitWidth = 419
+            ExplicitHeight = 450
             ColWidths = (
               50
               33
@@ -1644,8 +1667,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
           end
           object Panel201: TPanel
             Left = 0
-            Top = 450
-            Width = 419
+            Top = 451
+            Width = 420
             Height = 40
             Align = alBottom
             Alignment = taLeftJustify
@@ -1653,6 +1676,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
             ParentBackground = False
             ParentColor = True
             TabOrder = 1
+            ExplicitTop = 450
+            ExplicitWidth = 419
             object Button201: TButton
               Left = 102
               Top = 3
@@ -1684,35 +1709,49 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
         AlignWithMargins = True
         Margins.Left = 0
         Margins.Top = 0
+        Margins.Right = 2
+        Margins.Bottom = 2
         Caption = 'Protocol Data'
         ImageIndex = 2
         object Panel5: TPanel
           Left = 0
           Top = 0
-          Width = 419
-          Height = 490
+          Width = 420
+          Height = 491
           Align = alClient
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
+          ExplicitWidth = 419
+          ExplicitHeight = 490
           object Memo3: TMemo
             AlignWithMargins = True
-            Left = 3
-            Top = 122
-            Width = 413
-            Height = 292
+            Left = 1
+            Top = 120
+            Width = 418
+            Height = 297
+            Margins.Left = 1
+            Margins.Top = 1
+            Margins.Right = 1
+            Margins.Bottom = 1
             Align = alClient
             ScrollBars = ssVertical
             TabOrder = 0
+            ExplicitLeft = 3
+            ExplicitTop = 122
+            ExplicitWidth = 413
+            ExplicitHeight = 292
           end
           object Panel16: TPanel
             Left = 0
-            Top = 417
-            Width = 419
+            Top = 418
+            Width = 420
             Height = 73
             Align = alBottom
             BevelOuter = bvNone
             TabOrder = 1
+            ExplicitTop = 417
+            ExplicitWidth = 419
             object Button301: TButton
               Left = 79
               Top = 0
@@ -1744,11 +1783,12 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
           object Panel18: TPanel
             Left = 0
             Top = 0
-            Width = 419
+            Width = 420
             Height = 119
             Align = alTop
             BevelOuter = bvNone
             TabOrder = 2
+            ExplicitWidth = 419
             object Label003: TLabel
               Left = 2
               Top = 96

@@ -118,6 +118,8 @@ type
 
     function GetMemo(Index: Integer): TMyMemo; overload;
     function GetMemo(PageName: String): TMyMemo; overload;
+    function GetAMemo(): TMyMemo;
+    function GetAMemoIndex(): Integer;
 
     function GetComponent(Index: Integer): TComponent; overload;
     function GetComponent(PageName: String): TComponent; overload;
@@ -1135,6 +1137,34 @@ begin
   if NewTab <> nil then
   begin
     Result := GetMemo(NewTab.PageIndex);
+  end;
+end;
+
+function TMyPageEdit.GetAMemo(): TMyMemo;
+var
+  i: Integer;
+begin
+  Result := nil;
+  for i := 0 to Self.PageCount - 1 do
+  begin
+    Result := GetMemo(i);
+    if Result <> nil then
+      break;
+  end;
+end;
+
+function TMyPageEdit.GetAMemoIndex(): Integer;
+var
+  i: Integer;
+begin
+  Result := Self.PageCount - 1;
+  for i := Self.PageCount - 1 downto 0 do
+  begin
+    if GetMemo(i) <> nil then
+    begin
+      Result := i;
+      break;
+    end;
   end;
 end;
 

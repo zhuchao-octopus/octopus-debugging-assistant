@@ -96,15 +96,37 @@ type
   protected
   public
     function IsNetworkAvailable: Boolean;
+
   end;
 
 var
   DownloadObjectsManager: TDownloadObjectsManager;
 
+function GetFileNameFromURL(URL: string): string;
+
 implementation
 
 uses DataEngine;
 
+function GetFileNameFromURL(URL: string): string;
+var
+  Strings: TStrings;
+begin
+  // 从url取得文件名
+  Strings := TStringList.Create;
+  try
+    Strings.Delimiter := '/';
+    Strings.DelimitedText := URL;
+    if Strings.Count > 0 then
+      Result := Trim(Strings[Strings.Count - 1]);
+  finally
+    Strings.Free;
+  end;
+end;
+
+/// ///////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////////
 Constructor TDownloadObject.Create(const URL: String);
 begin
   FClient := THTTPClient.Create;
@@ -373,12 +395,17 @@ function TDownloadObjects.GetLocalFilePathName(FromURL: string; ToLFileName: str
 var
   LDownLoadFileName: String;
 begin
+  LDownLoadFileName := GetFileNameFromURL(FromURL);
+  if LDownLoadFileName = '' then
   LDownLoadFileName := ExtractFileName(FromURL);
+
   LDownLoadFileName := StringReplace(LDownLoadFileName, '/', '', [rfReplaceAll, rfIgnoreCase]);
+
   if DirectoryExists(ToLFileName) then
     ToLFileName := ToLFileName + '\' + LDownLoadFileName
   else
     ToLFileName := ToLFileName;
+
   Self.FFromURL := FromURL;
   Self.FToPathFileName := ToLFileName;
   Result := Self.FToPathFileName;
