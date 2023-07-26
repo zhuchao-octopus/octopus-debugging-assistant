@@ -289,7 +289,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 136
       Height = 25
-      Hint = 'This is the baud rate of the serial port'
+      Hint = 'The baud rate of the serial port'
       Margins.Left = 30
       Style = csDropDownList
       DropDownCount = 20
@@ -309,7 +309,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 222
       Height = 25
-      Hint = 'This is the way the serial port receives the characters '
+      Hint = 'The way of receiving'
       Style = csDropDownList
       DropDownCount = 20
       TabOrder = 1
@@ -1880,6 +1880,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       ParentColor = True
       ParentFont = True
       UseSystemFont = False
+      OnMouseEnter = StatusBar1MouseEnter
     end
   end
   object MainMenu: TMainMenu
@@ -2172,6 +2173,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     end
     object COMMenu: TMenuItem
       Caption = '&COM'
+      OnClick = COMMenuClick
     end
     object HelpMenu: TMenuItem
       Caption = '&Help'

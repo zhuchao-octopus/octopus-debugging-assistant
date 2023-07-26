@@ -355,6 +355,8 @@ type
     procedure FontDialogShow(Sender: TObject);
     procedure PageSetting1Click(Sender: TObject);
     procedure CancelItemClick(Sender: TObject);
+    procedure StatusBar1MouseEnter(Sender: TObject);
+    procedure COMMenuClick(Sender: TObject);
 
   private
     OcComPortObj_Loop: TOcComPortObj;
@@ -2262,6 +2264,28 @@ begin
   end;
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.COMMenuClick(Sender: TObject);
+var
+  i: Integer;
+  MenuItem: TMenuItem;
+  OcComPortObj: TOcComPortObj;
+begin
+  OcComPortObj := Self.GetCurrentDevice;
+  for i := 0 to SettingPagesDlg.ComboBoxEx1.Items.Count - 1 do
+  begin
+    if i < COMMenu.Count then
+      MenuItem := COMMenu.Items[i];
+    if MenuItem <> nil then
+      MenuItem.Checked := false;
+
+    if OcComPortObj = SettingPagesDlg.getDeciceByIndex(i) then
+    begin
+      if MenuItem.Tag = i then
+        MenuItem.Checked := True;
+    end;
+  end;
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.ToggleSwitchDeviceOnOffClick(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
@@ -3099,6 +3123,11 @@ begin
   Self.Fprogress := progress;
   Self.FprogressMax := progressMax;
   StatusBar1.Repaint;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1MouseEnter(Sender: TObject);
+begin
+  StatusBar1.Panels[1].Width := 160;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
