@@ -11,33 +11,34 @@ uses
 
 Const
 {$IFDEF CPU64BITS}
-  APPLICATION_TITLE = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
+  APPLICATION_TITLE_CN = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
 {$ELSE}
-  APPLICATION_TITLE = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
+  APPLICATION_TITLE_CN = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
 {$ENDIF}
-  E_MAIL = 'Octopus@1234998.cn';
-  CONFIGURATION_DIR = '\Setting\';
-  LOG_DIR = '\Logs\';
 
-  WEB_SITE = 'http://www.1234998.cn';
-  WEB_SITE1 = 'http://www.1234998.top';
+  OCTOPUS_DEFAULT_E_MAIL = 'Octopus@1234998.cn';
+  OCTOPUS_DEFAULT_CONFIGURATION_DIR = '\Setting\';
+  OCTOPUS_DEFAULT_LOG_DIR = '\Logs\';
 
-  WEB_SITE2 = 'http://1234998.cn';
 
-  DEFAULT_WEBSITE_ADDRESS = 'http://www.1234998.top';
+  OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 = 'http://www.1234998.cn';
+  OCTOPUS_DEFAULT_WEBSITE_ADDRESS2 = 'http://www.1234998.top';
+
   OCTOPUS_UPGRADING_URL = 'http://47.106.172.94:8090/zhuchao/octopus/devices/getDeviceInfor';
   OCTOPUS_APPLICATION_TITLE_NAME = 'Octopus Serial Port Debugging and Development Assistant';
   OCTOPUS_DEBUGGING_AND_DEVELOPMENT_CLASSNAME = 'TMainOctopusDebuggingDevelopmentForm';
-  APPLICATION_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
 
 {$IFDEF CPU64BITS}
-  ApplicatonShortcutName = 'Octopus Serial Development Assistant'; // for 64 bit;
+  OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME = 'Octopus Serial Development Assistant'; // for 64 bit;
+  OCTOPUS_SYSTEM_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
 {$ELSE}
-  ApplicatonShortcutName = 'Octopus Serial Development Assistant 32'; // for 32 bit;
+  OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME = 'Octopus Serial Development Assistant 32'; // for 32 bit;
+  OCTOPUS_SYSTEM_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
 {$ENDIF}
-  DEFAULT_ADDRESSMAP_COLS = 32;
-  DEFAULT_FIXED_COLS = 2;
-  DEFAULT_MAX_CHART_POINTS = 30;
+
+  ///DEFAULT_ADDRESSMAP_COLS = 32;
+  ///DEFAULT_FIXED_COLS = 2;
+  ///DEFAULT_MAX_CHART_POINTS = 30;
 
   { OCCOMPROTOCAL_START = 10; // 连接，要求对方回复 状态是否可以连接
     OCCOMPROTOCAL_ACK = 11; // 一般相应，要求对方相应当前状态
@@ -179,17 +180,16 @@ function writeFileToStream(FileStream: TFileStream; buffer: array of byte; len: 
 
 function DetectTextFileEncoding(const FileName: string): TEncoding;
 function CompareVersion(LVersion, RVersion: String): Boolean;
-function RemoveQuotes(const Str: string): string;
+function RemoveQuotes(const str: string): string;
 
 implementation
 
-function RemoveQuotes(const Str: string): string;
+function RemoveQuotes(const str: string): string;
 begin
-  Result := Str;
+  Result := str;
   if (Length(Result) >= 2) and (Result[1] = '"') and (Result[Length(Result)] = '"') then
     Result := Copy(Result, 2, Length(Result) - 2);
 end;
-
 
 function CompareVersion(LVersion, RVersion: String): Boolean;
 var

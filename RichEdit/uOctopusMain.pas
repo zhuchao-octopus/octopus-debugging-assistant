@@ -997,7 +997,7 @@ begin
     Self.FontSize.Text := IntToStr(TMyMemo(Component).Font.Size);
     FGColorBox.Selected := TMyMemo(Component).Font.Color;
     BGColorBox.Selected := SettingPagesDlg.ColorBoxContentBG.Selected;
-    UpdateStatus(WEB_SITE, 0);
+    UpdateStatus(OCTOPUS_DEFAULT_WEBSITE_ADDRESS1, 0);
   end
   else
   begin
@@ -1312,7 +1312,7 @@ begin
   if Value then
     UpdateStatus(sModified, 1)
   else
-    UpdateStatus(WEB_SITE, 1);
+    UpdateStatus(OCTOPUS_DEFAULT_WEBSITE_ADDRESS2, 1);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UpdateStatus(Value: String);
@@ -2145,13 +2145,13 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.EnglishMenuItemClick(Sender: TObject);
 begin
-  SettingPagesDlg.LoadLaunguageFromFile(Self, SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini', false);
+  SettingPagesDlg.LoadLaunguageFromFile(Self, SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', false);
   SettingPagesDlg.ComboBox8.ItemIndex := 0;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ChineseMenuItemClick(Sender: TObject);
 begin
-  SettingPagesDlg.LoadLaunguageFromFile(Self, SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini', false);
+  SettingPagesDlg.LoadLaunguageFromFile(Self, SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', false);
   SettingPagesDlg.ComboBox8.ItemIndex := 1;
 end;
 
@@ -2842,7 +2842,7 @@ var
   s: String;
   i: Integer;
 begin
-  s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  s := SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Octopus.ini';
   try
     Octopusini := TIniFile.Create(s);
     for i := 1 to StringGrid1.RowCount - 1 do
@@ -2861,7 +2861,7 @@ var
   s: String;
   i: Integer;
 begin
-  s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  s := SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Octopus.ini';
   try
     Octopusini := TIniFile.Create(s);
     for i := 1 to StringGrid1.RowCount - 1 do
@@ -3109,7 +3109,7 @@ begin
   try
     if (Panel.Index = 1) and (Fprogress = 0) and (FprogressMax = 0) then
     begin
-      str := WEB_SITE;
+      str := OCTOPUS_DEFAULT_WEBSITE_ADDRESS1;
       with StatusBar1.Canvas do
       begin
         Brush.Color := clMenuBar;
@@ -3173,11 +3173,11 @@ begin
   OcComPortObj.DebugLog('#################################################################');
   // OcComPortObj.DebugLog(APPLICATION_TITLE + FVersionNumberStr);
   OcComPortObj.DebugLog('Octopus Serial Port Debugging And Development Assistant ' + FVersionNumberStr);
-  OcComPortObj.DebugLog('Home Page: ' + WEB_SITE + ' ');
+  OcComPortObj.DebugLog('Home Page: ' + OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 + ' ');
   OcComPortObj.DebugLog('#################################################################');
   OcComPortObj.DebugLog('' + OcComPortObj.ComportFullName + ' ');
 
-  UpdateStatus(WEB_SITE, 0);
+  UpdateStatus(OCTOPUS_DEFAULT_WEBSITE_ADDRESS2, 0);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SaveProjectSetting(SavePrivate: Boolean);
@@ -3190,12 +3190,12 @@ begin
   try
     if not DirectoryExists(SettingPagesDlg.OctopusCfgDir) then
       CreateDir(SettingPagesDlg.OctopusCfgDir);
-    if not DirectoryExists(SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR) then
-      CreateDir(SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR);
+    if not DirectoryExists(SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR) then
+      CreateDir(SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR);
 
     if SavePrivate then
     begin
-      s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+      s := SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Octopus.ini';
       Octopusini := TIniFile.Create(s);
 
       for i := 1 to StringGrid1.RowCount - 1 do
@@ -3254,7 +3254,7 @@ begin
   Octopusini := nil;
   if not DirectoryExists(SettingPagesDlg.OctopusCfgDir) then
     exit;
-  s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  s := SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Octopus.ini';
   if (not FileExists(s)) then
     exit;
   try

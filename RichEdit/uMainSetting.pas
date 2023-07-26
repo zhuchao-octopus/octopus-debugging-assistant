@@ -380,7 +380,7 @@ begin
         OcComPortObj := TOcComPortObj.Create(self, DevideNameList.Strings[i]);
         OcComPortList.AddObject(DevideNameList.Strings[i], OcComPortObj);
         /// 导入设备配置信息
-        S := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
+        S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
         OcComPortObj.LoadSettings(stIniFile, S);
         LoadDeviceSetting(OcComPortObj);
       end;
@@ -404,13 +404,13 @@ begin
   OctopusCfgDir := ExtractFilePath(Application.Exename) + '\';
 
   SetCurrentDir(OctopusCfgDir);
-  OctopusCfgDir_LogFilePath := OctopusCfgDir + LOG_DIR;
+  OctopusCfgDir_LogFilePath := OctopusCfgDir + OCTOPUS_DEFAULT_LOG_DIR;
   if not DirectoryExists(OctopusCfgDir) then
     CreateDir(OctopusCfgDir);
-  if not DirectoryExists(OctopusCfgDir + CONFIGURATION_DIR) then
-    CreateDir(OctopusCfgDir + CONFIGURATION_DIR);
+  if not DirectoryExists(OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR) then
+    CreateDir(OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR);
   if not DirectoryExists(OctopusCfgDir_LogFilePath) then
-    CreateDir(OctopusCfgDir + LOG_DIR);
+    CreateDir(OctopusCfgDir + OCTOPUS_DEFAULT_LOG_DIR);
 
   VersionNumberStr := GetBuildInfo(Application.Exename);
   WindowsVersion := GetWIndowsVersion();
@@ -478,16 +478,16 @@ begin
 
   if CheckBoxShortcutForExplorer.Checked then
   begin
-    AddExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME, Application.Exename, '*');
+    AddExplorerContextMenu(OCTOPUS_SYSTEM_EXPLORER_MENU_NAME, Application.Exename, '*');
   end;
   if CheckBoxDesktopShortcutMenu.Checked then
   begin
-    CreateShortcut(Application.Exename, ApplicatonShortcutName);
+    CreateShortcut(Application.Exename, OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME);
   end;
 
   try
     MaintenanceOfEquipment.ApplicationFileName := Application.Exename;
-    MaintenanceOfEquipment.ConfigFileName := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+    MaintenanceOfEquipment.ConfigFileName := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Octopus.ini';
     MaintenanceOfEquipment.SetComments('');
     MaintenanceOfEquipment.Resume;
   finally
@@ -596,9 +596,9 @@ procedure TSettingPagesDlg.ComboBox8Change(Sender: TObject);
 begin
   case ComboBox8.ItemIndex of
     0:
-      LoadLaunguageFromFile(self, OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini', false);
+      LoadLaunguageFromFile(self, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', false);
     1:
-      LoadLaunguageFromFile(self, OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini', false);
+      LoadLaunguageFromFile(self, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', false);
   end;
 end;
 
@@ -624,12 +624,12 @@ begin
   AlphaBlend := CheckBox7.Checked;
 
   if CheckBoxShortcutForExplorer.Checked then
-    AddExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME, Application.Exename, '*')
+    AddExplorerContextMenu(OCTOPUS_SYSTEM_EXPLORER_MENU_NAME, Application.Exename, '*')
   else
-    RemoveExplorerContextMenu(APPLICATION_EXPLORER_MENU_NAME);
+    RemoveExplorerContextMenu(OCTOPUS_SYSTEM_EXPLORER_MENU_NAME);
 
   if CheckBoxDesktopShortcutMenu.Checked then
-    CreateShortcut(Application.Exename, ApplicatonShortcutName);
+    CreateShortcut(Application.Exename, OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME);
 end;
 
 procedure TSettingPagesDlg.Button3Click(Sender: TObject);
@@ -664,7 +664,7 @@ end;
 
 procedure TSettingPagesDlg.Button6Click(Sender: TObject);
 begin
-  CreateShortcut(Application.Exename, ApplicatonShortcutName);
+  CreateShortcut(Application.Exename, OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME);
 end;
 
 procedure TSettingPagesDlg.UpDown2Changing(Sender: TObject; var AllowChange: Boolean);
@@ -858,7 +858,7 @@ begin
   if OcComPortObj = nil then
     exit;
   try
-    S := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
+    S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
     OcComPortObj.StoreSettings(stIniFile, S);
     Octopusini := TIniFile.Create(S);
 
@@ -895,7 +895,7 @@ begin
   Octopusini := nil;
   if not DirectoryExists(OctopusCfgDir) then
     exit;
-  S := OctopusCfgDir + CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
+  S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
   if (not FileExists(S)) then
     exit;
 
@@ -1048,18 +1048,18 @@ procedure TSettingPagesDlg.LoadOrCreateLaunguageFromFile(Form: TForm; Create: Bo
 begin
   if Create then
   begin
-    LoadLaunguageFromFile(Form, OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini', Create);
-    LoadLaunguageFromFile(Form, OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini', Create);
+    LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', Create);
+    LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', Create);
     exit;
   end;
   case SettingPagesDlg.ComboBox8.ItemIndex of
     0:
       begin
-        LoadLaunguageFromFile(Form, OctopusCfgDir + CONFIGURATION_DIR + 'Lang_EN.ini', Create);
+        LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', Create);
       end;
     1:
       begin
-        LoadLaunguageFromFile(Form, OctopusCfgDir + CONFIGURATION_DIR + 'Lang_CN.ini', Create);
+        LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', Create);
       end;
   end;
 end;
