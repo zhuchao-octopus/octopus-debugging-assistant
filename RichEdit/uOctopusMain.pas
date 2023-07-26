@@ -732,7 +732,8 @@ begin
   begin
     // StatusBar1.SimplePanel := True;
     // StatusBar1.SimpleText := Application.Hint;
-    StatusBar1.Panels[1].Text := Application.Hint;
+    /// StatusBar1.Panels[1].Text := Application.Hint;
+    UpdateStatus(Application.Hint);
   end;
   // else StatusBar1.SimplePanel := False;
 end;
@@ -1309,18 +1310,28 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.SetModified(Value: Boolean);
 begin
   if Value then
-    StatusBar1.Panels[1].Text := sModified
+    UpdateStatus(sModified, 1)
   else
-    StatusBar1.Panels[1].Text := WEB_SITE;
+    UpdateStatus(WEB_SITE, 1);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UpdateStatus(Value: String);
 begin
-  StatusBar1.Panels[1].Text := Value;
+  /// StatusBar1.Panels[1].Text := Value;
+  UpdateStatus(Value, 1);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UpdateStatus(Value: String; Index: Integer);
+var
+  w: Integer;
 begin
+  if Index = 1 then
+  begin
+    w := StatusBar1.Canvas.TextWidth(Value);
+    /// if w > StatusBar1.Panels[Index].Width then
+    StatusBar1.Panels[Index].Width := w + 30;
+  end;
+
   StatusBar1.Panels[Index].Text := Value;
 end;
 
