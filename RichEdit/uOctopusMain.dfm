@@ -34,7 +34,6 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     Top = 0
     Width = 1205
     Height = 33
-    Hint = 'Background color|Color of the background in the selected range'
     AutoSize = True
     BorderWidth = 2
     ButtonHeight = 25
@@ -236,10 +235,11 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Left = 737
       Top = 0
       Width = 180
-      Height = 22
-      Hint = 'Foreground color|Color of the text in the selected range'
+      Height = 25
+      Hint = 'Foreground color'
       Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbPrettyNames]
       DropDownCount = 30
+      ItemHeight = 19
       TabOrder = 3
       OnChange = FGColorBoxChange
     end
@@ -255,9 +255,10 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Left = 925
       Top = 0
       Width = 180
-      Height = 22
+      Height = 25
       Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbIncludeDefault, cbPrettyNames]
       DropDownCount = 30
+      ItemHeight = 19
       TabOrder = 4
       OnChange = BGColorBoxChange
     end

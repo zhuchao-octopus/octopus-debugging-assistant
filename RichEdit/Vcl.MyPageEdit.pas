@@ -20,7 +20,7 @@ type
   public
     FStyle: Integer;
     FEncoding: TEncoding;
-    FFileName: String;
+    FPathFileName: String;
     FHexadecimalMode: Boolean;
     FShowLinesNumber: Boolean;
     EventCallBackFuntion: TEventCallBackFuntion;
@@ -37,10 +37,11 @@ type
     procedure LogEndLine(const Msg: String);
     procedure LogBuffer(const Buffer: array of Byte; Count: Integer);
 
-    procedure SaveTo(const FileName: String); overload;
-    procedure SaveTo(const FileName: String; Encoding: TEncoding); overload;
-    procedure LoadFrom(FileName: String); overload;
-    procedure LoadFrom(FileName: String; Encoding: TEncoding); overload;
+    procedure SaveTo(const PathFileName: String); overload;
+    procedure SaveTo(const PathFileName: String; Encoding: TEncoding); overload;
+    procedure LoadFrom(const PathFileName: String); overload;
+    procedure LoadFrom(const PathFileName: String; Encoding: TEncoding); overload;
+
     procedure ConvertEncoding(TargetEncoding: TEncoding);
     procedure ConvertToUTF8WithBOM();
     procedure ConvertEncoding3(TargetEncoding: TEncoding);
@@ -62,7 +63,7 @@ type
   public
     FStyle: Integer;
     FEncoding: TEncoding;
-    FFileName: String;
+    FPathFileName: String;
     FHexadecimalMode: Boolean;
     FShowLinesNumber: Boolean;
     EventCallBackFuntion: TEventCallBackFuntion;
@@ -82,10 +83,10 @@ type
     procedure LogEndLine(const Msg: String);
     procedure LogBuffer(const Buffer: array of Byte; Count: Integer);
 
-    procedure SaveTo(const FileName: String); overload;
-    procedure SaveTo(const FileName: String; Encoding: TEncoding); overload;
-    procedure LoadFrom(FileName: String); overload;
-    procedure LoadFrom(FileName: String; Encoding: TEncoding); overload;
+    procedure SaveTo(const PathFileName: String); overload;
+    procedure SaveTo(const PathFileName: String; Encoding: TEncoding); overload;
+    procedure LoadFrom(PathFileName: String); overload;
+    procedure LoadFrom(PathFileName: String; Encoding: TEncoding); overload;
     procedure ConvertEncoding(TargetEncoding: TEncoding);
     procedure ConvertToUTF8WithBOM();
     procedure ConvertEncoding3(TargetEncoding: TEncoding);
@@ -134,6 +135,7 @@ type
     function GetPageIndex(PageName: String): Integer;
 
     function LoadFileFrom(PathFileName: String; PageName: String): TMyRichEdit;
+    function GetPathFileName(Index: Integer): String;
   published
   end;
 
@@ -261,28 +263,28 @@ begin
   end;
 end;
 
-procedure TMyMemo.SaveTo(const FileName: String);
+procedure TMyMemo.SaveTo(const PathFileName: String);
 begin
-  Lines.SaveToFile(FileName);
-  Self.FFileName := FileName;
+  Lines.SaveToFile(PathFileName);
+  Self.FPathFileName := PathFileName;
 end;
 
-procedure TMyMemo.SaveTo(const FileName: String; Encoding: TEncoding);
+procedure TMyMemo.SaveTo(const PathFileName: String; Encoding: TEncoding);
 begin
-  Lines.SaveToFile(FileName, Encoding);
-  Self.FFileName := FileName;
+  Lines.SaveToFile(PathFileName, Encoding);
+  Self.FPathFileName := PathFileName;
 end;
 
-procedure TMyMemo.LoadFrom(FileName: String);
+procedure TMyMemo.LoadFrom(const PathFileName: String);
 begin
-  if FileExists(FileName) then
+  if FileExists(PathFileName) then
   begin
-    Self.Lines.LoadFromFile(FileName);
-    Self.FFileName := FileName;
+    Self.Lines.LoadFromFile(PathFileName);
+    Self.FPathFileName := PathFileName;
   end
-  else if FileExists(Self.FFileName) then
+  else if FileExists(Self.FPathFileName) then
   begin
-    Self.Lines.LoadFromFile(Self.FFileName);
+    Self.Lines.LoadFromFile(Self.FPathFileName);
   end
   else
   begin
@@ -290,15 +292,15 @@ begin
   end;
 end;
 
-procedure TMyMemo.LoadFrom(FileName: String; Encoding: TEncoding);
+procedure TMyMemo.LoadFrom(const PathFileName: String; Encoding: TEncoding);
 begin
-  if FileExists(FileName) then
+  if FileExists(PathFileName) then
   begin
     try
-      Self.Lines.LoadFromFile(FileName, Encoding);
+      Self.Lines.LoadFromFile(PathFileName, Encoding);
     Except
     end;
-    Self.FFileName := FileName;
+    Self.FPathFileName := PathFileName;
   end;
 end;
 
@@ -630,7 +632,7 @@ function TMyRichEdit.IsModifiedByExternal(): Boolean;
 var
   CurrentTimestamp: TDateTime;
 begin
-  CurrentTimestamp := FileAge(Self.FFileName);
+  CurrentTimestamp := FileAge(Self.FPathFileName);
   if CurrentTimestamp <> FPrevTimestamp then
   begin
     /// ShowMessage('The file has been modified externally.');
@@ -638,11 +640,11 @@ begin
   end;
 end;
 
-procedure TMyRichEdit.SaveTo(const FileName: String);
+procedure TMyRichEdit.SaveTo(const PathFileName: String);
 var
   ext: String;
 begin
-  ext := LowerCase(ExtractFileExt(FFileName));
+  ext := LowerCase(ExtractFileExt(PathFileName));
   if (ext = '.txt') or (ext = '.log') or (ext = '') then
     Self.PlainText := true
   else
@@ -653,16 +655,16 @@ begin
   else
     Self.PlainText := false;
 
-  Lines.SaveToFile(FileName);
-  Self.FFileName := FileName;
-  Self.FPrevTimestamp := FileAge(FileName);
+  Lines.SaveToFile(PathFileName);
+  Self.FPathFileName := PathFileName;
+  Self.FPrevTimestamp := FileAge(PathFileName);
 end;
 
-procedure TMyRichEdit.SaveTo(const FileName: String; Encoding: TEncoding);
+procedure TMyRichEdit.SaveTo(const PathFileName: String; Encoding: TEncoding);
 var
   ext: String;
 begin
-  ext := LowerCase(ExtractFileExt(FFileName));
+  ext := LowerCase(ExtractFileExt(PathFileName));
   if (ext = '.txt') or (ext = '.log') or (ext = '') then
     Self.PlainText := true
   else
@@ -673,21 +675,21 @@ begin
   else
     Self.PlainText := false;
 
-  Lines.SaveToFile(FileName, Encoding);
-  Self.FFileName := FileName;
-  Self.FPrevTimestamp := FileAge(FileName);
+  Lines.SaveToFile(PathFileName, Encoding);
+  Self.FPathFileName := PathFileName;
+  Self.FPrevTimestamp := FileAge(PathFileName);
 end;
 
-procedure TMyRichEdit.LoadFrom(FileName: String);
+procedure TMyRichEdit.LoadFrom(PathFileName: String);
 begin
-  if FileExists(FileName) then
+  if FileExists(PathFileName) then
   begin
-    Self.Lines.LoadFromFile(FileName);
-    Self.FFileName := FileName;
+    Self.Lines.LoadFromFile(PathFileName);
+    Self.FPathFileName := PathFileName;
   end
-  else if FileExists(Self.FFileName) then
+  else if FileExists(Self.FPathFileName) then
   begin
-    Self.Lines.LoadFromFile(Self.FFileName);
+    Self.Lines.LoadFromFile(Self.FPathFileName);
   end
   else
   begin
@@ -695,15 +697,15 @@ begin
   end;
 end;
 
-procedure TMyRichEdit.LoadFrom(FileName: String; Encoding: TEncoding);
+procedure TMyRichEdit.LoadFrom(PathFileName: String; Encoding: TEncoding);
 begin
-  if FileExists(FileName) then
+  if FileExists(PathFileName) then
   begin
     try
-      Self.Lines.LoadFromFile(FileName, Encoding);
+      Self.Lines.LoadFromFile(PathFileName, Encoding);
     Except
     end;
-    Self.FFileName := FileName;
+    Self.FPathFileName := PathFileName;
   end;
 end;
 
@@ -1262,6 +1264,18 @@ begin
   begin
     Result.LoadFrom(PathFileName);
   end;
+end;
+
+function TMyPageEdit.GetPathFileName(Index: Integer): String;
+var
+  Component: TComponent;
+begin
+  Result := '';
+  Component := GetComponent(Index);
+  if Component is TMyRichEdit then
+    Result := TMyRichEdit(Component).FPathFileName
+  else if Component is TMyMemo then
+    Result := TMyMemo(Component).FPathFileName;
 end;
 
 procedure TMyPageEdit.FreeAll();

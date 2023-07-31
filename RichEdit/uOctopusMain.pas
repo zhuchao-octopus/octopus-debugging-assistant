@@ -370,7 +370,7 @@ type
     FCheck, FNoCheck: TBitmap;
     Fprogress, FprogressMax: Integer;
 
-    FFilePathName: string;
+    /// FFilePathName: string;
     FUpdating: Boolean;
     FDragOfs: Integer;
     FDragging: Boolean;
@@ -384,7 +384,7 @@ type
     procedure SynchroFontDialog(MyRichEdit: TMyRichEdit; Style: Integer);
 
     procedure GetFontNames();
-    procedure SetPathFileName(const FileName: String);
+    procedure SetPathFileName(const PathFileName: String);
     procedure CheckFileSave();
     procedure SaveLog(Component: TComponent; PathFileName: String);
     procedure UpdateCursorPos();
@@ -392,7 +392,7 @@ type
     procedure PerformFileOpen(const AFileName: string); overload;
     procedure PerformFileOpen(const AFileName: string; PageName: String); overload;
     procedure LoadNewFileFromTo(PathFileName: String);
-    procedure LoadUntitledContent(MyRichEdit: TMyRichEdit; const AFileName: string);
+    procedure LoadUntitledContent(MyRichEdit: TMyRichEdit);
 
     procedure SetModified(Value: Boolean);
     procedure UpdateStatus(Value: String); overload;
@@ -740,12 +740,14 @@ begin
   // else StatusBar1.SimplePanel := False;
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.LoadUntitledContent(MyRichEdit: TMyRichEdit; const AFileName: string);
+procedure TMainOctopusDebuggingDevelopmentForm.LoadUntitledContent(MyRichEdit: TMyRichEdit);
 var
   FileNameNoExt: String;
+  AFileName: String;
 begin
   if MyRichEdit = nil then
     exit;
+  AFileName := ExtractFilePath(Application.Exename) + '\' + sUntitled + '.rtf';
   /// UpdateCursorPos;
   /// DragAcceptFiles(Handle, True);
   /// RichEditChange(nil);
@@ -754,11 +756,13 @@ begin
   if TFile.Exists(AFileName) then
   begin
     MyRichEdit.LoadFrom(AFileName);
+    MyRichEdit.FPathFileName := '';
     /// MyRichEdit.SetFocus;
-    FileNameNoExt := ExtractFileNameNoExt(AFileName);
+    /// FileNameNoExt := ExtractFileNameNoExt(AFileName);
+    FileNameNoExt := ExtractFileName(AFileName);
     PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
     SetModified(false);
-    /// SetPathFileName(AFileName);
+    SetPathFileName(sUntitled);
   end;
 end;
 
@@ -774,7 +778,7 @@ begin
     ComBoBoxFontName.Text := CMyRichEdit.SelAttributes.Name;
     FGColorBox.Selected := CMyRichEdit.SelAttributes.Color;
     BGColorBox.Selected := CMyRichEdit.SelAttributes.BackColor;
-    UpdateCursorPos();
+    ///UpdateCursorPos();
   finally
     FUpdating := false;
   end;
@@ -904,17 +908,15 @@ begin
   ComBoBoxFontName.Sorted := True;
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.SetPathFileName(const FileName: String);
+procedure TMainOctopusDebuggingDevelopmentForm.SetPathFileName(const PathFileName: String);
 begin
-  if FileName = '' then
+  if PathFileName = '' then
   begin
     Caption := Format('%s', [Application.Title]);
     exit;
   end;
-  FFilePathName := FileName;
-  Caption := Format('%s - %s', [Application.Title, FileName]);
-  /// ExtractFileName
-  StatusBar1.Panels[2].Text := FFilePathName;
+  Caption := Format('%s - %s', [Application.Title, PathFileName]);
+  UpdateStatus(PathFileName, 2);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.CancelItemClick(Sender: TObject);
@@ -934,7 +936,7 @@ begin
     exit;
   if not CMyRichEdit.Modified then
     exit;
-  SaveResp := MessageDlg(Format(sSaveChanges, [FFilePathName]), mtConfirmation, mbYesNoCancel, 0);
+  SaveResp := MessageDlg(Format(sSaveChanges, [CMyRichEdit.FPathFileName]), mtConfirmation, mbYesNoCancel, 0);
   case SaveResp of
     idYes:
       FileSave(Self);
@@ -992,6 +994,7 @@ begin
   begin
     CMyRichEdit := TMyRichEdit(Component);
     SynchroSetMyRichEditFont(Component);
+    SetPathFileName(CMyRichEdit.FPathFileName);
   end;
   if Component is TMyMemo then
   begin
@@ -1036,7 +1039,8 @@ begin
   if CMyRichEdit = nil then
     exit;
 
-  LoadUntitledContent(CMyRichEdit, ExtractFilePath(Application.Exename) + '\' + sUntitled + '.rtf');
+  LoadUntitledContent(CMyRichEdit);
+
   /// SetPathFileName(sUntitled);
   /// CMyRichEdit.Clear();
   /// CMyRichEdit.Modified := false;
@@ -1068,7 +1072,7 @@ begin
   CMyRichEdit.LoadFrom(AFileName);
   SetPathFileName(AFileName);
 
-  FileNameNoExt := ExtractFileNameNoExt(AFileName);
+  FileNameNoExt := ExtractFileName(AFileName);
   PageControl1.SetPageName(FileNameNoExt, PageControl1.GetPageIndex(PageName));
   /// CMyRichEdit.SetFocus;
   CMyRichEdit.Modified := false;
@@ -1090,7 +1094,7 @@ begin
     begin
       MyRichEdit.ReadOnly := ofReadOnly in FileOpenCmd.Dialog.Options;
       /// MyRichEdit.SetFocus;
-      FileNameNoExt := ExtractFileNameNoExt(PathFileName);
+      FileNameNoExt := ExtractFileName(PathFileName);
       PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
       SetModified(false);
       SetPathFileName(PathFileName);
@@ -1139,15 +1143,17 @@ begin
     FileSaveAsCmd.Dialog.FileName := OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
 end;
 
+/// Control + s save
 procedure TMainOctopusDebuggingDevelopmentForm.FileSave(Sender: TObject);
 var
   tmpComponent: TComponent;
+  FilePathName: String;
 begin
   tmpComponent := PageControl1.GetComponent(PageControl1.ActivePageIndex);
-
-  if (FFilePathName <> '') then
+  FilePathName := PageControl1.GetPathFileName(PageControl1.ActivePageIndex);
+  if (FilePathName <> '') then
   begin
-    SaveLog(tmpComponent, FFilePathName);
+    SaveLog(tmpComponent, FilePathName);
   end
   else
   /// if (FFilePathName = sUntitled) or (FFilePathName = '') then
@@ -1177,7 +1183,7 @@ begin
     { if FileSaveAsCmd.Dialog.FileName <> '' then
       begin
       SetPathFileName(FileSaveAsCmd.Dialog.FileName);
-      FileNameNoExt := ExtractFileNameNoExt(FileSaveAsCmd.Dialog.FileName);
+      ///FileNameNoExt := ExtractFileNameNoExt(FileSaveAsCmd.Dialog.FileName);
       PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
       end; }
     exit;
@@ -1189,21 +1195,22 @@ begin
 
   SaveLog(tmpComponent, FileSaveAsCmd.Dialog.FileName);
   SetPathFileName(FileSaveAsCmd.Dialog.FileName);
-  FileNameNoExt := ExtractFileNameNoExt(FileSaveAsCmd.Dialog.FileName);
+  FileNameNoExt := ExtractFileName(FileSaveAsCmd.Dialog.FileName);
   PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FilePrintAccept(Sender: TObject);
 var
   tmpComponent: TComponent;
+  FilePathName: String;
 begin
   tmpComponent := PageControl1.GetComponent(PageControl1.ActivePageIndex);
-
+  FilePathName := PageControl1.GetPathFileName(PageControl1.ActivePageIndex);
   if tmpComponent is TMyRichEdit then
-    TMyRichEdit(tmpComponent).Print(FFilePathName);
+    TMyRichEdit(tmpComponent).Print(FilePathName);
 
   if tmpComponent is TMyMemo then
-    TMyMemo(tmpComponent).Print(nil, FFilePathName);
+    TMyMemo(tmpComponent).Print(nil, FilePathName);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SelectFont(Sender: TObject);
@@ -1259,7 +1266,7 @@ begin
         if PageControl1.GetActivePageName = sUntitled then
         begin
         PerformFileOpen(CFileName);
-        FileNameNoExt := ExtractFileNameNoExt(CFileName);
+        ///FileNameNoExt := ExtractFileNameNoExt(CFileName);
         PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
         end; }
       LoadNewFileFromTo(CFileName);
@@ -1510,7 +1517,7 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.DefaultItemClick(Sender: TObject);
 begin
-  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.Default);
+  CMyRichEdit.LoadFrom(CMyRichEdit.FPathFileName, TEncoding.Default);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.DownloadUpdate1Click(Sender: TObject);
@@ -1520,32 +1527,32 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ASCIIItemClick(Sender: TObject);
 begin
-  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.ASCII);
+  CMyRichEdit.LoadFrom(CMyRichEdit.FPathFileName, TEncoding.ASCII);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ANSIItemClick(Sender: TObject);
 begin
-  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.ANSI);
+  CMyRichEdit.LoadFrom(CMyRichEdit.FPathFileName, TEncoding.ANSI);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UTF7EncodingItemClick(Sender: TObject);
 begin
-  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.UTF7);
+  CMyRichEdit.LoadFrom(CMyRichEdit.FPathFileName, TEncoding.UTF7);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UTF8EncodingItemClick(Sender: TObject);
 begin
-  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.UTF8);
+  CMyRichEdit.LoadFrom(CMyRichEdit.FPathFileName, TEncoding.UTF8);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UnicodeEncodingItemClick(Sender: TObject);
 begin
-  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.Unicode);
+  CMyRichEdit.LoadFrom(CMyRichEdit.FPathFileName, TEncoding.Unicode);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.BigEndianUnicodeEncodingItemClick(Sender: TObject);
 begin
-  CMyRichEdit.LoadFrom(CMyRichEdit.FFileName, TEncoding.BigEndianUnicode);
+  CMyRichEdit.LoadFrom(CMyRichEdit.FPathFileName, TEncoding.BigEndianUnicode);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.CRC1Click(Sender: TObject);
@@ -3063,6 +3070,7 @@ begin
     MyRichEdit := TMyRichEdit(Component);
     if MyRichEdit <> nil then
     begin
+      MyRichEdit.OnSelectionChange := Self.SelectionChange;
       MyRichEdit.OnClick := Self.RichEditorClick;
       MyRichEdit.OnLinkClick := Self.RichEditorLinkClick;
       MyRichEdit.PopupMenu := Self.PopupMenu1;
@@ -3077,9 +3085,7 @@ begin
       MyRichEdit.WantReturns := True;
       /// 用于设定Momo组件是否具有自动折行功能。
       MyRichEdit.WordWrap := false;
-
       MyRichEdit.OnChange := nil;
-      MyRichEdit.OnSelectionChange := Self.SelectionChange;
     end;
   end;
 
