@@ -588,6 +588,7 @@ begin
         if Msg.wParam = VK_TAB then
         begin
         end;
+
         if Msg.wParam = VK_CONTROL then
         begin
           OcComPortObj := Self.GetCurrentDevice();
@@ -617,14 +618,15 @@ begin
           OcComPortObj := Self.GetCurrentDevice();
           if (OcComPortObj <> nil) then
             OcComPortObj.SetLogComponentReadOnly(True);
+
           if CommandFrm.Showing then
-             CommandFrm.Close;
-          ShowHideRLPanel(1);
+            CommandFrm.Close
+          else
+            ShowHideRLPanel(1);
           Handled := True;
         end;
 
         GetKeyboardstate(keyState);
-
         if (Msg.wParam = VK_F3) or ((keyState[VK_LCONTROL] = 129) and (Msg.wParam = 70)) then
         begin
           ShowSearchDialog();
@@ -2955,7 +2957,7 @@ begin
       begin
         MenuItem.Caption := OcComPortObj.ComportFullName;
         MenuItem.Tag := i;
-        //ParentMenu.Add(MenuItem);
+        // ParentMenu.Add(MenuItem);
         MenuItem.OnClick := OnClicEvent;
 
       end
