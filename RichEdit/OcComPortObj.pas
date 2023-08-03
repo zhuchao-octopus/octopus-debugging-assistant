@@ -1201,7 +1201,10 @@ begin
             // 0x0D CR (carriage return) »Ø³µ¼ü
             str := str + #13;
             if FShowSendingLog then
+            begin
               log(SEND_FLAG + str);
+              log('');
+            end;
           end;
 
           try
@@ -1227,7 +1230,10 @@ begin
           s := FormatHexStrToByte(Trim(str), buf, bLength);
 
           if FShowSendingLog then
+          begin
             log(SEND_FLAG + s);
+            log('');
+          end;
 
           try
             self.Write(buf, bLength);
@@ -1250,7 +1256,10 @@ begin
         s := FormatHexStrToByte(Trim(str), buf, bLength);
 
         if FShowSendingLog then
+        begin
           log(SEND_FLAG + s);
+          log('');
+        end;
 
         SendProtocolData(OCCOMPROTOCAL_DATA, buf, bLength, false);
       end;

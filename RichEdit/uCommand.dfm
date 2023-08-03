@@ -16,7 +16,7 @@ object CommandFrm: TCommandFrm
   PixelsPerInch = 96
   TextHeight = 17
   object Label1: TLabel
-    Left = 10
+    Left = 3
     Top = 36
     Width = 253
     Height = 17
@@ -24,12 +24,10 @@ object CommandFrm: TCommandFrm
   end
   object ComboBox1: TComboBox
     AlignWithMargins = True
-    Left = 10
+    Left = 3
     Top = 3
-    Width = 617
+    Width = 631
     Height = 27
-    Margins.Left = 10
-    Margins.Right = 10
     Align = alTop
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -41,9 +39,11 @@ object CommandFrm: TCommandFrm
     OnKeyPress = ComboBox1KeyPress
     Items.Strings = (
       'Control+C')
+    ExplicitLeft = 10
+    ExplicitWidth = 617
   end
   object Button1: TButton
-    Left = 450
+    Left = 456
     Top = 33
     Width = 85
     Height = 25
@@ -52,12 +52,21 @@ object CommandFrm: TCommandFrm
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 542
+    Left = 549
     Top = 33
     Width = 85
     Height = 25
     Caption = 'Send As Byte'
     TabOrder = 2
     OnClick = Button2Click
+  end
+  object CheckBox100: TCheckBox
+    Left = 280
+    Top = 37
+    Width = 164
+    Height = 17
+    Caption = 'Displays the sent data'
+    TabOrder = 3
+    OnClick = CheckBox100Click
   end
 end

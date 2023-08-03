@@ -407,8 +407,8 @@ type
 
     procedure CreateMyObjectPage(PageName: String; PageType: Integer);
     procedure InitAllUartDevices();
-    procedure GetAndOpenADevices(OcComPortObj: TOcComPortObj); overload;
-    procedure GetAndOpenADevices(DeviceName: String); overload;
+    procedure GetAndOpenADevices(OcComPortObj: TOcComPortObj; AutoOpen: Boolean = true); overload;
+    procedure GetAndOpenADevices(DeviceName: String; AutoOpen: Boolean = true); overload;
     procedure GetAndRemoveDevices(DeviceName: String);
 
     procedure SkinsMenuOnClick(Sender: TObject);
@@ -596,7 +596,7 @@ begin
           begin
             if OcComPortObj.Connected then
             begin
-              OcComPortObj.MouseTextSelection := True;
+              OcComPortObj.MouseTextSelection := true;
             end;
           end;
         end;
@@ -604,40 +604,40 @@ begin
         if (Msg.wParam = VK_F1) then
         begin
           ShowHideRLPanel(1);
-          Handled := True;
+          Handled := true;
         end;
 
         if Msg.wParam = VK_F2 then
         begin
           ShowHideRLPanel(1);
-          Handled := True;
+          Handled := true;
         end;
 
         if (Msg.wParam = VK_ESCAPE) then
         begin
           OcComPortObj := Self.GetCurrentDevice();
           if (OcComPortObj <> nil) then
-            OcComPortObj.SetLogComponentReadOnly(True);
+            OcComPortObj.SetLogComponentReadOnly(true);
 
           if CommandFrm.Showing then
             CommandFrm.Close
           else
             ShowHideRLPanel(1);
-          Handled := True;
+          Handled := true;
         end;
 
         GetKeyboardstate(keyState);
         if (Msg.wParam = VK_F3) or ((keyState[VK_LCONTROL] = 129) and (Msg.wParam = 70)) then
         begin
           ShowSearchDialog();
-          Handled := True;
+          Handled := true;
         end;
       end; // WM_KEYDOWN:begin
     WM_KEYUP:
       begin
         if (Msg.wParam = VK_F1) then
         begin
-          Handled := True;
+          Handled := true;
         end;
         if Msg.wParam = VK_CONTROL then
         begin
@@ -666,7 +666,7 @@ begin
   InitUartsMenu(COMMenu, COM1MenuItemOnClick);
   UpdateUartToolBar();
   LoadProjectSetting();
-  SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, True);
+  SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, true);
 
   InitUserConfiguration();
 
@@ -697,7 +697,7 @@ begin
   begin
     Self.Splitter1.Visible := false;
   end;
-  DragAcceptFiles(Handle, True);
+  DragAcceptFiles(Handle, true);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -705,7 +705,7 @@ begin
   try
     /// CheckFileSave;
     Self.PageControl1.FreeAll;
-    SaveProjectSetting(True);
+    SaveProjectSetting(true);
   except
     CanClose := false;
   end;
@@ -721,7 +721,7 @@ begin
   begin
     ShowHideRLPanel(false);
     LoadNewFileFromTo(SelectedFile);
-    Self.StandardToolBar1.Visible := True;
+    Self.StandardToolBar1.Visible := true;
     Self.StandardToolBar2.Visible := false;
   end;
 end;
@@ -774,7 +774,7 @@ begin
   if CMyRichEdit = nil then
     exit;
   try
-    FUpdating := True;
+    FUpdating := true;
     FontSize.Text := IntToStr(CMyRichEdit.SelAttributes.Size);
     ComBoBoxFontName.Text := CMyRichEdit.SelAttributes.Name;
     FGColorBox.Selected := CMyRichEdit.SelAttributes.Color;
@@ -906,18 +906,20 @@ begin
   DC := GetDC(0);
   EnumFonts(DC, nil, @EnumFontsProc, Pointer(ComBoBoxFontName.Items));
   ReleaseDC(0, DC);
-  ComBoBoxFontName.Sorted := True;
+  ComBoBoxFontName.Sorted := true;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SetPathFileName(const PathFileName: String);
 begin
-  if PathFileName = '' then
+  if PathFileName <> '' then
+  begin
+    Caption := Format('%s - %s', [Application.Title, PathFileName]);
+    UpdateStatus(PathFileName, 2);
+  end
+  else
   begin
     Caption := Format('%s', [Application.Title]);
-    exit;
   end;
-  Caption := Format('%s - %s', [Application.Title, PathFileName]);
-  UpdateStatus(PathFileName, 2);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.CancelItemClick(Sender: TObject);
@@ -1012,6 +1014,9 @@ begin
   end;
 
   CommandFrm.OcComPortObj := Self.GetCurrentDevice();
+  if CommandFrm.OcComPortObj <> nil then
+    SetPathFileName(CommandFrm.OcComPortObj.ComPortFullName);
+
   Self.UpdateUartToolBar();
   StatusBarPrintFileSize();
 end;
@@ -1414,7 +1419,7 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SV_ROpened(Sender: TObject);
 begin
-  Splitter1.Visible := True;
+  Splitter1.Visible := true;
   Splitter1.Align := alRight;
   AdjustUI();
 end;
@@ -1482,8 +1487,8 @@ begin
   WindowState := wsMinimized;
   Hide;
   sleep(100);
-  ScreenshotFrm.MouseDownStart := True;
-  ScreenshotFrm.MouseUpDone := True;
+  ScreenshotFrm.MouseDownStart := true;
+  ScreenshotFrm.MouseUpDone := true;
   ScreenshotFrm.CopyScreenToBmp(ScreenshotFrm.Image1);
   WindowState := wsNormal;
 
@@ -1584,7 +1589,7 @@ begin
   CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 30;
   CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 5;
   Self.StandardToolBar1.Visible := false;
-  Self.StandardToolBar2.Visible := True;
+  Self.StandardToolBar2.Visible := true;
   ShowHideRLPanel(false);
 end;
 
@@ -1593,7 +1598,7 @@ begin
   if CommandFrm.Showing then
     CommandFrm.Close;
   ShowHideRLPanel(false);
-  Self.StandardToolBar1.Visible := True;
+  Self.StandardToolBar1.Visible := true;
   Self.StandardToolBar2.Visible := false;
   FileNewButton.Click;
 end;
@@ -1752,7 +1757,7 @@ begin
         delayCount := StrToInt(Trim(StringGrid1.Cells[5, i]));
         if Count = 0 then
         begin
-          While (True) do
+          While (true) do
           begin
             if (OcComPortObj_Loop <> nil) then
               OcComPortObj_Loop.FalconComSendData_MultiTimes(sStr, OcComPortObj_Loop.SendFormat);
@@ -1785,7 +1790,7 @@ begin
   begin
     Button201.Caption := 'Looping... ' + IntToStr(Button201.Tag);
     Button201.Tag := Button201.Tag + 1;
-    Timer1.Enabled := True;
+    Timer1.Enabled := true;
   end
   else
   begin
@@ -1828,7 +1833,7 @@ begin
     Button201.Tag := 0;
 
     OcComPortObj_Loop := OcComPortObj;
-    Timer1.Enabled := True;
+    Timer1.Enabled := true;
   end;
 end;
 
@@ -1988,7 +1993,7 @@ var
 begin
   OcComPortObj := Self.GetCurrentDevice();
   if OcComPortObj <> nil then
-    OcComPortObj.LogScrollMode := True;
+    OcComPortObj.LogScrollMode := true;
   Self.Show;
 end;
 
@@ -2098,12 +2103,12 @@ begin
   case SettingPagesDlg.ComboBox8.ItemIndex of
     0:
       begin
-        EnglishMenuItem.Checked := True;
+        EnglishMenuItem.Checked := true;
         ChineseMenuItem.Checked := false;
       end;
     1:
       begin
-        ChineseMenuItem.Checked := True;
+        ChineseMenuItem.Checked := true;
         EnglishMenuItem.Checked := false;
       end;
   end;
@@ -2133,24 +2138,24 @@ begin
   if CMyRichEdit <> nil then
   begin
     if CMyRichEdit.Lines.Encoding = TEncoding.Default then
-      DefaultItem.Checked := True
+      DefaultItem.Checked := true
     else if CMyRichEdit.Lines.Encoding = TEncoding.ASCII then
-      ASCIIItem.Checked := True
+      ASCIIItem.Checked := true
     else if CMyRichEdit.Lines.Encoding = TEncoding.ANSI then
-      ANSIItem.Checked := True
+      ANSIItem.Checked := true
     else if CMyRichEdit.Lines.Encoding = TEncoding.UTF7 then
-      UTF7EncodingItem.Checked := True
+      UTF7EncodingItem.Checked := true
     else if CMyRichEdit.Lines.Encoding = TEncoding.UTF8 then
-      UTF8EncodingItem.Checked := True
+      UTF8EncodingItem.Checked := true
     else if CMyRichEdit.Lines.Encoding = TEncoding.Unicode then
-      UnicodeEncodingItem.Checked := True
+      UnicodeEncodingItem.Checked := true
     else if CMyRichEdit.Lines.Encoding = TEncoding.BigEndianUnicode then
-      BigEndianUnicodeEncodingItem.Checked := True
+      BigEndianUnicodeEncodingItem.Checked := true
     else
-      DefaultItem.Checked := True;
+      DefaultItem.Checked := true;
   end
   else
-    DefaultItem.Checked := True;
+    DefaultItem.Checked := true;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.EnglishMenuItemClick(Sender: TObject);
@@ -2251,7 +2256,7 @@ begin
     for i := 0 to SkinsMenu.Count - 1 do
     begin
       if GetStyle(i) = FThemeSkinName then
-        SkinsMenu.Items[i].Checked := True
+        SkinsMenu.Items[i].Checked := true
       else
         SkinsMenu.Items[i].Checked := false;
     end;
@@ -2261,14 +2266,14 @@ begin
     for i := 0 to SkinsMenu.Count - 1 do
     begin
       if SkinsMenu.Items[i] = Self.SkinMenuItem then
-        SkinsMenu.Items[i].Checked := True
+        SkinsMenu.Items[i].Checked := true
       else
         SkinsMenu.Items[i].Checked := false;
     end;
   end
   else
   begin
-    SkinsMenu.Items[0].Checked := True;
+    SkinsMenu.Items[0].Checked := true;
   end;
 end;
 
@@ -2292,7 +2297,7 @@ begin
     if OcComPortObj = SettingPagesDlg.getDeciceByIndex(i) then
     begin
       if MenuItem.Tag = i then
-        MenuItem.Checked := True;
+        MenuItem.Checked := true;
     end;
   end;
 end;
@@ -2344,7 +2349,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.COM1MenuItemOnClick(Sender: TObje
 var
   PageName: String;
 begin
-  GetAndOpenADevices(SettingPagesDlg.getDeciceByIndex((TMenuItem(Sender)).Tag));
+  GetAndOpenADevices(SettingPagesDlg.getDeciceByIndex((TMenuItem(Sender)).Tag), false);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ComboBox1Change(Sender: TObject);
@@ -2500,18 +2505,18 @@ begin
   LptalpMenuItem.Checked := false;
 
   if Self.PageControl1.TabPosition = tpTop then
-    LptatpMenuItem.Checked := True;
+    LptatpMenuItem.Checked := true;
   if Self.PageControl1.TabPosition = tpBottom then
-    LptabpMenuItem.Checked := True;
+    LptabpMenuItem.Checked := true;
   if Self.PageControl1.TabPosition = tpLeft then
-    LptalpMenuItem.Checked := True;
+    LptalpMenuItem.Checked := true;
 
   if Self.PageControl2.TabPosition = tpTop then
-    RptatpMenuItem.Checked := True;
+    RptatpMenuItem.Checked := true;
   if Self.PageControl2.TabPosition = tpBottom then
-    RptabpMenuItem.Checked := True;
+    RptabpMenuItem.Checked := true;
   if Self.PageControl2.TabPosition = tpRight then
-    RptarpMenuItem.Checked := True;
+    RptarpMenuItem.Checked := true;
 
   /// if (CMyRichEdit <> nil) then
   /// ShowLinesNumberItem.Checked := CMyRichEdit.FShowLinesNumber;
@@ -2576,11 +2581,13 @@ begin
       ToggleSwitchDeviceOnOff.State := tssOff;
       ToggleSwitchDeviceOnOff.ThumbColor := clWindowText;
     end;
+    SetPathFileName(OcComPortObj.ComPortFullName);
   end
   else
   begin
     ToggleSwitchDeviceOnOff.State := tssOff;
     ToggleSwitchDeviceOnOff.ThumbColor := clWindowText;
+    SetPathFileName('');
   end;
 end;
 
@@ -2611,7 +2618,7 @@ begin;
     FThemeSkinName := str;
     AdjustSetStyle(str);
     /// AdjustSetStyle(str);
-    TMenuItem(Sender).Checked := True;
+    TMenuItem(Sender).Checked := true;
   end;
 end;
 
@@ -2650,14 +2657,14 @@ begin
     bmp.Handle := LoadBitmap(0, PChar(OBM_CHECKBOXES));
     bmp.PixelFormat := pf32bit;
     bmp.HandleType := bmDIB;
-    bmp.Transparent := True;
+    bmp.Transparent := true;
     bmp.TransparentColor := clWhite;
     // Bmp.Canvas.Brush.Color := clWhite;
     // Bmp.Canvas.FillRect(Rect(0, 0, Bmp.Width, Bmp.Height));
 
     FNoCheck.PixelFormat := pf32bit;
     FNoCheck.HandleType := bmDIB;
-    FNoCheck.Transparent := True;
+    FNoCheck.Transparent := true;
     FNoCheck.TransparentColor := clWhite;
     with FNoCheck do
     begin
@@ -2830,7 +2837,7 @@ begin
       end
       else
       begin
-        CanSelect := True;
+        CanSelect := true;
         Options := Options + [goEditing];
         if Options * [goRowSelect] <> [] then
           Options := Options - [goRowSelect];
@@ -2940,7 +2947,7 @@ begin
       OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
       if OcComPortObj <> nil then
       begin
-        MenuItem.Caption := OcComPortObj.ComportFullName;
+        MenuItem.Caption := OcComPortObj.ComPortFullName;
         MenuItem.Tag := i;
         ParentMenu.Add(MenuItem);
         MenuItem.OnClick := OnClicEvent;
@@ -2955,7 +2962,7 @@ begin
       OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
       if OcComPortObj <> nil then
       begin
-        MenuItem.Caption := OcComPortObj.ComportFullName;
+        MenuItem.Caption := OcComPortObj.ComPortFullName;
         MenuItem.Tag := i;
         // ParentMenu.Add(MenuItem);
         MenuItem.OnClick := OnClicEvent;
@@ -3016,26 +3023,25 @@ begin
   UpdateStatus('', 2);
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(DeviceName: String);
+procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(DeviceName: String; AutoOpen: Boolean = true);
 var
   OcComPortObj: TOcComPortObj;
   PageIndex: Integer;
 begin
   OcComPortObj := SettingPagesDlg.GetDeciceByFullName(DeviceName);
-  if OcComPortObj = nil then
-    exit;
-  GetAndOpenADevices(OcComPortObj);
+  if OcComPortObj <> nil then
+    GetAndOpenADevices(OcComPortObj);
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(OcComPortObj: TOcComPortObj);
+procedure TMainOctopusDebuggingDevelopmentForm.GetAndOpenADevices(OcComPortObj: TOcComPortObj; AutoOpen: Boolean = true);
 var
   PageIndex: Integer;
   MyRichEdit: TMyMemo;
 begin
   if OcComPortObj = nil then
     exit;
-  CreateMyObjectPage(OcComPortObj.ComportFullName, 2);
-  MyRichEdit := PageControl1.GetMemo(OcComPortObj.ComportFullName);
+  CreateMyObjectPage(OcComPortObj.ComPortFullName, 2);
+  MyRichEdit := PageControl1.GetMemo(OcComPortObj.ComPortFullName);
   MyRichEdit.FStyle := 1;
   OcComPortObj.SetLogComponent(MyRichEdit);
   OcComPortObj.SetMsgCallbackFunction(OcComPortObjCallBack);
@@ -3044,11 +3050,11 @@ begin
 
   OcComPortObj.SaveLog(SettingPagesDlg.OctopusCfgDir_LogFilePath);
   SynchroSetMyRichEditFont(MyRichEdit);
-  if not OcComPortObj.Connected then
+  if not OcComPortObj.Connected and AutoOpen then
   begin
     SettingPagesDlg.openDevice(OcComPortObj);
-    Self.UpdateUartToolBar();
   end;
+  Self.UpdateUartToolBar();
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.InitAllUartDevices();
@@ -3067,8 +3073,8 @@ begin
     OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
     if OcComPortObj = nil then
       exit;
-    CreateMyObjectPage(OcComPortObj.ComportFullName, 2);
-    MyRichEdit := PageControl1.GetMemo(OcComPortObj.ComportFullName);
+    CreateMyObjectPage(OcComPortObj.ComPortFullName, 2);
+    MyRichEdit := PageControl1.GetMemo(OcComPortObj.ComPortFullName);
     MyRichEdit.FStyle := 1;
     OcComPortObj.SetLogComponent(MyRichEdit);
     OcComPortObj.SetMsgCallbackFunction(OcComPortObjCallBack);
@@ -3106,13 +3112,13 @@ begin
       MyRichEdit.PopupMenu := Self.PopupMenu1;
       MyRichEdit.PlainText := false;
       MyRichEdit.ParentFont := false;
-      MyRichEdit.SpellChecking := True;
+      MyRichEdit.SpellChecking := true;
       /// 这个属性只在Memo、RichEdit和DBMemo组件中使用。通常在切换当前焦点控件时，我们通常使用Tab键。
       /// 但在上述三种组件中，编辑文本时常用Tab键来跳过若干个空格使文本对齐，这时就会有冲突。
       /// 所以应将WantTabs设置为True，这样子在组件内就可以使用Tab键来编辑文本。
-      MyRichEdit.WantTabs := True;
+      MyRichEdit.WantTabs := true;
       /// 需要回车键，否则无法回车换行
-      MyRichEdit.WantReturns := True;
+      MyRichEdit.WantReturns := true;
       /// 用于设定Momo组件是否具有自动折行功能。
       MyRichEdit.WordWrap := false;
       MyRichEdit.OnChange := nil;
@@ -3240,7 +3246,7 @@ begin
   OcComPortObj.DebugLog('Octopus Serial Port Debugging And Development Assistant ' + FVersionNumberStr);
   OcComPortObj.DebugLog('Home Page: ' + OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 + ' ');
   OcComPortObj.DebugLog('#################################################################');
-  OcComPortObj.DebugLog('' + OcComPortObj.ComportFullName + ' ');
+  OcComPortObj.DebugLog('' + OcComPortObj.ComPortFullName + ' ');
 
   UpdateStatus(OCTOPUS_DEFAULT_WEBSITE_ADDRESS2, 0);
 end;
@@ -3340,7 +3346,7 @@ begin
     SV_R.Width := Octopusini.ReadInteger('MyPreference', 'APPLICATION_SVR_WIDTH', SV_R.Width);
 
     StandardToolBar1.Visible := Octopusini.ReadBool('MyPreference', 'APPLICATION_STANDART_TOOLBAR1', false);
-    StandardToolBar2.Visible := Octopusini.ReadBool('MyPreference', 'APPLICATION_STANDART_TOOLBAR2', True);
+    StandardToolBar2.Visible := Octopusini.ReadBool('MyPreference', 'APPLICATION_STANDART_TOOLBAR2', true);
 
     i := Octopusini.ReadInteger('MyPreference', 'APPLICATION_PAGECONTROL1', 1);
     PageControl1.TabPosition := TTabPosition(i);
@@ -3355,8 +3361,8 @@ begin
     /// FontDialog.Font.Color := Octopusini.ReadInteger('Configuration', 'CONTENT_FONTCOLOR', clBlack);
     /// FGColorBox.Selected := FontDialog.Font.Color;
 
-    SettingPagesDlg.CheckBoxShortcutForExplorer.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_MENU_ITEM_EXPLORER', True);
-    SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_MENU_ITEM_DESKTOP', True);
+    SettingPagesDlg.CheckBoxShortcutForExplorer.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_MENU_ITEM_EXPLORER', true);
+    SettingPagesDlg.CheckBoxDesktopShortcutMenu.Checked := Octopusini.ReadBool('Configuration', 'APPLICATION_MENU_ITEM_DESKTOP', true);
 
     if FThemeSkinName <> '' then
       AdjustSetStyle(FThemeSkinName);
@@ -3428,7 +3434,7 @@ begin
       begin
         TMemo(Component).SelStart := p - buffer;
         TMemo(Component).SelLength := Length(SearchString);
-        Result := True;
+        Result := true;
       end;
     finally
       System.SysUtils.StrDispose(buffer);
@@ -3459,7 +3465,7 @@ begin
       begin
         TMyRichEdit(Component).SelStart := p - buffer;
         TMyRichEdit(Component).SelLength := Length(SearchString);
-        Result := True;
+        Result := true;
       end;
     finally
       System.SysUtils.StrDispose(buffer);
@@ -3513,7 +3519,7 @@ begin
   Data[8] := $00; // ����
   pPOcComPack := @Data[0]; // ʵ�ʷ��͵�ʱ�򳤶Ȳ�����CRC
 
-  bStatusOK := True;
+  bStatusOK := true;
   bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
 
   if not bStatusOK then
@@ -3551,7 +3557,7 @@ begin
       IntToBuffer(checksum, &Data[9], 4);
       pPOcComPack := @Data[0];
 
-      bStatusOK := True;
+      bStatusOK := true;
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
 
       DelayDelay(30);
@@ -3594,7 +3600,7 @@ begin
       // Memo2.Lines.Append(FormatBufferToHexStr(&Data[11], iLength));
 
       pPOcComPack := @Data[0]; // ʵ�ʷ��͵�ʱ�򳤶Ȳ�����CRC
-      bStatusOK := True;
+      bStatusOK := true;
       bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
 
       StatusBar1DrawProgress(i + 1, SL.Count);
@@ -3701,7 +3707,7 @@ begin
   Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // дFLASH
 
   // for i := 0 to SL.Count - 1 do
-  while (True) do
+  while (true) do
   begin
     // Application.ProcessMessages;
     iLength := MemoryStream.Read(&Data[11], DEFAULT_LENGTH);

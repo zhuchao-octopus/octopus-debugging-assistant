@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
 
-  OcComPortObj;
+  OcComPortObj,
+  uMainSetting;
 
 type
   TCommandFrm = class(TForm)
@@ -14,10 +15,12 @@ type
     Button1: TButton;
     Button2: TButton;
     Label1: TLabel;
+    CheckBox100: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure ComboBox1KeyPress(Sender: TObject; var Key: Char);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure CheckBox100Click(Sender: TObject);
   private
     { Private declarations }
     FCmdBuf: array [0 .. 1] of Byte;
@@ -37,6 +40,14 @@ implementation
 procedure TCommandFrm.FormShow(Sender: TObject);
 begin
   SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, 0);
+  CheckBox100.Checked := SettingPagesDlg.CheckBox36.Checked;
+end;
+
+procedure TCommandFrm.CheckBox100Click(Sender: TObject);
+begin
+  SettingPagesDlg.CheckBox36.Checked := CheckBox100.Checked;
+  if OcComPortObj <> nil then
+    OcComPortObj.ShowSendedLog := CheckBox100.Checked;
 end;
 
 procedure TCommandFrm.ComboBox1KeyPress(Sender: TObject; var Key: Char);
@@ -56,7 +67,10 @@ begin
       if Command = 'Control+C' then
         OcComPortObj.FalconComSendBuffer(FCmdBuf, 1)
       else
+      begin
+        OcComPortObj.ShowSendedLog := CheckBox100.Checked;
         OcComPortObj.FalconComSendData_Terminal(Command, 0);
+      end;
 
       OcComPortObj.NotifyCallBack();
 
