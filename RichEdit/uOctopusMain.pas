@@ -616,10 +616,9 @@ begin
         begin
           OcComPortObj := Self.GetCurrentDevice();
           if (OcComPortObj <> nil) then
-          begin
             OcComPortObj.SetLogComponentReadOnly(True);
-          end;
-
+          if CommandFrm.Showing then
+             CommandFrm.Close;
           ShowHideRLPanel(1);
           Handled := True;
         end;

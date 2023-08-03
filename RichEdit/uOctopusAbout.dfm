@@ -35,7 +35,7 @@ object AboutBox: TAboutBox
     ActivePage = TabSheet1
     TabOrder = 1
     object TabSheet1: TTabSheet
-      Caption = 'About Octopus'
+      Caption = 'About Octopus  Assistant'
       object Label3: TLabel
         Left = 182
         Top = 85
