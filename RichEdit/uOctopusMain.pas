@@ -467,7 +467,7 @@ uses uOctopusAbout, RichEdit, Winapi.ShellAPI, System.UITypes, System.IOUtils, W
 resourcestring
   sSaveChanges = 'Save changes to %s?';
   sOverWrite = 'The file already exists, if you need to overwrite it %s';
-  sUntitled = 'Untitled';
+  sUntitled = 'Untitled.rtf';
   sModified = 'Modified';
   sColRowInfo = 'Line: %3d  Col: %3d';
   sScrollPos = 'Scroll Pos: %d, %d';
@@ -742,12 +742,12 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.LoadUntitledContent(MyRichEdit: TMyRichEdit);
 var
-  FileNameNoExt: String;
+  FileNameExt: String;
   AFileName: String;
 begin
   if MyRichEdit = nil then
     exit;
-  AFileName := ExtractFilePath(Application.Exename) + '\' + sUntitled + '.rtf';
+  AFileName := ExtractFilePath(Application.Exename) + '\' + sUntitled;
   /// UpdateCursorPos;
   /// DragAcceptFiles(Handle, True);
   /// RichEditChange(nil);
@@ -759,10 +759,10 @@ begin
     MyRichEdit.FPathFileName := '';
     /// MyRichEdit.SetFocus;
     /// FileNameNoExt := ExtractFileNameNoExt(AFileName);
-    FileNameNoExt := ExtractFileName(AFileName);
-    PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
+    FileNameExt := ExtractFileName(AFileName);
+    PageControl1.SetPageName(FileNameExt, PageControl1.ActivePageIndex);
     SetModified(false);
-    SetPathFileName(sUntitled);
+    SetPathFileName(AFileName);
   end;
 end;
 
@@ -778,7 +778,7 @@ begin
     ComBoBoxFontName.Text := CMyRichEdit.SelAttributes.Name;
     FGColorBox.Selected := CMyRichEdit.SelAttributes.Color;
     BGColorBox.Selected := CMyRichEdit.SelAttributes.BackColor;
-    ///UpdateCursorPos();
+    /// UpdateCursorPos();
   finally
     FUpdating := false;
   end;
@@ -1081,21 +1081,21 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.LoadNewFileFromTo(PathFileName: String);
 var
-  FileNameNoExt: String;
+  FileNameExt: String;
   MyRichEdit: TMyRichEdit;
   NewPageName: String;
-  /// PageIndex:Integer;
 begin
   FileNew(Self);
-  if PageControl1.GetActivePageName = sUntitled then
+  NewPageName := PageControl1.GetActivePageName;
+  if NewPageName = sUntitled then
   begin
     MyRichEdit := PageControl1.LoadFileFrom(PathFileName, sUntitled);
     if MyRichEdit <> nil then
     begin
       MyRichEdit.ReadOnly := ofReadOnly in FileOpenCmd.Dialog.Options;
       /// MyRichEdit.SetFocus;
-      FileNameNoExt := ExtractFileName(PathFileName);
-      PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
+      FileNameExt := ExtractFileName(PathFileName);
+      PageControl1.SetPageName(FileNameExt, PageControl1.ActivePageIndex);
       SetModified(false);
       SetPathFileName(PathFileName);
     end
@@ -1103,7 +1103,7 @@ begin
       UpdateStatus('Load file failed!');
   end
   else
-    UpdateStatus('Load file failed!');
+    UpdateStatus('Load file failed! ' + NewPageName);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FileOpenAccept(Sender: TObject);
@@ -2277,8 +2277,11 @@ var
   MenuItem: TMenuItem;
   OcComPortObj: TOcComPortObj;
 begin
+
+  InitUartsMenu(COMMenu, COM1MenuItemOnClick);
   OcComPortObj := Self.GetCurrentDevice;
-  for i := 0 to SettingPagesDlg.ComboBoxEx1.Items.Count - 1 do
+
+  for i := 0 to COMMenu.Count - 1 do
   begin
     if i < COMMenu.Count then
       MenuItem := COMMenu.Items[i];
@@ -2926,20 +2929,46 @@ var
   MenuItem: TMenuItem;
   OcComPortObj: TOcComPortObj;
 begin
-  ParentMenu.Clear;
-  /// ToolbarImages.ad
-  for i := 0 to SettingPagesDlg.ComboBoxEx1.Items.Count - 1 do
+
+  if ParentMenu.Count <> SettingPagesDlg.ComboBoxEx1.Items.Count then
   begin
-    MenuItem := TMenuItem.Create(nil);
-    OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
-    if OcComPortObj <> nil then
+    ParentMenu.Clear;
+    for i := 0 to SettingPagesDlg.ComboBoxEx1.Items.Count - 1 do
     begin
-      MenuItem.Caption := OcComPortObj.ComportFullName;
-      MenuItem.Tag := i;
-      ParentMenu.Add(MenuItem);
-      MenuItem.OnClick := OnClicEvent;
+      MenuItem := TMenuItem.Create(nil);
+      OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
+      if OcComPortObj <> nil then
+      begin
+        MenuItem.Caption := OcComPortObj.ComportFullName;
+        MenuItem.Tag := i;
+        ParentMenu.Add(MenuItem);
+        MenuItem.OnClick := OnClicEvent;
+      end;
+    end;
+  end
+  else if ParentMenu.Count = SettingPagesDlg.ComboBoxEx1.Items.Count then
+  begin
+    for i := 0 to ParentMenu.Count - 1 do
+    begin
+      MenuItem := ParentMenu.Items[i];
+      OcComPortObj := SettingPagesDlg.getDeciceByIndex(i);
+      if OcComPortObj <> nil then
+      begin
+        MenuItem.Caption := OcComPortObj.ComportFullName;
+        MenuItem.Tag := i;
+        //ParentMenu.Add(MenuItem);
+        MenuItem.OnClick := OnClicEvent;
+
+      end
+      else
+      begin
+        MenuItem.Caption := '-';
+        MenuItem.Tag := i;
+        MenuItem.OnClick := nil;
+      end;
     end;
   end;
+
 end;
 
 /// function TMainForm.GetSelectedDeviceName(): String;

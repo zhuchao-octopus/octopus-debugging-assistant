@@ -1192,17 +1192,19 @@ begin
       begin
         if self.Connected then
         begin
-          try
-            if (Length(str) > 0) and (str[Length(str)] = #9) then
-            begin
-              /// 水平制表符
-            end
-            else
-            begin
-              // 0x0D CR (carriage return) 回车键
-              str := str + #13;
-            end;
+          if (Length(str) > 0) and (str[Length(str)] = #9) then
+          begin
+            /// 水平制表符
+          end
+          else
+          begin
+            // 0x0D CR (carriage return) 回车键
+            str := str + #13;
+            if FShowSendingLog then
+              log(SEND_FLAG + str);
+          end;
 
+          try
             writestr(str);
             FComSentCount := FComSentCount + Length(str);
           except
@@ -1216,7 +1218,6 @@ begin
           log('Device was closed,please open a device.');
           Exit;
         end;
-        // exit;
       end;
 
     Ord(S_HexadecimalFormat):
@@ -1224,7 +1225,10 @@ begin
         if self.Connected then
         begin
           s := FormatHexStrToByte(Trim(str), buf, bLength);
-          // Len := (Length(str) + 2) div 3;
+
+          if FShowSendingLog then
+            log(SEND_FLAG + s);
+
           try
             self.Write(buf, bLength);
             FComSentCount := FComSentCount + bLength;
@@ -1232,6 +1236,7 @@ begin
             log('Sorry Write to device fail!!');
             Exit;
           end;
+
         end
         else
         begin
@@ -1243,7 +1248,10 @@ begin
     Ord(S_OctopusProtocol):
       begin
         s := FormatHexStrToByte(Trim(str), buf, bLength);
-        // Len := (Length(str) + 2) div 3;
+
+        if FShowSendingLog then
+          log(SEND_FLAG + s);
+
         SendProtocolData(OCCOMPROTOCAL_DATA, buf, bLength, false);
       end;
   end;

@@ -135,11 +135,12 @@ type
     procedure updateSystemDevicesList(DevideName: String = ''; ActionType: Integer = $8000);
 
     function getCurrentDeviceName(): String;
-    function getCurrentDevice(): TOcComPortObj;
+
     function getDeciceByPort(Port: string): TOcComPortObj;
     function getDeciceByFullName(DeviceName: string): TOcComPortObj;
     function getDeciceByIndex(Index: Integer): TOcComPortObj;
     function getAvailableDevice(): TOcComPortObj;
+    function getCurrentDevice(): TOcComPortObj;
 
     function openDevice(OcComPortObj: TOcComPortObj): Boolean; overload;
     function openDevice(DeviceFullName: String): TOcComPortObj; overload;
@@ -340,6 +341,8 @@ var
 begin
   try
     ImageList1.Clear;
+    /// ComboBoxEx1.Clear;
+
     if OcComPortList = nil then
       OcComPortList := TStringList.Create;
 
@@ -362,20 +365,22 @@ begin
         SettingChangedCallBackFuntion(OcComPortObj);
     end;
 
-    if DevideNameList.Count = 0 then
-      exit;
     /// 更新设备列表
     ComboBoxEx1.ItemsEx.BeginUpdate;
-    /// UI COMBO 列表
-    ComboBoxEx1.Images := ImageList1;
     OcComPortList.BeginUpdate;
+    ComboBoxEx1.Images := ImageList1;
     /// 内部设备列表
     for i := 0 to DevideNameList.Count - 1 do
     begin
-      ComboBoxEx1.ItemsEx.AddItem(DevideNameList.Strings[i], imageId, imageId, imageId, -1, nil);
-      ComboBoxEx1.ItemsEx.Items[i].ImageIndex := imageId;
+
+      if ComboBoxEx1.Items.IndexOf(DevideNameList.Strings[i]) < 0 then
+      begin
+        ComboBoxEx1.ItemsEx.AddItem(DevideNameList.Strings[i], imageId, imageId, imageId, -1, nil);
+        ComboBoxEx1.ItemsEx.Items[i].ImageIndex := imageId;
+      end;
+
       if (OcComPortList.IndexOf(DevideNameList.Strings[i])) < 0 then
-      /// 只增加不删除
+      /// 只增加不删除,增加到内部列表
       begin
         OcComPortObj := TOcComPortObj.Create(self, DevideNameList.Strings[i]);
         OcComPortList.AddObject(DevideNameList.Strings[i], OcComPortObj);
@@ -385,8 +390,10 @@ begin
         LoadDeviceSetting(OcComPortObj);
       end;
     end;
-    ComboBoxEx1.ItemsEx.EndUpdate;
+
     OcComPortList.EndUpdate;
+    ComboBoxEx1.ItemsEx.EndUpdate;
+
   finally
     DevideNameList.Free;
   end;
@@ -703,16 +710,14 @@ begin
   end;
 end;
 
-function TSettingPagesDlg.getCurrentDevice(): TOcComPortObj;
-begin
-  Result := getDeciceByFullName(getCurrentDeviceName());
-end;
-
 function TSettingPagesDlg.getCurrentDeviceName(): String;
 begin
   Result := '';
-  if (ComboBoxEx1.Items.Count > 0) and (ComboBoxEx1.ItemIndex >= 0) then
-    Result := ComboBoxEx1.Items[ComboBoxEx1.ItemIndex];
+  if (ComboBoxEx1.Items.Count > 0) then
+  begin
+    if (ComboBoxEx1.ItemIndex >= 0) and (ComboBoxEx1.ItemIndex < ComboBoxEx1.Items.Count) then
+      Result := ComboBoxEx1.Items[ComboBoxEx1.ItemIndex];
+  end;
 end;
 
 function TSettingPagesDlg.getDeciceByFullName(DeviceName: string): TOcComPortObj;
@@ -720,26 +725,21 @@ var
   i: Integer;
 begin
   Result := nil;
-  if DeviceName = '' then
-    exit;
   try
     i := OcComPortList.IndexOf(DeviceName);
     if i >= 0 then
       Result := TOcComPortObj(OcComPortList.Objects[i]);
   finally
-
   end;
 end;
 
 function TSettingPagesDlg.getDeciceByIndex(Index: Integer): TOcComPortObj;
 begin
   Result := nil;
-  if (Index < 0) or (Index >= OcComPortList.Count) then
-    exit;
   try
-    Result := TOcComPortObj(OcComPortList.Objects[Index]);
+    if (Index >= 0) and (Index < OcComPortList.Count) then
+      Result := TOcComPortObj(OcComPortList.Objects[Index]);
   finally
-
   end;
 end;
 
@@ -760,6 +760,11 @@ begin
   end;
 end;
 
+function TSettingPagesDlg.getCurrentDevice(): TOcComPortObj;
+begin
+  Result := getDeciceByFullName(getCurrentDeviceName());
+end;
+
 procedure TSettingPagesDlg.CloseDevice(DeviceFullName: String);
 var
   OcComPortObj: TOcComPortObj;
@@ -770,13 +775,13 @@ begin
   if DeviceFullName = '' then
     exit;
   i := OcComPortList.IndexOf(DeviceFullName);
-  if i < 0 then
-    exit;
-
-  OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
-  if (OcComPortObj <> nil) and (OcComPortObj.Connected) then
+  if i >= 0 then
   begin
-    OcComPortObj.CloseDevice();
+    OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
+    if (OcComPortObj <> nil) and (OcComPortObj.Connected) then
+    begin
+      OcComPortObj.CloseDevice();
+    end;
   end;
 end;
 

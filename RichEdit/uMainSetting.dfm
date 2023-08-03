@@ -318,7 +318,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 64
               Width = 423
               Height = 20
-              Caption = 'The line number is shown before the data record'
+              Caption = 'Display the line numbers in the editor'
               TabOrder = 2
             end
             object CheckBox36: TCheckBox
@@ -326,7 +326,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 91
               Width = 423
               Height = 20
-              Caption = 'Displays the data being sent by the serial port'
+              Caption = 'Display the data being sent by the serial port'
               TabOrder = 3
             end
           end
