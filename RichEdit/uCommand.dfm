@@ -39,33 +39,31 @@ object CommandFrm: TCommandFrm
     OnKeyPress = ComboBox1KeyPress
     Items.Strings = (
       'Control+C')
-    ExplicitLeft = 10
-    ExplicitWidth = 617
   end
   object Button1: TButton
-    Left = 456
+    Left = 451
     Top = 33
-    Width = 85
+    Width = 88
     Height = 25
     Caption = 'Send As Text'
     TabOrder = 1
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 549
+    Left = 546
     Top = 33
-    Width = 85
+    Width = 88
     Height = 25
-    Caption = 'Send As Byte'
+    Caption = 'Send As Bytes'
     TabOrder = 2
     OnClick = Button2Click
   end
   object CheckBox100: TCheckBox
-    Left = 280
+    Left = 270
     Top = 37
-    Width = 164
+    Width = 166
     Height = 17
-    Caption = 'Displays the sent data'
+    Caption = 'Displays sending data'
     TabOrder = 3
     OnClick = CheckBox100Click
   end

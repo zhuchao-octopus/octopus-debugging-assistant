@@ -2,7 +2,7 @@ object SettingPagesDlg: TSettingPagesDlg
   Left = 195
   Top = 108
   BorderStyle = bsDialog
-  Caption = 'Octopus option settings '
+  Caption = 'Octopus Option Settings '
   ClientHeight = 636
   ClientWidth = 1100
   Color = clBtnFace
@@ -37,7 +37,7 @@ object SettingPagesDlg: TSettingPagesDlg
       Align = alClient
       TabOrder = 0
       object TabSheet1: TTabSheet
-        Caption = 'Serial Port Setting'
+        Caption = 'Serial Port Settings'
         object Panel6: TPanel
           Left = 326
           Top = 0
@@ -100,7 +100,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Left = 416
               Top = 112
               Width = 297
-              Height = 74
+              Height = 34
               Caption = 'Repair or create the desktop shortcut '
               TabOrder = 2
               OnClick = Button6Click
@@ -354,7 +354,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 35
               Width = 295
               Height = 34
-              Caption = 'Refresh the device list '
+              Caption = 'Refresh System COM Device List '
               ImageAlignment = iaRight
               ImageIndex = 0
               TabOrder = 1
@@ -412,23 +412,23 @@ object SettingPagesDlg: TSettingPagesDlg
             object Label102: TLabel
               Left = 5
               Top = 74
-              Width = 52
+              Width = 51
               Height = 17
-              Caption = 'Stop bits'
+              Caption = 'Stop Bits'
             end
             object Label101: TLabel
               Left = 5
               Top = 42
-              Width = 52
+              Width = 51
               Height = 17
-              Caption = 'Data bits'
+              Caption = 'Data Bits'
             end
             object Label100: TLabel
               Left = 5
               Top = 11
-              Width = 56
+              Width = 59
               Height = 17
-              Caption = 'Baud rate'
+              Caption = 'Baud Rate'
             end
             object Label106: TLabel
               Left = 5
@@ -596,6 +596,14 @@ object SettingPagesDlg: TSettingPagesDlg
       end
       object TabSheet2: TTabSheet
         Caption = 'Network Settings'
+        object PanelInternalCacheContainner: TPanel
+          Left = 18
+          Top = 16
+          Width = 308
+          Height = 34
+          Caption = 'Pane Internal Cache Containner'
+          TabOrder = 0
+        end
       end
     end
   end
@@ -609,9 +617,9 @@ object SettingPagesDlg: TSettingPagesDlg
     ParentColor = True
     TabOrder = 1
     object Button1: TButton
-      Left = 954
+      Left = 911
       Top = 0
-      Width = 134
+      Width = 145
       Height = 34
       Caption = 'Close'
       ModalResult = 1
@@ -621,7 +629,7 @@ object SettingPagesDlg: TSettingPagesDlg
     object Button2: TButton
       Left = 759
       Top = 0
-      Width = 156
+      Width = 145
       Height = 34
       Caption = 'Save Settings '
       Font.Charset = DEFAULT_CHARSET
@@ -634,14 +642,6 @@ object SettingPagesDlg: TSettingPagesDlg
       ParentFont = False
       TabOrder = 1
       OnClick = Button2Click
-    end
-    object PanelInternalCacheContainner: TPanel
-      Left = 18
-      Top = 0
-      Width = 308
-      Height = 34
-      Caption = 'Pane Internal Cache Containner'
-      TabOrder = 2
     end
   end
   object ImageList1: TImageList

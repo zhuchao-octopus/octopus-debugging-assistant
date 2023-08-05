@@ -2465,8 +2465,8 @@ end;
 /// init
 procedure TMainOctopusDebuggingDevelopmentForm.InitMainUI();
 begin
-  ToggleSwitchDeviceOnOff.Height := 25;
-  StandardToolBar2.Height := 33;
+  ///ToggleSwitchDeviceOnOff.Height := 25;
+  ///StandardToolBar2.Height := 33;
   Application.Title := OCTOPUS_APPLICATION_TITLE_NAME;
   Self.Caption := OCTOPUS_APPLICATION_TITLE_NAME;
   Self.Icon := Application.Icon;

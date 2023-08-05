@@ -268,7 +268,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     Top = 33
     Width = 1205
     Height = 33
-    BorderWidth = 2
+    BorderWidth = 1
     ButtonHeight = 25
     Color = clBtnFace
     Images = ToolbarImages
@@ -329,7 +329,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 50
       Height = 25
-      Hint = 'OnOff switch for device'
+      Hint = 'On off switch for device'
       ShowStateCaption = False
       TabOrder = 2
       OnClick = ToggleSwitchDeviceOnOffClick
@@ -361,7 +361,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object ToolButton16: TToolButton
       Left = 478
       Top = 0
-      Hint = 'Setting of device'
+      Hint = 'Settings of device'
       Caption = 'ToolButton16'
       ImageIndex = 29
       OnClick = ToolButton16Click
@@ -393,7 +393,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object ToolButton19: TToolButton
       Left = 540
       Top = 0
-      Hint = 'Quick Terminal '
+      Hint = 'Quick terminal '
       Caption = 'ToolButton19'
       ImageIndex = 30
       OnClick = ToolButton19Click
@@ -1906,7 +1906,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
         Caption = '-'
       end
       object SettingItem1: TMenuItem
-        Caption = 'Setting...'
+        Caption = 'Settings...'
         ImageIndex = 22
         OnClick = SettingItem1Click
       end
@@ -2192,7 +2192,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
         Caption = '-'
       end
       object SettingItem2: TMenuItem
-        Caption = 'Setting...'
+        Caption = 'Settings...'
         ImageIndex = 29
         OnClick = SettingItem2Click
       end
