@@ -268,7 +268,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     Top = 33
     Width = 1205
     Height = 33
-    BorderWidth = 1
+    AutoSize = True
+    BorderWidth = 2
     ButtonHeight = 25
     Color = clBtnFace
     Images = ToolbarImages
