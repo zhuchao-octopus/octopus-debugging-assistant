@@ -2283,18 +2283,16 @@ var
   MenuItem: TMenuItem;
   OcComPortObj: TOcComPortObj;
 begin
-
   InitUartsMenu(COMMenu, COM1MenuItemOnClick);
   OcComPortObj := Self.GetCurrentDevice;
-
   for i := 0 to COMMenu.Count - 1 do
   begin
-    if i < COMMenu.Count then
-      MenuItem := COMMenu.Items[i];
-    if MenuItem <> nil then
-      MenuItem.Checked := false;
+    MenuItem := COMMenu.Items[i];
+    if MenuItem = nil then
+      continue;
 
-    if OcComPortObj = SettingPagesDlg.getDeciceByIndex(i) then
+    MenuItem.Checked := false;
+    if (OcComPortObj = SettingPagesDlg.getDeciceByIndex(i)) and (OcComPortObj <> nil) then
     begin
       if MenuItem.Tag = i then
         MenuItem.Checked := true;
@@ -2359,22 +2357,29 @@ var
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := Self.GetCurrentDevice();
-  /// GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  
   if OcComPortObj = nil then
   begin
     /// MessageBox(Handle, 'Please specify a device for custom baudrate.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
-  if (ComboBox1.ItemIndex <= MAX_BAUDRATE_INDEX) then // High(TBaudRate))
-  begin
-    OcComPortObj.BaudRate := TBaudRate(ComboBox1.ItemIndex);
-    // OcComPortObj.BaudRateIndex := ComboBox1.ItemIndex;
-  end
-  else
-  begin
-    OcComPortObj.BaudRate := TBaudRate(0);
-    OcComPortObj.CustomBaudRate := StrToInt(ComboBox1.Text);
+  try
+    if (ComboBox1.ItemIndex <= MAX_BAUDRATE_INDEX) then // High(TBaudRate))
+    begin
+      OcComPortObj.BaudRate := TBaudRate(ComboBox1.ItemIndex);
+      // OcComPortObj.BaudRateIndex := ComboBox1.ItemIndex;
+    end
+    else
+    begin
+      OcComPortObj.BaudRate := TBaudRate(0);
+      OcComPortObj.CustomBaudRate := StrToInt(ComboBox1.Text);
+    end;
+  Except
+    on err: Exception do // 捕
+    begin
+       ShowMessage(err.Message+' Please go to Octopus Option Settings page to setup the device.');
+    end;
   end;
 end;
 
@@ -2465,8 +2470,8 @@ end;
 /// init
 procedure TMainOctopusDebuggingDevelopmentForm.InitMainUI();
 begin
-  ///ToggleSwitchDeviceOnOff.Height := 25;
-  ///StandardToolBar2.Height := 33;
+  /// ToggleSwitchDeviceOnOff.Height := 25;
+  /// StandardToolBar2.Height := 33;
   Application.Title := OCTOPUS_APPLICATION_TITLE_NAME;
   Self.Caption := OCTOPUS_APPLICATION_TITLE_NAME;
   Self.Icon := Application.Icon;
@@ -2966,7 +2971,6 @@ begin
         MenuItem.Tag := i;
         // ParentMenu.Add(MenuItem);
         MenuItem.OnClick := OnClicEvent;
-
       end
       else
       begin
@@ -2996,12 +3000,12 @@ end;
 
 function TMainOctopusDebuggingDevelopmentForm.GetCurrentDevice(): TOcComPortObj;
 var
-  OcComPortObj: TOcComPortObj;
+  /// OcComPortObj: TOcComPortObj;
   ActivePageName: String;
 begin
   ActivePageName := GetCurrentPageName();
-  OcComPortObj := SettingPagesDlg.GetDeciceByFullName(ActivePageName);
-  Result := OcComPortObj;
+  Result := SettingPagesDlg.GetDeciceByFullName(ActivePageName);
+  /// Result := OcComPortObj;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.GetAndRemoveDevices(DeviceName: String);

@@ -38,7 +38,7 @@ const
 const
   RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ', 'Hexadecimal Format Receiving ', 'Graphic Analysis ', 'Octopus Protocol Analysis', 'File Receiving');
 
-  MAX_BAUDRATE_INDEX: integer = 15;
+  MAX_BAUDRATE_INDEX: Integer = 15;
   DEFAULT_HEXDATA_HEXSTRING_SPACE = 5;
 
 type

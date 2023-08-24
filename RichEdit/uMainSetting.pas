@@ -116,11 +116,12 @@ type
     procedure ColorBoxTextChange(Sender: TObject);
   private
     { Private declarations }
+    OcComPortDeviceList: TStringList;
     procedure WMDeviceChange(var Msg: TMessage); message WM_DEVICECHANGE;
   public
     { Public declarations }
 
-    OcComPortList: TStringList;
+
     /// 系统端口列表
     OctopusCfgDir: String;
     OctopusCfgDir_LogFilePath: String;
@@ -343,8 +344,8 @@ begin
     ImageList1.Clear;
     /// ComboBoxEx1.Clear;
 
-    if OcComPortList = nil then
-      OcComPortList := TStringList.Create;
+    if OcComPortDeviceList = nil then
+      OcComPortDeviceList := TStringList.Create;
 
     DevideNameList := TStringList.Create;
 
@@ -367,7 +368,7 @@ begin
 
     /// 更新设备列表
     ComboBoxEx1.ItemsEx.BeginUpdate;
-    OcComPortList.BeginUpdate;
+    OcComPortDeviceList.BeginUpdate;
     ComboBoxEx1.Images := ImageList1;
     /// 内部设备列表
     for i := 0 to DevideNameList.Count - 1 do
@@ -379,11 +380,11 @@ begin
         ComboBoxEx1.ItemsEx.Items[i].ImageIndex := imageId;
       end;
 
-      if (OcComPortList.IndexOf(DevideNameList.Strings[i])) < 0 then
+      if (OcComPortDeviceList.IndexOf(DevideNameList.Strings[i])) < 0 then
       /// 只增加不删除,增加到内部列表
       begin
         OcComPortObj := TOcComPortObj.Create(self, DevideNameList.Strings[i]);
-        OcComPortList.AddObject(DevideNameList.Strings[i], OcComPortObj);
+        OcComPortDeviceList.AddObject(DevideNameList.Strings[i], OcComPortObj);
         /// 导入设备配置信息
         S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
         OcComPortObj.LoadSettings(stIniFile, S);
@@ -391,7 +392,7 @@ begin
       end;
     end;
 
-    OcComPortList.EndUpdate;
+    OcComPortDeviceList.EndUpdate;
     ComboBoxEx1.ItemsEx.EndUpdate;
 
   finally
@@ -406,8 +407,8 @@ var
   i: Integer;
   OcComPortObj: TOcComPortObj;
 begin
-  if OcComPortList = nil then
-    OcComPortList := TStringList.Create;
+  if OcComPortDeviceList = nil then
+    OcComPortDeviceList := TStringList.Create;
   OctopusCfgDir := ExtractFilePath(Application.Exename) + '\';
 
   SetCurrentDir(OctopusCfgDir);
@@ -475,7 +476,7 @@ begin
   begin
     ComboBoxEx1.ItemIndex := i;
     ComboBoxEx1Change(self); // 刷新到默认串口设置界面
-    OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
+    OcComPortObj := TOcComPortObj(OcComPortDeviceList.Objects[i]);
     if OcComPortObj <> nil then
     begin
       ApplyOcComPortObjAtrribute(OcComPortObj);
@@ -700,12 +701,12 @@ begin
   Result := nil;
   if Port = '' then
     exit;
-  for i := 0 to OcComPortList.Count - 1 do
+  for i := 0 to OcComPortDeviceList.Count - 1 do
   begin
-    str := OcComPortList[i];
+    str := OcComPortDeviceList[i];
     if (Pos(Port, str) > 0) then
     begin
-      Result := TOcComPortObj(OcComPortList.Objects[i]);
+      Result := TOcComPortObj(OcComPortDeviceList.Objects[i]);
     end;
   end;
 end;
@@ -726,9 +727,9 @@ var
 begin
   Result := nil;
   try
-    i := OcComPortList.IndexOf(DeviceName);
+    i := OcComPortDeviceList.IndexOf(DeviceName);
     if i >= 0 then
-      Result := TOcComPortObj(OcComPortList.Objects[i]);
+      Result := TOcComPortObj(OcComPortDeviceList.Objects[i]);
   finally
   end;
 end;
@@ -737,8 +738,8 @@ function TSettingPagesDlg.getDeciceByIndex(Index: Integer): TOcComPortObj;
 begin
   Result := nil;
   try
-    if (Index >= 0) and (Index < OcComPortList.Count) then
-      Result := TOcComPortObj(OcComPortList.Objects[Index]);
+    if (Index >= 0) and (Index < OcComPortDeviceList.Count) then
+      Result := TOcComPortObj(OcComPortDeviceList.Objects[Index]);
   finally
   end;
 end;
@@ -748,13 +749,13 @@ var
   i: Integer;
 begin
   Result := nil;
-  for i := 0 to OcComPortList.Count - 1 do
+  for i := 0 to OcComPortDeviceList.Count - 1 do
   begin
-    if (OcComPortList.Objects[i] = nil) then
+    if (OcComPortDeviceList.Objects[i] = nil) then
       continue;
-    if not TOcComPortObj(OcComPortList.Objects[i]).Connected and (TOcComPortObj(OcComPortList.Objects[i]).status = 0) then
+    if not TOcComPortObj(OcComPortDeviceList.Objects[i]).Connected and (TOcComPortObj(OcComPortDeviceList.Objects[i]).status = 0) then
     begin
-      Result := TOcComPortObj(OcComPortList.Objects[i]);
+      Result := TOcComPortObj(OcComPortDeviceList.Objects[i]);
       break;
     end;
   end;
@@ -770,14 +771,14 @@ var
   OcComPortObj: TOcComPortObj;
   i: Integer;
 begin
-  if OcComPortList = nil then
+  if OcComPortDeviceList = nil then
     exit;
   if DeviceFullName = '' then
     exit;
-  i := OcComPortList.IndexOf(DeviceFullName);
+  i := OcComPortDeviceList.IndexOf(DeviceFullName);
   if i >= 0 then
   begin
-    OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
+    OcComPortObj := TOcComPortObj(OcComPortDeviceList.Objects[i]);
     if (OcComPortObj <> nil) and (OcComPortObj.Connected) then
     begin
       OcComPortObj.CloseDevice();
@@ -830,7 +831,7 @@ var
   i: Integer;
 begin
   Result := nil;
-  if OcComPortList = nil then
+  if OcComPortDeviceList = nil then
     exit;
   if DeviceFullName = '' then
     exit;
@@ -947,9 +948,9 @@ var
   OcComPortObj: TOcComPortObj;
 begin
   try
-    for i := 0 to OcComPortList.Count - 1 do
+    for i := 0 to OcComPortDeviceList.Count - 1 do
     begin
-      OcComPortObj := TOcComPortObj(OcComPortList.Objects[i]);
+      OcComPortObj := TOcComPortObj(OcComPortDeviceList.Objects[i]);
       if OcComPortObj <> nil then
       begin
         if OcComPortObj.Connected then
