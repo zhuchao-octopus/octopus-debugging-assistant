@@ -2160,8 +2160,8 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.EnglishMenuItemClick(Sender: TObject);
 begin
-  SettingPagesDlg.LoadLaunguageFromFile(Self, SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', false);
   SettingPagesDlg.ComboBox8.ItemIndex := 0;
+  SettingPagesDlg.UpdateLaunguage(self);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ChineseMenuItemClick(Sender: TObject);
@@ -2178,7 +2178,6 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.ViewMenuClick(Sender: TObject);
 begin
   UpdateMainMenu();
-
   QuickTerminalCommandsItem.Checked := CommandFrm.Showing;
 end;
 
