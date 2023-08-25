@@ -669,8 +669,6 @@ begin
 
   InitUserConfiguration();
   Application.OnMessage := MyAppMsg;
-
-  SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, true);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormResize(Sender: TObject);
@@ -706,6 +704,7 @@ begin
     /// CheckFileSave;
     Self.PageControl1.FreeAll;
     SaveProjectSetting(true);
+    SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, true);
   except
     CanClose := false;
   end;
@@ -2161,13 +2160,13 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.EnglishMenuItemClick(Sender: TObject);
 begin
   SettingPagesDlg.ComboBox8.ItemIndex := 0;
-  SettingPagesDlg.UpdateLaunguage(self);
+  SettingPagesDlg.UpdateLaunguage(Self);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ChineseMenuItemClick(Sender: TObject);
 begin
   SettingPagesDlg.ComboBox8.ItemIndex := 1;
-  SettingPagesDlg.UpdateLaunguage(self);
+  SettingPagesDlg.UpdateLaunguage(Self);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.CloseTheDevice1Click(Sender: TObject);
@@ -2238,7 +2237,7 @@ begin
 
   Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
   SynchroSetMyRichEditFont(Component);
-  SettingPagesDlg.UpdateLaunguage(self);
+  SettingPagesDlg.UpdateLaunguage(Self);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SettingItem2Click(Sender: TObject);
@@ -2356,7 +2355,7 @@ var
   OcComPortObj: TOcComPortObj;
 begin
   OcComPortObj := Self.GetCurrentDevice();
-  
+
   if OcComPortObj = nil then
   begin
     /// MessageBox(Handle, 'Please specify a device for custom baudrate.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
@@ -2377,7 +2376,7 @@ begin
   Except
     on err: Exception do // 捕
     begin
-       ShowMessage(err.Message+' Please go to Octopus Option Settings page to setup the device.');
+      ShowMessage(err.message + ' Please go to Octopus Option Settings page to setup the device.');
     end;
   end;
 end;
@@ -3374,12 +3373,12 @@ begin
     if (b) then
     begin
       SettingPagesDlg.ComboBox8.ItemIndex := 1;
-      SettingPagesDlg.UpdateLaunguage(self);
+      SettingPagesDlg.UpdateLaunguage(Self);
     end
     else
     begin
       SettingPagesDlg.ComboBox8.ItemIndex := 0;
-      SettingPagesDlg.UpdateLaunguage(self);
+      SettingPagesDlg.UpdateLaunguage(Self);
     end;
 
   finally

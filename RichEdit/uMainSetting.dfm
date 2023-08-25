@@ -13,6 +13,7 @@ object SettingPagesDlg: TSettingPagesDlg
   Font.Name = 'Default'
   Font.Style = []
   Position = poMainFormCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96

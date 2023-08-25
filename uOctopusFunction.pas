@@ -15,11 +15,9 @@ Const
 {$ELSE}
   APPLICATION_TITLE_CN = '八爪鱼串口调试开发助手 32bit '; // for 32 bit;
 {$ENDIF}
-
   OCTOPUS_DEFAULT_E_MAIL = 'Octopus@1234998.cn';
   OCTOPUS_DEFAULT_CONFIGURATION_DIR = '\Setting\';
   OCTOPUS_DEFAULT_LOG_DIR = '\Logs\';
-
 
   OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 = 'http://www.1234998.cn';
   OCTOPUS_DEFAULT_WEBSITE_ADDRESS2 = 'http://www.1234998.top';
@@ -35,10 +33,9 @@ Const
   OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME = 'Octopus Serial Development Assistant 32'; // for 32 bit;
   OCTOPUS_SYSTEM_EXPLORER_MENU_NAME = 'Edit With Octopus Development Assistant';
 {$ENDIF}
-
-  ///DEFAULT_ADDRESSMAP_COLS = 32;
-  ///DEFAULT_FIXED_COLS = 2;
-  ///DEFAULT_MAX_CHART_POINTS = 30;
+  /// DEFAULT_ADDRESSMAP_COLS = 32;
+  /// DEFAULT_FIXED_COLS = 2;
+  /// DEFAULT_MAX_CHART_POINTS = 30;
 
   { OCCOMPROTOCAL_START = 10; // 连接，要求对方回复 状态是否可以连接
     OCCOMPROTOCAL_ACK = 11; // 一般相应，要求对方相应当前状态

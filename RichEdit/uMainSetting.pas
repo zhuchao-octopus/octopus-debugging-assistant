@@ -115,10 +115,11 @@ type
     procedure FormShow(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure ColorBoxTextChange(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     OcComPortDeviceList: TStringList;
-    CurrentLaunguage: Integer;
+    /// CurrentLaunguage: Integer;
     procedure WMDeviceChange(var Msg: TMessage); message WM_DEVICECHANGE;
   public
     { Public declarations }
@@ -402,6 +403,11 @@ begin
   end;
 end;
 
+procedure TSettingPagesDlg.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  SettingPagesDlg.LoadOrCreateLaunguageFromFile(self, true);
+end;
+
 procedure TSettingPagesDlg.FormCreate(Sender: TObject);
 var
   ComComboBox: TComComboBox;
@@ -504,8 +510,7 @@ begin
   finally
   end;
 
-  CurrentLaunguage := -1;
-  LoadOrCreateLaunguageFromFile(self, true);
+  /// CurrentLaunguage := -1;
 end;
 
 procedure TSettingPagesDlg.FormShow(Sender: TObject);
@@ -1050,6 +1055,7 @@ begin
 
 end;
 
+/// 从语言文件载入语言
 procedure TSettingPagesDlg.UpdateLaunguage(Form: TForm);
 begin
   /// if CurrentLaunguage <> ComboBox8.ItemIndex then
@@ -1064,13 +1070,18 @@ begin
   end;
 end;
 
+/// 创建语言文件
 procedure TSettingPagesDlg.LoadOrCreateLaunguageFromFile(Form: TForm; Create: Boolean);
 begin
   if Create then
   begin
     /// 创建语言文件
-    LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', Create);
-    LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', Create);
+    case ComboBox8.ItemIndex of
+      0:
+        LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', Create);
+      1:
+        LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', Create);
+    end;
   end;
 end;
 
@@ -1094,6 +1105,7 @@ begin
     begin
       IniFiles := TIniFile.Create(Path);
       Form.Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TForm', getMsgID(Form.Name), Form.Caption);
+      Application.Title:=IniFiles.ReadString(SectionName +  '_LANGUAGE_APPLICATION_TITLE', getMsgID('title_name'),OCTOPUS_APPLICATION_TITLE_NAME);
       /// showmessage(Form.Caption+' '+Path);
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
@@ -1133,11 +1145,13 @@ begin
         /// application.ProcessMessages;
       End;
     end
-    else if (not FileExists(Path)) and (Create) then
-    /// else if (Create) then   /// 创建语言文件
+    /// else if (not FileExists(Path)) and (Create) then
+    else if (Create) then
+    /// 创建语言文件
     begin
       IniFiles := TIniFile.Create(Path);
       IniFiles.WriteString(SectionName + '_LANGUAGE_TForm', getMsgID(Form.Name), Form.Caption);
+      IniFiles.WriteString(SectionName + '_LANGUAGE_APPLICATION_TITLE', getMsgID('title_name'), application.Title);
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
         tmpComponent := Form.Components[i];
