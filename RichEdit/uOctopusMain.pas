@@ -666,12 +666,11 @@ begin
   InitUartsMenu(COMMenu, COM1MenuItemOnClick);
   UpdateUartToolBar();
   LoadProjectSetting();
-  SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, true);
 
   InitUserConfiguration();
-
   Application.OnMessage := MyAppMsg;
 
+  SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, true);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormResize(Sender: TObject);
@@ -698,6 +697,7 @@ begin
     Self.Splitter1.Visible := false;
   end;
   DragAcceptFiles(Handle, true);
+
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -2166,8 +2166,8 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ChineseMenuItemClick(Sender: TObject);
 begin
-  SettingPagesDlg.LoadLaunguageFromFile(Self, SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', false);
   SettingPagesDlg.ComboBox8.ItemIndex := 1;
+  SettingPagesDlg.UpdateLaunguage(self);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.CloseTheDevice1Click(Sender: TObject);
@@ -2231,8 +2231,7 @@ var
 begin
   /// SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
   SettingPagesDlg.ShowModal();
-  /// SettingPagesDlg.Show();
-  ///
+
   InitUartsParameters();
   UpdateUartToolBar();
   AlphaBlend := SettingPagesDlg.AlphaBlend;
@@ -2240,6 +2239,7 @@ begin
 
   Component := PageControl1.GetComponent(PageControl1.ActivePageIndex);
   SynchroSetMyRichEditFont(Component);
+  SettingPagesDlg.UpdateLaunguage(self);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SettingItem2Click(Sender: TObject);
@@ -3341,8 +3341,6 @@ begin
     end;
 
     b := Octopusini.ReadBool('MyPreference', 'APPLICATION_CHINESE_LANG', false);
-    if (b) then
-      SettingPagesDlg.ComboBox8.ItemIndex := 1;
 
     FThemeSkinName := Octopusini.ReadString('MyPreference', 'APPLICATION_THEME_SKIN_NAME', TStyleManager.StyleNames[0]);
 
@@ -3373,6 +3371,17 @@ begin
 
     Self.AlphaBlend := Octopusini.ReadBool('MyPreference', 'APPLICATION_ALPHA_BLEND', false);
     Self.AlphaBlendValue := Octopusini.ReadInteger('MyPreference', 'APPLICATION_ALPHA_VALUE', 238);
+
+    if (b) then
+    begin
+      SettingPagesDlg.ComboBox8.ItemIndex := 1;
+      SettingPagesDlg.UpdateLaunguage(self);
+    end
+    else
+    begin
+      SettingPagesDlg.ComboBox8.ItemIndex := 0;
+      SettingPagesDlg.UpdateLaunguage(self);
+    end;
 
   finally
     Octopusini.Free;

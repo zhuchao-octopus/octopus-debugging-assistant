@@ -443,7 +443,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 430
       Height = 531
-      ActivePage = TabSheet_SendingData
+      ActivePage = TabSheet_BatchData
       Align = alClient
       TabHeight = 30
       TabOrder = 0
@@ -2222,7 +2222,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
         OnClick = EnglishMenuItemClick
       end
       object ChineseMenuItem: TMenuItem
-        Caption = 'Chinese'
+        Caption = #20013#25991#31616#20307
         OnClick = ChineseMenuItemClick
       end
       object N12: TMenuItem

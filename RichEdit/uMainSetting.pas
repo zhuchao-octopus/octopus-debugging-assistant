@@ -100,6 +100,7 @@ type
     Edit3: TEdit;
     UpDown3: TUpDown;
     PanelInternalCacheContainner: TPanel;
+    Button7: TButton;
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxEx1Change(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -117,10 +118,10 @@ type
   private
     { Private declarations }
     OcComPortDeviceList: TStringList;
+    CurrentLaunguage: Integer;
     procedure WMDeviceChange(var Msg: TMessage); message WM_DEVICECHANGE;
   public
     { Public declarations }
-
 
     /// 系统端口列表
     OctopusCfgDir: String;
@@ -158,9 +159,10 @@ type
     procedure ApplyCodePageSetting(OcComPortObj: TOcComPortObj);
     procedure ApplyOcComPortObjAtrribute(OcComPortObj: TOcComPortObj);
 
-    procedure LoadLaunguageFromFile(Form: TForm; Path: String; Create: Boolean);
+    procedure LoadLaunguageFromFile(Form: TForm; const Path: String; Create: Boolean);
     procedure LoadOrCreateLaunguageFromFile(Form: TForm; Create: Boolean);
 
+    procedure UpdateLaunguage(Form: TForm);
   end;
 
   /// const
@@ -407,6 +409,7 @@ var
   i: Integer;
   OcComPortObj: TOcComPortObj;
 begin
+
   if OcComPortDeviceList = nil then
     OcComPortDeviceList := TStringList.Create;
   OctopusCfgDir := ExtractFilePath(Application.Exename) + '\';
@@ -501,12 +504,14 @@ begin
   finally
   end;
 
+  CurrentLaunguage := -1;
+  LoadOrCreateLaunguageFromFile(self, true);
 end;
 
 procedure TSettingPagesDlg.FormShow(Sender: TObject);
 begin
-  SettingPagesDlg.LoadOrCreateLaunguageFromFile(self, True);
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
+  UpdateLaunguage(self);
   /// ShowMessage(getCommandLine());
   /// SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, 0);
 end;
@@ -602,12 +607,7 @@ end;
 
 procedure TSettingPagesDlg.ComboBox8Change(Sender: TObject);
 begin
-  case ComboBox8.ItemIndex of
-    0:
-      LoadLaunguageFromFile(self, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', false);
-    1:
-      LoadLaunguageFromFile(self, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', false);
-  end;
+  UpdateLaunguage(self);
 end;
 
 procedure TSettingPagesDlg.Button1Click(Sender: TObject);
@@ -806,7 +806,7 @@ begin
 
   try
     OcComPortObj.Open;
-    Result := True;
+    Result := true;
     OcComPortObj.status := 1;
   Except
     // OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
@@ -974,7 +974,7 @@ begin
   if OcComPortObj = nil then
     exit;
   OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil,
-    CheckBox33.Checked, CheckBox34.Checked, CheckBox35.Checked, CheckBox36.Checked, True);
+    CheckBox33.Checked, CheckBox34.Checked, CheckBox35.Checked, CheckBox36.Checked, true);
 
   case CBAlignmentMode.ItemIndex of
     0:
@@ -1025,17 +1025,17 @@ begin
       CodePage := TEncoding.UTF7.CodePage; // 42;
     4:
       begin
-        OcComPortObj.CompatibleUnicode := True;
+        OcComPortObj.CompatibleUnicode := true;
         CodePage := TEncoding.UTF8.CodePage;
       end;
     5:
       begin
-        OcComPortObj.CompatibleUnicode := True;
+        OcComPortObj.CompatibleUnicode := true;
         CodePage := TEncoding.Unicode.CodePage;
       end;
     6:
       begin
-        OcComPortObj.CompatibleUnicode := True;
+        OcComPortObj.CompatibleUnicode := true;
         CodePage := TEncoding.BigEndianUnicode.CodePage;
       end;
   end;
@@ -1050,33 +1050,38 @@ begin
 
 end;
 
+procedure TSettingPagesDlg.UpdateLaunguage(Form: TForm);
+begin
+  /// if CurrentLaunguage <> ComboBox8.ItemIndex then
+  begin
+    case ComboBox8.ItemIndex of
+      0:
+        LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', false);
+      1:
+        LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', false);
+    end;
+    /// CurrentLaunguage := ComboBox8.ItemIndex;
+  end;
+end;
+
 procedure TSettingPagesDlg.LoadOrCreateLaunguageFromFile(Form: TForm; Create: Boolean);
 begin
   if Create then
   begin
+    /// 创建语言文件
     LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', Create);
     LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', Create);
-    exit;
-  end;
-  case SettingPagesDlg.ComboBox8.ItemIndex of
-    0:
-      begin
-        LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_EN.ini', Create);
-      end;
-    1:
-      begin
-        LoadLaunguageFromFile(Form, OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Lang_CN.ini', Create);
-      end;
   end;
 end;
 
-procedure TSettingPagesDlg.LoadLaunguageFromFile(Form: TForm; Path: String; Create: Boolean);
+procedure TSettingPagesDlg.LoadLaunguageFromFile(Form: TForm; const Path: String; Create: Boolean);
 var
   i: Integer;
   tmpComponent: TComponent;
   IniFiles: TIniFile;
   str: String;
-  function getMsgID(str: String): String;
+  SectionName: String;
+  function getMsgID(const str: String): String;
   begin
     Result := 'MESSAGE_' + UpperCase(str);
   end;
@@ -1084,30 +1089,36 @@ var
 begin
   try
     IniFiles := nil;
+    SectionName := UpperCase(Form.Name);
     if (FileExists(Path)) and (not Create) then
     begin
       IniFiles := TIniFile.Create(Path);
+      Form.Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TForm', getMsgID(Form.Name), Form.Caption);
+      /// showmessage(Form.Caption+' '+Path);
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
         tmpComponent := Form.Components[i];
 
-        if tmpComponent is TForm then
-          TForm(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE_TButton', getMsgID(TForm(tmpComponent).Name), TForm(tmpComponent).Caption);
+        /// if tmpComponent is TForm then
+        /// TForm(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TForm', getMsgID(TForm(tmpComponent).Name), TForm(tmpComponent).Caption);
 
         if tmpComponent is TButton then
-          TButton(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name), TButton(tmpComponent).Caption);
+        begin
+          TButton(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name), TButton(tmpComponent).Caption);
+          /// showmessage(TButton(tmpComponent).Caption+' ' +getMsgID(TButton(tmpComponent).Name)+' '+Path);
+        end;
 
         if tmpComponent is TCheckBox then
-          TCheckBox(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE_TCheckBox', getMsgID(TCheckBox(tmpComponent).Name), TCheckBox(tmpComponent).Caption);
+          TCheckBox(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TCheckBox', getMsgID(TCheckBox(tmpComponent).Name), TCheckBox(tmpComponent).Caption);
 
         if tmpComponent is TLabel then
-          TLabel(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE_TLabel', getMsgID(TLabel(tmpComponent).Name), TLabel(tmpComponent).Caption);
+          TLabel(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TLabel', getMsgID(TLabel(tmpComponent).Name), TLabel(tmpComponent).Caption);
 
         if tmpComponent is TMenuItem then
-          TMenuItem(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE_TMenuItem', getMsgID(TMenuItem(tmpComponent).Name), TMenuItem(tmpComponent).Caption);
+          TMenuItem(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TMenuItem', getMsgID(TMenuItem(tmpComponent).Name), TMenuItem(tmpComponent).Caption);
 
         if tmpComponent is TTabSheet then
-          TTabSheet(tmpComponent).Caption := IniFiles.ReadString('LANGUAGE_TTabSheet', getMsgID(TTabSheet(tmpComponent).Name), TTabSheet(tmpComponent).Caption);
+          TTabSheet(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TTabSheet', getMsgID(TTabSheet(tmpComponent).Name), TTabSheet(tmpComponent).Caption);
 
         if tmpComponent is TStringGrid then
         begin
@@ -1119,36 +1130,38 @@ begin
           TStringGrid(tmpComponent).Cells[5, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL5'), TStringGrid(tmpComponent).Cells[5, 0]);
           TStringGrid(tmpComponent).Cells[6, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL6'), TStringGrid(tmpComponent).Cells[6, 0]);
         end;
+        /// application.ProcessMessages;
       End;
     end
     else if (not FileExists(Path)) and (Create) then
-    /// else if (Create) then
+    /// else if (Create) then   /// 创建语言文件
     begin
       IniFiles := TIniFile.Create(Path);
+      IniFiles.WriteString(SectionName + '_LANGUAGE_TForm', getMsgID(Form.Name), Form.Caption);
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
         tmpComponent := Form.Components[i];
 
-        if tmpComponent is TForm then
-          IniFiles.WriteString('LANGUAGE_TButton', getMsgID(TForm(tmpComponent).Name), TForm(tmpComponent).Caption);
+        /// if tmpComponent is TForm then
+        /// IniFiles.WriteString(SectionName + '_LANGUAGE_TForm', getMsgID(TForm(tmpComponent).Name), TForm(tmpComponent).Caption);
 
         if tmpComponent is TButton then
-          IniFiles.WriteString('LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name), TButton(tmpComponent).Caption);
+          IniFiles.WriteString(SectionName + '_LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name), TButton(tmpComponent).Caption);
 
         if tmpComponent is TCheckBox then
-          IniFiles.WriteString('LANGUAGE_TCheckBox', getMsgID(TCheckBox(tmpComponent).Name), TCheckBox(tmpComponent).Caption);
+          IniFiles.WriteString(SectionName + '_LANGUAGE_TCheckBox', getMsgID(TCheckBox(tmpComponent).Name), TCheckBox(tmpComponent).Caption);
 
         if tmpComponent is TLabel then
-          IniFiles.WriteString('LANGUAGE_TLabel', getMsgID(TLabel(tmpComponent).Name), TLabel(tmpComponent).Caption);
+          IniFiles.WriteString(SectionName + '_LANGUAGE_TLabel', getMsgID(TLabel(tmpComponent).Name), TLabel(tmpComponent).Caption);
 
         if tmpComponent is TMenuItem then
         begin
           if TMenuItem(tmpComponent).Caption <> '-' then
-            IniFiles.WriteString('LANGUAGE_TMenuItem', getMsgID(TMenuItem(tmpComponent).Name), TMenuItem(tmpComponent).Caption);
+            IniFiles.WriteString(SectionName + '_LANGUAGE_TMenuItem', getMsgID(TMenuItem(tmpComponent).Name), TMenuItem(tmpComponent).Caption);
         end;
 
         if tmpComponent is TTabSheet then
-          IniFiles.WriteString('LANGUAGE_TTabSheet', getMsgID(TTabSheet(tmpComponent).Name), TTabSheet(tmpComponent).Caption);
+          IniFiles.WriteString(SectionName + '_LANGUAGE_TTabSheet', getMsgID(TTabSheet(tmpComponent).Name), TTabSheet(tmpComponent).Caption);
 
         if tmpComponent is TStringGrid then
         begin
@@ -1160,10 +1173,15 @@ begin
           IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL5'), TStringGrid(tmpComponent).Cells[5, 0]);
           IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL6'), TStringGrid(tmpComponent).Cells[6, 0]);
         end;
-
       End;
+    end
+    else
+    begin
+      /// showmessage('dfdfdfd');
     end;
+
   finally
+
     if IniFiles <> nil then
       IniFiles.Free;
   end;
@@ -1231,7 +1249,7 @@ begin
   end;
   IPFile := IObj as IPersistFile;
   if IPFile.Save(PWideChar(LinkFileName), false) = 0 then
-    Result := True;
+    Result := true;
 end;
 
 procedure AddExplorerContextMenu(const MenuName, PathFileName, FileType: string);
@@ -1246,12 +1264,12 @@ begin
   with TRegistry.Create do
     try
       RootKey := HKEY_CURRENT_USER;
-      if OpenKey('\Software\Classes\*\shell\' + fileName, True) then
+      if OpenKey('\Software\Classes\*\shell\' + fileName, true) then
         WriteString('', MenuName);
-      if OpenKey('\Software\Classes\*\shell\' + fileName + '\command', True) then
+      if OpenKey('\Software\Classes\*\shell\' + fileName + '\command', true) then
         WriteString('', PathFileName + ' "%1"');
 
-      if OpenKey('\Software\Classes\*\shell\' + fileName + '\DefaultIcon', True) then
+      if OpenKey('\Software\Classes\*\shell\' + fileName + '\DefaultIcon', true) then
         WriteString('', icon);
     finally
       Free;

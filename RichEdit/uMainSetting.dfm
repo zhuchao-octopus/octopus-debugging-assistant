@@ -141,7 +141,7 @@ object SettingPagesDlg: TSettingPagesDlg
             object CheckBoxShortcutForExplorer: TCheckBox
               Left = 416
               Top = 8
-              Width = 289
+              Width = 305
               Height = 17
               Caption = 'Add a shortcut menu in System Explorer'
               Checked = True
@@ -157,6 +157,15 @@ object SettingPagesDlg: TSettingPagesDlg
               Checked = True
               State = cbChecked
               TabOrder = 7
+            end
+            object Button7: TButton
+              Left = 416
+              Top = 152
+              Width = 297
+              Height = 34
+              Caption = 'Generate the language translation files '
+              Enabled = False
+              TabOrder = 8
             end
           end
           object Panel23: TPanel
@@ -523,9 +532,9 @@ object SettingPagesDlg: TSettingPagesDlg
             object Label109: TLabel
               Left = 5
               Top = 144
-              Width = 238
+              Width = 234
               Height = 17
-              Caption = ' The alignment mode of hex data  shows'
+              Caption = 'The alignment mode of hex data  shows'
             end
             object Label108: TLabel
               Left = 5

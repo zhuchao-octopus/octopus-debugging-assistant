@@ -66,7 +66,7 @@ object DownloaderFrm: TDownloaderFrm
       object Label6: TLabel
         Left = 24
         Top = 296
-        Width = 617
+        Width = 608
         Height = 17
         Caption = 
           'The old version of the software will not be deleted after upgrad' +

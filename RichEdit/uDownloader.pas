@@ -116,7 +116,7 @@ var
   DownloadObject: TDownloadObject;
   JSONValue: TJSONValue;
   JSONArray: TJSONArray;
-  name, updateFilePath, appVersion: String;
+  name, updateFilePath, appVersion,comments: String;
   DownloadUrl: String;
   I: Integer;
   Thread: TThread;
@@ -155,9 +155,13 @@ begin
         name := (JSONValue as TJsonObject).GetValue('name').ToString;
         appVersion := (JSONValue as TJsonObject).GetValue('appVersion').ToString;
         updateFilePath := (JSONValue as TJsonObject).GetValue('updateFilePath').ToString;
+        comments:= (JSONValue as TJsonObject).GetValue('comments').ToString;
+
         Memo1.Lines.Add('FileName:  ' + name);
         Memo1.Lines.Add('Version :  ' + appVersion);
         Memo1.Lines.Add('FilePath:  ' + updateFilePath);
+        Memo1.Lines.Add('FilePath:  ' + comments);
+
         DownloadUrl := StringReplace(updateFilePath, '"', '', [rfReplaceAll, rfIgnoreCase]);
         DownloadUrl := StringReplace(DownloadUrl, '\', '', [rfReplaceAll, rfIgnoreCase]);
 
