@@ -257,8 +257,8 @@ begin
     SettingPagesDlg := TSettingPagesDlg.Create(nil);
 
   self.CustomTitleBar.Height := 40;
-  if SettingPagesDlg <> nil then
-    Application.Title := APPLICATION_TITLE + SettingPagesDlg.VersionNumberStr;
+  //if SettingPagesDlg <> nil then
+  //  Application.Title := APPLICATION_TITLE + SettingPagesDlg.VersionNumberStr;
 
   self.Caption := Application.Title;
 
@@ -393,8 +393,8 @@ begin
   begin
     OcComPortObj.DebugLog('');
     OcComPortObj.DebugLog('################################################');
-    OcComPortObj.DebugLog(APPLICATION_TITLE + SettingPagesDlg.VersionNumberStr);
-    OcComPortObj.DebugLog('Home Page :' + WEB_SITE + ' ');
+    //OcComPortObj.DebugLog(APPLICATION_TITLE + SettingPagesDlg.VersionNumberStr);
+    //OcComPortObj.DebugLog('Home Page :' + WEB_SITE + ' ');
     OcComPortObj.DebugLog('Function  :' + 'ESC¡¢F1¡¢F2¡¢F3');
     OcComPortObj.DebugLog('################################################');
     //OcComPortObj.DebugLog(OcComPortObj.OcComPortObjPara.ComportFullName);

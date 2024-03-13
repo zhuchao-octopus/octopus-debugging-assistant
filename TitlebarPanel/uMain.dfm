@@ -34,7 +34,6 @@ object FrmMain: TFrmMain
   StyleElements = [seFont, seClient]
   OnCreate = FormCreate
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 21
   object TitleBarPanel1: TTitleBarPanel
     AlignWithMargins = True
@@ -85,8 +84,7 @@ object FrmMain: TFrmMain
         Color = clMenuBar
         ColorMap.DisabledFontColor = 10461087
         ColorMap.HighlightColor = clWhite
-        ColorMap.BtnSelectedFont = clWhite
-        ColorMap.SelectedFontColor = clWhite
+        ColorMap.BtnSelectedFont = clBlack
         ColorMap.UnusedColor = clWhite
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -249,6 +247,8 @@ object FrmMain: TFrmMain
         Top = 0
         HelpContext = 1
         Caption = #22270#24418
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
@@ -313,6 +313,8 @@ object FrmMain: TFrmMain
         Top = 0
         HelpContext = 2
         Caption = #24110#21161
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object WebBrowser1: TWebBrowser
           Left = 136
           Top = 104

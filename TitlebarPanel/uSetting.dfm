@@ -14,7 +14,6 @@ object SettingPagesDlg: TSettingPagesDlg
   Font.Style = []
   Position = poScreenCenter
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 17
   object Panel1: TPanel
     Left = 0
@@ -26,6 +25,8 @@ object SettingPagesDlg: TSettingPagesDlg
     BorderWidth = 5
     ParentColor = True
     TabOrder = 0
+    ExplicitWidth = 866
+    ExplicitHeight = 408
     object PageControl1: TPageControl
       Left = 5
       Top = 5
@@ -34,6 +35,8 @@ object SettingPagesDlg: TSettingPagesDlg
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 856
+      ExplicitHeight = 398
       object TabSheet1: TTabSheet
         Caption = #20018#21475#35774#32622
         object Panel19: TPanel
@@ -435,6 +438,8 @@ object SettingPagesDlg: TSettingPagesDlg
     BevelOuter = bvNone
     ParentColor = True
     TabOrder = 1
+    ExplicitTop = 408
+    ExplicitWidth = 866
     object OKBtn: TButton
       Left = 594
       Top = 1

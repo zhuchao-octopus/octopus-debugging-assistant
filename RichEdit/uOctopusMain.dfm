@@ -17,7 +17,6 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
   OnCreate = FormCreate
   OnResize = FormResize
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 17
   object Splitter1: TSplitter
     Left = 772
@@ -46,6 +45,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     TabOrder = 0
     Transparent = False
     Wrapable = False
+    ExplicitWidth = 1201
     object FileNewButton: TToolButton
       Left = 4
       Top = 0
@@ -122,7 +122,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object FontSize: TEdit
       Left = 385
       Top = 0
-      Width = 58
+      Width = 186
       Height = 25
       Hint = 'Font Size|Select font size'
       NumbersOnly = True
@@ -131,7 +131,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnChange = FontSizeChange
     end
     object UpDown1: TUpDown
-      Left = 443
+      Left = 571
       Top = 0
       Width = 16
       Height = 25
@@ -140,37 +140,37 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       TabOrder = 2
     end
     object BoldButton: TToolButton
-      Left = 475
+      Left = 587
       Top = 0
       Action = FormatRichEditBoldCmd
       Style = tbsCheck
     end
     object ItalicButton: TToolButton
-      Left = 498
+      Left = 610
       Top = 0
       Action = FormatRichEditItalicCmd
       Style = tbsCheck
     end
     object UnderlineButton: TToolButton
-      Left = 521
+      Left = 633
       Top = 0
       Action = FormatRichEditUnderlineCmd
       Style = tbsCheck
     end
     object StrikeoutButton: TToolButton
-      Left = 544
+      Left = 656
       Top = 0
       Action = FormatRichEditStrikeOutCmd
     end
     object ToolButton1: TToolButton
-      Left = 567
+      Left = 679
       Top = 0
       Width = 8
       ImageIndex = 12
       Style = tbsDivider
     end
     object LeftAlign: TToolButton
-      Left = 575
+      Left = 687
       Top = 0
       Action = FormatRichEditAlignLeftCmd
       Grouped = True
@@ -178,7 +178,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     end
     object CenterAlign: TToolButton
       Tag = 2
-      Left = 598
+      Left = 710
       Top = 0
       Action = FormatRichEditAlignCenterCmd
       Grouped = True
@@ -186,27 +186,27 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     end
     object RightAlign: TToolButton
       Tag = 1
-      Left = 621
+      Left = 733
       Top = 0
       Action = FormatRichEditAlignRightCmd
       Grouped = True
       Style = tbsCheck
     end
     object ToolButton2: TToolButton
-      Left = 644
+      Left = 756
       Top = 0
       Width = 8
       ImageIndex = 15
       Style = tbsDivider
     end
     object BulletsButton: TToolButton
-      Left = 652
+      Left = 764
       Top = 0
       Action = FormatRichEditBulletsCmd
       Style = tbsCheck
     end
     object ToolButton4: TToolButton
-      Left = 675
+      Left = 787
       Top = 0
       Width = 8
       Caption = 'ToolButton4'
@@ -214,17 +214,17 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object SupersciptButton: TToolButton
-      Left = 683
+      Left = 795
       Top = 0
       Action = SuperscriptCmd
     end
     object SubscriptButton: TToolButton
-      Left = 706
+      Left = 818
       Top = 0
       Action = SubscriptCmd
     end
     object ToolButton3: TToolButton
-      Left = 729
+      Left = 841
       Top = 0
       Width = 8
       Caption = 'ToolButton3'
@@ -232,7 +232,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object FGColorBox: TColorBox
-      Left = 737
+      Left = 849
       Top = 0
       Width = 180
       Height = 25
@@ -244,7 +244,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnChange = FGColorBoxChange
     end
     object ToolButton6: TToolButton
-      Left = 917
+      Left = 1029
       Top = 0
       Width = 8
       Caption = 'ToolButton6'
@@ -252,7 +252,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object BGColorBox: TColorBox
-      Left = 925
+      Left = 1037
       Top = 0
       Width = 180
       Height = 25
@@ -343,24 +343,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       ImageIndex = 24
       Style = tbsSeparator
     end
-    object ToolButton12: TToolButton
-      Left = 447
-      Top = 0
-      Hint = 'Clear content'
-      Caption = ' ToolButton12 '
-      ImageIndex = 23
-      OnClick = ToolButton12Click
-    end
-    object ToolButton17: TToolButton
-      Left = 470
-      Top = 0
-      Width = 8
-      Caption = 'ToolButton17'
-      ImageIndex = 30
-      Style = tbsSeparator
-    end
     object ToolButton16: TToolButton
-      Left = 478
+      Left = 447
       Top = 0
       Hint = 'Settings of device'
       Caption = 'ToolButton16'
@@ -368,7 +352,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnClick = ToolButton16Click
     end
     object ToolButton18: TToolButton
-      Left = 501
+      Left = 470
       Top = 0
       Width = 8
       Caption = 'ToolButton18'
@@ -376,7 +360,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object ToolButton13: TToolButton
-      Left = 509
+      Left = 478
       Top = 0
       Hint = 'Close and remove current page'
       Caption = '&Close'
@@ -384,7 +368,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnClick = ToolButton13Click
     end
     object ToolButton14: TToolButton
-      Left = 532
+      Left = 501
       Top = 0
       Width = 8
       Caption = 'ToolButton14'
@@ -392,12 +376,28 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object ToolButton19: TToolButton
-      Left = 540
+      Left = 509
       Top = 0
       Hint = 'Quick terminal '
       Caption = 'ToolButton19'
       ImageIndex = 30
       OnClick = ToolButton19Click
+    end
+    object ToolButton17: TToolButton
+      Left = 532
+      Top = 0
+      Width = 8
+      Caption = 'ToolButton17'
+      ImageIndex = 30
+      Style = tbsSeparator
+    end
+    object ToolButton12: TToolButton
+      Left = 540
+      Top = 0
+      Hint = 'Clear content'
+      Caption = ' ToolButton12 '
+      ImageIndex = 23
+      OnClick = ToolButton12Click
     end
   end
   object Panel1: TPanel
@@ -409,7 +409,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     BevelOuter = bvNone
     TabOrder = 2
     ExplicitTop = 63
-    ExplicitHeight = 534
+    ExplicitWidth = 768
+    ExplicitHeight = 533
     object PageControl1: TPageControl
       Left = 0
       Top = 0
@@ -421,7 +422,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       TabOrder = 0
       TabPosition = tpBottom
       OnChange = PageControl1Change
-      ExplicitHeight = 534
+      ExplicitWidth = 768
+      ExplicitHeight = 533
     end
   end
   object SV_R: TSplitView
@@ -436,8 +438,9 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     TabOrder = 3
     OnClosed = SV_RClosed
     OnOpened = SV_ROpened
+    ExplicitLeft = 771
     ExplicitTop = 63
-    ExplicitHeight = 534
+    ExplicitHeight = 533
     object PageControl2: TPageControl
       Left = 0
       Top = 0
@@ -449,7 +452,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       TabOrder = 0
       TabPosition = tpBottom
       OnChange = PageControl2Change
-      ExplicitHeight = 534
+      ExplicitHeight = 533
       object TabSheet_SendingData: TTabSheet
         AlignWithMargins = True
         Margins.Left = 0
@@ -616,7 +619,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
           BevelOuter = bvNone
           ParentBackground = False
           TabOrder = 0
-          ExplicitHeight = 494
+          ExplicitHeight = 493
           object StringGrid1: TStringGrid
             Left = 0
             Top = 0
@@ -650,7 +653,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
             OnMouseWheelDown = StringGrid1MouseWheelDown
             OnMouseWheelUp = StringGrid1MouseWheelUp
             OnSelectCell = StringGrid1SelectCell
-            ExplicitHeight = 454
+            ExplicitHeight = 453
             ColWidths = (
               50
               33
@@ -1671,7 +1674,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
             ParentBackground = False
             ParentColor = True
             TabOrder = 1
-            ExplicitTop = 454
+            ExplicitTop = 453
             object Button201: TButton
               Left = 102
               Top = 3
@@ -1879,6 +1882,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
+    ExplicitTop = 598
+    ExplicitWidth = 1195
     object StatusBar1: TStatusBar
       Left = 0
       Top = 0
@@ -1900,6 +1905,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       ParentFont = True
       UseSystemFont = False
       OnMouseEnter = StatusBar1MouseEnter
+      ExplicitWidth = 1195
     end
   end
   object MainMenu: TMainMenu

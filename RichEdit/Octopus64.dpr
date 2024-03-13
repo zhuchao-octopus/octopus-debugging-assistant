@@ -46,7 +46,10 @@ uses
   uCommand in 'uCommand.pas' {CommandFrm},
   uDownloadsManager in 'uDownloadsManager.pas',
   uDownloader in 'uDownloader.pas' {DownloaderFrm},
-  uPageSetup in 'uPageSetup.pas' {PageSetupFrm};
+  uPageSetup in 'uPageSetup.pas' {PageSetupFrm},
+  NetInterface in '..\..\ZSBWM\PUBLIC\NetInterface.pas',
+  uANNDataSetting in '..\..\ZSBWM\SCREEN\uANNDataSetting.pas' {ANNDataSettingFrm},
+  CRC in '..\..\ZSBWM\PUBLIC\CRC.pas';
 
 {$R *.res}
 
@@ -65,5 +68,6 @@ begin
   Application.CreateForm(TCommandFrm, CommandFrm);
   Application.CreateForm(TDownloaderFrm, DownloaderFrm);
   Application.CreateForm(TPageSetupFrm, PageSetupFrm);
+  Application.CreateForm(TANNDataSettingFrm, ANNDataSettingFrm);
   Application.Run;
 end.

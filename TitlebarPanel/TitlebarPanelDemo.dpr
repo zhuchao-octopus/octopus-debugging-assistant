@@ -25,7 +25,8 @@ uses
   DockExceptions in 'DockForm\DockExceptions.pas',
   IntfDockable in 'DockForm\IntfDockable.pas',
   uDockableControllerPanel in 'uDockableControllerPanel.pas' {FrmDockableController},
-  uOctopusFunction in '..\uOctopusFunction.pas';
+  uOctopusFunction in '..\uOctopusFunction.pas',
+  CRC in '..\CRC.pas';
 
 {$R *.res}
 

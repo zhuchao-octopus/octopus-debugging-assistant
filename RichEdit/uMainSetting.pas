@@ -29,7 +29,7 @@ uses
   OcComPortObj;
 
 type
-  TSettingChangedCallBackFuntion = Procedure(Obj: TObject) of object;
+  TSettingChangedCallBackFuntion = Procedure(Obj: TObject;Action:integer) of object;
 
   TSettingPagesDlg = class(TForm)
     Panel1: TPanel;
@@ -101,6 +101,7 @@ type
     UpDown3: TUpDown;
     PanelInternalCacheContainner: TPanel;
     Button7: TButton;
+    CheckboxProcessDataBackground: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure ComboBoxEx1Change(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -362,11 +363,12 @@ begin
 
     if (OcComPortObj <> nil) and (ActionType = DBT_DEVICEREMOVECOMPLETE) then
     begin
+      OcComPortObj.DebugLog(OcComPortObj.ComPortFullName+' has been removed from the system!');
       if OcComPortObj.Connected then
         CloseDevice(OcComPortObj);
-      /// 关闭移除的设备
-      if Assigned(SettingChangedCallBackFuntion) then
-        SettingChangedCallBackFuntion(OcComPortObj);
+        ///if Assigned(SettingChangedCallBackFuntion) then
+        ///  SettingChangedCallBackFuntion(OcComPortObj,DBT_DEVICEREMOVECOMPLETE);
+        /// 关闭移除的设备
     end;
 
     /// 更新设备列表
@@ -378,6 +380,7 @@ begin
     begin
 
       if ComboBoxEx1.Items.IndexOf(DevideNameList.Strings[i]) < 0 then
+      /// 只增加不删除,增加到内部列表
       begin
         ComboBoxEx1.ItemsEx.AddItem(DevideNameList.Strings[i], imageId, imageId, imageId, -1, nil);
         ComboBoxEx1.ItemsEx.Items[i].ImageIndex := imageId;
@@ -393,11 +396,26 @@ begin
         OcComPortObj.LoadSettings(stIniFile, S);
         LoadDeviceSetting(OcComPortObj);
       end;
+
+    end;
+
+    for i := 0 to OcComPortDeviceList.Count - 1 do
+    begin
+         if (DevideNameList.IndexOf(OcComPortDeviceList.Strings[i])) < 0 then
+         OcComPortDeviceList.Delete(i);
+    end;
+
+    for i := 0 to ComboBoxEx1.GetCount - 1 do
+    begin
+         if (DevideNameList.IndexOf(ComboBoxEx1.Items[i])) < 0 then
+             ComboBoxEx1.Items.Delete(i);
     end;
 
     OcComPortDeviceList.EndUpdate;
     ComboBoxEx1.ItemsEx.EndUpdate;
-
+    ///回调UI层
+    if Assigned(SettingChangedCallBackFuntion) then
+        SettingChangedCallBackFuntion(nil,0);
   finally
     DevideNameList.Free;
   end;
@@ -643,6 +661,8 @@ begin
 
   if CheckBoxDesktopShortcutMenu.Checked then
     CreateShortcut(Application.Exename, OCTOPUS_SYSTEM_DESKTOP_SHORTCUT_NAME);
+
+  Close();
 end;
 
 procedure TSettingPagesDlg.Button3Click(Sender: TObject);
@@ -805,16 +825,24 @@ var
 begin
   Result := false;
   if OcComPortObj = nil then
+  begin
+    OcComPortObj.DebugLog('Open ' + OcComPortObj.ComportFullName+' failed the device do not exists!');
     exit;
+  end;
   if OcComPortObj.Connected then
     exit;
 
   try
+    ApplyOcComPortObjAtrribute(OcComPortObj);
+    ApplyCodePageSetting(OcComPortObj);
+    SaveDeviceSetting(self.getCurrentDevice);
+    Timer1.Enabled := CheckBox8.Checked;
+
     OcComPortObj.Open;
     Result := true;
     OcComPortObj.status := 1;
   Except
-    // OcComPortObj.Log('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    OcComPortObj.DebugLog('Open ' + OcComPortObj.ComportFullName+' failed the device may be in using!');
     Result := false;
     OcComPortObj.status := 1;
     // MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
@@ -880,6 +908,7 @@ begin
     Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox34.Name), CheckBox34.Checked);
     Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox35.Name), CheckBox35.Checked);
     Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox36.Name), CheckBox36.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckboxProcessDataBackground.Name), CheckboxProcessDataBackground.Checked);
 
     Octopusini.WriteString('Configuration', 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
     Octopusini.WriteInteger('Configuration', 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
@@ -920,6 +949,8 @@ begin
     ComboBox6.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
     ComboBox7.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
 
+    CheckboxProcessDataBackground.Checked:=  Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckboxProcessDataBackground.Name), true);
+
     FontDialogConsole.Font.Charset := TFontCharset(DEFAULT_CHARSET);
     FontDialogConsole.Font.Name := Octopusini.ReadString(OcComPortObj.ComportFullName, 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
     FontDialogConsole.Font.Size := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
@@ -942,6 +973,8 @@ begin
     OcComPortObj.ShowDate := CheckBox34.Checked;
     OcComPortObj.ShowLineNumber := CheckBox35.Checked;
     OcComPortObj.ShowSendedLog := CheckBox36.Checked;
+
+
   finally
     Octopusini.Free;
   end;
@@ -980,6 +1013,8 @@ begin
     exit;
   OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil,
     CheckBox33.Checked, CheckBox34.Checked, CheckBox35.Checked, CheckBox36.Checked, true);
+
+  OcComPortObj.BackgroundTaskMode:= CheckboxProcessDataBackground.Checked;
 
   case CBAlignmentMode.ItemIndex of
     0:

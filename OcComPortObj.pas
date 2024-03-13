@@ -116,6 +116,7 @@ type
     FNeedNewLine: Boolean;
     FLogScrollMode: Boolean;
     FMouseTextSelection: Boolean;
+    FBackgroundTaskMode:Boolean;
     // function GetConfiguration(): TOcComPortObjPara;
     function GetLineNumberDateTimeStamp(N: Int64): String;
     function SaveToTheExcelFile(Length: integer; Rows: integer): integer;
@@ -180,6 +181,7 @@ type
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode default True;
     // property BaudRateIndex: integer read FBaudRateIndex write FBaudRateIndex;
     property MouseTextSelection: Boolean read FMouseTextSelection write FMouseTextSelection;
+    property BackgroundTaskMode:boolean read FBackgroundTaskMode write FBackgroundTaskMode default true;
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
     property ComportFullName: String read FComportFullName write FComportFullName;
 
@@ -1449,7 +1451,7 @@ var
 Label FUNCTION_END;
   function isBackHandlerMode(): Boolean;
   begin
-    Result := (FMouseTextSelection) or (FShowLineNumber or FShowDate or FShowTime);
+    Result := (FMouseTextSelection) or (FShowLineNumber or FShowDate or FShowTime) or FBackgroundTaskMode;
   end;
 
 // FMouseTextSelection 后台缓存前台复制考本等
@@ -1487,7 +1489,9 @@ begin
     end;
 
     if (not isBackHandlerMode()) and (StringInternelCache.Lines.Count <= 0) then
-      FComUIHandleThread.Suspended := True // 挂起后台线程任务
+    begin
+      FComUIHandleThread.Suspended := True; // 挂起后台线程任务
+    end
     else if isBackHandlerMode() or (not FComUIHandleThread.Suspended) or (StringInternelCache.Lines.Count > 0) then // 后台工作模式
     begin
       CachedString(FComReceiveString);

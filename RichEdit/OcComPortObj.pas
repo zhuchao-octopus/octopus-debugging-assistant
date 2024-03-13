@@ -117,6 +117,7 @@ type
     FNeedNewLine: Boolean;
     FLogScrollMode: Boolean;
     FMouseTextSelection: Boolean;
+    FBackgroundTaskMode:Boolean;
     // function GetConfiguration(): TOcComPortObjPara;
     function GetLineNumberDateTimeStamp(N: Int64): String;
     function SaveToTheExcelFile(Length: integer; Rows: integer): integer;
@@ -185,6 +186,7 @@ type
     property ShowTime: Boolean read FShowTime write FShowTime;
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode default True;
     property MouseTextSelection: Boolean read FMouseTextSelection write FMouseTextSelection;
+    property BackgroundTaskMode:boolean read FBackgroundTaskMode write FBackgroundTaskMode default true;
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
     property ComPortFullName: String read FComPortFullName write FComPortFullName;
 
@@ -1506,7 +1508,7 @@ var
 Label FUNCTION_END;
   function isBackHandlerMode(): Boolean;
   begin
-    Result := (FMouseTextSelection) or (FShowLineNumber or FShowDate or FShowTime);
+    Result := (FMouseTextSelection) or (FShowLineNumber or FShowDate or FShowTime) or FBackgroundTaskMode;
   end;
 
 // FMouseTextSelection 后台缓存前台复制考本等

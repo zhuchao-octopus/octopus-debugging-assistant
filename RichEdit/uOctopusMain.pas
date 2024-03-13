@@ -447,7 +447,7 @@ type
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
     Procedure SystemMessage_WMMenuSelect(var Msg: TWMMenuSelect); message WM_SysCommand;
     procedure OcComPortObjCallBack(Count: Integer);
-    Procedure SettingChangedCallBackFuntion(Obj: TObject);
+    Procedure SettingChangedCallBackFuntion(Obj: TObject;Action:integer);
     procedure EventCallBackFuntion(Obj: TObject);
   end;
 
@@ -1198,10 +1198,24 @@ begin
     if MessageDlg(Format(sOverWrite, [FileSaveAsCmd.Dialog.FileName]), mtConfirmation, mbYesNoCancel, 0) <> idYes then
       exit;
 
+  FileNameNoExt := ExtractFileExt(FileSaveAsCmd.Dialog.FileName);
+  if FileNameNoExt = '' then
+  begin
+     case FileSaveAsCmd.Dialog.FilterIndex of
+         1:  FileSaveAsCmd.Dialog.FileName:=FileSaveAsCmd.Dialog.FileName +  '.rtf';
+         2:  FileSaveAsCmd.Dialog.FileName:=FileSaveAsCmd.Dialog.FileName +  '.txt';
+         3:  FileSaveAsCmd.Dialog.FileName:=FileSaveAsCmd.Dialog.FileName +  '.log';
+         else
+           FileSaveAsCmd.Dialog.FileName:=FileSaveAsCmd.Dialog.FileName +  '.txt';
+     end;
+
+  end;
+
   SaveLog(tmpComponent, FileSaveAsCmd.Dialog.FileName);
   SetPathFileName(FileSaveAsCmd.Dialog.FileName);
-  FileNameNoExt := ExtractFileName(FileSaveAsCmd.Dialog.FileName);
-  PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
+
+  if tmpComponent is TMyRichEdit then
+    PageControl1.SetPageName(FileNameNoExt, PageControl1.ActivePageIndex);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FilePrintAccept(Sender: TObject);
@@ -2309,7 +2323,8 @@ begin
     begin
       ComboBox1.OnChange(Self);
       ComboBox2.OnChange(Self);
-      SettingPagesDlg.openDevice(OcComPortObj);
+      GetAndOpenADevices(OcComPortObj,true);
+      //SettingPagesDlg.openDevice(OcComPortObj);
       ToggleSwitchDeviceOnOff.ThumbColor := clRed;
     end
     else
@@ -2333,6 +2348,7 @@ begin
   begin
     ToggleSwitchDeviceOnOff.State := tssOff;
     ToggleSwitchDeviceOnOff.ThumbColor := clWindowText;
+    ///MessageBox(Handle, 'This device does not exist or has been removed from the system!', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
   end;
 end;
 
@@ -2940,7 +2956,6 @@ var
   MenuItem: TMenuItem;
   OcComPortObj: TOcComPortObj;
 begin
-
   if ParentMenu.Count <> SettingPagesDlg.ComboBoxEx1.Items.Count then
   begin
     ParentMenu.Clear;
@@ -3146,9 +3161,10 @@ begin
   StatusBarPrintFileSize();
 end;
 
-Procedure TMainOctopusDebuggingDevelopmentForm.SettingChangedCallBackFuntion(Obj: TObject);
+Procedure TMainOctopusDebuggingDevelopmentForm.SettingChangedCallBackFuntion(Obj: TObject;Action:integer);
 begin
   UpdateUartToolBar();
+  InitUartsMenu(COMMenu, COM1MenuItemOnClick);
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.EventCallBackFuntion(Obj: TObject);

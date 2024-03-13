@@ -16,7 +16,6 @@ object SettingPagesDlg: TSettingPagesDlg
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 17
   object Panel1: TPanel
     Left = 0
@@ -28,6 +27,8 @@ object SettingPagesDlg: TSettingPagesDlg
     BorderWidth = 5
     ParentColor = True
     TabOrder = 0
+    ExplicitWidth = 1096
+    ExplicitHeight = 592
     object PageControl1: TPageControl
       AlignWithMargins = True
       Left = 8
@@ -37,6 +38,8 @@ object SettingPagesDlg: TSettingPagesDlg
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 1080
+      ExplicitHeight = 576
       object TabSheet1: TTabSheet
         Caption = 'Serial Port Settings'
         object Panel6: TPanel
@@ -47,6 +50,8 @@ object SettingPagesDlg: TSettingPagesDlg
           Align = alRight
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitLeft = 322
+          ExplicitHeight = 544
           object Panel11: TPanel
             AlignWithMargins = True
             Left = 5
@@ -196,7 +201,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object Label115: TLabel
               Left = 8
-              Top = 144
+              Top = 139
               Width = 365
               Height = 17
               Caption = 
@@ -204,7 +209,7 @@ object SettingPagesDlg: TSettingPagesDlg
                 'p'
             end
             object Edit1: TEdit
-              Left = 384
+              Left = 416
               Top = 27
               Width = 90
               Height = 25
@@ -214,7 +219,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Text = '238'
             end
             object UpDown1: TUpDown
-              Left = 474
+              Left = 506
               Top = 27
               Width = 16
               Height = 25
@@ -225,7 +230,7 @@ object SettingPagesDlg: TSettingPagesDlg
               TabOrder = 1
             end
             object UpDown2: TUpDown
-              Left = 474
+              Left = 506
               Top = 78
               Width = 16
               Height = 25
@@ -237,7 +242,7 @@ object SettingPagesDlg: TSettingPagesDlg
               OnChanging = UpDown2Changing
             end
             object Edit2: TEdit
-              Left = 384
+              Left = 416
               Top = 78
               Width = 90
               Height = 25
@@ -267,7 +272,7 @@ object SettingPagesDlg: TSettingPagesDlg
             end
             object CheckBox2: TCheckBox
               Left = 8
-              Top = 116
+              Top = 114
               Width = 535
               Height = 20
               Caption = 
@@ -276,7 +281,7 @@ object SettingPagesDlg: TSettingPagesDlg
               TabOrder = 6
             end
             object Edit3: TEdit
-              Left = 384
+              Left = 416
               Top = 136
               Width = 90
               Height = 25
@@ -285,7 +290,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Text = '0'
             end
             object UpDown3: TUpDown
-              Left = 474
+              Left = 506
               Top = 136
               Width = 16
               Height = 25
@@ -328,7 +333,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 64
               Width = 423
               Height = 20
-              Caption = 'Display the line numbers in the editor'
+              Caption = 'Displays the line number in the editor'
               TabOrder = 2
             end
             object CheckBox36: TCheckBox
@@ -336,8 +341,18 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 91
               Width = 423
               Height = 20
-              Caption = 'Display the data being sent by the serial port'
+              Caption = 'Displays the data that is being transferred'
               TabOrder = 3
+            end
+            object CheckboxProcessDataBackground: TCheckBox
+              Left = 416
+              Top = 90
+              Width = 257
+              Height = 17
+              Caption = 'Process the data in the background'
+              Checked = True
+              State = cbChecked
+              TabOrder = 4
             end
           end
         end
@@ -349,6 +364,7 @@ object SettingPagesDlg: TSettingPagesDlg
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 1
+          ExplicitHeight = 544
           object Panel3: TPanel
             AlignWithMargins = True
             Left = 6
@@ -626,6 +642,8 @@ object SettingPagesDlg: TSettingPagesDlg
     BevelOuter = bvNone
     ParentColor = True
     TabOrder = 1
+    ExplicitTop = 592
+    ExplicitWidth = 1096
     object Button1: TButton
       Left = 911
       Top = 0

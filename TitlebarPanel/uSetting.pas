@@ -352,13 +352,13 @@ begin
   OctopusCfgDir := ExtractFilePath(Application.Exename) + '\';
 
   SetCurrentDir(OctopusCfgDir);
-  OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR + GetSystemDateTimeStampStr();
-  if not DirectoryExists(OctopusCfgDir) then
-    CreateDir(OctopusCfgDir);
-  if not DirectoryExists(OctopusCfgDir + CONFIGURATION_DIR) then
-    CreateDir(OctopusCfgDir + CONFIGURATION_DIR);
-  if not DirectoryExists(OctopusCfgDir + LOG_DIR) then
-    CreateDir(OctopusCfgDir + LOG_DIR);
+  //OctopusCfgDir_LogFileName := OctopusCfgDir + LOG_DIR + GetSystemDateTimeStampStr();
+  //if not DirectoryExists(OctopusCfgDir) then
+  //  CreateDir(OctopusCfgDir);
+  //if not DirectoryExists(OctopusCfgDir + CONFIGURATION_DIR) then
+  //  CreateDir(OctopusCfgDir + CONFIGURATION_DIR);
+  //if not DirectoryExists(OctopusCfgDir + LOG_DIR) then
+  //  CreateDir(OctopusCfgDir + LOG_DIR);
 
   VersionNumberStr := GetBuildInfo(Application.Exename);
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
@@ -641,11 +641,11 @@ begin
   OcComPortObj.SaveLog(OctopusCfgDir_LogFileName + '_' + OcComPortObj.Port + '.log'); // 打开的时候创建日志文件
   OcComPortObj.LogMemo.ReadOnly := True;
   OcComPortObj.Log('################################################');
-  OcComPortObj.Log(APPLICATION_TITLE + VersionNumberStr);
+  //OcComPortObj.Log(APPLICATION_TITLE + VersionNumberStr);
   // OcComPortObj.Log(VERSIONNAME); // 'Version  :2.00'
-  OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
-  OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
-  OcComPortObj.Log('################################################');
+  //OcComPortObj.Log('Home Page :' + WEB_SITE + ' ');
+  //OcComPortObj.Log('Function  :' + 'ESC、F1、F2、F3');
+  //OcComPortObj.Log('################################################');
   //OcComPortObj.Log(OcComPortObj.OcComPortObjPara.ComportFullName);
   OcComPortObj.Log('');
 end;
@@ -750,7 +750,7 @@ begin
   Octopusini := nil;
   if not DirectoryExists(OctopusCfgDir) then
     exit;
-  S := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  //S := OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
   if (not FileExists(S)) then
     exit;
   try

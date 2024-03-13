@@ -2,8 +2,8 @@ object FrmDockableController: TFrmDockableController
   Left = 0
   Top = 0
   Caption = 'FrmDockableController'
-  ClientHeight = 545
-  ClientWidth = 840
+  ClientHeight = 544
+  ClientWidth = 836
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -15,17 +15,18 @@ object FrmDockableController: TFrmDockableController
   OnCreate = FormCreate
   OnResize = FormResize
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 17
   object Panel6: TPanel
     Left = 0
     Top = 0
-    Width = 840
-    Height = 545
+    Width = 836
+    Height = 544
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel6'
     TabOrder = 0
+    ExplicitWidth = 840
+    ExplicitHeight = 545
     object Notebook3: TNotebook
       Left = 0
       Top = 0
@@ -504,8 +505,8 @@ object FrmDockableController: TFrmDockableController
     end
     object TabSet3: TTabSet
       Left = 0
-      Top = 515
-      Width = 840
+      Top = 514
+      Width = 836
       Height = 30
       Align = alBottom
       Font.Charset = DEFAULT_CHARSET
@@ -522,6 +523,8 @@ object FrmDockableController: TFrmDockableController
         #35774#32622)
       TabIndex = 0
       OnChange = TabSet3Change
+      ExplicitTop = 515
+      ExplicitWidth = 840
     end
   end
   object ApplicationEvents1: TApplicationEvents

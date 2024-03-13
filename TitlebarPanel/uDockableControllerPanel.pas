@@ -455,7 +455,7 @@ var
 begin
   if SettingPagesDlg = nil then
     Exit;
-  s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  //s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
   try
     Octopusini := TIniFile.Create(s);
     for i := 1 to StringGrid1.RowCount - 1 do
@@ -477,7 +477,7 @@ begin
   if SettingPagesDlg = nil then
     Exit;
 
-  s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
+  //s := SettingPagesDlg.OctopusCfgDir + CONFIGURATION_DIR + 'Octopus.ini';
   try
     Octopusini := TIniFile.Create(s);
     for i := 1 to StringGrid1.RowCount - 1 do
