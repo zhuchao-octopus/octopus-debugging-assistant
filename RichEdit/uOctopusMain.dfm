@@ -122,7 +122,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     object FontSize: TEdit
       Left = 385
       Top = 0
-      Width = 186
+      Width = 234
       Height = 25
       Hint = 'Font Size|Select font size'
       NumbersOnly = True
@@ -131,7 +131,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnChange = FontSizeChange
     end
     object UpDown1: TUpDown
-      Left = 571
+      Left = 619
       Top = 0
       Width = 16
       Height = 25
@@ -140,37 +140,37 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       TabOrder = 2
     end
     object BoldButton: TToolButton
-      Left = 587
+      Left = 635
       Top = 0
       Action = FormatRichEditBoldCmd
       Style = tbsCheck
     end
     object ItalicButton: TToolButton
-      Left = 610
+      Left = 658
       Top = 0
       Action = FormatRichEditItalicCmd
       Style = tbsCheck
     end
     object UnderlineButton: TToolButton
-      Left = 633
+      Left = 681
       Top = 0
       Action = FormatRichEditUnderlineCmd
       Style = tbsCheck
     end
     object StrikeoutButton: TToolButton
-      Left = 656
+      Left = 704
       Top = 0
       Action = FormatRichEditStrikeOutCmd
     end
     object ToolButton1: TToolButton
-      Left = 679
+      Left = 727
       Top = 0
       Width = 8
       ImageIndex = 12
       Style = tbsDivider
     end
     object LeftAlign: TToolButton
-      Left = 687
+      Left = 735
       Top = 0
       Action = FormatRichEditAlignLeftCmd
       Grouped = True
@@ -178,7 +178,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     end
     object CenterAlign: TToolButton
       Tag = 2
-      Left = 710
+      Left = 758
       Top = 0
       Action = FormatRichEditAlignCenterCmd
       Grouped = True
@@ -186,27 +186,27 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
     end
     object RightAlign: TToolButton
       Tag = 1
-      Left = 733
+      Left = 781
       Top = 0
       Action = FormatRichEditAlignRightCmd
       Grouped = True
       Style = tbsCheck
     end
     object ToolButton2: TToolButton
-      Left = 756
+      Left = 804
       Top = 0
       Width = 8
       ImageIndex = 15
       Style = tbsDivider
     end
     object BulletsButton: TToolButton
-      Left = 764
+      Left = 812
       Top = 0
       Action = FormatRichEditBulletsCmd
       Style = tbsCheck
     end
     object ToolButton4: TToolButton
-      Left = 787
+      Left = 835
       Top = 0
       Width = 8
       Caption = 'ToolButton4'
@@ -214,17 +214,17 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object SupersciptButton: TToolButton
-      Left = 795
+      Left = 843
       Top = 0
       Action = SuperscriptCmd
     end
     object SubscriptButton: TToolButton
-      Left = 818
+      Left = 866
       Top = 0
       Action = SubscriptCmd
     end
     object ToolButton3: TToolButton
-      Left = 841
+      Left = 889
       Top = 0
       Width = 8
       Caption = 'ToolButton3'
@@ -232,7 +232,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object FGColorBox: TColorBox
-      Left = 849
+      Left = 897
       Top = 0
       Width = 180
       Height = 25
@@ -244,7 +244,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       OnChange = FGColorBoxChange
     end
     object ToolButton6: TToolButton
-      Left = 1029
+      Left = 1077
       Top = 0
       Width = 8
       Caption = 'ToolButton6'
@@ -252,7 +252,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Style = tbsSeparator
     end
     object BGColorBox: TColorBox
-      Left = 1037
+      Left = 1085
       Top = 0
       Width = 180
       Height = 25
@@ -291,7 +291,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 136
       Height = 25
-      Hint = 'The baud rate of the serial port'
+      Hint = 'Port baud rate'
       Margins.Left = 30
       Style = csDropDownList
       DropDownCount = 20
@@ -311,7 +311,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 222
       Height = 25
-      Hint = 'The way of receiving'
+      Hint = 'Receiving mode'
       Style = csDropDownList
       DropDownCount = 20
       TabOrder = 1

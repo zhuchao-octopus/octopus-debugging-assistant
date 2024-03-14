@@ -29,7 +29,7 @@ uses
   OcComPortObj;
 
 type
-  TSettingChangedCallBackFuntion = Procedure(Obj: TObject;Action:integer) of object;
+  TSettingChangedCallBackFuntion = Procedure(Obj: TObject; Action: integer) of object;
 
   TSettingPagesDlg = class(TForm)
     Panel1: TPanel;
@@ -131,18 +131,18 @@ type
     VersionNumberStr: String;
     WindowsVersion: String;
 
-    AlphaBlendValue: Integer;
+    AlphaBlendValue: integer;
     AlphaBlend: Boolean;
 
     SettingChangedCallBackFuntion: TSettingChangedCallBackFuntion;
 
-    procedure updateSystemDevicesList(DevideName: String = ''; ActionType: Integer = $8000);
+    procedure updateSystemDevicesList(DevideName: String = ''; ActionType: integer = $8000);
 
     function getCurrentDeviceName(): String;
 
     function getDeciceByPort(Port: string): TOcComPortObj;
     function getDeciceByFullName(DeviceName: string): TOcComPortObj;
-    function getDeciceByIndex(Index: Integer): TOcComPortObj;
+    function getDeciceByIndex(Index: integer): TOcComPortObj;
     function getAvailableDevice(): TOcComPortObj;
     function getCurrentDevice(): TOcComPortObj;
 
@@ -177,7 +177,7 @@ var
 
 function ExtractFileNameNoExt(FilePathName: String): String;
 function GetSystemDateTimeStampStr(): string;
-function CreateShortcut(Exe: string; Lnk: string = ''; Dir: string = ''; ID: Integer = -1): Boolean;
+function CreateShortcut(Exe: string; Lnk: string = ''; Dir: string = ''; ID: integer = -1): Boolean;
 procedure AddExplorerContextMenu(const MenuName, PathFileName, FileType: string);
 procedure RemoveExplorerContextMenu(const MenuName: string);
 
@@ -196,18 +196,19 @@ begin
   // Getsystemtime(lpSystemTime);
   GetLocalTime(LocalSystemTime);
   // Result:=Format('[%0.4d\%0.2d\%0.2d\%0.2d:%0.2d:%0.2d] ',[lpSystemTime.wYear,lpSystemTime.wMonth,lpSystemTime.wDay,lpSystemTime.wHour,lpSystemTime.wMinute,lpSystemTime.wSecond]);
-  Result := Format('%0.4d%0.2d%0.2d_%0.2d%0.2d%0.2d', [LocalSystemTime.wYear, LocalSystemTime.wMonth, LocalSystemTime.wDay, LocalSystemTime.wHour, LocalSystemTime.wMinute, LocalSystemTime.wSecond]);
+  Result := Format('%0.4d%0.2d%0.2d_%0.2d%0.2d%0.2d', [LocalSystemTime.wYear, LocalSystemTime.wMonth, LocalSystemTime.wDay, LocalSystemTime.wHour, LocalSystemTime.wMinute,
+    LocalSystemTime.wSecond]);
 end;
 
-function FirstDriveFromMask(unitmask: Integer): string;
+function FirstDriveFromMask(unitmask: integer): string;
 var
-  i: Integer;
+  i: integer;
 begin
   Result := '';
   for i := 0 to 25 do
   begin
     if Boolean(unitmask and 1) then
-      Result := Result + Char(Integer('A') + i);
+      Result := Result + Char(integer('A') + i);
     unitmask := unitmask shr 1;
   end;
 end;
@@ -215,7 +216,7 @@ end;
 function FalconGetComPort(DriverName: string): string;
 var
   ss: string;
-  i1, i2: Integer;
+  i1, i2: integer;
   pStr: PChar;
 begin
   DriverName := Trim(DriverName);
@@ -336,9 +337,9 @@ begin
   end;
 end;
 
-procedure TSettingPagesDlg.updateSystemDevicesList(DevideName: String = ''; ActionType: Integer = $8000);
+procedure TSettingPagesDlg.updateSystemDevicesList(DevideName: String = ''; ActionType: integer = $8000);
 var
-  imageId, i: Integer;
+  imageId, i: integer;
   DevideNameList: TStringList;
   OcComPortObj: TOcComPortObj;
   S: String;
@@ -363,12 +364,12 @@ begin
 
     if (OcComPortObj <> nil) and (ActionType = DBT_DEVICEREMOVECOMPLETE) then
     begin
-      OcComPortObj.DebugLog(OcComPortObj.ComPortFullName+' has been removed from the system!');
+      OcComPortObj.DebugLog(OcComPortObj.ComPortFullName + ' has been removed from the system!');
       if OcComPortObj.Connected then
         CloseDevice(OcComPortObj);
-        ///if Assigned(SettingChangedCallBackFuntion) then
-        ///  SettingChangedCallBackFuntion(OcComPortObj,DBT_DEVICEREMOVECOMPLETE);
-        /// 关闭移除的设备
+      /// if Assigned(SettingChangedCallBackFuntion) then
+      /// SettingChangedCallBackFuntion(OcComPortObj,DBT_DEVICEREMOVECOMPLETE);
+      /// 关闭移除的设备
     end;
 
     /// 更新设备列表
@@ -392,7 +393,7 @@ begin
         OcComPortObj := TOcComPortObj.Create(self, DevideNameList.Strings[i]);
         OcComPortDeviceList.AddObject(DevideNameList.Strings[i], OcComPortObj);
         /// 导入设备配置信息
-        S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
+        S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComPortFullName + '.ini';
         OcComPortObj.LoadSettings(stIniFile, S);
         LoadDeviceSetting(OcComPortObj);
       end;
@@ -401,21 +402,21 @@ begin
 
     for i := 0 to OcComPortDeviceList.Count - 1 do
     begin
-         if (DevideNameList.IndexOf(OcComPortDeviceList.Strings[i])) < 0 then
-         OcComPortDeviceList.Delete(i);
+      if (DevideNameList.IndexOf(OcComPortDeviceList.Strings[i])) < 0 then
+        OcComPortDeviceList.Delete(i);
     end;
 
     for i := 0 to ComboBoxEx1.GetCount - 1 do
     begin
-         if (DevideNameList.IndexOf(ComboBoxEx1.Items[i])) < 0 then
-             ComboBoxEx1.Items.Delete(i);
+      if (DevideNameList.IndexOf(ComboBoxEx1.Items[i])) < 0 then
+        ComboBoxEx1.Items.Delete(i);
     end;
 
     OcComPortDeviceList.EndUpdate;
     ComboBoxEx1.ItemsEx.EndUpdate;
-    ///回调UI层
+    /// 回调UI层
     if Assigned(SettingChangedCallBackFuntion) then
-        SettingChangedCallBackFuntion(nil,0);
+      SettingChangedCallBackFuntion(nil, 0);
   finally
     DevideNameList.Free;
   end;
@@ -430,7 +431,7 @@ procedure TSettingPagesDlg.FormCreate(Sender: TObject);
 var
   ComComboBox: TComComboBox;
   j: TRECEIVE_FORMAT;
-  i: Integer;
+  i: integer;
   OcComPortObj: TOcComPortObj;
 begin
 
@@ -579,7 +580,7 @@ end;
 procedure TSettingPagesDlg.ComboBox1Change(Sender: TObject);
 var
   str: String;
-  btl: Integer;
+  btl: integer;
   OcComPortObj: TOcComPortObj;
 begin
 
@@ -720,7 +721,7 @@ end;
 
 function TSettingPagesDlg.getDeciceByPort(Port: string): TOcComPortObj;
 var
-  i: Integer;
+  i: integer;
   str: String;
 begin
   Result := nil;
@@ -748,7 +749,7 @@ end;
 
 function TSettingPagesDlg.getDeciceByFullName(DeviceName: string): TOcComPortObj;
 var
-  i: Integer;
+  i: integer;
 begin
   Result := nil;
   try
@@ -759,7 +760,7 @@ begin
   end;
 end;
 
-function TSettingPagesDlg.getDeciceByIndex(Index: Integer): TOcComPortObj;
+function TSettingPagesDlg.getDeciceByIndex(Index: integer): TOcComPortObj;
 begin
   Result := nil;
   try
@@ -771,7 +772,7 @@ end;
 
 function TSettingPagesDlg.getAvailableDevice(): TOcComPortObj;
 var
-  i: Integer;
+  i: integer;
 begin
   Result := nil;
   for i := 0 to OcComPortDeviceList.Count - 1 do
@@ -794,7 +795,7 @@ end;
 procedure TSettingPagesDlg.CloseDevice(DeviceFullName: String);
 var
   OcComPortObj: TOcComPortObj;
-  i: Integer;
+  i: integer;
 begin
   if OcComPortDeviceList = nil then
     exit;
@@ -821,12 +822,12 @@ end;
 
 function TSettingPagesDlg.openDevice(OcComPortObj: TOcComPortObj): Boolean;
 var
-  i: Integer;
+  i: integer;
 begin
   Result := false;
   if OcComPortObj = nil then
   begin
-    OcComPortObj.DebugLog('Open ' + OcComPortObj.ComportFullName+' failed the device do not exists!');
+    OcComPortObj.DebugLog('Open ' + OcComPortObj.ComPortFullName + ' failed the device do not exists!');
     exit;
   end;
   if OcComPortObj.Connected then
@@ -842,7 +843,7 @@ begin
     Result := true;
     OcComPortObj.status := 1;
   Except
-    OcComPortObj.DebugLog('Open ' + OcComPortObj.ComportFullName+' failed the device may be in using!');
+    OcComPortObj.DebugLog('Open ' + OcComPortObj.ComPortFullName + ' failed the device may be in using!');
     Result := false;
     OcComPortObj.status := 1;
     // MessageBox(Application.Handle, PChar('Open device ' + DeviceFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
@@ -861,7 +862,7 @@ end;
 function TSettingPagesDlg.openDevice(DeviceFullName: String; LogMemo: TMyMemo): TOcComPortObj;
 var
   OcComPortObj: TOcComPortObj;
-  i: Integer;
+  i: integer;
 begin
   Result := nil;
   if OcComPortDeviceList = nil then
@@ -897,18 +898,18 @@ begin
   if OcComPortObj = nil then
     exit;
   try
-    S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
+    S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComPortFullName + '.ini';
     OcComPortObj.StoreSettings(stIniFile, S);
     Octopusini := TIniFile.Create(S);
 
-    Octopusini.WriteInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
-    Octopusini.WriteInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
+    Octopusini.WriteInteger(OcComPortObj.ComPortFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
+    Octopusini.WriteInteger(OcComPortObj.ComPortFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
 
-    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox33.Name), CheckBox33.Checked);
-    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox34.Name), CheckBox34.Checked);
-    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox35.Name), CheckBox35.Checked);
-    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckBox36.Name), CheckBox36.Checked);
-    Octopusini.WriteBool(OcComPortObj.ComportFullName, getObjectID(CheckboxProcessDataBackground.Name), CheckboxProcessDataBackground.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox33.Name), CheckBox33.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox34.Name), CheckBox34.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox35.Name), CheckBox35.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox36.Name), CheckBox36.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckboxProcessDataBackground.Name), CheckboxProcessDataBackground.Checked);
 
     Octopusini.WriteString('Configuration', 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
     Octopusini.WriteInteger('Configuration', 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
@@ -924,7 +925,7 @@ procedure TSettingPagesDlg.LoadDeviceSetting(OcComPortObj: TOcComPortObj);
 var
   Octopusini: TIniFile;
   S: string;
-  i: Integer;
+  i: integer;
 
   function getObjectID(str: String): String;
   begin
@@ -935,29 +936,29 @@ begin
   Octopusini := nil;
   if not DirectoryExists(OctopusCfgDir) then
     exit;
-  S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComportFullName + '.ini';
+  S := OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + OcComPortObj.ComPortFullName + '.ini';
   if (not FileExists(S)) then
     exit;
 
   try
     Octopusini := TIniFile.Create(S);
-    CheckBox33.Checked := Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckBox33.Name), false);
-    CheckBox34.Checked := Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckBox34.Name), false);
-    CheckBox35.Checked := Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckBox35.Name), false);
-    CheckBox36.Checked := Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckBox36.Name), false);
+    CheckBox33.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox33.Name), false);
+    CheckBox34.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox34.Name), false);
+    CheckBox35.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox35.Name), false);
+    CheckBox36.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox36.Name), false);
 
-    ComboBox6.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
-    ComboBox7.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComportFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
+    ComboBox6.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
+    ComboBox7.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
 
-    CheckboxProcessDataBackground.Checked:=  Octopusini.ReadBool(OcComPortObj.ComportFullName, getObjectID(CheckboxProcessDataBackground.Name), true);
+    CheckboxProcessDataBackground.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckboxProcessDataBackground.Name), true);
 
     FontDialogConsole.Font.Charset := TFontCharset(DEFAULT_CHARSET);
-    FontDialogConsole.Font.Name := Octopusini.ReadString(OcComPortObj.ComportFullName, 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
-    FontDialogConsole.Font.Size := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
-    FontDialogConsole.Font.Color := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_FONTCOLOR', FontDialogConsole.Font.Color);
+    FontDialogConsole.Font.Name := Octopusini.ReadString(OcComPortObj.ComPortFullName, 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
+    FontDialogConsole.Font.Size := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
+    FontDialogConsole.Font.Color := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_FONTCOLOR', FontDialogConsole.Font.Color);
     ColorBoxText.Selected := FontDialogConsole.Font.Color;
 
-    ColorBoxContentBG.Selected := Octopusini.ReadInteger(OcComPortObj.ComportFullName, 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
+    ColorBoxContentBG.Selected := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
     if ColorBoxContentBG.Selected = clBlack then
     begin
       FontDialogConsole.Font.Color := clSilver;
@@ -974,7 +975,6 @@ begin
     OcComPortObj.ShowLineNumber := CheckBox35.Checked;
     OcComPortObj.ShowSendedLog := CheckBox36.Checked;
 
-
   finally
     Octopusini.Free;
   end;
@@ -982,7 +982,7 @@ end;
 
 procedure TSettingPagesDlg.SaveAllComPortLogData(DoClose: Boolean);
 var
-  i: Integer;
+  i: integer;
   OcComPortObj: TOcComPortObj;
 begin
   try
@@ -1007,14 +1007,14 @@ end;
 
 procedure TSettingPagesDlg.ApplyOcComPortObjAtrribute(OcComPortObj: TOcComPortObj);
 var
-  CodePage: Integer;
+  CodePage: integer;
 begin
   if OcComPortObj = nil then
     exit;
-  OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil,
-    CheckBox33.Checked, CheckBox34.Checked, CheckBox35.Checked, CheckBox36.Checked, true);
+  OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex,
+    ComboBox7.ItemIndex, nil, CheckBox33.Checked, CheckBox34.Checked, CheckBox35.Checked, CheckBox36.Checked, true);
 
-  OcComPortObj.BackgroundTaskMode:= CheckboxProcessDataBackground.Checked;
+  OcComPortObj.BackgroundTaskMode := CheckboxProcessDataBackground.Checked;
 
   case CBAlignmentMode.ItemIndex of
     0:
@@ -1031,7 +1031,7 @@ end;
 
 procedure TSettingPagesDlg.ApplyCodePageSetting(OcComPortObj: TOcComPortObj);
 var
-  CodePage: Integer;
+  CodePage: integer;
 begin
   if OcComPortObj = nil then
     exit;
@@ -1122,7 +1122,7 @@ end;
 
 procedure TSettingPagesDlg.LoadLaunguageFromFile(Form: TForm; const Path: String; Create: Boolean);
 var
-  i: Integer;
+  i: integer;
   tmpComponent: TComponent;
   IniFiles: TIniFile;
   str: String;
@@ -1140,7 +1140,7 @@ begin
     begin
       IniFiles := TIniFile.Create(Path);
       Form.Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TForm', getMsgID(Form.Name), Form.Caption);
-      Application.Title:=IniFiles.ReadString(SectionName +  '_LANGUAGE_APPLICATION_TITLE', getMsgID('title_name'),OCTOPUS_APPLICATION_TITLE_NAME);
+      Application.Title := IniFiles.ReadString(SectionName + '_LANGUAGE_APPLICATION_TITLE', getMsgID('title_name'), OCTOPUS_APPLICATION_TITLE_NAME);
       /// showmessage(Form.Caption+' '+Path);
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
@@ -1169,13 +1169,19 @@ begin
 
         if tmpComponent is TStringGrid then
         begin
-          TStringGrid(tmpComponent).Cells[0, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL0'), TStringGrid(tmpComponent).Cells[0, 0]);
-          TStringGrid(tmpComponent).Cells[1, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL1'), TStringGrid(tmpComponent).Cells[1, 0]);
-          TStringGrid(tmpComponent).Cells[2, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL2'), TStringGrid(tmpComponent).Cells[2, 0]);
+          TStringGrid(tmpComponent).Cells[0, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL0'),
+            TStringGrid(tmpComponent).Cells[0, 0]);
+          TStringGrid(tmpComponent).Cells[1, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL1'),
+            TStringGrid(tmpComponent).Cells[1, 0]);
+          TStringGrid(tmpComponent).Cells[2, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL2'),
+            TStringGrid(tmpComponent).Cells[2, 0]);
 
-          TStringGrid(tmpComponent).Cells[4, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL4'), TStringGrid(tmpComponent).Cells[4, 0]);
-          TStringGrid(tmpComponent).Cells[5, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL5'), TStringGrid(tmpComponent).Cells[5, 0]);
-          TStringGrid(tmpComponent).Cells[6, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL6'), TStringGrid(tmpComponent).Cells[6, 0]);
+          TStringGrid(tmpComponent).Cells[4, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL4'),
+            TStringGrid(tmpComponent).Cells[4, 0]);
+          TStringGrid(tmpComponent).Cells[5, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL5'),
+            TStringGrid(tmpComponent).Cells[5, 0]);
+          TStringGrid(tmpComponent).Cells[6, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL6'),
+            TStringGrid(tmpComponent).Cells[6, 0]);
         end;
         /// application.ProcessMessages;
       End;
@@ -1186,7 +1192,7 @@ begin
     begin
       IniFiles := TIniFile.Create(Path);
       IniFiles.WriteString(SectionName + '_LANGUAGE_TForm', getMsgID(Form.Name), Form.Caption);
-      IniFiles.WriteString(SectionName + '_LANGUAGE_APPLICATION_TITLE', getMsgID('title_name'), application.Title);
+      IniFiles.WriteString(SectionName + '_LANGUAGE_APPLICATION_TITLE', getMsgID('title_name'), Application.Title);
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
         tmpComponent := Form.Components[i];
@@ -1240,8 +1246,8 @@ function ExtractFileNameNoExt(FilePathName: String): String;
 Var
   FileWithExtString: String;
   FileExtString: String;
-  LenExt: Integer;
-  LenNameWithExt: Integer;
+  LenExt: integer;
+  LenNameWithExt: integer;
 Begin
   FileWithExtString := ExtractFileName(FilePathName);
   LenNameWithExt := Length(FileWithExtString);
@@ -1263,7 +1269,7 @@ End;
 { 第四个参数是用常数的方式指定目的文件夹; 该系列常数定义在 ShlObj 单元, CSIDL_ 打头 }
 // CreateShortcut(Application.ExeName, '', '', CSIDL_PROGRAMS);
 // CreateShortcut(Application.ExeName, '', 'C:/');
-function CreateShortcut(Exe: string; Lnk: string = ''; Dir: string = ''; ID: Integer = -1): Boolean;
+function CreateShortcut(Exe: string; Lnk: string = ''; Dir: string = ''; ID: integer = -1): Boolean;
 var
   IObj: IUnknown;
   ILnk: IShellLink;

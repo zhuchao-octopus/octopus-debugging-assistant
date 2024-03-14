@@ -447,7 +447,7 @@ type
     procedure WMDropFiles(var Msg: TWMDropFiles); message WM_DROPFILES;
     Procedure SystemMessage_WMMenuSelect(var Msg: TWMMenuSelect); message WM_SysCommand;
     procedure OcComPortObjCallBack(Count: Integer);
-    Procedure SettingChangedCallBackFuntion(Obj: TObject;Action:integer);
+    Procedure SettingChangedCallBackFuntion(Obj: TObject; Action: Integer);
     procedure EventCallBackFuntion(Obj: TObject);
   end;
 
@@ -1201,13 +1201,16 @@ begin
   FileNameNoExt := ExtractFileExt(FileSaveAsCmd.Dialog.FileName);
   if FileNameNoExt = '' then
   begin
-     case FileSaveAsCmd.Dialog.FilterIndex of
-         1:  FileSaveAsCmd.Dialog.FileName:=FileSaveAsCmd.Dialog.FileName +  '.rtf';
-         2:  FileSaveAsCmd.Dialog.FileName:=FileSaveAsCmd.Dialog.FileName +  '.txt';
-         3:  FileSaveAsCmd.Dialog.FileName:=FileSaveAsCmd.Dialog.FileName +  '.log';
-         else
-           FileSaveAsCmd.Dialog.FileName:=FileSaveAsCmd.Dialog.FileName +  '.txt';
-     end;
+    case FileSaveAsCmd.Dialog.FilterIndex of
+      1:
+        FileSaveAsCmd.Dialog.FileName := FileSaveAsCmd.Dialog.FileName + '.rtf';
+      2:
+        FileSaveAsCmd.Dialog.FileName := FileSaveAsCmd.Dialog.FileName + '.txt';
+      3:
+        FileSaveAsCmd.Dialog.FileName := FileSaveAsCmd.Dialog.FileName + '.log';
+    else
+      FileSaveAsCmd.Dialog.FileName := FileSaveAsCmd.Dialog.FileName + '.txt';
+    end;
 
   end;
 
@@ -2323,8 +2326,8 @@ begin
     begin
       ComboBox1.OnChange(Self);
       ComboBox2.OnChange(Self);
-      GetAndOpenADevices(OcComPortObj,true);
-      //SettingPagesDlg.openDevice(OcComPortObj);
+      GetAndOpenADevices(OcComPortObj, true);
+      // SettingPagesDlg.openDevice(OcComPortObj);
       ToggleSwitchDeviceOnOff.ThumbColor := clRed;
     end
     else
@@ -2348,7 +2351,8 @@ begin
   begin
     ToggleSwitchDeviceOnOff.State := tssOff;
     ToggleSwitchDeviceOnOff.ThumbColor := clWindowText;
-    ///MessageBox(Handle, 'This device does not exist or has been removed from the system!', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    /// MessageBox(Handle, 'This device does not exist or has been removed from the system!', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
+    /// showmessage();
   end;
 end;
 
@@ -3161,7 +3165,7 @@ begin
   StatusBarPrintFileSize();
 end;
 
-Procedure TMainOctopusDebuggingDevelopmentForm.SettingChangedCallBackFuntion(Obj: TObject;Action:integer);
+Procedure TMainOctopusDebuggingDevelopmentForm.SettingChangedCallBackFuntion(Obj: TObject; Action: Integer);
 begin
   UpdateUartToolBar();
   InitUartsMenu(COMMenu, COM1MenuItemOnClick);
@@ -3240,8 +3244,8 @@ begin
   /// and (OcComPortObj.Connected)
   begin
 
-    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes' + ' | Received: ' + IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes' +
-      ' | Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes' + ' | Total: ' + IntToStr(Length(OcComPortObj.LogObject.Text)) + ' Bytes' + ' | Line: ' +
+    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes' + ' | Received: ' + IntToStr(OcComPortObj.ComReceiveCount) +
+      ' Bytes' + ' | Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes' + ' | Total: ' + IntToStr(Length(OcComPortObj.LogObject.Text)) + ' Bytes' + ' | Line: ' +
       IntToStr(OcComPortObj.LogObject.CaretPos.Y) + ' | Lines: ' + IntToStr(OcComPortObj.LogObject.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
 
     // StatusBar1.Panels.EndUpdate;

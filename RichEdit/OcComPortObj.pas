@@ -36,14 +36,15 @@ const
   SEND_FLAG = '-> ';
 
 const
-  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ', 'Hexadecimal Format Receiving ', 'Graphic Analysis ', 'Octopus Protocol Analysis', 'File Receiving');
+  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ', 'Hexadecimal Format Receiving ', 'Graphic Analysis ', 'Octopus Protocol Analysis',
+    'File Receiving');
 
   MAX_BAUDRATE_INDEX: Integer = 15;
   DEFAULT_HEXDATA_HEXSTRING_SPACE = 5;
 
 type
-  TCallBackFun = Procedure(Count: integer = 0) of object;
-  TProtocolCallBackFun = Procedure(TypeID: integer) of object;
+  TCallBackFun = Procedure(Count: Integer = 0) of object;
+  TProtocolCallBackFun = Procedure(TypeID: Integer) of object;
 
   { TOcComPortObjPara = packed record
     ComportFullName: String;
@@ -76,9 +77,9 @@ type
     FFastLineSeries: TFastLineSeries;
 
     FComPortFullName: String;
-    FSendFormat: integer; // h
-    FSendCodeFormat: integer;
-    FReceiveFormat: integer; // i
+    FSendFormat: Integer; // h
+    FSendCodeFormat: Integer;
+    FReceiveFormat: Integer; // i
     FLogObject: TMyMemo; // TMyRichEdit; // j
     FShowDate: Boolean;
     FShowTime: Boolean;
@@ -86,17 +87,17 @@ type
     /// 永远为false,已抛弃
     FShowSendingLog: Boolean;
     FHexModeWithString: Boolean; // o
-    FHexModeFormatCount: integer;
+    FHexModeFormatCount: Integer;
     FCompatibleUnicode: Boolean;
     FComReceiveString: String;
     FStringInternalMemo: TMemo;
 
     FComUIHandleThread: TComUIHandleThread; // 异步线程
     FComPackParserThread: TComPackParserHandleThread;
-    FBackGroundProcessRecordCount: integer;
+    FBackGroundProcessRecordCount: Integer;
     FComHandleThread_Wait: Boolean; // 同步变量
 
-    FProtocalData: integer;
+    FProtocalData: Integer;
     FNeedCRC16: Boolean;
     FComReceiveCount: Int64;
     FComProcessedCount: Int64;
@@ -113,43 +114,43 @@ type
     FPreCommadLineStr: String;
     FLastLineStr: String;
     FCommandHistory: TStringList;
-    FCommandHistoryIndex: integer;
+    FCommandHistoryIndex: Integer;
     FNeedNewLine: Boolean;
     FLogScrollMode: Boolean;
     FMouseTextSelection: Boolean;
-    FBackgroundTaskMode:Boolean;
+    FBackgroundTaskMode: Boolean;
     // function GetConfiguration(): TOcComPortObjPara;
     function GetLineNumberDateTimeStamp(N: Int64): String;
-    function SaveToTheExcelFile(Length: integer; Rows: integer): integer;
-    procedure OcComPortObjRxChar(Sender: TObject; Count: integer);
+    function SaveToTheExcelFile(Length: Integer; Rows: Integer): Integer;
+    procedure OcComPortObjRxChar(Sender: TObject; Count: Integer);
     procedure OcComPortObjRxProtocol(OcComPack: POcComPack);
 
     procedure KeyPress(Sender: TObject; var Key: Char);
     procedure KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
-    procedure MouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
-    procedure MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+    procedure MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure RunWindosShellCmd(const str: string);
 
     procedure CachedString(const str: String);
   public
-    status: integer;
+    status: Integer;
     ExcelApp: Variant;
 
     Constructor Create(AOwner: TComponent; DeviceName: String);
     destructor Destroy; override;
     // procedure OcComPortObjInit(OcComPortObjPara: TOcComPortObjPara);
-    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
+    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
 
     function getCMDStr(): String;
     function IsLogBottom(): Boolean;
     procedure log(const Msg: string); // log data
-    procedure LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
+    procedure LogBuff(flag: String; const Buff: Array of Byte; Count: Integer);
     procedure LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
     procedure DebugLog(const Msg: string);
     procedure ClearLog();
-    procedure ClearInternalBuff(id: integer = 100);
+    procedure ClearInternalBuff(id: Integer = 100);
 
     procedure SaveLog(FullLogFilePath: String);
     procedure SetLogComponent(Component: TMyMemo);
@@ -167,16 +168,16 @@ type
     property ComReceiveCount: Int64 read FComReceiveCount;
     property ComProcessedCount: Int64 read FComProcessedCount;
     property ComSentCount: Int64 read FComSentCount;
-    property ComHandleThread_AsynCount: integer read FBackGroundProcessRecordCount write FBackGroundProcessRecordCount default OCTOPUS_BACKGROUD_STRING_TRIGGERLINE;
-    property HexModeFormatCount: integer read FHexModeFormatCount write FHexModeFormatCount default 16;
+    property ComHandleThread_AsynCount: Integer read FBackGroundProcessRecordCount write FBackGroundProcessRecordCount default OCTOPUS_BACKGROUD_STRING_TRIGGERLINE;
+    property HexModeFormatCount: Integer read FHexModeFormatCount write FHexModeFormatCount default 16;
     property FileStream: TFileStream read FFileStream write FFileStream default nil;
     property FileStreamName: String read FFileStreamName write FFileStreamName;
-    property ProtocalData: integer read FProtocalData write FProtocalData default -1;
+    property ProtocalData: Integer read FProtocalData write FProtocalData default -1;
     property FastLineSeries: TFastLineSeries read FFastLineSeries write FFastLineSeries;
 
-    property ReceiveFormat: integer read FReceiveFormat write FReceiveFormat;
-    property SendFormat: integer read FSendFormat write FSendFormat default 0;
-    property SendCodeFormat: integer read FSendCodeFormat write FSendCodeFormat default 0;
+    property ReceiveFormat: Integer read FReceiveFormat write FReceiveFormat;
+    property SendFormat: Integer read FSendFormat write FSendFormat default 0;
+    property SendCodeFormat: Integer read FSendCodeFormat write FSendCodeFormat default 0;
 
     property CompatibleUnicode: Boolean read FCompatibleUnicode write FCompatibleUnicode default false;
     property NeedCRC16: Boolean read FNeedCRC16 write FNeedCRC16 default false;
@@ -186,29 +187,29 @@ type
     property ShowTime: Boolean read FShowTime write FShowTime;
     property LogScrollMode: Boolean read FLogScrollMode write FLogScrollMode default True;
     property MouseTextSelection: Boolean read FMouseTextSelection write FMouseTextSelection;
-    property BackgroundTaskMode:boolean read FBackgroundTaskMode write FBackgroundTaskMode default true;
+    property BackgroundTaskMode: Boolean read FBackgroundTaskMode write FBackgroundTaskMode default True;
     property CommadLineStr: String read FCommadLineStr write FCommadLineStr;
     property ComPortFullName: String read FComPortFullName write FComPortFullName;
 
-    function FalconComSendBuffer(const Buffer: array of Byte; Count: integer): Bool;
-    function FalconComSendData_Common(str: string; SendFormat: integer): Bool;
-    function FalconComSendData_Terminal(str: string; SendFormat: integer): Bool;
-    function FalconComSendData_MultiTimes(str: string; SendFormat: integer): Bool;
-    function FalconComSendData_SentString(str: string): integer;
+    function FalconComSendBuffer(const Buffer: array of Byte; Count: Integer): Bool;
+    function FalconComSendData_Common(str: string; SendFormat: Integer): Bool;
+    function FalconComSendData_Terminal(str: string; SendFormat: Integer): Bool;
+    function FalconComSendData_MultiTimes(str: string; SendFormat: Integer): Bool;
+    function FalconComSendData_SentString(str: string): Integer;
 
-    function WaitProtocolACK(ACK: integer; timeOut: integer): Boolean;
-    function WaitProtocolACK2(ACKBuffer: array of Byte; bCount: integer; timeOut: integer): Boolean;
+    function WaitProtocolACK(ACK: Integer; timeOut: Integer): Boolean;
+    function WaitProtocolACK2(ACKBuffer: array of Byte; bCount: Integer; timeOut: Integer): Boolean;
 
-    function SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean; overload;
-    function SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean; overload;
+    function SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
+    function SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
 
     function SendProtocolPackage(pPOcComPack: POcComPack): Boolean; overload;
-    function SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: integer): Boolean;
+    function SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: Integer): Boolean;
 
-    function GetPacks(): integer;
+    function GetPacks(): Integer;
     procedure SendProtocolACK(); // 发送ACK
 
-    procedure PrintReceivedProtocolData(Index: integer);
+    procedure PrintReceivedProtocolData(Index: Integer);
     procedure PrintProtocolPack(flag: String; OcComPack: POcComPack);
     procedure RequestProtocolConnection(); // 发送连接请求
 
@@ -225,13 +226,13 @@ type
   private
     FOcComPortObj: TOcComPortObj;
     FUIStartIndex: Int64;
-    FNeedToReset: integer;
+    FNeedToReset: Integer;
     // FThreadSync_BusyFlag:Boolean;
   protected
     constructor Create(OcComPortObj: TOcComPortObj);
     procedure Execute; override;
   public
-    property ResetID: integer read FNeedToReset write FNeedToReset default -1;
+    property ResetID: Integer read FNeedToReset write FNeedToReset default -1;
   end;
 
   TComPackParserHandleThread = class(TThread)
@@ -269,7 +270,7 @@ begin
   end;
 end;
 
-function writeFileToStream(FileStream: TFileStream; Buffer: array of Byte; Len: integer): integer;
+function writeFileToStream(FileStream: TFileStream; Buffer: array of Byte; Len: Integer): Integer;
 begin
   try
     Result := FileStream.Write(Buffer, Len);
@@ -282,7 +283,7 @@ const
   pattern = 'COM +d';
 var
   ss: string;
-  i1, i2: integer;
+  i1, i2: Integer;
   pStr: Pchar;
   // match: TMatch;
 begin
@@ -305,7 +306,7 @@ begin
   Result := ss;
 end;
 
-function GetSystemDateTimeStampStr2(types: integer): string;
+function GetSystemDateTimeStampStr2(types: Integer): string;
 var
   LocalSystemTime: _SYSTEMTIME;
   d, t: String;
@@ -796,7 +797,7 @@ begin
   self.CallBackFun := CallBackFun;
 end;
 
-procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
+procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
 var
   threadsuspended: Boolean;
   // oldi:integer;
@@ -860,7 +861,7 @@ begin
   FNeedNewLine := True;
 end;
 
-procedure TOcComPortObj.ClearInternalBuff(id: integer = 100);
+procedure TOcComPortObj.ClearInternalBuff(id: Integer = 100);
 // ClearInternelLogBuff(); //不随便清楚内部缓存
 begin
   case id of
@@ -942,12 +943,12 @@ begin
     FCallBackFun();
 end;
 
-procedure TOcComPortObj.LogBuff(flag: String; const Buff: Array of Byte; Count: integer);
+procedure TOcComPortObj.LogBuff(flag: String; const Buff: Array of Byte; Count: Integer);
 var
   str: String;
-  i, j: integer;
+  i, j: Integer;
   f: string;
-  HexModeFormatCount: integer;
+  HexModeFormatCount: Integer;
 begin
   str := '';
   if (Count <= 0) then
@@ -1057,7 +1058,7 @@ end;
 function TOcComPortObj.IsLogBottom(): Boolean;
 var
   SF: TScrollInfo;
-  currentPos: integer;
+  currentPos: Integer;
 begin
   if FLogObject = nil then
     Exit;
@@ -1074,7 +1075,7 @@ begin
 end;
 
 // for send file 默认 十六进制发送
-function TOcComPortObj.FalconComSendBuffer(const Buffer: array of Byte; Count: integer): Bool;
+function TOcComPortObj.FalconComSendBuffer(const Buffer: array of Byte; Count: Integer): Bool;
 begin
   Result := True;
   if self.Connected then
@@ -1096,10 +1097,10 @@ begin
 end;
 
 // 一般发送
-function TOcComPortObj.FalconComSendData_Common(str: string; SendFormat: integer): Bool;
+function TOcComPortObj.FalconComSendData_Common(str: string; SendFormat: Integer): Bool;
 var
   buf: array [0 .. 1023] of Byte;
-  bLength: integer;
+  bLength: Integer;
   s, tempstr: string;
 begin
   Result := True;
@@ -1181,10 +1182,10 @@ begin
 end;
 
 // 终端模式发送
-function TOcComPortObj.FalconComSendData_Terminal(str: string; SendFormat: integer): Bool;
+function TOcComPortObj.FalconComSendData_Terminal(str: string; SendFormat: Integer): Bool;
 var
   buf: array [0 .. 1023] of Byte;
-  bLength: integer;
+  bLength: Integer;
   s: string;
 begin
   Result := True;
@@ -1269,10 +1270,10 @@ begin
 end;
 
 // 多次发送 ,块发送，循环发送，区别是不另外预留新行供接收使用
-function TOcComPortObj.FalconComSendData_MultiTimes(str: string; SendFormat: integer): Bool;
+function TOcComPortObj.FalconComSendData_MultiTimes(str: string; SendFormat: Integer): Bool;
 var
   buf: array [0 .. 1023] of Byte;
-  bLength: integer;
+  bLength: Integer;
   s: string;
 begin
   Result := True;
@@ -1348,7 +1349,7 @@ begin
     FCallBackFun();
 end;
 
-function TOcComPortObj.FalconComSendData_SentString(str: string): integer;
+function TOcComPortObj.FalconComSendData_SentString(str: string): Integer;
 VAR
   ss: TStringStream;
 begin
@@ -1435,10 +1436,10 @@ begin
   end;
 end;
 
-function TOcComPortObj.SaveToTheExcelFile(Length: integer; Rows: integer): integer;
+function TOcComPortObj.SaveToTheExcelFile(Length: Integer; Rows: Integer): Integer;
 var
   // FileName: String;
-  i: integer;
+  i: Integer;
 begin
   if Rows = 0 then
     Rows := 1;
@@ -1498,9 +1499,9 @@ begin
   end;
 end;
 
-procedure TOcComPortObj.OcComPortObjRxChar(Sender: TObject; Count: integer);
+procedure TOcComPortObj.OcComPortObjRxChar(Sender: TObject; Count: Integer);
 var
-  i: integer;
+  i: Integer;
   PreLogLinesCount: Int64;
   Buff: array of Byte;
   f: Text;
@@ -1728,7 +1729,7 @@ end;
 function TOcComPortObj.SendProtocolPackage(pPOcComPack: POcComPack): Boolean;
 var
   p: pbyte;
-  ilength: integer;
+  ilength: Integer;
 begin
   p := pbyte(pPOcComPack);
   ilength := SizeOf(TOcComPackHead) + pPOcComPack.Length + 2; { crc + end }
@@ -1742,9 +1743,9 @@ begin
   Result := True;
 end;
 
-function TOcComPortObj.SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: integer): Boolean;
+function TOcComPortObj.SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: Integer): Boolean;
 var
-  reTryCount: integer;
+  reTryCount: Integer;
 begin
   Result := True;
   reTryCount := 0;
@@ -1768,17 +1769,17 @@ begin
   end;
 end;
 
-function TOcComPortObj.SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean;
+function TOcComPortObj.SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean;
 begin
   Result := SendProtocolData(OCCOMPROTOCAL_HEAD, TypeID, Buffer, Count, NeedACK);
 end;
 
-function TOcComPortObj.SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: integer; NeedACK: Boolean): Boolean;
+function TOcComPortObj.SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean;
 var
   OcComPack: TOcComPack;
   // OcComPackHead: TOcComPackHead;
-  packs, i, j: integer;
-  PaLoad_Max_Length: integer;
+  packs, i, j: Integer;
+  PaLoad_Max_Length: Integer;
 begin
   OcComPack := FOcComProtocal.CreatePack(Head, TypeID);
   Result := True;
@@ -1829,7 +1830,7 @@ begin
   end; // case
 end;
 
-function TOcComPortObj.WaitProtocolACK(ACK: integer; timeOut: integer): Boolean;
+function TOcComPortObj.WaitProtocolACK(ACK: Integer; timeOut: Integer): Boolean;
 var
   pOc: POcComPack;
   Start: real;
@@ -1858,11 +1859,11 @@ begin
 
 end;
 
-function TOcComPortObj.WaitProtocolACK2(ACKBuffer: array of Byte; bCount: integer; timeOut: integer): Boolean;
+function TOcComPortObj.WaitProtocolACK2(ACKBuffer: array of Byte; bCount: Integer; timeOut: Integer): Boolean;
 var
   pOc: POcComPack;
   Start: real;
-  ilength: integer;
+  ilength: Integer;
 begin
   Result := false;
   Start := GetTickCount;
@@ -1928,7 +1929,7 @@ end;
 
 procedure TOcComPortObj.PrintProtocolPack(flag: String; OcComPack: POcComPack);
 var
-  j, l: integer;
+  j, l: Integer;
   str, f: String;
 begin
   str := flag;
@@ -1961,9 +1962,9 @@ begin
   log(str);
 end;
 
-procedure TOcComPortObj.PrintReceivedProtocolData(Index: integer);
+procedure TOcComPortObj.PrintReceivedProtocolData(Index: Integer);
 var
-  i, j: integer;
+  i, j: Integer;
   str: String;
 begin
   str := '';
@@ -2017,7 +2018,7 @@ begin
     FLogObject.SaveTo(FullLogFileName);
 end;
 
-function TOcComPortObj.GetPacks: integer;
+function TOcComPortObj.GetPacks: Integer;
 begin
   Result := self.FOcComProtocal.PackList_RB_Count;
 end;
@@ -2025,8 +2026,8 @@ end;
 function TOcComPortObj.getCMDStr(): String;
 var
   LastStr: String;
-  jh: integer;
-  my: integer;
+  jh: Integer;
+  my: Integer;
 begin
   LastStr := Trim(FLogObject.GetLastLine());
   jh := Pos('#', LastStr);
@@ -2047,9 +2048,9 @@ end;
 
 procedure TOcComPortObj.KeyPress(Sender: TObject; var Key: Char);
 var
-  CurrentLine: integer;
+  CurrentLine: Integer;
   // thid: Dword;
-  i, j, Len: integer;
+  i, j, Len: Integer;
   cmd: String;
   LastStr: String;
 begin
@@ -2256,17 +2257,17 @@ begin
   end;
 end;
 
-procedure TOcComPortObj.MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+procedure TOcComPortObj.MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
 
 end;
 
-procedure TOcComPortObj.MouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
+procedure TOcComPortObj.MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 begin
 
 end;
 
-procedure TOcComPortObj.MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: integer);
+procedure TOcComPortObj.MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
 
 end;
