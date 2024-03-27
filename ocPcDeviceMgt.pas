@@ -150,38 +150,47 @@ type
     Reserved: LongInt;
   end;
 
-function SetupDiGetClassDevs(const ClassGuid: PGUID; Enumerator: PChar; hwndParent: HWND; Flags: DWORD): Cardinal; stdcall; external 'Setupapi.dll' name 'SetupDiGetClassDevsA';
+function SetupDiGetClassDevs(const ClassGuid: PGUID; Enumerator: PChar; hwndParent: HWND; Flags: DWORD): Cardinal;
+  stdcall; external 'Setupapi.dll' name 'SetupDiGetClassDevsA';
 
-function SetupDiEnumDeviceInfo(DeviceInfoSet: HDEVINFO; MemberIndex: DWORD; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiEnumDeviceInfo';
+function SetupDiEnumDeviceInfo(DeviceInfoSet: HDEVINFO; MemberIndex: DWORD; DeviceInfoData: PSP_DEVINFO_DATA): BOOL;
+  stdcall; external 'Setupapi.dll' name 'SetupDiEnumDeviceInfo';
 
-function SetupDiGetDeviceRegistryProperty(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; Propertys: DWORD; PropertyRegDataType: PWORD; PropertyBuffer: PByte;
-  PropertyBufferSize: DWORD; RequiredSize: PDWORD): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetDeviceRegistryPropertyA';
+function SetupDiGetDeviceRegistryProperty(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; Propertys: DWORD;
+  PropertyRegDataType: PWORD; PropertyBuffer: PByte; PropertyBufferSize: DWORD; RequiredSize: PDWORD): BOOL; stdcall;
+  external 'Setupapi.dll' name 'SetupDiGetDeviceRegistryPropertyA';
 
-function SetupDiDestroyDeviceInfoList(DeviceInfoSet: Cardinal): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiDestroyDeviceInfoList';
+function SetupDiDestroyDeviceInfoList(DeviceInfoSet: Cardinal): BOOL; stdcall;
+  external 'Setupapi.dll' name 'SetupDiDestroyDeviceInfoList';
 
-function SetupDiClassNameFromGuid(ClassGuid: PGUID; ClassName: PChar; ClassNameSize: DWORD; RequiredSize: PDWORD): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiClassNameFromGuidA';
+function SetupDiClassNameFromGuid(ClassGuid: PGUID; ClassName: PChar; ClassNameSize: DWORD; RequiredSize: PDWORD): BOOL;
+  stdcall; external 'Setupapi.dll' name 'SetupDiClassNameFromGuidA';
 
-function SetupDiGetClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetClassImageList';
+function SetupDiGetClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall;
+  external 'Setupapi.dll' name 'SetupDiGetClassImageList';
 
-function SetupDiDestroyClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiDestroyClassImageList';
+function SetupDiDestroyClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall;
+  external 'Setupapi.dll' name 'SetupDiDestroyClassImageList';
 
-function SetupDiGetClassImageIndex(ClassImageListData: PSP_CLASSIMAGELIST_DATA; ClassGuid: PGUID; ImageIndex: PINT): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiGetClassImageIndex';
+function SetupDiGetClassImageIndex(ClassImageListData: PSP_CLASSIMAGELIST_DATA; ClassGuid: PGUID; ImageIndex: PINT)
+  : BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetClassImageIndex';
 
-function SetupDiEnumDriverInfo(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; DriverType: DWORD; MemberIndex: DWORD; DriverInfoData: SP_DRVINFO_DATA): BOOL; stdcall;
+function SetupDiEnumDriverInfo(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; DriverType: DWORD;
+  MemberIndex: DWORD; DriverInfoData: SP_DRVINFO_DATA): BOOL; stdcall;
   external 'Setupapi.dll' name 'SetupDiEnumDriverInfoA';
 
-function SetupDiGetSelectedDriver(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; DriverInfoData: PSP_DRVINFO_DATA): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiGetSelectedDriverA';
+function SetupDiGetSelectedDriver(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA;
+  DriverInfoData: PSP_DRVINFO_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetSelectedDriverA';
 
-function SetupDiSetClassInstallParams(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; ClassInstallParams: PSP_CLASSINSTALL_HEADER; ClassInstallParamsSize: DWORD)
-  : BOOL stdcall; external 'Setupapi.dll' name 'SetupDiSetClassInstallParamsA';
-function SetupDiCallClassInstaller(InstallFunction: DI_FUNCTION; DeviceInfoSet: HDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiCallClassInstaller';
+function SetupDiSetClassInstallParams(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA;
+  ClassInstallParams: PSP_CLASSINSTALL_HEADER; ClassInstallParamsSize: DWORD): BOOL stdcall;
+  external 'Setupapi.dll' name 'SetupDiSetClassInstallParamsA';
+function SetupDiCallClassInstaller(InstallFunction: DI_FUNCTION; DeviceInfoSet: HDEVINFO;
+  DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiCallClassInstaller';
 
 procedure GetAllHardDevice(tr: Ttreeview; il1: TImageList);
-Procedure GetTheHardDevice(yTypes: string; il1: TImageList; var sDevices: TStringList; var imid: integer) { :TStringList };
+Procedure GetTheHardDevice(yTypes: string; il1: TImageList; var sDevices: TStringList; var imid: integer)
+{ :TStringList };
 Function GetDeviceName(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
 Function DeviceClassName(Guid: TGUID): string;
 
@@ -219,7 +228,8 @@ begin
   result := str;
 end;
 
-Procedure GetTheHardDevice(yTypes: string; il1: TImageList; var sDevices: TStringList; var imid: integer) { :TStringList };
+Procedure GetTheHardDevice(yTypes: string; il1: TImageList; var sDevices: TStringList; var imid: integer)
+{ :TStringList };
 var
   ImageList: SP_CLASSIMAGELIST_DATA;
   HDEVINFO: Cardinal;
@@ -245,12 +255,10 @@ begin
   try
     while SetupDiEnumDeviceInfo(HDEVINFO, i, @DeviceInfoData) do
     begin
-
       GetDeviceName(HDEVINFO, @DeviceInfoData, Name);
       SetupDiGetClassImageIndex(@ImageList, @DeviceInfoData.ClassGuid, @ImageIndex);
       gui := GUIDToString(DeviceInfoData.ClassGuid);
       Types := Trim(DeviceClassName(DeviceInfoData.ClassGuid));
-
       if lowercase(Types) = lowercase(yTypes) then
       begin
         sDevices.Append(Trim(name));
@@ -298,9 +306,11 @@ begin
   buffersize := 256;
   buffer := AllocMem(buffersize);
   result := False;
-  if not SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData, SPDRP_FRIENDLYNAME, @DataT, PByte(buffer), buffersize, @buffersize) then
+  if not SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData, SPDRP_FRIENDLYNAME, @DataT, PByte(buffer),
+    buffersize, @buffersize) then
   begin
-    result := SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData, SPDRP_DEVICEDESC, @DataT, PByte(buffer), buffersize, @buffersize)
+    result := SetupDiGetDeviceRegistryProperty(DeviceInfoSet, DeviceInfoData, SPDRP_DEVICEDESC, @DataT, PByte(buffer),
+      buffersize, @buffersize)
   end
   else
     result := True;
@@ -329,7 +339,8 @@ begin
   PropChangeParams.Scope := DICS_FLAG_GLOBAL;
   PropChangeParams.StateChange := NewStatus;
 
-  if not SetupDiSetClassInstallParams(HDEVINFO, @DeviceInfoData, PSP_CLASSINSTALL_HEADER(@PropChangeParams), SizeOf(PropChangeParams)) then
+  if not SetupDiSetClassInstallParams(HDEVINFO, @DeviceInfoData, PSP_CLASSINSTALL_HEADER(@PropChangeParams),
+    SizeOf(PropChangeParams)) then
     Exit;
 
   // Call the ClassInstaller and perform the change.
@@ -379,8 +390,9 @@ end;
 procedure GetAllHardDevice(tr: Ttreeview; il1: TImageList);
 var
   ImageList: SP_CLASSIMAGELIST_DATA;
-  systemn, keyboardn, portsn, fdcn, hdcn, mousen, monitorn, floppydiskn, hidclassn, cdromn, diskdriven, displayn, usbn, median, netn, scsiadaptern, computern, legacydrivern,
-    volumen, processorn, intelunifieddisplaydrivern, othersn, rootn: TTreenode;
+  systemn, keyboardn, portsn, fdcn, hdcn, mousen, monitorn, floppydiskn, hidclassn, cdromn, diskdriven, displayn, usbn,
+    median, netn, scsiadaptern, computern, legacydrivern, volumen, processorn, intelunifieddisplaydrivern, othersn,
+    rootn: TTreenode;
 
   HDEVINFO: Cardinal;
   DeviceInfoData: SP_DEVINFO_DATA;

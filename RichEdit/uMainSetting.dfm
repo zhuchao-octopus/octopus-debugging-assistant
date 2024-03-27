@@ -27,8 +27,6 @@ object SettingPagesDlg: TSettingPagesDlg
     BorderWidth = 5
     ParentColor = True
     TabOrder = 0
-    ExplicitWidth = 1096
-    ExplicitHeight = 589
     object PageControl1: TPageControl
       AlignWithMargins = True
       Left = 8
@@ -38,8 +36,6 @@ object SettingPagesDlg: TSettingPagesDlg
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
-      ExplicitWidth = 1080
-      ExplicitHeight = 573
       object TabSheet1: TTabSheet
         Caption = 'Serial Port Settings'
         object Panel6: TPanel
@@ -50,8 +46,6 @@ object SettingPagesDlg: TSettingPagesDlg
           Align = alRight
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitLeft = 322
-          ExplicitHeight = 541
           object Panel11: TPanel
             AlignWithMargins = True
             Left = 5
@@ -364,7 +358,6 @@ object SettingPagesDlg: TSettingPagesDlg
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 1
-          ExplicitHeight = 541
           object Panel3: TPanel
             AlignWithMargins = True
             Left = 6
@@ -642,8 +635,6 @@ object SettingPagesDlg: TSettingPagesDlg
     BevelOuter = bvNone
     ParentColor = True
     TabOrder = 1
-    ExplicitTop = 589
-    ExplicitWidth = 1096
     object Button1: TButton
       Left = 911
       Top = 4
