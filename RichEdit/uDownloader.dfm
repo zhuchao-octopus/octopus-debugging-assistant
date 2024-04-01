@@ -15,7 +15,6 @@ object DownloaderFrm: TDownloaderFrm
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 17
   object PageControl1: TPageControl
     AlignWithMargins = True

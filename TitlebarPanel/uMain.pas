@@ -94,8 +94,7 @@ type
 
     procedure act_DynamicExecute(Sender: TObject);
     procedure act_tabset_albottomExecute(Sender: TObject);
-    procedure TabSet1DrawTab(Sender: TObject; TabCanvas: TCanvas; R: TRect;
-      Index: Integer; Selected: Boolean);
+    procedure TabSet1DrawTab(Sender: TObject; TabCanvas: TCanvas; R: TRect; Index: Integer; Selected: Boolean);
     procedure BitBtn1Click(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
   private
@@ -121,6 +120,8 @@ type
 var
   FrmMain: TFrmMain;
 
+procedure testSetupAPI();
+
 implementation
 
 uses
@@ -130,7 +131,8 @@ uses
   ClassTFormDockable,
   ClassTFormDockHostTabs,
   ClassTFormDockHostJoin,
-  uDockableControllerPanel;
+  uDockableControllerPanel.
+  ocPcDeviceMgt;
 
 {$R *.dfm}
 
@@ -240,7 +242,7 @@ begin
   Memo1.Lines.BeginUpdate;
   Memo1.Lines.Add('dafdfdf');
   Memo1.Lines.EndUpdate;
-
+  testSetupAPI();
 end;
 
 procedure TFrmMain.SetAsMainForm();
@@ -257,8 +259,8 @@ begin
     SettingPagesDlg := TSettingPagesDlg.Create(nil);
 
   self.CustomTitleBar.Height := 40;
-  //if SettingPagesDlg <> nil then
-  //  Application.Title := APPLICATION_TITLE + SettingPagesDlg.VersionNumberStr;
+  // if SettingPagesDlg <> nil then
+  // Application.Title := APPLICATION_TITLE + SettingPagesDlg.VersionNumberStr;
 
   self.Caption := Application.Title;
 
@@ -310,25 +312,25 @@ begin
   MainTabSetChange(NewTab);
 end;
 
-procedure TFrmMain.TabSet1DrawTab(Sender: TObject; TabCanvas: TCanvas; R: TRect;
-  Index: Integer; Selected: Boolean);
-var S : String;
+procedure TFrmMain.TabSet1DrawTab(Sender: TObject; TabCanvas: TCanvas; R: TRect; Index: Integer; Selected: Boolean);
+var
+  S: String;
 begin
 
-   //if IndexOfDisabledTab = Index
-   //then
-   //  TabCanvas.Font.Color := clGray
-   //else
-     TabCanvas.Font.Color := clBlack;
+  // if IndexOfDisabledTab = Index
+  // then
+  // TabCanvas.Font.Color := clGray
+  // else
+  TabCanvas.Font.Color := clBlack;
 
   S := TabSet1.Tabs.Strings[Index];
-  TabCanvas.TextRect(R, S, [tfVerticalCenter,tfSingleLine]);
+  TabCanvas.TextRect(R, S, [tfVerticalCenter, tfSingleLine]);
 end;
 
 procedure TFrmMain.Timer1Timer(Sender: TObject);
 begin
   inherited;
- Memo1.Lines.BeginUpdate;
+  Memo1.Lines.BeginUpdate;
   Memo1.Lines.Add('dafdfdf');
   Memo1.Lines.EndUpdate;
 end;
@@ -361,8 +363,8 @@ begin
   OcComPortObj := SettingPagesDlg.getAvailableDevice();
   if OcComPortObj = nil then
     Exit;
-  //if OcComPortObj.OcComPortObjPara.ComportFullName = '' then
-  //  Exit;
+  // if OcComPortObj.OcComPortObjPara.ComportFullName = '' then
+  // Exit;
 
   if OcComPortObj <> nil then
   begin
@@ -393,15 +395,15 @@ begin
   begin
     OcComPortObj.DebugLog('');
     OcComPortObj.DebugLog('################################################');
-    //OcComPortObj.DebugLog(APPLICATION_TITLE + SettingPagesDlg.VersionNumberStr);
-    //OcComPortObj.DebugLog('Home Page :' + WEB_SITE + ' ');
+    // OcComPortObj.DebugLog(APPLICATION_TITLE + SettingPagesDlg.VersionNumberStr);
+    // OcComPortObj.DebugLog('Home Page :' + WEB_SITE + ' ');
     OcComPortObj.DebugLog('Function  :' + 'ESC、F1、F2、F3');
     OcComPortObj.DebugLog('################################################');
-    //OcComPortObj.DebugLog(OcComPortObj.OcComPortObjPara.ComportFullName);
+    // OcComPortObj.DebugLog(OcComPortObj.OcComPortObjPara.ComportFullName);
   end
   else
   begin
-   // OcComPortObj.DebugLog('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
+    // OcComPortObj.DebugLog('Can not open  ' + OcComPortObj.OcComPortObjPara.ComportFullName);
     OcComPortObj.DebugLog('Open failed!!!!! the device may be in use');
     // MessageBox(Application.Handle, PChar('Open device ' + OcComPortObj.OcComPortObjPara.ComportFullName + ' failed, it may be in used.'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
   end;
@@ -426,6 +428,58 @@ begin
     ToolBar16.GradientEndColor := LColor;
     // ToolBar32.GradientStartColor := LColor;
     // ToolBar32.GradientEndColor := LColor;
+  end;
+end;
+
+procedure testSetupAPI();
+var
+  hDevInfo: Int64;
+  // DeviceInfoData: SP_DEVINFO_DATA;
+  MemberIndex: DWORD;
+  hLib: HMODULE;
+  MySetupDiGetClassDevs: function(const ClassGuid: PGUID; Enumerator: PChar; hwndParent: HWND; Flags: DWORD)
+    : Int64; stdcall;
+  MySetupDiEnumDeviceInfo: function(DeviceInfoSet: HDEVINFO; MemberIndex: DWORD; DeviceInfoData: PSP_DEVINFO_DATA): BOOL;
+begin
+  hLib := LoadLibrary('C:\Windows\System32\setupapi.dll');
+  if hLib <> 0 then
+  begin
+    MySetupDiGetClassDevs := GetProcAddress(hLib, 'SetupDiGetClassDevsA');
+  end;
+  if Assigned(MySetupDiGetClassDevs) then
+  begin
+   hDevInfo := MySetupDiGetClassDevs(nil, nil, 0, DIGCF_ALLCLASSES or DIGCF_PRESENT);
+  end;
+  // 获取设备信息列表句柄
+  // hDevInfo := SetupDiGetClassDevs(nil, nil, 0, DIGCF_ALLCLASSES or DIGCF_PRESENT);
+  if hDevInfo = INVALID_HANDLE_VALUE then
+  begin
+    // 处理错误
+    // ShowMessage('无法获取设备信息列表句柄');
+    Exit;
+  end;
+
+  try
+    // 枚举设备信息元素
+    MemberIndex := 0;
+    // while SetupDiEnumDeviceInfo(hDevInfo, MemberIndex, @DeviceInfoData) do
+    begin
+      // 处理设备信息
+      // ...
+
+      // 递增 MemberIndex
+      Inc(MemberIndex);
+    end;
+
+    // 检查是否有错误
+    if GetLastError <> ERROR_NO_MORE_ITEMS then
+    begin
+      // 处理错误
+      // ShowMessage('枚举设备信息时发生错误');
+    end;
+  finally
+    // 关闭设备信息列表句柄
+    // SetupDiDestroyDeviceInfoList(hDevInfo);
   end;
 end;
 

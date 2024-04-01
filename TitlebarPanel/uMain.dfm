@@ -232,10 +232,10 @@ object FrmMain: TFrmMain
           OnClick = BitBtn1Click
         end
         object Memo2: TMemo
-          Left = 168
-          Top = 96
-          Width = 587
-          Height = 321
+          Left = 200
+          Top = 328
+          Width = 267
+          Height = 121
           Lines.Strings = (
             'Memo2')
           TabOrder = 2
@@ -247,8 +247,6 @@ object FrmMain: TFrmMain
         Top = 0
         HelpContext = 1
         Caption = #22270#24418
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object Chart1: TChart
           AlignWithMargins = True
           Left = 3
@@ -313,8 +311,6 @@ object FrmMain: TFrmMain
         Top = 0
         HelpContext = 2
         Caption = #24110#21161
-        ExplicitWidth = 0
-        ExplicitHeight = 0
         object WebBrowser1: TWebBrowser
           Left = 136
           Top = 104

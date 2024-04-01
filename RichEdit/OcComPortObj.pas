@@ -21,7 +21,7 @@ uses
 
 type
   TRECEIVE_FORMAT = (ASCIIFormat, HexadecimalFormat, Graphic, OctopusProtocol, SaveToFile);
-  TSEND_FORMAT = (S_ASCIIFormat, S_HexadecimalFormat, S_OctopusProtocol);
+  TSEND_FORMAT    = (S_ASCIIFormat, S_HexadecimalFormat, S_OctopusProtocol);
 
 const
   INPUT_OUTPUT_BUFFER_SIZE = 2097152; // 1048576;
@@ -36,14 +36,14 @@ const
   SEND_FLAG = '-> ';
 
 const
-  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ', 'Hexadecimal Format Receiving ', 'Graphic Analysis ', 'Octopus Protocol Analysis',
-    'File Receiving');
+  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ',
+    'Hexadecimal Format Receiving ', 'Graphic Analysis ', 'Octopus Protocol Analysis', 'File Receiving');
 
-  MAX_BAUDRATE_INDEX: Integer = 15;
+  MAX_BAUDRATE_INDEX: Integer     = 15;
   DEFAULT_HEXDATA_HEXSTRING_SPACE = 5;
 
 type
-  TCallBackFun = Procedure(Count: Integer = 0) of object;
+  TCallBackFun         = Procedure(Count: Integer = 0) of object;
   TProtocolCallBackFun = Procedure(TypeID: Integer) of object;
 
   { TOcComPortObjPara = packed record
@@ -66,7 +66,7 @@ type
 
   // thread for background monitoring of port events
 type
-  TComUIHandleThread = class;
+  TComUIHandleThread         = class;
   TComPackParserHandleThread = class;
 
   TOcComPortObj = class(TComport)
@@ -141,7 +141,8 @@ type
     Constructor Create(AOwner: TComponent; DeviceName: String);
     destructor Destroy; override;
     // procedure OcComPortObjInit(OcComPortObjPara: TOcComPortObjPara);
-    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
+    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit;
+      time, date, line, log, o: Boolean);
 
     function getCMDStr(): String;
     function IsLogBottom(): Boolean;
@@ -168,7 +169,8 @@ type
     property ComReceiveCount: Int64 read FComReceiveCount;
     property ComProcessedCount: Int64 read FComProcessedCount;
     property ComSentCount: Int64 read FComSentCount;
-    property ComHandleThread_AsynCount: Integer read FBackGroundProcessRecordCount write FBackGroundProcessRecordCount default OCTOPUS_BACKGROUD_STRING_TRIGGERLINE;
+    property ComHandleThread_AsynCount: Integer read FBackGroundProcessRecordCount write FBackGroundProcessRecordCount
+      default OCTOPUS_BACKGROUD_STRING_TRIGGERLINE;
     property HexModeFormatCount: Integer read FHexModeFormatCount write FHexModeFormatCount default 16;
     property FileStream: TFileStream read FFileStream write FFileStream default nil;
     property FileStreamName: String read FFileStreamName write FFileStreamName;
@@ -200,8 +202,10 @@ type
     function WaitProtocolACK(ACK: Integer; timeOut: Integer): Boolean;
     function WaitProtocolACK2(ACKBuffer: array of Byte; bCount: Integer; timeOut: Integer): Boolean;
 
-    function SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
-    function SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
+    function SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean)
+      : Boolean; overload;
+    function SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean)
+      : Boolean; overload;
 
     function SendProtocolPackage(pPOcComPack: POcComPack): Boolean; overload;
     function SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: Integer): Boolean;
@@ -354,7 +358,8 @@ begin
     Result := Format('%0.10d| ', [LineNumber])
 end;
 
-constructor TComPackParserHandleThread.Create(OcComPortObj: TOcComPortObj; OcComProtocal: TOcComProtocal); // 数据特殊处理线程后台进行
+constructor TComPackParserHandleThread.Create(OcComPortObj: TOcComPortObj; OcComProtocal: TOcComProtocal);
+// 数据特殊处理线程后台进行
 begin
   inherited Create(True); // 先挂起
   FStartIndex := 0;
@@ -397,7 +402,8 @@ begin
     try
       if Length(FOcComPortObj.FComReceiveInternalBuffer) >= SizeOf(TOcComPackHead) then
       begin
-        j := self.FOcComProtocal.ParserPack(@FOcComPortObj.FComReceiveInternalBuffer[FStartIndex], Length(FOcComPortObj.FComReceiveInternalBuffer) - FStartIndex);
+        j := self.FOcComProtocal.ParserPack(@FOcComPortObj.FComReceiveInternalBuffer[FStartIndex],
+          Length(FOcComPortObj.FComReceiveInternalBuffer) - FStartIndex);
 
         FStartIndex := FStartIndex + j;
       end
@@ -575,7 +581,8 @@ begin
             if FOcComPortObj.FHexModeWithString then // 需要解析翻译
             begin
               s := Format(f, [Trim(s)]);
-              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1], FOcComPortObj.FHexModeFormatCount);
+              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer
+                [FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1], FOcComPortObj.FHexModeFormatCount);
             end;
             FOcComPortObj.log(s);
             s := ''; // 这时J 的值无意义
@@ -596,11 +603,13 @@ begin
               if ((Length(FOcComPortObj.FComReceiveInternalBuffer) - j) <= FOcComPortObj.FHexModeFormatCount) then
               begin
                 s := Format(f, [Trim(s)]);
-                s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount);
+                s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j],
+                  FOcComPortObj.FHexModeFormatCount);
               end
               else
               begin // 这种情况应该没有
-                s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
+                s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j],
+                  Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
               end;
             end
             else
@@ -797,7 +806,8 @@ begin
   self.CallBackFun := CallBackFun;
 end;
 
-procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
+procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit;
+  time, date, line, log, o: Boolean);
 var
   threadsuspended: Boolean;
   // oldi:integer;
@@ -1548,7 +1558,8 @@ begin
 
     if (not isBackHandlerMode()) and (StringInternelCache.Lines.Count <= 0) then
       FComUIHandleThread.Suspended := True // 挂起后台线程任务
-    else if isBackHandlerMode() or (not FComUIHandleThread.Suspended) or (StringInternelCache.Lines.Count > 0) then // 后台工作模式
+    else if isBackHandlerMode() or (not FComUIHandleThread.Suspended) or (StringInternelCache.Lines.Count > 0) then
+    // 后台工作模式
     begin
       CachedString(FComReceiveString);
 
@@ -1566,7 +1577,8 @@ begin
     begin // 直接处理，无需缓存无需特殊处理，不额外显示日期日期信息
       if FNeedNewLine then
       begin
-        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
+        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10)
+        then // \r\n
           FNeedNewLine := True
         else
           FNeedNewLine := false;
@@ -1576,7 +1588,8 @@ begin
       end
       else
       begin
-        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
+        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10)
+        then // \r\n
           FNeedNewLine := True
         else
           FNeedNewLine := false;
@@ -1661,7 +1674,8 @@ begin
   /// ///////////////////////////////////////////////////////////////////////////
   else if FReceiveFormat = Ord(SaveToFile) then // for File save to file
   begin
-    if (CompareText(ExtractFileExt(self.FileStreamName), '.txt') = 0) or (CompareText(ExtractFileExt(self.FileStreamName), '.log') = 0) then
+    if (CompareText(ExtractFileExt(self.FileStreamName), '.txt') = 0) or
+      (CompareText(ExtractFileExt(self.FileStreamName), '.log') = 0) then
     begin
       AssignFile(f, self.FileStreamName);
       Append(f);
@@ -1676,7 +1690,8 @@ begin
       // if Assigned(FCallBackFun) then
       // FCallBackFun();
     end
-    else if (CompareText(ExtractFileExt(self.FileStreamName), '.xls') = 0) or (CompareText(ExtractFileExt(self.FileStreamName), '.xlsx') = 0) then
+    else if (CompareText(ExtractFileExt(self.FileStreamName), '.xls') = 0) or
+      (CompareText(ExtractFileExt(self.FileStreamName), '.xlsx') = 0) then
     begin
       ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
       i := self.Read(FComReceiveBuffer, Count);
@@ -1769,12 +1784,14 @@ begin
   end;
 end;
 
-function TOcComPortObj.SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean;
+function TOcComPortObj.SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer;
+  NeedACK: Boolean): Boolean;
 begin
   Result := SendProtocolData(OCCOMPROTOCAL_HEAD, TypeID, Buffer, Count, NeedACK);
 end;
 
-function TOcComPortObj.SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean;
+function TOcComPortObj.SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer;
+  NeedACK: Boolean): Boolean;
 var
   OcComPack: TOcComPack;
   // OcComPackHead: TOcComPackHead;
@@ -2326,7 +2343,8 @@ begin
     end;
     try // NORMAL_PRIORITY_CLASS
       { 创建一个子进程，运行console程序 }
-      if CreateProcess(nil, Pchar(cmdstr), @Security, @Security, True, REALTIME_PRIORITY_CLASS, nil, nil, Start, ProcessInfo) then
+      if CreateProcess(nil, Pchar(cmdstr), @Security, @Security, True, REALTIME_PRIORITY_CLASS, nil, nil, Start,
+        ProcessInfo) then
       begin
         { 等待进程运行结束 }
         WaitForSingleObject(ProcessInfo.hProcess, WAIT_TIMEOUT); // INFINITE

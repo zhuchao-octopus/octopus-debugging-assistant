@@ -343,7 +343,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 90
               Width = 257
               Height = 17
-              Caption = 'Process the data in the background'
+              Caption = 'Data processing in the background'
               Checked = True
               State = cbChecked
               TabOrder = 4

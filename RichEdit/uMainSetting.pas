@@ -197,8 +197,8 @@ begin
   // Getsystemtime(lpSystemTime);
   GetLocalTime(LocalSystemTime);
   // Result:=Format('[%0.4d\%0.2d\%0.2d\%0.2d:%0.2d:%0.2d] ',[lpSystemTime.wYear,lpSystemTime.wMonth,lpSystemTime.wDay,lpSystemTime.wHour,lpSystemTime.wMinute,lpSystemTime.wSecond]);
-  Result := Format('%0.4d%0.2d%0.2d_%0.2d%0.2d%0.2d', [LocalSystemTime.wYear, LocalSystemTime.wMonth,
-    LocalSystemTime.wDay, LocalSystemTime.wHour, LocalSystemTime.wMinute, LocalSystemTime.wSecond]);
+  Result := Format('%0.4d%0.2d%0.2d_%0.2d%0.2d%0.2d', [LocalSystemTime.wYear, LocalSystemTime.wMonth, LocalSystemTime.wDay, LocalSystemTime.wHour,
+    LocalSystemTime.wMinute, LocalSystemTime.wSecond]);
 end;
 
 function FirstDriveFromMask(unitmask: integer): string;
@@ -348,7 +348,6 @@ var
 begin
   try
     ImageList1.Clear;
-    ComboBoxEx1.Clear;
 
     if OcComPortDeviceList = nil then
       OcComPortDeviceList := TStringList.Create;
@@ -373,18 +372,18 @@ begin
     end;
 
     /// 更新设备列表
+    ComboBoxEx1.Clear;
     ComboBoxEx1.Images := ImageList1;
     /// 内部设备列表
-
     for i := 0 to devideNameList.Count - 1 do // 当前可用列表
     begin
       if ComboBoxEx1.Items.IndexOf(devideNameList.Strings[i]) < 0 then
       /// 只增加不删除,ComboBoxEx1
       begin
-        ComboBoxEx1.ItemsEx.BeginUpdate;
+        // ComboBoxEx1.ItemsEx.BeginUpdate;
         ComboBoxEx1.ItemsEx.AddItem(devideNameList.Strings[i], imageId, imageId, imageId, -1, nil);
         ComboBoxEx1.ItemsEx.EndUpdate;
-        ComboBoxEx1.ItemsEx.Items[i].ImageIndex := imageId;
+        // ComboBoxEx1.ItemsEx.Items[i].ImageIndex := imageId;
       end;
 
       OcComPortDeviceList.BeginUpdate;
@@ -419,6 +418,10 @@ begin
     /// 回调UI层
     if Assigned(SettingChangedCallBackFuntion) then
       SettingChangedCallBackFuntion(nil, 0);
+
+    if ComboBoxEx1.ItemIndex < 0 then
+      ComboBoxEx1.ItemIndex := 1;
+    ComboBoxEx1.Update;
   finally
     devideNameList.Free;
   end;
@@ -531,6 +534,8 @@ begin
   finally
   end;
 
+  CheckBox8.Checked:=false;
+  Timer1.Enabled := CheckBox8.Checked;
   /// CurrentLaunguage := -1;
 end;
 
@@ -544,8 +549,8 @@ end;
 
 procedure TSettingPagesDlg.ComboBoxEx1Change(Sender: TObject);
 var
-  /// sDriverName: string;
-  /// i: Integer;
+  // bName: string;
+  i: integer;
   OcComPortObj: TOcComPortObj;
 begin
   if (ComboBoxEx1.Items.Count <= 0) or (ComboBoxEx1.Text = 'None') then
@@ -560,8 +565,19 @@ begin
     exit;
   /// sDriverName := Trim(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   /// sDriverName := FalconGetComPort(sDriverName);
+  if OcComPortObj.BaudRate = TBaudRate(0) then
+  begin
+    i := ComboBox1.Items.IndexOf(IntToStr(OcComPortObj.CustomBaudRate));
+    if (i > 0) and (i < ComboBox1.Items.Count) then
+      ComboBox1.ItemIndex := i
+    else
+      ComboBox1.ItemIndex := 0;
+  end
+  else
+  begin
+    ComboBox1.ItemIndex := ord(OcComPortObj.BaudRate);
+  end;
 
-  ComboBox1.ItemIndex := ord(OcComPortObj.BaudRate);
   ComboBox2.ItemIndex := ord(OcComPortObj.DataBits);
   ComboBox3.ItemIndex := ord(OcComPortObj.StopBits);
   ComboBox4.ItemIndex := ord(OcComPortObj.Parity.Bits);
@@ -588,15 +604,13 @@ begin
 
   if ComboBoxEx1.Items.Count <= 0 then
   begin
-    MessageBox(Handle, 'Please specify a device for custom baudrate.', PChar(Application.Title),
-      MB_ICONINFORMATION + MB_OK);
+    MessageBox(Handle, 'Please specify a device for custom baudrate.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
   OcComPortObj := getDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if OcComPortObj = nil then
   begin
-    MessageBox(Handle, 'Please specify a device for custom baudrate.', PChar(Application.Title),
-      MB_ICONINFORMATION + MB_OK);
+    MessageBox(Handle, 'Please specify a device for custom baudrate.', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
     exit;
   end;
 
@@ -615,8 +629,7 @@ begin
         ComboBox1.ItemIndex := ComboBox1.Items.IndexOf(str);
       except
         ComboBox1.ItemIndex := 13;
-        MessageBox(Handle, 'Wrong baud rate,Please input a integer number. ', PChar(Application.Title),
-          MB_ICONINFORMATION + MB_OK);
+        MessageBox(Handle, 'Wrong baud rate,Please input a integer number. ', PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
       end;
     end;
     exit;
@@ -631,6 +644,8 @@ begin
   begin // 配置自定义波特率
     OcComPortObj.BaudRate := TBaudRate(0);
     OcComPortObj.CustomBaudRate := StrToInt(ComboBox1.Text);
+    // if ComboBox1.Items.IndexOf(IntToStr(OcComPortObj.CustomBaudRate)) < 0 then
+    // ComboBox1.ItemIndex := ComboBox1.Items.IndexOf(str);
   end;
 end;
 
@@ -653,10 +668,10 @@ begin
   begin
     ApplyOcComPortObjAtrribute(OcComPortObj);
     ApplyCodePageSetting(OcComPortObj);
-    SaveDeviceSetting(self.getCurrentDevice);
-    Timer1.Enabled := CheckBox8.Checked;
+    SaveDeviceSetting(OcComPortObj);
   end;
 
+  Timer1.Enabled := CheckBox8.Checked;
   AlphaBlendValue := UpDown1.Position;
   AlphaBlend := CheckBox7.Checked;
 
@@ -784,8 +799,7 @@ begin
   begin
     if (OcComPortDeviceList.Objects[i] = nil) then
       continue;
-    if not TOcComPortObj(OcComPortDeviceList.Objects[i]).Connected and
-      (TOcComPortObj(OcComPortDeviceList.Objects[i]).status = 0) then
+    if not TOcComPortObj(OcComPortDeviceList.Objects[i]).Connected and (TOcComPortObj(OcComPortDeviceList.Objects[i]).status = 0) then
     begin
       Result := TOcComPortObj(OcComPortDeviceList.Objects[i]);
       break;
@@ -839,12 +853,23 @@ begin
   if OcComPortObj.Connected then
     exit;
 
-  try
-    ApplyOcComPortObjAtrribute(OcComPortObj);
-    ApplyCodePageSetting(OcComPortObj);
-    SaveDeviceSetting(self.getCurrentDevice);
-    Timer1.Enabled := CheckBox8.Checked;
+  i := ComboBoxEx1.Items.IndexOf(OcComPortObj.ComPortFullName);
+  if (i >= 0) and (i < ComboBoxEx1.GetCount) then
+  begin // 刷新当前设备配置显示
+    ComboBoxEx1.ItemIndex := i;
+    ComboBoxEx1.OnChange(self);
+  end
+  else
+  begin
+    OcComPortObj.DebugLog('OcComPortObj.ComPortFullName is not avalable!');
+    exit;
+  end;
 
+  // ApplyOcComPortObjAtrribute(OcComPortObj);
+  // ApplyCodePageSetting(OcComPortObj);
+  // SaveDeviceSetting(OcComPortObj);
+
+  try
     OcComPortObj.Open;
     Result := true;
     OcComPortObj.status := 1;
@@ -915,8 +940,7 @@ begin
     Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox34.Name), CheckBox34.Checked);
     Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox35.Name), CheckBox35.Checked);
     Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox36.Name), CheckBox36.Checked);
-    Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckboxProcessDataBackground.Name),
-      CheckboxProcessDataBackground.Checked);
+    Octopusini.WriteBool(OcComPortObj.ComPortFullName, getObjectID(CheckboxProcessDataBackground.Name), CheckboxProcessDataBackground.Checked);
 
     Octopusini.WriteString('Configuration', 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
     Octopusini.WriteInteger('Configuration', 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
@@ -954,25 +978,18 @@ begin
     CheckBox35.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox35.Name), false);
     CheckBox36.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckBox36.Name), false);
 
-    ComboBox6.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, getObjectID(ComboBox6.Name),
-      ComboBox6.ItemIndex);
-    ComboBox7.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, getObjectID(ComboBox7.Name),
-      ComboBox7.ItemIndex);
+    ComboBox6.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, getObjectID(ComboBox6.Name), ComboBox6.ItemIndex);
+    ComboBox7.ItemIndex := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, getObjectID(ComboBox7.Name), ComboBox7.ItemIndex);
 
-    CheckboxProcessDataBackground.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName,
-      getObjectID(CheckboxProcessDataBackground.Name), true);
+    CheckboxProcessDataBackground.Checked := Octopusini.ReadBool(OcComPortObj.ComPortFullName, getObjectID(CheckboxProcessDataBackground.Name), true);
 
     FontDialogConsole.Font.Charset := TFontCharset(DEFAULT_CHARSET);
-    FontDialogConsole.Font.Name := Octopusini.ReadString(OcComPortObj.ComPortFullName, 'CONTENT_FONTNAME',
-      FontDialogConsole.Font.Name);
-    FontDialogConsole.Font.Size := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_FONTSIZE',
-      FontDialogConsole.Font.Size);
-    FontDialogConsole.Font.Color := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_FONTCOLOR',
-      FontDialogConsole.Font.Color);
+    FontDialogConsole.Font.Name := Octopusini.ReadString(OcComPortObj.ComPortFullName, 'CONTENT_FONTNAME', FontDialogConsole.Font.Name);
+    FontDialogConsole.Font.Size := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_FONTSIZE', FontDialogConsole.Font.Size);
+    FontDialogConsole.Font.Color := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_FONTCOLOR', FontDialogConsole.Font.Color);
     ColorBoxText.Selected := FontDialogConsole.Font.Color;
 
-    ColorBoxContentBG.Selected := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_BACKGROUNDCOLOR',
-      ColorBoxContentBG.Selected);
+    ColorBoxContentBG.Selected := Octopusini.ReadInteger(OcComPortObj.ComPortFullName, 'CONTENT_BACKGROUNDCOLOR', ColorBoxContentBG.Selected);
     if ColorBoxContentBG.Selected = clBlack then
     begin
       FontDialogConsole.Font.Color := clSilver;
@@ -1025,9 +1042,8 @@ var
 begin
   if OcComPortObj = nil then
     exit;
-  OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex,
-    ComboBox4.ItemIndex, ComboBox5.ItemIndex, ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil, CheckBox33.Checked,
-    CheckBox34.Checked, CheckBox35.Checked, CheckBox36.Checked, true);
+  OcComPortObj.OcComPortObjInit2('', '', ComboBox1.ItemIndex, ComboBox2.ItemIndex, ComboBox3.ItemIndex, ComboBox4.ItemIndex, ComboBox5.ItemIndex,
+    ComboBox6.ItemIndex, ComboBox7.ItemIndex, nil, CheckBox33.Checked, CheckBox34.Checked, CheckBox35.Checked, CheckBox36.Checked, true);
 
   OcComPortObj.BackgroundTaskMode := CheckboxProcessDataBackground.Checked;
 
@@ -1155,8 +1171,7 @@ begin
     begin
       IniFiles := TIniFile.Create(Path);
       Form.Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TForm', getMsgID(Form.Name), Form.Caption);
-      Application.Title := IniFiles.ReadString(SectionName + '_LANGUAGE_APPLICATION_TITLE', getMsgID('title_name'),
-        OCTOPUS_APPLICATION_TITLE_NAME);
+      Application.Title := IniFiles.ReadString(SectionName + '_LANGUAGE_APPLICATION_TITLE', getMsgID('title_name'), OCTOPUS_APPLICATION_TITLE_NAME);
       /// showmessage(Form.Caption+' '+Path);
       For i := 0 To Form.ComponentCount - 1 Do
       Begin
@@ -1167,42 +1182,42 @@ begin
 
         if tmpComponent is TButton then
         begin
-          TButton(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TButton',
-            getMsgID(TButton(tmpComponent).Name), TButton(tmpComponent).Caption);
+          TButton(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name),
+            TButton(tmpComponent).Caption);
           /// showmessage(TButton(tmpComponent).Caption+' ' +getMsgID(TButton(tmpComponent).Name)+' '+Path);
         end;
 
         if tmpComponent is TCheckBox then
-          TCheckBox(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TCheckBox',
-            getMsgID(TCheckBox(tmpComponent).Name), TCheckBox(tmpComponent).Caption);
+          TCheckBox(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TCheckBox', getMsgID(TCheckBox(tmpComponent).Name),
+            TCheckBox(tmpComponent).Caption);
 
         if tmpComponent is TLabel then
-          TLabel(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TLabel',
-            getMsgID(TLabel(tmpComponent).Name), TLabel(tmpComponent).Caption);
+          TLabel(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TLabel', getMsgID(TLabel(tmpComponent).Name),
+            TLabel(tmpComponent).Caption);
 
         if tmpComponent is TMenuItem then
-          TMenuItem(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TMenuItem',
-            getMsgID(TMenuItem(tmpComponent).Name), TMenuItem(tmpComponent).Caption);
+          TMenuItem(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TMenuItem', getMsgID(TMenuItem(tmpComponent).Name),
+            TMenuItem(tmpComponent).Caption);
 
         if tmpComponent is TTabSheet then
-          TTabSheet(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TTabSheet',
-            getMsgID(TTabSheet(tmpComponent).Name), TTabSheet(tmpComponent).Caption);
+          TTabSheet(tmpComponent).Caption := IniFiles.ReadString(SectionName + '_LANGUAGE_TTabSheet', getMsgID(TTabSheet(tmpComponent).Name),
+            TTabSheet(tmpComponent).Caption);
 
         if tmpComponent is TStringGrid then
         begin
-          TStringGrid(tmpComponent).Cells[0, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid',
-            getMsgID(TStringGrid(tmpComponent).Name + 'COL0'), TStringGrid(tmpComponent).Cells[0, 0]);
-          TStringGrid(tmpComponent).Cells[1, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid',
-            getMsgID(TStringGrid(tmpComponent).Name + 'COL1'), TStringGrid(tmpComponent).Cells[1, 0]);
-          TStringGrid(tmpComponent).Cells[2, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid',
-            getMsgID(TStringGrid(tmpComponent).Name + 'COL2'), TStringGrid(tmpComponent).Cells[2, 0]);
+          TStringGrid(tmpComponent).Cells[0, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL0'),
+            TStringGrid(tmpComponent).Cells[0, 0]);
+          TStringGrid(tmpComponent).Cells[1, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL1'),
+            TStringGrid(tmpComponent).Cells[1, 0]);
+          TStringGrid(tmpComponent).Cells[2, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL2'),
+            TStringGrid(tmpComponent).Cells[2, 0]);
 
-          TStringGrid(tmpComponent).Cells[4, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid',
-            getMsgID(TStringGrid(tmpComponent).Name + 'COL4'), TStringGrid(tmpComponent).Cells[4, 0]);
-          TStringGrid(tmpComponent).Cells[5, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid',
-            getMsgID(TStringGrid(tmpComponent).Name + 'COL5'), TStringGrid(tmpComponent).Cells[5, 0]);
-          TStringGrid(tmpComponent).Cells[6, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid',
-            getMsgID(TStringGrid(tmpComponent).Name + 'COL6'), TStringGrid(tmpComponent).Cells[6, 0]);
+          TStringGrid(tmpComponent).Cells[4, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL4'),
+            TStringGrid(tmpComponent).Cells[4, 0]);
+          TStringGrid(tmpComponent).Cells[5, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL5'),
+            TStringGrid(tmpComponent).Cells[5, 0]);
+          TStringGrid(tmpComponent).Cells[6, 0] := IniFiles.ReadString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL6'),
+            TStringGrid(tmpComponent).Cells[6, 0]);
         end;
         /// application.ProcessMessages;
       End;
@@ -1222,43 +1237,32 @@ begin
         /// IniFiles.WriteString(SectionName + '_LANGUAGE_TForm', getMsgID(TForm(tmpComponent).Name), TForm(tmpComponent).Caption);
 
         if tmpComponent is TButton then
-          IniFiles.WriteString(SectionName + '_LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name),
-            TButton(tmpComponent).Caption);
+          IniFiles.WriteString(SectionName + '_LANGUAGE_TButton', getMsgID(TButton(tmpComponent).Name), TButton(tmpComponent).Caption);
 
         if tmpComponent is TCheckBox then
-          IniFiles.WriteString(SectionName + '_LANGUAGE_TCheckBox', getMsgID(TCheckBox(tmpComponent).Name),
-            TCheckBox(tmpComponent).Caption);
+          IniFiles.WriteString(SectionName + '_LANGUAGE_TCheckBox', getMsgID(TCheckBox(tmpComponent).Name), TCheckBox(tmpComponent).Caption);
 
         if tmpComponent is TLabel then
-          IniFiles.WriteString(SectionName + '_LANGUAGE_TLabel', getMsgID(TLabel(tmpComponent).Name),
-            TLabel(tmpComponent).Caption);
+          IniFiles.WriteString(SectionName + '_LANGUAGE_TLabel', getMsgID(TLabel(tmpComponent).Name), TLabel(tmpComponent).Caption);
 
         if tmpComponent is TMenuItem then
         begin
           if TMenuItem(tmpComponent).Caption <> '-' then
-            IniFiles.WriteString(SectionName + '_LANGUAGE_TMenuItem', getMsgID(TMenuItem(tmpComponent).Name),
-              TMenuItem(tmpComponent).Caption);
+            IniFiles.WriteString(SectionName + '_LANGUAGE_TMenuItem', getMsgID(TMenuItem(tmpComponent).Name), TMenuItem(tmpComponent).Caption);
         end;
 
         if tmpComponent is TTabSheet then
-          IniFiles.WriteString(SectionName + '_LANGUAGE_TTabSheet', getMsgID(TTabSheet(tmpComponent).Name),
-            TTabSheet(tmpComponent).Caption);
+          IniFiles.WriteString(SectionName + '_LANGUAGE_TTabSheet', getMsgID(TTabSheet(tmpComponent).Name), TTabSheet(tmpComponent).Caption);
 
         if tmpComponent is TStringGrid then
         begin
-          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL0'),
-            TStringGrid(tmpComponent).Cells[0, 0]);
-          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL1'),
-            TStringGrid(tmpComponent).Cells[1, 0]);
-          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL2'),
-            TStringGrid(tmpComponent).Cells[2, 0]);
+          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL0'), TStringGrid(tmpComponent).Cells[0, 0]);
+          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL1'), TStringGrid(tmpComponent).Cells[1, 0]);
+          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL2'), TStringGrid(tmpComponent).Cells[2, 0]);
 
-          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL4'),
-            TStringGrid(tmpComponent).Cells[4, 0]);
-          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL5'),
-            TStringGrid(tmpComponent).Cells[5, 0]);
-          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL6'),
-            TStringGrid(tmpComponent).Cells[6, 0]);
+          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL4'), TStringGrid(tmpComponent).Cells[4, 0]);
+          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL5'), TStringGrid(tmpComponent).Cells[5, 0]);
+          IniFiles.WriteString('LANGUAGE_TStringGrid', getMsgID(TStringGrid(tmpComponent).Name + 'COL6'), TStringGrid(tmpComponent).Cells[6, 0]);
         end;
       End;
     end
