@@ -534,7 +534,7 @@ begin
   finally
   end;
 
-  CheckBox8.Checked:=false;
+  CheckBox8.Checked := false;
   Timer1.Enabled := CheckBox8.Checked;
   /// CurrentLaunguage := -1;
 end;
@@ -858,16 +858,15 @@ begin
   begin // 刷新当前设备配置显示
     ComboBoxEx1.ItemIndex := i;
     ComboBoxEx1.OnChange(self);
+    ApplyOcComPortObjAtrribute(OcComPortObj);
+    ApplyCodePageSetting(OcComPortObj);
+    // SaveDeviceSetting(OcComPortObj);
   end
   else
   begin
     OcComPortObj.DebugLog('OcComPortObj.ComPortFullName is not avalable!');
     exit;
   end;
-
-  // ApplyOcComPortObjAtrribute(OcComPortObj);
-  // ApplyCodePageSetting(OcComPortObj);
-  // SaveDeviceSetting(OcComPortObj);
 
   try
     OcComPortObj.Open;
