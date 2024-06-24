@@ -145,7 +145,7 @@ type
       time, date, line, log, o: Boolean);
 
     function getCMDStr(): String;
-    function IsLogBottom(): Boolean;
+    function IsLogAtBottom(): Boolean;
     procedure log(const Msg: string); // log data
     procedure LogBuff(flag: String; const Buff: Array of Byte; Count: Integer);
     procedure LogBottomMod(const Msg: string; appendMod: Boolean; bottomMod: Boolean);
@@ -529,7 +529,8 @@ begin
         else }
       begin
         s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.FLogObject.Lines.Count) + s;
-        FOcComPortObj.FLogObject.log(s);
+        //FOcComPortObj.FLogObject.log(s);
+        FOcComPortObj.LogBottomMod(s, True, FOcComPortObj.IsLogAtBottom());
       end;
 
       { // s := FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex];
@@ -642,7 +643,7 @@ begin
         FOcComPortObj.ClearInternalBuff();
         LeaveCriticalSection(Critical);
 
-        self.Suspended := True; // 忙完了挂起
+        Self.Suspended := True; // 忙完了挂起
         Continue;
       end;
     end // hex
@@ -929,7 +930,7 @@ begin
     Exit;
   end;
 
-  isBottom := IsLogBottom();
+  isBottom := IsLogAtBottom();
   PreLogLinesCount := FLogObject.Lines.Count;
 
   FLogObject.Lines.BeginUpdate;
@@ -1041,7 +1042,7 @@ var
 begin
   if (FLogObject = nil) or (FLogObject.Parent = nil) then
     Exit;
-  isBottom := IsLogBottom();
+  isBottom := IsLogAtBottom();
   PreLogLinesCount := FLogObject.Lines.Count;
 
   FLogObject.Lines.BeginUpdate;
@@ -1065,21 +1066,21 @@ end;
 
 // LogMemo 垂直滚动条是否滑到了最底部
 // 如果是最底部，则LogMemo进入自动滚动模式
-function TOcComPortObj.IsLogBottom(): Boolean;
+function TOcComPortObj.IsLogAtBottom(): Boolean;
 var
   SF: TScrollInfo;
   currentPos: Integer;
 begin
+   Result := False;
   if FLogObject = nil then
     Exit;
   SF.fMask := SIF_ALL;
   SF.cbSize := SizeOf(SF);
   GetScrollInfo(FLogObject.Handle, SB_VERT, SF);
   currentPos := SF.nPos + SF.nPage;
-  Result := false;
   if currentPos >= SF.nMax - 20 then
   begin
-    // '滚动条到达底部'
+    // 滚动条已经到达底部
     Result := True;
   end;
 end;
@@ -1515,7 +1516,7 @@ var
   PreLogLinesCount: Int64;
   Buff: array of Byte;
   f: Text;
-  isBottom: Boolean;
+  isAtBottom: Boolean;
 Label FUNCTION_END;
   function isBackHandlerMode(): Boolean;
   begin
@@ -1531,7 +1532,7 @@ begin
   if (not Connected) then
     Exit; // 突然断开
 
-  isBottom := IsLogBottom();
+  isAtBottom := IsLogAtBottom();
 
   if FReceiveFormat = Ord(ASCIIFormat) then // receive as string
   begin
@@ -1584,7 +1585,7 @@ begin
           FNeedNewLine := false;
 
         FComReceiveString := TrimRight(FComReceiveString);
-        LogBottomMod(FComReceiveString, True, isBottom);
+        LogBottomMod(FComReceiveString, True, isAtBottom);
       end
       else
       begin
@@ -1595,7 +1596,7 @@ begin
           FNeedNewLine := false;
 
         FComReceiveString := TrimRight(FComReceiveString);
-        LogBottomMod(FComReceiveString, false, isBottom);
+        LogBottomMod(FComReceiveString, false, isAtBottom);
       end;
       // 统计处理数量
       FComProcessedCount := FComProcessedCount + Length(FComReceiveString);
@@ -1719,7 +1720,7 @@ FUNCTION_END:
     FCallBackFun();
   if FReceiveFormat = Ord(ASCIIFormat) then
   begin
-    if (FLogScrollMode) and (Length(FComReceiveString) > 0) and isBottom then
+    if (FLogScrollMode) and (Length(FComReceiveString) > 0) and isAtBottom then
     begin
       FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
       FLogObject.Perform(WM_HSCROLL, SB_LEFT, 0);
