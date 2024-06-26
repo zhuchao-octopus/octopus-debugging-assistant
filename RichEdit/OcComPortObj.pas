@@ -118,6 +118,7 @@ type
     FNeedNewLine: Boolean;
     FLogScrollMode: Boolean;
     FMouseTextSelection: Boolean;
+    //FMouseStatus:Boolean;
     FBackgroundTaskMode: Boolean;
     // function GetConfiguration(): TOcComPortObjPara;
     function GetLineNumberDateTimeStamp(N: Int64): String;
@@ -257,9 +258,16 @@ var
   Critical: TRTLCriticalSection;
   CmdDir: String;
 
+function IsLeftMouseButtonDown: Boolean;
+
 implementation
 
 uses uOctopusFunction;
+
+function IsLeftMouseButtonDown: Boolean;
+begin
+  Result := GetKeyState(MK_LBUTTON) < 0;
+end;
 
 function readFileToStream(FileName: String): TFileStream;
 var
@@ -1558,7 +1566,9 @@ begin
     end;
 
     if (not isBackHandlerMode()) and (StringInternelCache.Lines.Count <= 0) then
-      FComUIHandleThread.Suspended := True // 挂起后台线程任务
+    begin
+      FComUIHandleThread.Suspended := True; // 挂起后台线程任务
+    end
     else if isBackHandlerMode() or (not FComUIHandleThread.Suspended) or (StringInternelCache.Lines.Count > 0) then
     // 后台工作模式
     begin
@@ -2267,7 +2277,7 @@ end;
 
 procedure TOcComPortObj.KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if Shift = [] then
+  if (Shift = [])  and (not IsLeftMouseButtonDown()) then
   begin
     FMouseTextSelection := false; // 去掉缓存
     if (StringInternelCache.Lines.Count > 0) and (not FMouseTextSelection) then
@@ -2282,12 +2292,18 @@ end;
 
 procedure TOcComPortObj.MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 begin
-
+  if (FMouseTextSelection = false) and (IsLeftMouseButtonDown()) then
+     FMouseTextSelection := True; // 启动缓存
 end;
 
 procedure TOcComPortObj.MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-
+   if Shift = [] then
+  begin
+    FMouseTextSelection := false; // 去掉缓存
+    if (StringInternelCache.Lines.Count > 0) and (not FMouseTextSelection) then
+      StartFlushOutCackedString(); // 开启线程
+  end;
 end;
 
 procedure TOcComPortObj.RunWindosShellCmd(const str: string);

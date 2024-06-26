@@ -635,11 +635,13 @@ begin
       end; // WM_KEYDOWN:begin
     WM_KEYUP:
       begin
+
         if (Msg.wParam = VK_F1) then
         begin
           Handled := true;
         end;
-        if Msg.wParam = VK_CONTROL then
+
+        if (Msg.wParam = VK_CONTROL)  and (not IsLeftMouseButtonDown()) then
         begin
           OcComPortObj := Self.GetCurrentDevice();
           if (OcComPortObj <> nil) then
@@ -649,7 +651,9 @@ begin
           end;
         end;
       end;
-  end; // case   msg.message   of
+
+  end; //case msg.message of
+
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormCreate(Sender: TObject);
