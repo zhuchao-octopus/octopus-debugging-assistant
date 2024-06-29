@@ -915,12 +915,16 @@ procedure TOcComPortObj.ClearLog;
 begin
   if (FLogObject <> nil) and self.FLogObject.Showing then
   begin
+
+    self.FLogObject.Lines.BeginUpdate;
     self.FLogObject.Clear;
     self.FComProcessedCount := 0;
     self.FComReceiveCount := 0;
     self.FComSentCount := 0;
     self.FComPackParserThread.StopReSetClear;
     self.FOcComProtocal.ClearPacks;
+    self.FLogObject.Lines.EndUpdate;
+
     if Assigned(FCallBackFun) then
       FCallBackFun();
   end;

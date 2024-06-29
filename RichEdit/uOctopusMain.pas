@@ -2450,7 +2450,7 @@ begin
   if OcComPortObj <> nil then
   begin
     OcComPortObj.ClearLog();
-    OcComPortObj.ClearInternalBuff();
+    //OcComPortObj.ClearInternalBuff();
     exit;
   end;
   Component := Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
