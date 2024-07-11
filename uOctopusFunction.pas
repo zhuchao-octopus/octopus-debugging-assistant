@@ -10,6 +10,7 @@ uses
   Vcl.WinXCtrls, Vcl.Menus, IniFiles, Vcl.Themes;
 
 Const
+
 {$IFDEF CPU64BITS}
   APPLICATION_TITLE_CN = '八爪鱼串口调试开发助手 64bit '; // for 64 bit;
 {$ELSE}

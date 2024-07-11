@@ -429,6 +429,7 @@ type
 
     procedure UpdateUartToolBar();
     procedure UpdateMainMenu();
+    procedure UpdateCommandObject();
 
     procedure StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
     procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
@@ -990,6 +991,13 @@ begin
   (Sender as TAction).Checked := CMyRichEdit.SelAttributes.Subscript = sstSuperscript;
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.UpdateCommandObject();
+begin
+  CommandFrm.OcComPortObj := Self.GetCurrentDevice();
+  if CommandFrm.OcComPortObj <> nil then
+    SetPathFileName(CommandFrm.OcComPortObj.ComPortFullName);
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.PageControl1Change(Sender: TObject);
 var
   Component: TComponent;
@@ -1016,11 +1024,8 @@ begin
       CommandFrm.Close;
   end;
 
-  CommandFrm.OcComPortObj := Self.GetCurrentDevice();
-  if CommandFrm.OcComPortObj <> nil then
-    SetPathFileName(CommandFrm.OcComPortObj.ComPortFullName);
-
-  Self.UpdateUartToolBar();
+  UpdateCommandObject();
+  UpdateUartToolBar();
   StatusBarPrintFileSize();
 end;
 
@@ -2344,6 +2349,7 @@ begin
     begin
       ToggleSwitchDeviceOnOff.State := tssOn;
       ToggleSwitchDeviceOnOff.ThumbColor := clRed;
+      UpdateCommandObject();
     end
     else
     begin
@@ -3243,6 +3249,13 @@ begin
   OcComPortObj := Self.GetCurrentDevice();
   if (OcComPortObj = nil) then
     exit;
+
+  if not OcComPortObj.Connected then
+   begin
+      UpdateUartToolBar();
+   end;
+
+
   StatusBar1.Panels.BeginUpdate;
   if (OcComPortObj.LogObject <> nil) then
   /// and (OcComPortObj.Connected)

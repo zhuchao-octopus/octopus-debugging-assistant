@@ -30,7 +30,9 @@ type
   public
     { Public declarations }
     procedure CheckNewVersion();
-    procedure DownLoadObjectDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64; var Abort: Boolean);
+    procedure DownLoadObjectDataEvent(const Sender: TObject; MsgType: Integer;
+      ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64;
+      var Abort: Boolean);
   end;
 
 var
@@ -40,8 +42,38 @@ implementation
 
 {$R *.dfm}
 
-uses uMainSetting, uDownloadsManager, Json, REST.Json, ShellAPI, uOctopusFunction,
+uses uMainSetting, uDownloadsManager, Json, REST.Json, ShellAPI,
+  uOctopusFunction,
   uDownloader;
+
+function GetFileCreationTime(const Filename: string): TDateTime; // 获应用程序时间
+var
+  Data: TWin32FindData;
+  H: THandle;
+  FT: TFileTime;
+  I: Integer;
+begin
+  {
+    Data.ftCreationTime:   TFileTime;   //创建时间
+    Data.ftLastAccessTime:   TFileTime; //最后访问时间
+    Data.ftLastWriteTime:   TFileTime;  //最后修改时间
+  }
+  H := FindFirstFile(PCHAR(Filename), Data);
+  if H <> INVALID_HANDLE_VALUE then
+  begin
+    try
+      FileTimeToLocalFileTime(Data.ftLastWriteTime, FT);
+      FileTimeToDosDateTime(FT, LongRec(I).Hi, LongRec(I).Lo);
+      Result := FileDateToDateTime(I);
+    finally
+      Windows.FindClose(H);
+    end
+  end
+  else
+  begin
+    Result := 0;
+  end;
+end;
 
 function GetSystemBits: Integer;
 var
@@ -73,17 +105,27 @@ procedure TAboutBox.FormCreate(Sender: TObject);
 var
   MS: TMemoryStatusEx;
   bits: Integer;
+  builddt: String;
+  dt: TDateTime;
 begin
   MS.dwLength := SizeOf(TMemoryStatusEx);
   GlobalMemoryStatusEx(MS);
   PhysMem.Caption := FormatFloat('#,###" MB"', MS.ullTotalPhys shr 20);
   FreeRes.Caption := Format('%d %%', [MS.dwMemoryLoad]);
   bits := GetCPUBits();
+  dt := GetFileCreationTime(Application.Exename);
+  builddt := DateTimeToStr(dt);
+
 {$IFDEF CPU64BITS}
-  Label5.Caption := 'Version Information: ' + SettingPagesDlg.VersionNumberStr + ' 64bit  (' + SettingPagesDlg.WindowsVersion + ' ' + inttostr(bits) + 'bit )';
+  Label5.Caption := 'Version Information: ' + SettingPagesDlg.VersionNumberStr +
+    ' 64bit  (' + SettingPagesDlg.WindowsVersion + ' ' + inttostr(bits)
+    + 'bit )';
 {$ELSE}
-  Label5.Caption := 'Version Information: ' + SettingPagesDlg.VersionNumberStr + ' 32bit  (' + SettingPagesDlg.WindowsVersion + ' ' + inttostr(bits) + 'bit )';
+  Label5.Caption := 'Version : ' + SettingPagesDlg.VersionNumberStr + ' 32bit '
+    + builddt + ' (' + SettingPagesDlg.WindowsVersion + ' ' + inttostr(bits)
+    + 'bit )';
 {$ENDIF}
+
   CheckNewVersion();
 end;
 
@@ -111,7 +153,9 @@ begin
   DownloadObject.StartPost();
 end;
 
-procedure TAboutBox.DownLoadObjectDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64; var Abort: Boolean);
+procedure TAboutBox.DownLoadObjectDataEvent(const Sender: TObject;
+  MsgType: Integer; ThreadNo: Integer; ASpeed: Integer;
+  AContentLength, AReadCount: Int64; var Abort: Boolean);
 var
   ResultContent: String;
   DownloadObject: TDownloadObject;
@@ -146,14 +190,17 @@ begin
       begin
         JSONValue := JSONArray.Items[0];
         name := (JSONValue as TJsonObject).GetValue('name').ToString;
-        appVersion := (JSONValue as TJsonObject).GetValue('appVersion').ToString;
-        updateFilePath := (JSONValue as TJsonObject).GetValue('updateFilePath').ToString;
+        appVersion := (JSONValue as TJsonObject).GetValue('appVersion')
+          .ToString;
+        updateFilePath := (JSONValue as TJsonObject)
+          .GetValue('updateFilePath').ToString;
         if CompareVersion(SettingPagesDlg.VersionNumberStr, appVersion) then
         begin
           TThread.Synchronize(nil,
             procedure
             begin
-              Button1.Caption := 'Found A New Version:' + RemoveQuotes(appVersion);
+              Button1.Caption := 'Found A New Version:' +
+                RemoveQuotes(appVersion);
               Button1.Visible := true;
               Button1.Enabled := true;
             end);

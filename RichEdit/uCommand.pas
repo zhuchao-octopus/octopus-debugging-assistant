@@ -84,6 +84,7 @@ begin
     else if (OcComPortObj <> nil) then
     begin
       OcComPortObj.DebugLog('[No device connected,please open a device.  ]');
+      OcComPortObj.NotifyCallBack();
     end;
 
   end;

@@ -13,7 +13,6 @@ object AboutBox: TAboutBox
   Font.Style = []
   Position = poScreenCenter
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 17
   object OKButton: TButton
     Left = 492

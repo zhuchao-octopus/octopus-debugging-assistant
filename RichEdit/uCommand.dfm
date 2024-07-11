@@ -13,7 +13,6 @@ object CommandFrm: TCommandFrm
   Font.Style = []
   Position = poMainFormCenter
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 17
   object Label1: TLabel
     Left = 3
