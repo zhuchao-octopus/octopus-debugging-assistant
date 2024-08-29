@@ -1165,7 +1165,8 @@ begin
       begin
         if self.Connected then
         begin
-          s := FormatHexStrToByte(Trim(str), buf, bLength);
+          //s := FormatHexStrToByte(Trim(str), buf, bLength);
+          s:=FormatHexStrToBuffer(Trim(str), buf, bLength);
           if FShowSendingLog then
             log(SEND_FLAG + s); // Log(''); // new line prepare to receive
 
@@ -2296,8 +2297,8 @@ end;
 
 procedure TOcComPortObj.MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 begin
-  if (FMouseTextSelection = false) and (IsLeftMouseButtonDown()) then
-     FMouseTextSelection := True; // Æô¶¯»º´æ
+  ///if (FMouseTextSelection = false) and (IsLeftMouseButtonDown()) then
+  ///   FMouseTextSelection := True; // Æô¶¯»º´æ
 end;
 
 procedure TOcComPortObj.MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
