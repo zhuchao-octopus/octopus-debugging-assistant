@@ -234,6 +234,7 @@ type
     CancelItem: TMenuItem;
     N21: TMenuItem;
     ToolButton19: TToolButton;
+    Timer2: TTimer;
 
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -357,6 +358,8 @@ type
     procedure CancelItemClick(Sender: TObject);
     procedure StatusBar1MouseEnter(Sender: TObject);
     procedure COMMenuClick(Sender: TObject);
+    procedure Timer2Timer(Sender: TObject);
+    procedure StringGrid1SetEditText(Sender: TObject; ACol, ARow: LongInt; const Value: string);
 
   private
     OcComPortObj_Loop: TOcComPortObj;
@@ -435,6 +438,8 @@ type
     procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
     procedure StatusBarPrintFileSize();
     procedure ShowStartComments(OcComPortObj: TOcComPortObj);
+
+    procedure SaveUserData(SavePrivate: Boolean);
     procedure SaveProjectSetting(SavePrivate: Boolean);
     procedure LoadProjectSetting();
 
@@ -458,6 +463,9 @@ const
 
 var
   MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm;
+
+  UserDataChanged: Boolean;
+  UserDataLength: Integer;
 
 implementation
 
@@ -518,9 +526,9 @@ begin
     Application.ProcessMessages;
 end;
 
-procedure Delay(MSecs: Longint);
+procedure Delay(MSecs: LongInt);
 var
-  FirstTickCount, Now: Longint;
+  FirstTickCount, Now: LongInt;
 begin
   FirstTickCount := GetTickCount();
   repeat
@@ -642,7 +650,7 @@ begin
           Handled := true;
         end;
 
-        if (Msg.wParam = VK_CONTROL)  and (not IsLeftMouseButtonDown()) then
+        if (Msg.wParam = VK_CONTROL) and (not IsLeftMouseButtonDown()) then
         begin
           OcComPortObj := Self.GetCurrentDevice();
           if (OcComPortObj <> nil) then
@@ -652,8 +660,7 @@ begin
           end;
         end;
       end;
-
-  end; //case msg.message of
+  end; // case msg.message of
 
 end;
 
@@ -674,6 +681,8 @@ begin
 
   InitUserConfiguration();
   Application.OnMessage := MyAppMsg;
+  UserDataChanged := false;
+  UserDataLength := 0;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FormResize(Sender: TObject);
@@ -708,7 +717,7 @@ begin
   try
     /// CheckFileSave;
     Self.PageControl1.FreeAll;
-    SaveProjectSetting(true);
+    Self.SaveProjectSetting(true);
     SettingPagesDlg.LoadOrCreateLaunguageFromFile(Self, true);
   except
     CanClose := false;
@@ -1823,6 +1832,12 @@ begin
   end;
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.Timer2Timer(Sender: TObject);
+begin
+  Self.SaveUserData(UserDataChanged);
+  UserDataChanged := false;
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.Button200Click(Sender: TObject);
 begin
   StopLoopSending();
@@ -2052,7 +2067,8 @@ begin
     begin
       if frDown in Options then
       begin
-        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the beginning of the file')), PChar(Application.Title), MB_YESNO) = ID_YES then
+        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the beginning of the file')), PChar(Application.Title), MB_YESNO) = ID_YES
+        then
         begin
           if Component is TMyMemo then
             TMyMemo(Component).SelStart := 0;
@@ -2064,7 +2080,8 @@ begin
       end
       else
       begin
-        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the end of the file')), PChar(Application.Title), MB_YESNO) = ID_YES then
+        if MessageBox(Handle, PWideChar(Concat('Not found "', FindStr, '" restart seach from the end of the file')), PChar(Application.Title), MB_YESNO) = ID_YES
+        then
         begin
           if Component is TMyMemo then
             TMyMemo(Component).SelStart := TMyMemo(Component).GetTextLen;
@@ -2456,7 +2473,7 @@ begin
   if OcComPortObj <> nil then
   begin
     OcComPortObj.ClearLog();
-    //OcComPortObj.ClearInternalBuff();
+    // OcComPortObj.ClearInternalBuff();
     exit;
   end;
   Component := Self.PageControl1.GetComponent(PageControl1.ActivePageIndex);
@@ -2881,6 +2898,17 @@ begin
   end;
 end;
 
+procedure TMainOctopusDebuggingDevelopmentForm.StringGrid1SetEditText(Sender: TObject; ACol, ARow: LongInt; const Value: string);
+begin
+  UserDataLength := UserDataLength + Length(Value);
+  if (UserDataLength >= 10) and (not Timer2.Enabled) then
+  begin
+    UserDataChanged := true;
+    Timer2.Enabled := true;
+    UserDataLength := 0;
+  end;
+end;
+
 procedure TMainOctopusDebuggingDevelopmentForm.StringGridSelectCell(ACol, ARow: Integer);
 var
   GridRect: TGridRect;
@@ -3251,19 +3279,19 @@ begin
     exit;
 
   if not OcComPortObj.Connected then
-   begin
-      UpdateUartToolBar();
-   end;
-
+  begin
+    UpdateUartToolBar();
+  end;
 
   StatusBar1.Panels.BeginUpdate;
   if (OcComPortObj.LogObject <> nil) then
   /// and (OcComPortObj.Connected)
   begin
 
-    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes' + ' | Received: ' + IntToStr(OcComPortObj.ComReceiveCount) +
-      ' Bytes' + ' | Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes' + ' | Total: ' + IntToStr(Length(OcComPortObj.LogObject.Text)) + ' Bytes' + ' | Line: ' +
-      IntToStr(OcComPortObj.LogObject.CaretPos.Y) + ' | Lines: ' + IntToStr(OcComPortObj.LogObject.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
+    StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes' + ' | Received: ' +
+      IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes' + ' | Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes' + ' | Total: ' +
+      IntToStr(Length(OcComPortObj.LogObject.Text)) + ' Bytes' + ' | Line: ' + IntToStr(OcComPortObj.LogObject.CaretPos.Y) + ' | Lines: ' +
+      IntToStr(OcComPortObj.LogObject.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
 
     // StatusBar1.Panels.EndUpdate;
   end
@@ -3288,6 +3316,35 @@ begin
   OcComPortObj.DebugLog('' + OcComPortObj.ComPortFullName + ' ');
 
   UpdateStatus(OCTOPUS_DEFAULT_WEBSITE_ADDRESS2, 0);
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.SaveUserData(SavePrivate: Boolean);
+var
+  Octopusini: TIniFile;
+  s: String;
+  i: Integer;
+  str: String;
+begin
+  try
+    if not SavePrivate then
+      exit;
+    if not DirectoryExists(SettingPagesDlg.OctopusCfgDir) then
+      exit;
+    if not DirectoryExists(SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR) then
+      exit;
+
+    s := SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Octopus.ini';
+    Octopusini := TIniFile.Create(s);
+
+    for i := 1 to StringGrid1.RowCount - 1 do
+    begin
+      str := Trim(StringGrid1.Cells[2, i]);
+      if str <> '' then
+        Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', str);
+    end;
+  finally
+    Octopusini.Free;
+  end;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SaveProjectSetting(SavePrivate: Boolean);
@@ -3350,7 +3407,6 @@ begin
   finally
     Octopusini.Free;
   end;
-
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.LoadProjectSetting();

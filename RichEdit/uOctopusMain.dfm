@@ -649,6 +649,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
             OnMouseWheelDown = StringGrid1MouseWheelDown
             OnMouseWheelUp = StringGrid1MouseWheelUp
             OnSelectCell = StringGrid1SelectCell
+            OnSetEditText = StringGrid1SetEditText
             ExplicitHeight = 454
             ColWidths = (
               50
@@ -3505,8 +3506,8 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
   end
   object PopupMenu1: TPopupMenu
     Images = ToolbarImages
-    Left = 512
-    Top = 288
+    Left = 480
+    Top = 280
     object CloseTheDevice1: TMenuItem
       Caption = 'Close And Remove This Page/Device'
       ImageIndex = 20
@@ -3548,5 +3549,12 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Caption = 'Cancel'
       OnClick = CancelItemClick
     end
+  end
+  object Timer2: TTimer
+    Enabled = False
+    Interval = 60000
+    OnTimer = Timer2Timer
+    Left = 472
+    Top = 154
   end
 end
