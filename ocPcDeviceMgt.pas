@@ -11,47 +11,48 @@ const
 
   DBT_DEVNODES_CHANGED = $0007;
 
-  DBT_DEVICEARRIVAL           = $8000; // system detected a new device
-  DBT_DEVICEQUERYREMOVE       = $8001; // wants to remove, may fail
+  DBT_DEVICEARRIVAL = $8000; // system detected a new device
+  DBT_DEVICEQUERYREMOVE = $8001; // wants to remove, may fail
   DBT_DEVICEQUERYREMOVEFAILED = $8002; // removal aborted
-  DBT_DEVICEREMOVEPENDING     = $8003; // about to remove, still avail.
-  DBT_DEVICEREMOVECOMPLETE    = $8004; // device is gone
-  DBT_DEVICETYPESPECIFIC      = $8005; // type specific event
+  DBT_DEVICEREMOVEPENDING = $8003; // about to remove, still avail.
+  DBT_DEVICEREMOVECOMPLETE = $8004; // device is gone
+  DBT_DEVICETYPESPECIFIC = $8005; // type specific event
 
   DBTF_MEDIA = $0001; // media comings and goings
-  DBTF_NET   = $0002; // network volume
+  DBTF_NET = $0002; // network volume
 
-  DBT_DEVTYP_OEM     = $00000000; // oem-defined device type
+  DBT_DEVTYP_OEM = $00000000; // oem-defined device type
   DBT_DEVTYP_DEVNODE = $00000001; // devnode number
-  DBT_DEVTYP_VOLUME  = $00000002; // logical volume
-  DBT_DEVTYP_PORT    = $00000003; // serial, parallel
-  DBT_DEVTYP_NET     = $00000004; // network resource
+  DBT_DEVTYP_VOLUME = $00000002; // logical volume
+  DBT_DEVTYP_PORT = $00000003; // serial, parallel
+  DBT_DEVTYP_NET = $00000004; // network resource
 
   DBT_DEVTYP_DEVICEINTERFACE = $00000005; // device interface class
 
   DIF_PROPERTYCHANGE = 18;
-  DICS_ENABLE        = 1;
-  DICS_FLAG_GLOBAL   = 1;
-  DICS_DISABLE       = 2;
+  DICS_ENABLE = 1;
+  DICS_FLAG_GLOBAL = 1;
+  DICS_DISABLE = 2;
 
-  DIGCF_DEFAULT         = $00000001;
-  DIGCF_PRESENT         = $00000002;
-  DIGCF_ALLCLASSES      = $00000004;
-  DIGCF_PROFILE         = $00000008;
+  DIGCF_DEFAULT = $00000001;
+  DIGCF_PRESENT = $00000002;
+  DIGCF_ALLCLASSES = $00000004;
+  DIGCF_PROFILE = $00000008;
   DIGCF_DEVICEINTERFACE = $00000010;
 
-  SPDRP_DEVICEDESC   = $00000000;
+  SPDRP_DEVICEDESC = $00000000;
   SPDRP_FRIENDLYNAME = $0000000C;
 
   LINE_LEN = 256;
 
-  SPDIT_NODRIVER     = $00000000;
-  SPDIT_CLASSDRIVER  = $00000001;
+  SPDIT_NODRIVER = $00000000;
+  SPDIT_CLASSDRIVER = $00000001;
   SPDIT_COMPATDRIVER = $00000002;
 
 type
-  HDEVINFO    = type Cardinal;
-  DI_FUNCTION = type Cardinal;
+  THDEVINFO = type NativeUInt;
+
+  DI_FUNCTION = type NativeUInt;
 
   PDEV_BROADCAST_VOLUME = ^TDEV_BROADCAST_VOLUME;
 
@@ -150,45 +151,42 @@ type
     Reserved: Longint;
   end;
 
-function SetupDiGetClassDevs(const ClassGuid: PGUID; Enumerator: PChar; hwndParent: HWND; Flags: DWORD): Cardinal; stdcall;
+function SetupDiGetClassDevs(const ClassGuid: PGUID; Enumerator: PChar; hwndParent: HWND; Flags: DWORD): THDEVINFO; stdcall;
   external 'Setupapi.dll' name 'SetupDiGetClassDevsA';
 
-function SetupDiEnumDeviceInfo(DeviceInfoSet: HDEVINFO; MemberIndex: DWORD; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall;
+function SetupDiEnumDeviceInfo(DeviceInfoSet: THDEVINFO; MemberIndex: DWORD; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall;
   external 'Setupapi.dll' name 'SetupDiEnumDeviceInfo';
 
-function SetupDiGetDeviceRegistryProperty(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; Propertys: DWORD; PropertyRegDataType: PWORD;
-  PropertyBuffer: PByte; PropertyBufferSize: DWORD; RequiredSize: PDWORD): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiGetDeviceRegistryPropertyA';
+function SetupDiGetDeviceRegistryProperty(DeviceInfoSet: THDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA; Propertys: DWORD; PropertyRegDataType: PWORD;
+  PropertyBuffer: PByte; PropertyBufferSize: DWORD; RequiredSize: PDWORD): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetDeviceRegistryPropertyA';
 
-function SetupDiDestroyDeviceInfoList(DeviceInfoSet: Cardinal): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiDestroyDeviceInfoList';
+function SetupDiDestroyDeviceInfoList(DeviceInfoSet: THDEVINFO): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiDestroyDeviceInfoList';
 
 function SetupDiClassNameFromGuid(ClassGuid: PGUID; ClassName: PChar; ClassNameSize: DWORD; RequiredSize: PDWORD): BOOL; stdcall;
   external 'Setupapi.dll' name 'SetupDiClassNameFromGuidA';
 
-function SetupDiGetClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiGetClassImageList';
+function SetupDiGetClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiGetClassImageList';
 
-function SetupDiDestroyClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall;
-  external 'Setupapi.dll' name 'SetupDiDestroyClassImageList';
+function SetupDiDestroyClassImageList(ClassImageListData: PSP_CLASSIMAGELIST_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiDestroyClassImageList';
 
 function SetupDiGetClassImageIndex(ClassImageListData: PSP_CLASSIMAGELIST_DATA; ClassGuid: PGUID; ImageIndex: PINT): BOOL; stdcall;
   external 'Setupapi.dll' name 'SetupDiGetClassImageIndex';
 
-function SetupDiEnumDriverInfo(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; DriverType: DWORD; MemberIndex: DWORD;
+function SetupDiEnumDriverInfo(DeviceInfoSet: THDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA; DriverType: DWORD; MemberIndex: DWORD;
   DriverInfoData: SP_DRVINFO_DATA): BOOL; stdcall; external 'Setupapi.dll' name 'SetupDiEnumDriverInfoA';
 
-function SetupDiGetSelectedDriver(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; DriverInfoData: PSP_DRVINFO_DATA): BOOL; stdcall;
+function SetupDiGetSelectedDriver(DeviceInfoSet: THDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA; DriverInfoData: PSP_DRVINFO_DATA): BOOL; stdcall;
   external 'Setupapi.dll' name 'SetupDiGetSelectedDriverA';
 
-function SetupDiSetClassInstallParams(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; ClassInstallParams: PSP_CLASSINSTALL_HEADER;
+function SetupDiSetClassInstallParams(DeviceInfoSet: THDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA; ClassInstallParams: PSP_CLASSINSTALL_HEADER;
   ClassInstallParamsSize: DWORD): BOOL stdcall; external 'Setupapi.dll' name 'SetupDiSetClassInstallParamsA';
-function SetupDiCallClassInstaller(InstallFunction: DI_FUNCTION; DeviceInfoSet: HDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall;
+function SetupDiCallClassInstaller(InstallFunction: DI_FUNCTION; DeviceInfoSet: THDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA): BOOL; stdcall;
   external 'Setupapi.dll' name 'SetupDiCallClassInstaller';
 
 procedure GetAllHardDevice(tr: Ttreeview; il1: TImageList);
 Procedure GetTheHardDevice(yTypes: string; il1: TImageList; var sDevices: TStringList; var imid: integer)
 { :TStringList };
-Function GetDeviceName(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
+Function GetDeviceName(DeviceInfoSet: THDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
 Function DeviceClassName(Guid: TGUID): string;
 
 implementation
@@ -225,11 +223,86 @@ begin
   result := str;
 end;
 
+procedure GetDeviceImageIndex(const DeviceInfoData: SP_DEVINFO_DATA; const ImageList: SP_CLASSIMAGELIST_DATA; var ImageIndex: integer);
+begin
+  if not SetupDiGetClassImageIndex(@ImageList, @DeviceInfoData.ClassGuid, @ImageIndex) then
+  begin
+    ImageIndex := -1; // 设置默认图像索引，避免无效值
+    raise Exception.Create('无法获取设备图像索引: ' + SysErrorMessage(GetLastError));
+  end;
+end;
+
+procedure GetDeviceInfo(HDEVINFO: THDEVINFO; var DeviceInfoData: SP_DEVINFO_DATA; var DeviceName, DeviceType: string);
+begin
+  if not GetDeviceName(HDEVINFO, @DeviceInfoData, DeviceName) then
+    raise Exception.Create('无法获取设备名称: ' + SysErrorMessage(GetLastError));
+
+  DeviceType := Trim(DeviceClassName(DeviceInfoData.ClassGuid));
+end;
+
+procedure GetTheHardDevice2(yTypes: string; il1: TImageList; var sDevices: TStringList; var imid: integer);
+var
+  ImageList: SP_CLASSIMAGELIST_DATA;
+  HDEVINFO: THDEVINFO;
+  DeviceInfoData: SP_DEVINFO_DATA;
+  i: DWORD;
+  Name, Types: string;
+  ImageIndex: integer;
+begin
+  // 初始化 ImageList
+  ImageList.cbSize := SizeOf(SP_CLASSIMAGELIST_DATA);
+  if not SetupDiGetClassImageList(@ImageList) then
+    raise Exception.Create('无法获取类图像列表: ' + SysErrorMessage(GetLastError));
+
+  il1.Handle := ImageList.ImageList;
+
+  // 获取设备信息集
+  HDEVINFO := SetupDiGetClassDevs(nil, 0, 0, DIGCF_PRESENT or DIGCF_ALLCLASSES);
+  if HDEVINFO = INVALID_HANDLE_VALUE then
+    raise Exception.Create('无法获取设备信息列表: ' + SysErrorMessage(GetLastError));
+
+  try
+    // 初始化设备信息数据结构
+    DeviceInfoData.cbSize := SizeOf(SP_DEVINFO_DATA);
+    i := 0;
+
+    // 枚举设备
+    while SetupDiEnumDeviceInfo(HDEVINFO, i, @DeviceInfoData) do
+    begin
+      try
+        // 获取设备名称和类型
+        GetDeviceInfo(HDEVINFO, DeviceInfoData, Name, Types);
+
+        // 获取图像索引
+        GetDeviceImageIndex(DeviceInfoData, ImageList, ImageIndex);
+
+        // 判断设备类型
+        if SameText(Types, yTypes) then
+        begin
+          sDevices.Append(Trim(Name));
+          imid := ImageIndex;
+        end;
+      except
+        on E: Exception do
+        begin
+          ShowMessage('处理设备时出错: ' + E.Message);
+        end;
+      end;
+
+      Inc(i);
+    end;
+
+  finally
+    // 清理资源
+    SetupDiDestroyDeviceInfoList(HDEVINFO);
+  end;
+end;
+
 Procedure GetTheHardDevice(yTypes: string; il1: TImageList; var sDevices: TStringList; var imid: integer)
 { :TStringList };
 var
   ImageList: SP_CLASSIMAGELIST_DATA;
-  HDEVINFO: Cardinal;
+  HDEVINFO: THDEVINFO;
   DeviceInfoData: SP_DEVINFO_DATA;
   // DriverInfoData: SP_DRVINFO_DATA;
   i: DWORD;
@@ -273,7 +346,7 @@ end;
 Function DeviceClassName(Guid: TGUID): string;
 var
   ClassName: PChar;
-  ClassNameSzie: Cardinal;
+  ClassNameSzie: Integer;
 begin
   ClassNameSzie := 0;
   GetMem(ClassName, ClassNameSzie);
@@ -294,7 +367,7 @@ begin
     FreeMem(ClassName);
 end;
 
-Function GetDeviceName(DeviceInfoSet: Cardinal; DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
+Function GetDeviceName(DeviceInfoSet: THDEVINFO; DeviceInfoData: PSP_DEVINFO_DATA; var Name: string): Boolean;
 var
   DataT, buffersize: DWORD;
   buffer: PChar;
@@ -316,7 +389,7 @@ begin
   Name := Trim(Name);
 end;
 
-function ChangeDeviceState(HDEVINFO: HDEVINFO; NewStatus: DWORD; SelectedItem: DWORD): Boolean;
+function ChangeDeviceState(HDEVINFO: THDEVINFO; NewStatus: DWORD; SelectedItem: DWORD): Boolean;
 var
   PropChangeParams: SP_PROPCHANGE_PARAMS;
   DeviceInfoData: SP_DEVINFO_DATA;
@@ -347,7 +420,7 @@ function ControlDisk(nStatus: integer; Device_Guid: string): Boolean;
 var
   Guid: TGUID;
   GUIDString: string;
-  HDEVINFO: Cardinal;
+  HDEVINFO: THDEVINFO;
   i: DWORD;
   DeviceInfoData: SP_DEVINFO_DATA;
 begin
@@ -383,10 +456,10 @@ end;
 procedure GetAllHardDevice(tr: Ttreeview; il1: TImageList);
 var
   ImageList: SP_CLASSIMAGELIST_DATA;
-  systemn, keyboardn, portsn, fdcn, hdcn, mousen, monitorn, floppydiskn, hidclassn, cdromn, diskdriven, displayn, usbn, median, netn, scsiadaptern,
-    computern, legacydrivern, volumen, processorn, intelunifieddisplaydrivern, othersn, rootn: TTreenode;
+  systemn, keyboardn, portsn, fdcn, hdcn, mousen, monitorn, floppydiskn, hidclassn, cdromn, diskdriven, displayn, usbn, median, netn, scsiadaptern, computern,
+    legacydrivern, volumen, processorn, intelunifieddisplaydrivern, othersn, rootn: TTreenode;
 
-  HDEVINFO: Cardinal;
+  HDEVINFO: THDEVINFO;
   DeviceInfoData: SP_DEVINFO_DATA;
   // DriverInfoData: SP_DRVINFO_DATA;
   i: DWORD;

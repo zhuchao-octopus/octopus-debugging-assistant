@@ -55,6 +55,7 @@ uses
 
 begin
   Application.Initialize;
+  TStyleManager.TrySetStyle('Emerald Light Slate');
   Application.Title := 'Octopus serial port debugging and development assistant';
   Application.CreateForm(TMainOctopusDebuggingDevelopmentForm, MainOctopusDebuggingDevelopmentForm);
   Application.CreateForm(TConfigurationFrm, ConfigurationFrm);

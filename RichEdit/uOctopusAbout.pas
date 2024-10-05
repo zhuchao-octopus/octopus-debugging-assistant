@@ -30,8 +30,7 @@ type
   public
     { Public declarations }
     procedure CheckNewVersion();
-    procedure DownLoadObjectDataEvent(const Sender: TObject; MsgType: Integer;
-      ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64;
+    procedure DownLoadObjectDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64;
       var Abort: Boolean);
   end;
 
@@ -117,15 +116,12 @@ begin
   builddt := DateTimeToStr(dt);
 
 {$IFDEF CPU64BITS}
-  Label5.Caption := 'Version Information: ' + SettingPagesDlg.VersionNumberStr +
-    ' 64bit  (' + SettingPagesDlg.WindowsVersion + ' ' + inttostr(bits)
+  Label5.Caption := 'Version: ' + SettingPagesDlg.VersionNumberStr + ' 64bit ' + builddt + ' (' + SettingPagesDlg.WindowsVersion + ' ' + inttostr(bits)
     + 'bit )';
 {$ELSE}
-  Label5.Caption := 'Version : ' + SettingPagesDlg.VersionNumberStr + ' 32bit '
-    + builddt + ' (' + SettingPagesDlg.WindowsVersion + ' ' + inttostr(bits)
+  Label5.Caption := 'Version: ' + SettingPagesDlg.VersionNumberStr + ' 32bit ' + builddt + ' (' + SettingPagesDlg.WindowsVersion + ' ' + inttostr(bits)
     + 'bit )';
 {$ENDIF}
-
   CheckNewVersion();
 end;
 
@@ -153,9 +149,8 @@ begin
   DownloadObject.StartPost();
 end;
 
-procedure TAboutBox.DownLoadObjectDataEvent(const Sender: TObject;
-  MsgType: Integer; ThreadNo: Integer; ASpeed: Integer;
-  AContentLength, AReadCount: Int64; var Abort: Boolean);
+procedure TAboutBox.DownLoadObjectDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64;
+  var Abort: Boolean);
 var
   ResultContent: String;
   DownloadObject: TDownloadObject;
@@ -190,17 +185,14 @@ begin
       begin
         JSONValue := JSONArray.Items[0];
         name := (JSONValue as TJsonObject).GetValue('name').ToString;
-        appVersion := (JSONValue as TJsonObject).GetValue('appVersion')
-          .ToString;
-        updateFilePath := (JSONValue as TJsonObject)
-          .GetValue('updateFilePath').ToString;
+        appVersion := (JSONValue as TJsonObject).GetValue('appVersion').ToString;
+        updateFilePath := (JSONValue as TJsonObject).GetValue('updateFilePath').ToString;
         if CompareVersion(SettingPagesDlg.VersionNumberStr, appVersion) then
         begin
           TThread.Synchronize(nil,
             procedure
             begin
-              Button1.Caption := 'Found A New Version:' +
-                RemoveQuotes(appVersion);
+              Button1.Caption := 'Found A New Version:' + RemoveQuotes(appVersion);
               Button1.Visible := true;
               Button1.Enabled := true;
             end);
