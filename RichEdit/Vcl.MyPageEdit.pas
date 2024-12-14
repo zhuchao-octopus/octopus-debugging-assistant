@@ -203,7 +203,7 @@ begin
     Log(Msg);
 end;
 
-procedure TMyMemo.LogEndLine(const Msg: String);
+procedure TMyMemo.LogEndLine(const Msg: String); //连接到最后
 begin
   if Lines.Count > 0 then
   begin

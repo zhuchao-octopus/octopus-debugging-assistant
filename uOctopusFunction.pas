@@ -192,6 +192,7 @@ implementation
 function NormalizeLineBreaks(const S: string): string;
 begin
   Result := StringReplace(S, #13#10, #10, [rfReplaceAll]); // 转换 CRLF 为 LF
+  Result := StringReplace(Result, #10#13, #10, [rfReplaceAll]); // 转换 CRLF 为 LF
   Result := StringReplace(Result, #13, #10, [rfReplaceAll]); // 将孤立 CR 转为 LF
   Result := StringReplace(Result, #10, #13#10, [rfReplaceAll]); // 最后统一为 CRLF
 end;

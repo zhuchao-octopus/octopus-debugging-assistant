@@ -17,7 +17,8 @@ uses
   OcProtocol,
   VCLTee.Series,
   Vcl.MyPageEdit,
-  RegularExpressions;
+  RegularExpressions,
+  System.SyncObjs;
 
 type
   TRECEIVE_FORMAT = (ASCIIFormat, HexadecimalFormat, Graphic, OctopusProtocol, SaveToFile);
@@ -71,6 +72,7 @@ type
 
   TOcComPortObj = class(TComport)
   private
+
     FComReceiveBuffer: array [0 .. INPUT_OUTPUT_BUFFER_SIZE] of Byte;
     // 1024 * 1024 =  1048576 =1M // for com port receive buffer
     FComReceiveInternalBuffer: array of Byte; // for 异步处理
@@ -227,6 +229,7 @@ type
 
   TComUIHandleThread = class(TThread)
   private
+    FEvent: TEvent;
     FOcComPortObj: TOcComPortObj;
     FCachedCounterIndex: Int64;
     FNeedToReset: Integer;
@@ -234,6 +237,9 @@ type
   protected
     constructor Create(OcComPortObj: TOcComPortObj);
     procedure Execute; override;
+    destructor Destroy; override;
+    procedure Pause;
+    procedure ResumeThread;
   public
     property ResetID: Integer read FNeedToReset write FNeedToReset default -1;
   end;
@@ -445,6 +451,21 @@ begin
   self.FOcComPortObj := OcComPortObj;
   self.Suspended := True;
   self.Priority := tpHighest;
+  FEvent := TEvent.Create(nil, True, False, ''); // 手动重置的初始事件
+end;
+destructor TComUIHandleThread.Destroy;
+begin
+  FEvent.Free;
+  inherited;
+end;
+procedure TComUIHandleThread.Pause;
+begin
+  FEvent.ResetEvent; // 暂停线程，WaitFor 将阻塞
+end;
+
+procedure TComUIHandleThread.ResumeThread;
+begin
+  FEvent.SetEvent; // 恢复线程，WaitFor 将通过
 end;
 
 procedure Delay(MSecs: Longint);
@@ -473,15 +494,20 @@ begin
     Exit;
 
   delayTimesTick := GetTickCount();
-  while (self.Terminated = false) do
+
+  while not Terminated do
   begin
-    // ReStart:
-    Application.ProcessMessages;
+
     if FOcComPortObj.FComHandleThread_Wait then
       Continue;
-
     if (not FOcComPortObj.Connected) then
-      Continue;
+    begin
+      break;
+    end;
+
+    ///FEvent.WaitFor(INFINITE); // // 阻塞线程，直到被唤醒
+
+    if Terminated then break;
 
     case FNeedToReset of // 强制切换接收格式清先前的缓存
       0:
@@ -497,6 +523,7 @@ begin
       begin
         Continue;
       end;
+
       if FCachedCounterIndex >= FOcComPortObj.GetCachedLinesCount() then
       begin
         Continue;
@@ -513,60 +540,11 @@ begin
       FOcComPortObj.FComProcessedCount := FOcComPortObj.FComProcessedCount + Length(s);
       delayTimesTick := GetTickCount();
 
-      { if FUIStartIndex = 0 then
-        begin // 第一行后面接龙
-        if Trim(FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1]) = '' then
-        begin
-        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count - 1) + s;
-        FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] := s;
-        end
-        else if (Length(s) > 0) and ((s[1] = #10) or (s[1] = #13)) then // #13#10,分开发送导致无法正确的换行
-        begin
-        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count) + s;
-        FOcComPortObj.LogMemo.Lines.Append(s);
-        // FOcComPortObj.Log(s);
-        end
-        else
-        begin
-        // s := FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] + Trim(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]);
-        // FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1] := s;
-        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.LogMemo.Lines.Count) + s;
-        FOcComPortObj.LogMemo.Lines.Append(s);
-        // FOcComPortObj.Log(s);
-        end;
-        end
-        else }
-      begin
-        s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.FLogObject.Lines.Count) + s;
-        // FOcComPortObj.FLogObject.log(s);
-        FOcComPortObj.LogBottomMod(s, True, FOcComPortObj.IsLogAtBottom());
-      end;
-
-      { // s := FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex];
-        // FOcComPortObj.Log(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]); }
+      s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.FLogObject.Lines.Count) + s;
+      FOcComPortObj.LogBottomMod(s, True, FOcComPortObj.IsLogAtBottom());
 
       INC(FCachedCounterIndex); // 下一行
-      { if FUIStartIndex >= FOcComPortObj.StringInternelCache.Lines.Count then
-        begin
-        if FOcComPortObj.FComHandleThread_Wait then
-        Continue; // 中途有数据加入
-        if FUIStartIndex < FOcComPortObj.StringInternelCache.Lines.Count then
-        Continue; // 中途有数据加入
 
-        //if FOcComPortObj.StringInternelCache.Lines.Count < 500 then
-        //  Continue; // 500行内不清缓存，避免频繁清 测试
-        //FOcComPortObj.StringInternelCache.Lines.SaveToFile('StringInternelCache.log');
-
-        FUIStartIndex := 0;
-        // 数据处理完毕，清理缓存
-        EnterCriticalSection(Critical);
-        FOcComPortObj.ClearInternalBuff();
-        LeaveCriticalSection(Critical);
-
-        FOcComPortObj.FLastLineStr := FOcComPortObj.LogMemo.Lines.Strings[FOcComPortObj.LogMemo.Lines.Count - 1];
-        // self.Suspended := True; // 忙完了挂起
-        Continue;
-        end; }
       if Assigned(FOcComPortObj.FCallBackFun) then
         FOcComPortObj.FCallBackFun();
     end
@@ -1030,7 +1008,7 @@ begin
   begin
     if (not bottomMod) then
     begin
-      // BeginUpdate memo控件不会滚动更新垂直滚动条不会自动滑动
+      /// BeginUpdate memo控件不会滚动更新垂直滚动条不会自动滑动
       FLogObject.Lines.BeginUpdate;
       /// LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] := LogMemo.Lines.Strings[LogMemo.Lines.Count - 1] + Msg;
       FLogObject.LogEndLine(Msg);
@@ -1482,28 +1460,46 @@ begin
 end;
 
 procedure TOcComPortObj.CachedString(const str: String);
-var
-  s: String;
+//var
+//  s: String;
 begin
   FComHandleThread_Wait := True;
   FComHandleThread_Wait := True;
 
   EnterCriticalSection(Critical);
-  StringInternelCache.Lines.BeginUpdate;
-  s := StringInternelCache.Lines.Strings[StringInternelCache.Lines.Count - 1];
-  StringInternelCache.Lines.Strings[StringInternelCache.Lines.Count - 1] := s + str;
-  StringInternelCache.Lines.EndUpdate;
-  // StringInternelCache.Update;
-  LeaveCriticalSection(Critical);
+  try
+    StringInternelCache.Lines.BeginUpdate;
+    try
+      // 获取最后一行内容并追加新字符串
+      if StringInternelCache.Lines.Count > 0 then
+        StringInternelCache.Lines.Strings[StringInternelCache.Lines.Count - 1] :=
+          StringInternelCache.Lines.Strings[StringInternelCache.Lines.Count - 1] + str
+      else
+        StringInternelCache.Lines.Add(str); // 如果没有行，则直接添加
+
+    finally
+      StringInternelCache.Lines.EndUpdate;
+    end;
+
+    // 强制更新界面显示
+    //StringInternelCache.Update;
+
+  finally
+    LeaveCriticalSection(Critical);
+  end;
+
   FComHandleThread_Wait := false;
   Application.ProcessMessages;
-  // Application.ProcessMessages;
+  /// Application.ProcessMessages;
 end;
 
 procedure TOcComPortObj.StartFlushOutCackedString();
 begin
   if  GetCachedLinesCount() <= 0 then
     Exit;
+  ///FComUIHandleThread.ResumeThread;
+  ///FComHandleThread_Wait := false;
+
   if FComUIHandleThread.Suspended then
   begin
     FComUIHandleThread.Suspended := false; // 启动后台线程
@@ -1513,6 +1509,8 @@ end;
 
 procedure TOcComPortObj.PauseFlushOutCackedString();
 begin
+  ///FComUIHandleThread.Pause;
+  ///FComHandleThread_Wait := True;
   if not FComUIHandleThread.Suspended then
   begin
     LeaveCriticalSection(Critical);
@@ -1523,9 +1521,9 @@ end;
 
 function TOcComPortObj.GetCachedLinesCount():Integer;
 begin
-    LeaveCriticalSection(Critical);
-    Result:=StringInternelCache.Lines.Count;
-    EnterCriticalSection(Critical);
+   //EnterCriticalSection(Critical);
+   Result:=StringInternelCache.Lines.Count;
+   //LeaveCriticalSection(Critical);
 end;
 
 procedure TOcComPortObj.OcComPortObjRxChar(Sender: TObject; Count: Integer);
@@ -1561,10 +1559,18 @@ begin
         ReadStr(FComReceiveString, Count);
        // 兼容 \R 字符的索引从1开始也即是>=1
       FComReceiveString:=NormalizeLineBreaks(FComReceiveString);
+
     Except
     end;
 
-    if isBackHandlerMode() or (not FComUIHandleThread.Suspended) or (GetCachedLinesCount() > 0) then
+    if FComUIHandleThread.FCachedCounterIndex >= GetCachedLinesCount() then
+    begin // 当前缓冲区数据已经处理完毕，清空缓冲区
+      EnterCriticalSection(Critical);
+      self.ClearInternalBuff();
+      LeaveCriticalSection(Critical);
+    end;
+
+    if isBackHandlerMode() or (GetCachedLinesCount() > 0) then
     // 后台工作模式
     begin
       CachedString(FComReceiveString);
@@ -1583,33 +1589,15 @@ begin
        FComUIHandleThread.Suspended := True; // 挂起后台线程任务
     end;
 
-    if FComUIHandleThread.FCachedCounterIndex >= GetCachedLinesCount() then
-    begin // 当前缓冲区数据已经处理完毕
-      self.ClearInternalBuff();
-    end;
-
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////
     begin // 直接处理，无需缓存无需特殊处理，不额外显示日期日期信息
       if FNeedNewLine then
       begin
-        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
-         begin
-          FNeedNewLine := True;
-          FComReceiveString := TrimRight(FComReceiveString);
-         end
-        else
-          FNeedNewLine := false;
+        FNeedNewLine := false;
         LogBottomMod(FComReceiveString, True, isAtBottom);
       end
       else
       begin
-        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
-         begin
-          FNeedNewLine := True;
-          FComReceiveString := TrimRight(FComReceiveString);
-         end
-        else
-          FNeedNewLine := false;
         LogBottomMod(FComReceiveString, false, isAtBottom);
       end;
       // 统计处理数量
