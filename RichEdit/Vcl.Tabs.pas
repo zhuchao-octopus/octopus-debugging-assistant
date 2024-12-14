@@ -1,23 +1,23 @@
-{*******************************************************}
-{                                                       }
-{            Delphi Visual Component Library            }
-{                                                       }
+{ ******************************************************* }
+{ }
+{ Delphi Visual Component Library }
+{ }
 { Copyright(c) 1995-2021 Embarcadero Technologies, Inc. }
-{              All rights reserved                      }
-{                                                       }
-{*******************************************************}
+{ All rights reserved }
+{ }
+{ ******************************************************* }
 
-{****************************************************************************}
-{                                                                            }
+{ **************************************************************************** }
+{ }
 { Limitation on Distribution of Programs Created with this Source Code File: }
 { ========================================================================== }
-{                                                                            }
-{ For distribution of an application which you create with this Source       }
-{ Code File, your application may not be a general-purpose, interactive      }
-{ spreadsheet program, or a substitute for or generally competitive          }
-{ with Quattro Pro.                                                          }
-{                                                                            }
-{****************************************************************************}
+{ }
+{ For distribution of an application which you create with this Source }
+{ Code File, your application may not be a general-purpose, interactive }
+{ spreadsheet program, or a substitute for or generally competitive }
+{ with Quattro Pro. }
+{ }
+{ **************************************************************************** }
 
 unit Vcl.Tabs;
 
@@ -40,9 +40,9 @@ type
   private
     FSize, FStartPos: Word;
   public
-   property Size: Word read FSize write FSize;
-   property StartPos: Word read FStartPos write FStartPos;
-   constructor Create(AStartPos, ASize: Word);
+    property Size: Word read FSize write FSize;
+    property StartPos: Word read FStartPos write FStartPos;
+    constructor Create(AStartPos, ASize: Word);
   end;
 
   TTabPosList = TList<TTabPos>;
@@ -117,23 +117,18 @@ type
   end;
 
   { each TEdgeType is made up of one or two of these parts }
-  TEdgePart = (epSelectedLeft, epUnselectedLeft, epSelectedRight,
-    epUnselectedRight);
+  TEdgePart = (epSelectedLeft, epUnselectedLeft, epSelectedRight, epUnselectedRight);
 
   { represents the intersection between two tabs, or the edge of a tab }
-  TEdgeType = (etNone, etFirstIsSel, etFirstNotSel, etLastIsSel, etLastNotSel,
-    etNotSelToSel, etSelToNotSel, etNotSelToNotSel);
+  TEdgeType = (etNone, etFirstIsSel, etFirstNotSel, etLastIsSel, etLastNotSel, etNotSelToSel, etSelToNotSel, etNotSelToNotSel);
 
   TTabSetTabStyle = (tsStandard, tsOwnerDraw, tsSoftTabs, tsModernTabs, tsModernPopout, tsIDETabs);
   TTabStyle = TTabSetTabStyle;
 
-  TMeasureTabEvent = procedure(Sender: TObject; Index: Integer;
-    var TabWidth: Integer) of object;
-  TTabSetDrawTabEvent = procedure(Sender: TObject; TabCanvas: TCanvas; R: TRect;
-    Index: Integer; Selected: Boolean) of object;
+  TMeasureTabEvent = procedure(Sender: TObject; Index: Integer; var TabWidth: Integer) of object;
+  TTabSetDrawTabEvent = procedure(Sender: TObject; TabCanvas: TCanvas; R: TRect; Index: Integer; Selected: Boolean) of object;
   TDrawTabEvent = TTabSetDrawTabEvent;
-  TTabChangeEvent = procedure(Sender: TObject; NewTab: Integer;
-    var AllowChange: Boolean) of object;
+  TTabChangeEvent = procedure(Sender: TObject; NewTab: Integer; var AllowChange: Boolean) of object;
 
   TTabSet = class(TCustomControl)
   private
@@ -155,7 +150,7 @@ type
     FOnChange: TTabChangeEvent;
 
     FEdgeImageList: TImageList;
-    FMemBitmap: TBitmap;   { used for off-screen drawing }
+    FMemBitmap: TBitmap; { used for off-screen drawing }
     FBrushBitmap: TBitmap; { used for background pattern }
     FTabPositions: TTabPosList;
     FSortedTabPositions: TTabPosList;
@@ -192,8 +187,7 @@ type
     procedure CMStyleChanged(var Message: TMessage); message CM_STYLECHANGED;
     procedure PaintEdge(X, Y, H: Integer; Edge: TEdgeType);
     procedure CreateBrushPattern(Bitmap: TBitmap);
-    function CalcTabPositions(const AStart, AStop: Integer; Canvas: TCanvas;
-      First: Integer; FullTabs: Boolean): Integer;
+    function CalcTabPositions(const AStart, AStop: Integer; Canvas: TCanvas; First: Integer; FullTabs: Boolean): Integer;
     procedure CreateScroller;
     procedure InitBitmaps;
     procedure DoneBitmaps;
@@ -206,7 +200,7 @@ type
     procedure SetShrinkToFit(const Value: Boolean);
     procedure SetTabPosition(const Value: TTabPosition);
     procedure SetFontOrientation(ACanvas: TCanvas);
-     procedure ImageListChange(Sender: TObject);
+    procedure ImageListChange(Sender: TObject);
     procedure DoDefaultPainting;
     procedure DoPopoutModernPainting;
     function ScrollerShown: Boolean;
@@ -215,12 +209,10 @@ type
     procedure CMHintShow(var Message: TCMHintShow); message CM_HINTSHOW;
     procedure CreateParams(var Params: TCreateParams); override;
     procedure CreateWnd; override;
-    procedure DrawTab(TabCanvas: TCanvas; R: TRect; Index: Integer;
-      Selected: Boolean); virtual;
+    procedure DrawTab(TabCanvas: TCanvas; R: TRect; Index: Integer; Selected: Boolean); virtual;
     function GetImageIndex(TabIndex: Integer): Integer; virtual;
     procedure MeasureTab(Index: Integer; var TabWidth: Integer); virtual;
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState;
-      X, Y: Integer); override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetupTabPositions;
     procedure DoIDEPainting; virtual;
@@ -314,13 +306,14 @@ implementation
 {$R Tabs.res}
 {$ENDIF}
 
-uses 
+uses
 {$IF DEFINED(CLR)}
   System.Runtime.InteropServices, System.Reflection, System.Security.Permissions,
 {$ENDIF}
   System.SysUtils, System.Types, System.UITypes, System.Math, Vcl.GraphUtil, Vcl.Consts;
 
 {$IF DEFINED(CLR)}
+
 const
   ResourceBaseName = 'Borland.Vcl.Tabs';
 {$ENDIF}
@@ -330,15 +323,14 @@ var
   LStyle: TCustomStyleServices;
 begin
   LStyle := StyleServices(AControl);
-  Result := LStyle.Enabled and
-    LStyle.GetElementColor(Details, ElementColor, Color) and (Color <> clNone);
+  Result := LStyle.Enabled and LStyle.GetElementColor(Details, ElementColor, Color) and (Color <> clNone);
 end;
 
 { TTabPos }
 
 constructor TTabPos.Create(AStartPos, ASize: Word);
 begin
-  inherited ;
+  inherited;
   FStartPos := AStartPos;
   FSize := ASize;
 end;
@@ -370,12 +362,12 @@ begin
 end;
 
 const
-  cLeftOrient: array[TScrollOrientation] of string = ('SBLEFT', 'SBUP');               { Do not localize }
-  cLeftDnOrient: array[TScrollOrientation] of string = ('SBLEFTDN', 'SBUPDN');         { Do not localize }
-  cLeftDisOrient: array[TScrollOrientation] of string = ('SBLEFTDIS', 'SBUPDIS');      { Do not localize }
-  cRightOrient: array[TScrollOrientation] of string = ('SBRIGHT', 'SBDOWN');           { Do not localize }
-  cRightDnOrient: array[TScrollOrientation] of string = ('SBRIGHTDN', 'SBDOWNDN');     { Do not localize }
-  cRightDisOrient: array[TScrollOrientation] of string = ('SBRIGHTDIS', 'SBDOWNDIS');  { Do not localize }
+  cLeftOrient: array [TScrollOrientation] of string = ('SBLEFT', 'SBUP'); { Do not localize }
+  cLeftDnOrient: array [TScrollOrientation] of string = ('SBLEFTDN', 'SBUPDN'); { Do not localize }
+  cLeftDisOrient: array [TScrollOrientation] of string = ('SBLEFTDIS', 'SBUPDIS'); { Do not localize }
+  cRightOrient: array [TScrollOrientation] of string = ('SBRIGHT', 'SBDOWN'); { Do not localize }
+  cRightDnOrient: array [TScrollOrientation] of string = ('SBRIGHTDN', 'SBDOWNDN'); { Do not localize }
+  cRightDisOrient: array [TScrollOrientation] of string = ('SBRIGHTDIS', 'SBDOWNDIS'); { Do not localize }
 
 procedure TScroller.Paint;
 {$IF DEFINED(CLR)}
@@ -412,13 +404,10 @@ begin
   FBitmap.Assign(nil); // release the bitmap resource
 end;
 {$ELSE}
+
 const
-  LeftButton: array[Boolean, Boolean] of TThemedSpin = (
-    (tsDownHorzDisabled, tsDownHorzNormal),
-    (tsDownHorzNormal, tsDownHorzPressed));
-  RightButton: array[Boolean, Boolean] of TThemedSpin = (
-    (tsUpHorzDisabled, tsUpHorzNormal),
-    (tsUpHorzNormal, tsUpHorzPressed));
+  LeftButton: array [Boolean, Boolean] of TThemedSpin = ((tsDownHorzDisabled, tsDownHorzNormal), (tsDownHorzNormal, tsDownHorzPressed));
+  RightButton: array [Boolean, Boolean] of TThemedSpin = ((tsUpHorzDisabled, tsUpHorzNormal), (tsUpHorzNormal, tsUpHorzPressed));
 var
   R: TRect;
   LPPI: Integer;
@@ -430,22 +419,18 @@ begin
     LPPI := CurrentPPI;
     LStyle := StyleServices(Self);
     if FHover and CanScrollLeft and (R.Contains(FHoverPoint)) and not FDown then
-      LStyle.DrawElement(Canvas.Handle,
-        LStyle.GetElementDetails(tsDownHorzHot), R, nil, LPPI)
+      LStyle.DrawElement(Canvas.Handle, LStyle.GetElementDetails(tsDownHorzHot), R, nil, LPPI)
     else
-      LStyle.DrawElement(Canvas.Handle,
-        LStyle.GetElementDetails(LeftButton[CanScrollLeft, FDown and (FCurrent = sbLeft)]), R, nil, LPPI);
+      LStyle.DrawElement(Canvas.Handle, LStyle.GetElementDetails(LeftButton[CanScrollLeft, FDown and (FCurrent = sbLeft)]), R, nil, LPPI);
 
     if IsCustomStyleActive then
       R := TRect.Create(FWidth div 2, 0, FWidth - 1, FHeight)
     else
       R := TRect.Create(FWidth div 2, 0, FWidth, FHeight);
-    if FHover and CanScrollRight and (R.Contains(FHoverPoint))and not FDown then
-      LStyle.DrawElement(Canvas.Handle,
-        LStyle.GetElementDetails(tsUpHorzHot), R, nil, LPPI)
+    if FHover and CanScrollRight and (R.Contains(FHoverPoint)) and not FDown then
+      LStyle.DrawElement(Canvas.Handle, LStyle.GetElementDetails(tsUpHorzHot), R, nil, LPPI)
     else
-      LStyle.DrawElement(Canvas.Handle,
-        LStyle.GetElementDetails(RightButton[CanScrollRight, FDown and (FCurrent = sbRight)]), R, nil, LPPI);
+      LStyle.DrawElement(Canvas.Handle, LStyle.GetElementDetails(RightButton[CanScrollRight, FDown and (FCurrent = sbRight)]), R, nil, LPPI);
   end
   else
     with Canvas do
@@ -494,20 +479,24 @@ end;
 
 procedure TScroller.SetMin(Value: Longint);
 begin
-  if Value < FMax then FMin := Value;
+  if Value < FMax then
+    FMin := Value;
 end;
 
 procedure TScroller.SetMax(Value: Longint);
 begin
-  if Value > FMin then FMax := Value;
+  if Value > FMin then
+    FMax := Value;
 end;
 
 procedure TScroller.SetPosition(Value: Longint);
 begin
   if Value <> FPosition then
   begin
-    if Value < Min then Value := Min;
-    if Value > Max then Value := Max;
+    if Value < Min then
+      Value := Min;
+    if Value > Max then
+      Value := Max;
     FPosition := Value;
     Invalidate;
     if Assigned(FOnClick) then
@@ -532,8 +521,12 @@ begin
   else
     FCurrent := sbRight;
   case FCurrent of
-    sbLeft: if not CanScrollLeft then Exit;
-    sbRight: if not CanScrollRight then Exit;
+    sbLeft:
+      if not CanScrollLeft then
+        Exit;
+    sbRight:
+      if not CanScrollRight then
+        Exit;
   end;
   FPressed := True;
   FDown := True;
@@ -572,7 +565,8 @@ begin
     FHover := False;
     P := Point(Message.XPos, Message.YPos);
     R := TRect.Create(0, 0, FWidth div 2, FHeight);
-    if FCurrent = sbRight then OffsetRect(R, FWidth div 2, 0);
+    if FCurrent = sbRight then
+      OffsetRect(R, FWidth div 2, 0);
     if R.Contains(P) <> FDown then
     begin
       FDown := not FDown;
@@ -601,16 +595,18 @@ begin
     FDown := False;
     NewPos := Position;
     case FCurrent of
-      sbLeft: Dec(NewPos, Change);
-      sbRight: Inc(NewPos, Change);
+      sbLeft:
+        Dec(NewPos, Change);
+      sbRight:
+        Inc(NewPos, Change);
     end;
     Position := NewPos;
   end;
 end;
 
 const
-  cWidthSize: array[TScrollOrientation] of Integer = (24, 26);
-  cHeightSize: array[TScrollOrientation] of Integer = (13, 12);
+  cWidthSize: array [TScrollOrientation] of Integer = (24, 26);
+  cHeightSize: array [TScrollOrientation] of Integer = (13, 12);
 
 procedure TScroller.SetScrollOrientation(const Value: TScrollOrientation);
 begin
@@ -657,7 +653,8 @@ begin
   inherited Insert(Index, S);
   if FTabSet <> nil then
   begin
-    if Index <= FTabSet.FTabIndex then Inc(FTabSet.FTabIndex);
+    if Index <= FTabSet.FTabIndex then
+      Inc(FTabSet.FTabIndex);
     FTabSet.Invalidate;
   end;
 end;
@@ -667,7 +664,7 @@ var
   OldIndex: Integer;
   LastVisibleTab: Integer;
 begin
-  OldIndex := FTabSet.Tabindex;
+  OldIndex := FTabSet.TabIndex;
   inherited Delete(Index);
 
   if OldIndex < Count then
@@ -692,7 +689,7 @@ begin
   FTabSet.SetupTabPositions;
   FTabSet.Invalidate;
   if OldIndex = Index then
-    FTabSet.Click;  { We deleted the selected tab }
+    FTabSet.Click; { We deleted the selected tab }
 end;
 
 procedure TTabList.Put(Index: Integer; const S: string);
@@ -744,13 +741,13 @@ begin
   CreateScroller;
   FTabIndex := -1;
   FFirstIndex := 0;
-  FVisibleTabs := 0;  { set by draw routine }
+  FVisibleTabs := 0; { set by draw routine }
   FStartMargin := 5;
   FEndMargin := 5;
   FTabPosition := tpBottom;
   FImageChangeLink := TChangeLink.Create;
   FImageChangeLink.OnChange := ImageListChange;
-  FEdgeWidth := cNonFlatWidth;  { This controls the angle of the tab edges }
+  FEdgeWidth := cNonFlatWidth; { This controls the angle of the tab edges }
 
   { initialize default values }
   FSelectedColor := clBtnFace;
@@ -779,7 +776,7 @@ procedure TTabSet.CreateParams(var Params: TCreateParams);
 begin
   inherited CreateParams(Params);
   with Params.WindowClass do
-    style := style and not (CS_VREDRAW or CS_HREDRAW);
+    Style := Style and not(CS_VREDRAW or CS_HREDRAW);
 end;
 
 procedure TTabSet.CreateWnd;
@@ -832,8 +829,7 @@ begin
 end;
 
 { cache the tab position data, and return number of visible tabs }
-function TTabSet.CalcTabPositions(const AStart, AStop: Integer; Canvas: TCanvas;
-  First: Integer; FullTabs: Boolean): Integer;
+function TTabSet.CalcTabPositions(const AStart, AStop: Integer; Canvas: TCanvas; First: Integer; FullTabs: Boolean): Integer;
 var
   Index: Integer;
   TabPos, NextTabPos: TTabPos;
@@ -842,7 +838,7 @@ var
   I, J: Integer;
   MaxSize: Integer;
 begin
-  FTabPositions.Clear;{ Erase all previously cached data }
+  FTabPositions.Clear; { Erase all previously cached data }
   FSortedTabPositions.Clear;
   Index := First;
   Start := AStart;
@@ -850,11 +846,11 @@ begin
   while (Start < Stop) and (Index < Tabs.Count) do
   begin
     TabPos := TTabPos.Create(Start, ItemWidth(Index));
-    Inc(Start, TabPos.Size + FEdgeWidth);    { next usable position }
-                                            
+    Inc(Start, TabPos.Size + FEdgeWidth); { next usable position }
+
     if (Start <= Stop) or (not FullTabs) then { Allowing this allows partial tabs }
     begin
-      FTabPositions.Add(TabPos);    { add to list }
+      FTabPositions.Add(TabPos); { add to list }
       Inc(Index);
     end;
     FSortedTabPositions.Add(TabPos);
@@ -877,8 +873,7 @@ begin
       function(const Left, Right: TTabPos): Integer
       begin
         Result := Right.Size - Left.Size;
-      end
-    ));
+      end));
     { Trim off what we have to cut }
     while (CutAmount > 0) and (FSortedTabPositions.Count > 0) do
     begin
@@ -924,10 +919,10 @@ begin
       while (Start < Stop) and (Index < Tabs.Count) do
       begin
         TabPos := TTabPos.Create(Start, Min(ItemWidth(Index), MaxSize));
-        Inc(Start, TabPos.Size + FEdgeWidth);    { next usable position }
+        Inc(Start, TabPos.Size + FEdgeWidth); { next usable position }
         if Start <= Stop then
         begin
-          FTabPositions.Add(TabPos);    { add to list }
+          FTabPositions.Add(TabPos); { add to list }
           Inc(Index);
         end;
       end;
@@ -945,8 +940,7 @@ var
   MinLeft, MaxRight: Integer;
 begin
   Result := -1;
-  if (Pos.X < 0) or (Pos.X > ClientWidth) or
-     (Pos.Y < 0) or (Pos.Y > ClientHeight) then
+  if (Pos.X < 0) or (Pos.X > ClientWidth) or (Pos.Y < 0) or (Pos.Y > ClientHeight) then
     Exit;
 
   case FTabPosition of
@@ -955,23 +949,23 @@ begin
     tpTop:
       YStart := ClientHeight - FTabHeight;
     tpLeft:
-    begin
-      { Switch the X and Y }
-      I := Pos.X;
-      Pos.X := Pos.Y;
-      Pos.Y := I;
-      YStart := ClientWidth - FTabHeight;  { Really the "X" start }
-    end;
+      begin
+        { Switch the X and Y }
+        I := Pos.X;
+        Pos.X := Pos.Y;
+        Pos.Y := I;
+        YStart := ClientWidth - FTabHeight; { Really the "X" start }
+      end;
     tpRight:
-    begin
-      { Switch the X and Y }
-      I := Pos.X;
-      Pos.X := Pos.Y;
-      Pos.Y := I;
-      YStart := 0;  { Really the "X" start }
-    end;
-    else
-      YStart := 0;
+      begin
+        { Switch the X and Y }
+        I := Pos.X;
+        Pos.X := Pos.Y;
+        Pos.Y := I;
+        YStart := 0; { Really the "X" start }
+      end;
+  else
+    YStart := 0;
   end;
 
   if IgnoreTabHeight or ((Pos.Y >= YStart) and (Pos.Y <= YStart + FTabHeight)) then
@@ -1021,14 +1015,12 @@ begin
 
     if FTabPosition in [tpTop, tpBottom] then
     begin
-      Result := TRect.Create(TabPos.StartPos, TabTop, TabPos.StartPos + TabPos.Size,
-        TabTop + FTabHeight);
+      Result := TRect.Create(TabPos.StartPos, TabTop, TabPos.StartPos + TabPos.Size, TabTop + FTabHeight);
       InflateRect(Result, 1, -2);
     end
-    else     { Flip the X and Y if the position is vertical }
+    else { Flip the X and Y if the position is vertical }
     begin
-      Result := TRect.Create(TabTop, TabPos.StartPos,
-        TabTop + FTabHeight, TabPos.StartPos + TabPos.Size);
+      Result := TRect.Create(TabTop, TabPos.StartPos, TabTop + FTabHeight, TabPos.StartPos + TabPos.Size);
       InflateRect(Result, -1, 1);
     end;
   end
@@ -1055,7 +1047,7 @@ end;
 
 procedure TTabSet.DoDefaultPainting;
 const
-  TabState: array[Boolean] of TThemedTabSet = (tbsTabNormal, tbsTabSelected);
+  TabState: array [Boolean] of TThemedTabSet = (tbsTabNormal, tbsTabSelected);
 var
   YStart, YEnd, YMod: Integer;
   TabPos: TTabPos;
@@ -1113,9 +1105,9 @@ begin
 
     // draw top edge
     // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    //  \               /--------------/
-    //   \             /\             /
-    //    \___________/  \___________/
+    // \               /--------------/
+    // \             /\             /
+    // \___________/  \___________/
     Pen.Width := 1;
     if LStyle.Enabled then
       LDetails := LStyle.GetElementDetails(tbsTabNormal);
@@ -1189,25 +1181,21 @@ begin
 
     { set up the canvas }
     if FTabPosition in [tpTop, tpBottom] then
-      R := TRect.Create(TabPos.StartPos, TabTop,
-        TabPos.StartPos + TabPos.Size, TabTop + FTabHeight)
-    else { Switch X and Y  }
-      R := TRect.Create(TabTop, TabPos.StartPos, TabTop + FTabHeight,
-        TabPos.StartPos + TabPos.Size);
+      R := TRect.Create(TabPos.StartPos, TabTop, TabPos.StartPos + TabPos.Size, TabTop + FTabHeight)
+    else { Switch X and Y }
+      R := TRect.Create(TabTop, TabPos.StartPos, TabTop + FTabHeight, TabPos.StartPos + TabPos.Size);
 
     if isSelected then
       if LStyle.Enabled and not LStyle.IsSystemStyle and (seClient in StyleElements) then
         FMemBitmap.Canvas.Brush.Color := LStyle.GetSystemColor(clHighLight)
-      else
-      if (seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self) then
+      else if (seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self) then
         FMemBitmap.Canvas.Brush.Color := LColor
       else
         FMemBitmap.Canvas.Brush.Color := SelectedColor
+    else if (seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self) then
+      FMemBitmap.Canvas.Brush.Color := LColor
     else
-      if (seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self) then
-        FMemBitmap.Canvas.Brush.Color := LColor
-      else
-        FMemBitmap.Canvas.Brush.Color := UnselectedColor;
+      FMemBitmap.Canvas.Brush.Color := UnselectedColor;
 
     FMemBitmap.Canvas.FillRect(R);
 
@@ -1257,16 +1245,14 @@ begin
             end
             else if FTabPosition = tpRight then
             begin
-              FImages.Draw(FMemBitmap.Canvas, R.Left - TextHeight('X'),
-                R.Top, ImageIndex);
+              FImages.Draw(FMemBitmap.Canvas, R.Left - TextHeight('X'), R.Top, ImageIndex);
               Inc(R.Top, 2 + FImages.Height);
               Dec(R.Right, FImages.Height); { For proper clipping }
               Inc(R.Left, 2);
             end
             else
             begin
-              FImages.Draw(FMemBitmap.Canvas, R.Left, R.Top - FImages.Height,
-                ImageIndex);
+              FImages.Draw(FMemBitmap.Canvas, R.Left, R.Top - FImages.Height, ImageIndex);
               Dec(R.Top, 2 + FImages.Height);
               Dec(R.Right, FImages.Height); { For proper clipping }
               Inc(R.Left, 2);
@@ -1274,8 +1260,7 @@ begin
           end;
         end;
         S := Tabs[Tab + FirstIndex];
-        if (R.Right - R.Left >= MinRect) or
-            (TextWidth(S) <= (R.Right - R.Left)) then
+        if (R.Right - R.Left >= MinRect) or (TextWidth(S) <= (R.Right - R.Left)) then
         begin
           if LStyle.Enabled and not LStyle.IsSystemStyle then
           begin
@@ -1287,9 +1272,7 @@ begin
             else
               FMemBitmap.Canvas.Font.Color := Self.Font.Color;
           end
-          else
-          if (seFont in StyleElements) and GetThemeColor(LStyle.GetElementDetails(TabState[isSelected]), ecTextColor, LColor, Self)
-          then
+          else if (seFont in StyleElements) and GetThemeColor(LStyle.GetElementDetails(TabState[isSelected]), ecTextColor, LColor, Self) then
             FMemBitmap.Canvas.Font.Color := LColor
           else
             FMemBitmap.Canvas.Font.Color := Self.Font.Color;
@@ -1298,24 +1281,24 @@ begin
       end;
     end;
 
-    { draw trailing edge  }
+    { draw trailing edge }
     // ===============|XXXX|=================
-    //  \             |  XX|-------------/
-    //   \            | XX |            /
-    //    \___________|X  X|___________/
+    // \             |  XX|-------------/
+    // \            | XX |            /
+    // \___________|X  X|___________/
     // or
     // ==============================|XXXX|==
-    //  \               /------------|XXX |
-    //   \             /\            | X  |
-    //    \___________/  \___________|X   |
+    // \               /------------|XXX |
+    // \             /\            | X  |
+    // \___________/  \___________|X   |
     if Trailing <> etNone then
       PaintEdge(TabPos.StartPos + TabPos.Size, TabTop, FTabHeight - 1, Trailing);
 
     { draw connecting lines above and below the text }
     // ====================================
-    //  \               /-XXXXXXXXXXX--/
-    //   \             /\             /
-    //    \XXXXXXXXXXX/  \XXXXXXXXXXX/
+    // \               /-XXXXXXXXXXX--/
+    // \             /\             /
+    // \XXXXXXXXXXX/  \XXXXXXXXXXX/
     with FMemBitmap.Canvas do
     begin
       if FStyle = tsSoftTabs then
@@ -1323,14 +1306,12 @@ begin
           Pen.Color := LColor
         else
           Pen.Color := clBtnShadow
+      else if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
+        Pen.Color := LColor
       else
-        if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
-          Pen.Color := LColor
-        else
-          Pen.Color := clWindowFrame;
+        Pen.Color := clWindowFrame;
 
-      DrawLine(FMemBitmap.Canvas, TabPos.StartPos, YEnd - YMod,
-        TabPos.StartPos + TabPos.Size, YEnd - YMod);
+      DrawLine(FMemBitmap.Canvas, TabPos.StartPos, YEnd - YMod, TabPos.StartPos + TabPos.Size, YEnd - YMod);
 
       if not isSelected then
       begin
@@ -1339,20 +1320,17 @@ begin
             Pen.Color := LColor
           else
             Pen.Color := BackgroundColor
+        else if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
+          Pen.Color := LColor
         else
-          if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
-            Pen.Color := LColor
-          else
-            Pen.Color := clWindowFrame;
-        DrawLine(FMemBitmap.Canvas, TabPos.StartPos, YStart + YMod,
-          TabPos.StartPos + TabPos.Size, YStart + YMod);
+          Pen.Color := clWindowFrame;
+        DrawLine(FMemBitmap.Canvas, TabPos.StartPos, YStart + YMod, TabPos.StartPos + TabPos.Size, YStart + YMod);
 
         if GetThemeColor(LDetails, ecEdgeShadowColor, LColor, Self) then
           Pen.Color := LColor
         else
           Pen.Color := clBtnShadow;
-        DrawLine(FMemBitmap.Canvas, TabPos.StartPos, YStart,
-          TabPos.StartPos + TabPos.Size + 1, YStart);
+        DrawLine(FMemBitmap.Canvas, TabPos.StartPos, YStart, TabPos.StartPos + TabPos.Size + 1, YStart);
       end;
     end;
   end;
@@ -1386,8 +1364,7 @@ var
   LColor: TColor;
   LDetails, LBkDetails: TThemedElementDetails;
 
-  procedure DrawPoly(Canvas: TCanvas; Polygon: Boolean;
-    Points: array of TPoint);
+  procedure DrawPoly(Canvas: TCanvas; Polygon: Boolean; Points: array of TPoint);
   var
     I: Integer;
     TempX: Integer;
@@ -1422,7 +1399,7 @@ var
         Pen.Color := clBtnShadow;
       DrawPoly(Canvas, False, [Point(0, Y), Point(FEdgeWidth + 1, Y)]);
       { Fill in the middle }
-      if (seClient in StyleElements) and  GetThemeColor(LDetails, ecFillColor, LColor, Self) then
+      if (seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self) then
       begin
         Pen.Color := LColor;
         Brush.Color := LColor;
@@ -1433,9 +1410,7 @@ var
         Brush.Color := UnselectedColor;
       end;
 
-      DrawPoly(Canvas, True, [Point(3, Y + YMod),
-        Point(FEdgeWidth - 1, YEnd), Point(FEdgeWidth, YEnd),
-        Point(FEdgeWidth, Y + YMod), Point(3, Y + YMod)]);
+      DrawPoly(Canvas, True, [Point(3, Y + YMod), Point(FEdgeWidth - 1, YEnd), Point(FEdgeWidth, YEnd), Point(FEdgeWidth, Y + YMod), Point(3, Y + YMod)]);
 
       if SoftTop then
       begin
@@ -1443,22 +1418,18 @@ var
           Pen.Color := LColor
         else
           Pen.Color := BackgroundColor;
-        DrawPoly(Canvas, False, [Point(4, Y + YMod),
-          Point(FEdgeWidth + 1, Y + YMod)]);
+        DrawPoly(Canvas, False, [Point(4, Y + YMod), Point(FEdgeWidth + 1, Y + YMod)]);
 
         if FStyle = tsSoftTabs then
           if GetThemeColor(LDetails, ecEdgeShadowColor, LColor, Self) then
             Pen.Color := LColor
           else
             Pen.Color := clBtnShadow
+        else if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
+          Pen.Color := LColor
         else
-          if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
-            Pen.Color := LColor
-          else
-            Pen.Color := clWindowFrame;
-        DrawPoly(Canvas, False, [Point(3, Y + YMod),
-          Point(FEdgeWidth - 1, YEnd),
-          Point(FEdgeWidth, YEnd)]);
+          Pen.Color := clWindowFrame;
+        DrawPoly(Canvas, False, [Point(3, Y + YMod), Point(FEdgeWidth - 1, YEnd), Point(FEdgeWidth, YEnd)]);
       end
       else
       begin
@@ -1467,15 +1438,11 @@ var
             Pen.Color := LColor
           else
             Pen.Color := clBtnShadow
+        else if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
+          Pen.Color := LColor
         else
-          if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
-            Pen.Color := LColor
-          else
-            Pen.Color := clWindowFrame;
-        DrawPoly(Canvas, False, [Point(0, Y + YMod),
-          Point(FEdgeWidth + 1, Y + YMod),
-          Point(3, Y + YMod),
-          Point(FEdgeWidth - 1, YEnd),
+          Pen.Color := clWindowFrame;
+        DrawPoly(Canvas, False, [Point(0, Y + YMod), Point(FEdgeWidth + 1, Y + YMod), Point(3, Y + YMod), Point(FEdgeWidth - 1, YEnd),
           Point(FEdgeWidth, YEnd)]);
       end;
     end;
@@ -1490,23 +1457,18 @@ var
     begin
       if (seClient in StyleElements) and LStyle.Enabled and not LStyle.IsSystemStyle then
         LColor := LStyle.GetSystemColor(clHighLight)
-      else
-      if not ((seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self)) then
+      else if not((seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self)) then
         LColor := SelectedColor;
       Pen.Color := LColor;
       Brush.Color := LColor;
       { Fill the inside with the selected color }
-      DrawPoly(Canvas, True, [Point(3, Y),
-        Point(FEdgeWidth - 1, YEnd),
-        Point(FEdgeWidth, YEnd),
-        Point(FEdgeWidth, Y),
-        Point(3, Y)]);
+      DrawPoly(Canvas, True, [Point(3, Y), Point(FEdgeWidth - 1, YEnd), Point(FEdgeWidth, YEnd), Point(FEdgeWidth, Y), Point(3, Y)]);
 
       if GetThemeColor(LDetails, ecEdgeShadowColor, LColor, Self) then
         Pen.Color := LColor
       else
         Pen.Color := clBtnShadow;
-      if not (FStyle = tsSoftTabs) then
+      if not(FStyle = tsSoftTabs) then
       begin
         { Draw 3-D edges on the left }
         DrawPoly(Canvas, False, [Point(0, Y), Point(4, Y)]);
@@ -1514,8 +1476,7 @@ var
           Pen.Color := LColor
         else
           Pen.Color := clBtnHighlight;
-        DrawPoly(Canvas, False, [Point(4, Y + YMod),
-          Point(FEdgeWidth, YEnd + 1)]);
+        DrawPoly(Canvas, False, [Point(4, Y + YMod), Point(FEdgeWidth, YEnd + 1)]);
         if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
           Pen.Color := LColor
         else
@@ -1523,14 +1484,9 @@ var
       end;
 
       if SoftTop then
-        DrawPoly(Canvas, False, [Point(3, Y + YMod),
-          Point(FEdgeWidth - 1, YEnd),
-          Point(FEdgeWidth, YEnd)])
+        DrawPoly(Canvas, False, [Point(3, Y + YMod), Point(FEdgeWidth - 1, YEnd), Point(FEdgeWidth, YEnd)])
       else
-        DrawPoly(Canvas, False, [Point(0, Y + YMod),
-          Point(3, Y + YMod),
-          Point(FEdgeWidth - 1, YEnd),
-          Point(FEdgeWidth, YEnd)]);
+        DrawPoly(Canvas, False, [Point(0, Y + YMod), Point(3, Y + YMod), Point(FEdgeWidth - 1, YEnd), Point(FEdgeWidth, YEnd)]);
     end;
   end;
 
@@ -1558,9 +1514,7 @@ var
         Brush.Color := UnselectedColor;
       end;
 
-      DrawPoly(Canvas, True, [Point(FEdgeWidth - 3, Y + YMod),
-        Point(1, YEnd), Point(0, YEnd),
-        Point(0, Y + YMod), Point(FEdgeWidth - 3, Y + YMod)]);
+      DrawPoly(Canvas, True, [Point(FEdgeWidth - 3, Y + YMod), Point(1, YEnd), Point(0, YEnd), Point(0, Y + YMod), Point(FEdgeWidth - 3, Y + YMod)]);
 
       { workaround for bug in S3 driver }
       if GetThemeColor(LDetails, ecEdgeShadowColor, LColor, Self) then
@@ -1575,22 +1529,18 @@ var
           Pen.Color := LColor
         else
           Pen.Color := BackgroundColor;
-        DrawPoly(Canvas, False, [Point(0, Y + YMod),
-          Point(FEdgeWidth - 1, Y + YMod)]);
+        DrawPoly(Canvas, False, [Point(0, Y + YMod), Point(FEdgeWidth - 1, Y + YMod)]);
 
         if FStyle = tsSoftTabs then
           if GetThemeColor(LDetails, ecEdgeShadowColor, LColor, Self) then
             Pen.Color := LColor
           else
             Pen.Color := clBtnShadow
+        else if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
+          Pen.Color := LColor
         else
-          if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
-            Pen.Color := LColor
-          else
-            Pen.Color := clWindowFrame;
-        DrawPoly(Canvas, False, [Point(FEdgeWidth - 2, Y + YMod),
-          Point(2, YEnd),
-          Point(-1, YEnd)]);
+          Pen.Color := clWindowFrame;
+        DrawPoly(Canvas, False, [Point(FEdgeWidth - 2, Y + YMod), Point(2, YEnd), Point(-1, YEnd)]);
       end
       else
       begin
@@ -1599,16 +1549,11 @@ var
             Pen.Color := LColor
           else
             Pen.Color := clBtnShadow
+        else if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
+          Pen.Color := LColor
         else
-          if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
-            Pen.Color := LColor
-          else
-            Pen.Color := clWindowFrame;
-        DrawPoly(Canvas, False, [Point(0, Y + YMod),
-          Point(FEdgeWidth + 1, Y + YMod),
-          Point(FEdgeWidth - 2, Y + YMod),
-          Point(2, YEnd),
-          Point(-1, YEnd)]);
+          Pen.Color := clWindowFrame;
+        DrawPoly(Canvas, False, [Point(0, Y + YMod), Point(FEdgeWidth + 1, Y + YMod), Point(FEdgeWidth - 2, Y + YMod), Point(2, YEnd), Point(-1, YEnd)]);
       end;
     end;
   end;
@@ -1622,17 +1567,12 @@ var
     begin
       if (seClient in StyleElements) and LStyle.Enabled and not LStyle.IsSystemStyle then
         LColor := LStyle.GetSystemColor(clHighLight)
-      else
-      if not ((seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self)) then
+      else if not((seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self)) then
         LColor := SelectedColor;
       Pen.Color := LColor;
       Brush.Color := LColor;
 
-      DrawPoly(Canvas, True, [Point(FEdgeWidth - 3, Y + YMod),
-        Point(2, YEnd),
-        Point(0, YEnd),
-        Point(0, Y),
-        Point(FEdgeWidth + 1, Y)]);
+      DrawPoly(Canvas, True, [Point(FEdgeWidth - 3, Y + YMod), Point(2, YEnd), Point(0, YEnd), Point(0, Y), Point(FEdgeWidth + 1, Y)]);
 
       if GetThemeColor(LDetails, ecEdgeShadowColor, LColor, Self) then
         Pen.Color := LColor
@@ -1642,25 +1582,16 @@ var
         DrawLine(Canvas, FEdgeWidth + 1, Y, FEdgeWidth - 2, Y)
       else
       begin
-        DrawPoly(Canvas, False, [Point(FEdgeWidth + 1, Y),
-          Point(FEdgeWidth - 3, Y),
-          Point(FEdgeWidth - 3, Y + YMod),
-          Point(1, YEnd),
-          Point(-1, YEnd)]);
+        DrawPoly(Canvas, False, [Point(FEdgeWidth + 1, Y), Point(FEdgeWidth - 3, Y), Point(FEdgeWidth - 3, Y + YMod), Point(1, YEnd), Point(-1, YEnd)]);
         if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
           Pen.Color := LColor
         else
           Pen.Color := clWindowFrame;
       end;
       if SoftTop then
-        DrawPoly(Canvas, False, [Point(FEdgeWidth - 2, Y + YMod),
-          Point(2, YEnd),
-          Point(-1, YEnd)])
+        DrawPoly(Canvas, False, [Point(FEdgeWidth - 2, Y + YMod), Point(2, YEnd), Point(-1, YEnd)])
       else
-        DrawPoly(Canvas, False, [Point(FEdgeWidth, Y + YMod),
-          Point(FEdgeWidth - 2, Y + YMod),
-          Point(2, YEnd),
-          Point(-1, YEnd)]);
+        DrawPoly(Canvas, False, [Point(FEdgeWidth, Y + YMod), Point(FEdgeWidth - 2, Y + YMod), Point(2, YEnd), Point(-1, YEnd)]);
     end;
   end;
 
@@ -1696,7 +1627,7 @@ begin
       ActualWidth := FTabHeight;
       ActualHeight := FEdgeWidth;
     end;
-    TempList := TImageList.CreateSize(ActualWidth, ActualHeight); {exceptions}
+    TempList := TImageList.CreateSize(ActualWidth, ActualHeight); { exceptions }
   except
     FTabHeight := SaveHeight;
     raise;
@@ -1705,7 +1636,7 @@ begin
   FEdgeImageList := TempList;
   LStyle := StyleServices(Self);
 
-  if not (FStyle in [tsModernTabs, tsModernPopout, tsIDETabs]) then
+  if not(FStyle in [tsModernTabs, tsModernPopout, tsIDETabs]) then
   begin
     { These parts aren't used in the "modern" painting look }
     Working := TBitmap.Create;
@@ -1728,7 +1659,6 @@ begin
         YEnd := 0;
       end;
 
-
       if LStyle.Enabled then
         LBkDetails := LStyle.GetElementDetails(tbsBackground);
 
@@ -1741,10 +1671,14 @@ begin
           FillRect(TRect.Create(0, 0, ActualWidth, ActualHeight));
         end;
         case EdgePart of
-          epSelectedLeft: DrawSL(Working.Canvas);
-          epUnselectedLeft: DrawUL(Working.Canvas);
-          epSelectedRight: DrawSR(Working.Canvas);
-          epUnselectedRight: DrawUR(Working.Canvas);
+          epSelectedLeft:
+            DrawSL(Working.Canvas);
+          epUnselectedLeft:
+            DrawUL(Working.Canvas);
+          epSelectedRight:
+            DrawSR(Working.Canvas);
+          epUnselectedRight:
+            DrawUR(Working.Canvas);
         end;
         FEdgeImageList.AddMasked(Working, MaskColor);
       end;
@@ -1803,8 +1737,8 @@ begin
   with Bitmap.Canvas do
   begin
     Brush.Style := bsSolid;
-    if not (not (seClient in StyleElements) and (IsCustomStyleActive))
-        and GetThemeColor(StyleServices(Self).GetElementDetails(tbsBackground), ecFillColor, LColor, Self) then
+    if not(not(seClient in StyleElements) and (IsCustomStyleActive)) and GetThemeColor(StyleServices(Self).GetElementDetails(tbsBackground), ecFillColor,
+      LColor, Self) then
       Brush.Color := LColor
     else
       Brush.Color := FBackgroundColor;
@@ -1812,11 +1746,10 @@ begin
     if FDitherBackground and not IsCustomStyleActive then
       for Y := 0 to 7 do
         for X := 0 to 7 do
-          if (Y mod 2) = (X mod 2) then  { toggles between even/odd pixles }
-            Pixels[X, Y] := clWhite;     { on even/odd rows }
+          if (Y mod 2) = (X mod 2) then { toggles between even/odd pixles }
+            Pixels[X, Y] := clWhite; { on even/odd rows }
   end;
 end;
-
 
 function TTabSet.ScrollerSize: Integer;
 begin
@@ -1841,8 +1774,7 @@ var
       Dec(Result, ScrollerSize);
   end;
 
-  function ReverseCalcNumTabs(Start, Stop: Integer; Canvas: TCanvas;
-    Last: Integer): Integer;
+  function ReverseCalcNumTabs(Start, Stop: Integer; Canvas: TCanvas; Last: Integer): Integer;
   var
     W: Integer;
   begin
@@ -1854,8 +1786,9 @@ var
         with Canvas do
         begin
           W := ItemWidth(Result) + FEdgeWidth;
-          Dec(Start, W);  { next usable position }
-          if Start >= Stop then Dec(Result);
+          Dec(Start, W); { next usable position }
+          if Start >= Stop then
+            Dec(Result);
         end;
       end;
       if (Start < Stop) or (Result < 0) then
@@ -1873,8 +1806,7 @@ begin
     LastVisibleTab := FFirstIndex + FVisibleTabs - 1;
     if (LastVisibleTab > 0) and (FTabIndex >= LastVisibleTab) then
     begin
-      FFirstIndex := ReverseCalcNumTabs(GetRightSide, StartMargin,
-        Canvas, FTabIndex);
+      FFirstIndex := ReverseCalcNumTabs(GetRightSide, StartMargin, Canvas, FTabIndex);
       LastVisibleTab := FFirstIndex + FVisibleTabs - 1;
       if FTabIndex > LastVisibleTab then
         Inc(FFirstIndex);
@@ -1998,7 +1930,8 @@ begin
     NewIndex := TabIndex;
     if Direction then
       Inc(NewIndex)
-    else Dec(NewIndex);
+    else
+      Dec(NewIndex);
     if NewIndex = Tabs.Count then
       NewIndex := 0
     else if NewIndex < 0 then
@@ -2020,8 +1953,10 @@ procedure TTabSet.SetTabList(Value: TStrings);
 begin
   FTabs.Assign(Value);
   FTabIndex := -1;
-  if FTabs.Count > 0 then TabIndex := 0
-  else Invalidate;
+  if FTabs.Count > 0 then
+    TabIndex := 0
+  else
+    Invalidate;
 end;
 
 procedure TTabSet.SetTabStyle(Value: TTabStyle);
@@ -2054,14 +1989,15 @@ begin
   end;
 end;
 
-procedure TTabSet.DrawTab(TabCanvas: TCanvas; R: TRect; Index: Integer;
-  Selected: Boolean);
+procedure TTabSet.DrawTab(TabCanvas: TCanvas; R: TRect; Index: Integer; Selected: Boolean);
 begin
   if Assigned(FOnDrawTab) then
     FOnDrawTab(Self, TabCanvas, R, Index, Selected);
 end;
 
-{$IFDEF CLR}[UIPermission(SecurityAction.LinkDemand, Window=UIPermissionWindow.AllWindows)]{$ENDIF}
+{$IFDEF CLR}[UIPermission(SecurityAction.LinkDemand, Window = UIPermissionWindow.AllWindows)]
+{$ENDIF}
+
 procedure TTabSet.GetChildren(Proc: TGetChildProc; Root: TComponent);
 begin
 end;
@@ -2072,8 +2008,7 @@ begin
     FOnMeasureTab(Self, Index, TabWidth);
 end;
 
-procedure TTabSet.MouseDown(Button: TMouseButton; Shift: TShiftState;
-  X, Y: Integer);
+procedure TTabSet.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   I: Integer;
 begin
@@ -2090,14 +2025,13 @@ procedure TTabSet.WMSize(var Message: TWMSize);
 var
   NumVisTabs, LastTabPos: Integer;
 
-  function CalcNumTabs(Start, Stop: Integer; Canvas: TCanvas;
-    First: Integer): Integer;
+  function CalcNumTabs(Start, Stop: Integer; Canvas: TCanvas; First: Integer): Integer;
   begin
     Result := First;
     while (Start < Stop) and (Result < Tabs.Count) do
       with Canvas do
       begin
-        Inc(Start, ItemWidth(Result) + FEdgeWidth);    { next usable position }
+        Inc(Start, ItemWidth(Result) + FEdgeWidth); { next usable position }
         if Start <= Stop then
           Inc(Result);
       end;
@@ -2113,8 +2047,7 @@ begin
       LastTabPos := Height - EndMargin;
 
     NumVisTabs := CalcNumTabs(StartMargin + FEdgeWidth, LastTabPos, Canvas, 0);
-    if (FTabIndex = Tabs.Count) or (NumVisTabs > FVisibleTabs) or
-       (NumVisTabs = Tabs.Count) then
+    if (FTabIndex = Tabs.Count) or (NumVisTabs > FVisibleTabs) or (NumVisTabs = Tabs.Count) then
       FirstIndex := Tabs.Count - NumVisTabs;
     FDoFix := True;
   end;
@@ -2203,7 +2136,7 @@ begin
   else if FTabPosition = tpLeft then
     ACanvas.Font.Orientation := 900 { 90 degrees to the left }
   else
-    ACanvas.Font.Orientation := 0; 
+    ACanvas.Font.Orientation := 0;
 end;
 
 function TTabSet.ItemWidth(Index: Integer): Integer;
@@ -2232,8 +2165,7 @@ begin
       Canvas.Font.Style := LFontStyle;
     end;
   end
-  else
-  if (FStyle = tsOwnerDraw) then
+  else if (FStyle = tsOwnerDraw) then
     MeasureTab(Index, Result);
 end;
 
@@ -2259,7 +2191,7 @@ begin
       Images.RegisterChanges(FImageChangeLink);
       Images.FreeNotification(Self);
     end;
-    if not (csDestroying in ComponentState) then
+    if not(csDestroying in ComponentState) then
     begin
       CreateEdgeParts; { Height is changed if Value <> nil }
       Invalidate;
@@ -2272,8 +2204,7 @@ begin
   Invalidate;
 end;
 
-procedure TTabSet.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TTabSet.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
   if (Operation = opRemove) and (AComponent = Images) then
@@ -2374,7 +2305,7 @@ begin
   begin
     TabTop := 0;
     YStart := ScaleValue(1);
-  end 
+  end
   else if TabPosition = tpRight then
   begin
     TabTop := ScaleValue(2);
@@ -2385,7 +2316,7 @@ begin
     TabTop := ClientHeight - TabHeight - ScaleValue(2);
     YStart := ClientHeight - ScaleValue(2);
   end
-  else // tpLeft 
+  else // tpLeft
   begin
     TabTop := ClientWidth - TabHeight - ScaleValue(2);
     YStart := ClientWidth - ScaleValue(2);
@@ -2396,12 +2327,11 @@ begin
   else
     TotalSize := MemBitmap.Height;
 
-  // draw background of tab area 
-  // Fill in with the background color 
+  // draw background of tab area
+  // Fill in with the background color
   if TStyleManager.IsCustomStyleActive then
-    BGColor := LStyle.GetSystemColor(clBtnface)
-  else    
-  if GetThemeColor(LStyle.GetElementDetails(tbsBackground), ecFillColor, LColor) then
+    BGColor := LStyle.GetSystemColor(clBtnFace)
+  else if GetThemeColor(LStyle.GetElementDetails(tbsBackground), ecFillColor, LColor) then
     BGColor := LColor
   else
     BGColor := GetHighlightColor(BackgroundColor);
@@ -2416,7 +2346,7 @@ begin
     Dec(YStart)
   else
     Dec(YStart);
-  // draw the top edge 
+  // draw the top edge
   if LStyle.Enabled then
     LDetails := LStyle.GetElementDetails(tbsTabNormal);
 
@@ -2437,14 +2367,12 @@ begin
     isSelected := Tab + FirstIndex = TabIndex;
 
     if TabPosition = tpTop then
-      R := TRect.Create(TabPos.StartPos + ScaleValue(2) - TabOffset, TabTop + ScaleValue(2),
-        TabPos.StartPos + TabPos.Size + TabOffset, TabTop + TabHeight + ScaleValue(2))
+      R := TRect.Create(TabPos.StartPos + ScaleValue(2) - TabOffset, TabTop + ScaleValue(2), TabPos.StartPos + TabPos.Size + TabOffset,
+        TabTop + TabHeight + ScaleValue(2))
     else if TabPosition = tpBottom then
-      R := TRect.Create(TabPos.StartPos + ScaleValue(2) - TabOffset, TabTop,
-        TabPos.StartPos + TabPos.Size + TabOffset, TabTop + TabHeight)
+      R := TRect.Create(TabPos.StartPos + ScaleValue(2) - TabOffset, TabTop, TabPos.StartPos + TabPos.Size + TabOffset, TabTop + TabHeight)
     else
-      R := TRect.Create(TabTop, TabPos.StartPos + ScaleValue(2) - TabOffset,
-        TabTop + TabHeight - ScaleValue(1), TabPos.StartPos + TabPos.Size + TabOffset);
+      R := TRect.Create(TabTop, TabPos.StartPos + ScaleValue(2) - TabOffset, TabTop + TabHeight - ScaleValue(1), TabPos.StartPos + TabPos.Size + TabOffset);
 
     if isSelected and (FSelectedFontColor <> clNone) then
       LFontColor := FSelectedFontColor
@@ -2468,12 +2396,12 @@ begin
       FMemBitmap.Canvas.FillRect(R);
     LRect := R;
     LIndex := Tab + FirstIndex;
-    s := Tabs[LIndex];
+    S := Tabs[LIndex];
 
     if (FTabPosition in [tpTop, tpBottom]) and (R.Width > cTabSetMargin * 3) then
     begin
       InflateRect(LRect, -ScaleValue(cTabSetMargin), 0);
-      FMemBitmap.Canvas.TextRect(LRect, s, [tfCenter, tfSingleLine, tfVerticalCenter, tfNoClip, tfEndEllipsis])
+      FMemBitmap.Canvas.TextRect(LRect, S, [tfCenter, tfSingleLine, tfVerticalCenter, tfNoClip, tfEndEllipsis])
     end
     else if (FTabPosition in [tpLeft, tpRight]) and (R.Height > cTabSetMargin * 3) then
     begin
@@ -2490,13 +2418,13 @@ begin
       end;
       LRect.Right := LRect.Left + TabPos.Size;
       LRect.Bottom := LRect.Top + FTabHeight;
-      FMemBitmap.Canvas.TextRect(LRect, s, [tfEndEllipsis, tfNoClip]);
+      FMemBitmap.Canvas.TextRect(LRect, S, [tfEndEllipsis, tfNoClip]);
     end;
 
     isNextSelected := (LIndex + FirstIndex) + 1 = TabIndex;
-    if  (LIndex < FTabs.Count - 1) and not isSelected and not isNextSelected then
+    if (LIndex < FTabs.Count - 1) and not isSelected and not isNextSelected then
     begin
-      FMemBitmap.Canvas.Pen.Color  := LStyle.GetSystemColor(clGrayText);
+      FMemBitmap.Canvas.Pen.Color := LStyle.GetSystemColor(clGrayText);
       if FTabPosition in [tpTop, tpBottom] then
       begin
         FMemBitmap.Canvas.MoveTo(R.Right - ScaleValue(1), R.Top + ScaleValue(4));
@@ -2513,7 +2441,7 @@ end;
 
 procedure TTabSet.DoModernPainting;
 const
-  TabState: array[Boolean] of TThemedTabSet = (tbsTabNormal, tbsTabSelected);
+  TabState: array [Boolean] of TThemedTabSet = (tbsTabNormal, tbsTabSelected);
 var
   YStart: Integer;
   TabPos: TTabPos;
@@ -2612,9 +2540,7 @@ begin
         FMemBitmap.Canvas.Pen.Color := LColor
       else
         FMemBitmap.Canvas.Pen.Color := clWindowFrame;
-      DrawLine(FMemBitmap.Canvas,
-        TabPos.StartPos - TabOffset + 1, TabTop,
-        TabPos.StartPos - TabOffset + 1, TabTop + FTabHeight);
+      DrawLine(FMemBitmap.Canvas, TabPos.StartPos - TabOffset + 1, TabTop, TabPos.StartPos - TabOffset + 1, TabTop + FTabHeight);
 
       if GetThemeColor(LDetails, ecFillColor, LColor, Self) then
         FMemBitmap.Canvas.Pen.Color := GetHighlightColor(LColor)
@@ -2622,9 +2548,7 @@ begin
         FMemBitmap.Canvas.Pen.Color := GetHighlightColor(SelectedColor);
 
       { Draw the next leading edge as highlighted. }
-      DrawLine(FMemBitmap.Canvas,
-        TabPos.StartPos - TabOffset + 2, TabTop,
-        TabPos.StartPos - TabOffset + 2, TabTop + FTabHeight);
+      DrawLine(FMemBitmap.Canvas, TabPos.StartPos - TabOffset + 2, TabTop, TabPos.StartPos - TabOffset + 2, TabTop + FTabHeight);
 
       if GetThemeColor(LDetails, ecEdgeDkShadowColor, LColor, Self) then
         FMemBitmap.Canvas.Pen.Color := LColor
@@ -2632,40 +2556,31 @@ begin
         FMemBitmap.Canvas.Pen.Color := clWindowFrame;
       { Draw the bottom edge. }
       if FTabPosition in [tpBottom, tpRight] then
-        DrawLine(FMemBitmap.Canvas,
-          TabPos.StartPos + 1 - TabOffset, TabTop + FTabHeight - 1,
-          TabPos.StartPos + TabPos.Size + 1 + TabOffset,
+        DrawLine(FMemBitmap.Canvas, TabPos.StartPos + 1 - TabOffset, TabTop + FTabHeight - 1, TabPos.StartPos + TabPos.Size + 1 + TabOffset,
           TabTop + FTabHeight - 1)
       else
         DrawLine(FMemBitmap.Canvas, { Really the top edge, in this case }
-          TabPos.StartPos + 1 - TabOffset + 1, TabTop,
-          TabPos.StartPos + TabPos.Size + 1 + TabOffset, TabTop);
+        TabPos.StartPos + 1 - TabOffset + 1, TabTop, TabPos.StartPos + TabPos.Size + 1 + TabOffset, TabTop);
 
       { Draw the right edge }
-      DrawLine(FMemBitmap.Canvas,
-        TabPos.StartPos + TabPos.Size + TabOffset, TabTop,
-        TabPos.StartPos + TabPos.Size + TabOffset,
-        TabTop + FTabHeight - 1);
+      DrawLine(FMemBitmap.Canvas, TabPos.StartPos + TabPos.Size + TabOffset, TabTop, TabPos.StartPos + TabPos.Size + TabOffset, TabTop + FTabHeight - 1);
       { Fill in the inside up with the button face }
 
       if (seClient in StyleElements) and LStyle.Enabled and not LStyle.IsSystemStyle then
         FMemBitmap.Canvas.Brush.Color := LStyle.GetSystemColor(clHighLight)
-      else
-      if (seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self) then
+      else if (seClient in StyleElements) and GetThemeColor(LDetails, ecFillColor, LColor, Self) then
         FMemBitmap.Canvas.Brush.Color := LColor
       else
         FMemBitmap.Canvas.Brush.Color := SelectedColor;
 
       if FTabPosition in [tpTop, tpBottom] then
-        R := TRect.Create(TabPos.StartPos + 2 - TabOffset, TabTop,
-          TabPos.StartPos + TabPos.Size + TabOffset, TabTop + FTabHeight - 1)
+        R := TRect.Create(TabPos.StartPos + 2 - TabOffset, TabTop, TabPos.StartPos + TabPos.Size + TabOffset, TabTop + FTabHeight - 1)
       else
-        R := TRect.Create(TabTop, TabPos.StartPos + 2 - TabOffset,
-          TabTop + FTabHeight - 1, TabPos.StartPos + TabPos.Size + TabOffset);
+        R := TRect.Create(TabTop, TabPos.StartPos + 2 - TabOffset, TabTop + FTabHeight - 1, TabPos.StartPos + TabPos.Size + TabOffset);
 
       if FTabPosition = tpTop then
       begin
-       { Move the rect down and to the right a little }
+        { Move the rect down and to the right a little }
         Inc(R.Left);
         Inc(R.Top);
         Inc(R.Bottom);
@@ -2689,19 +2604,15 @@ begin
         FMemBitmap.Canvas.Pen.Color := LColor
       else
         FMemBitmap.Canvas.Pen.Color := clBtnShadow;
-      DrawLine(FMemBitmap.Canvas,
-        TabPos.StartPos + TabPos.Size + TabOffset, TabTop + 3,
-        TabPos.StartPos + TabPos.Size + TabOffset,
+      DrawLine(FMemBitmap.Canvas, TabPos.StartPos + TabPos.Size + TabOffset, TabTop + 3, TabPos.StartPos + TabPos.Size + TabOffset,
         TabTop + FTabHeight - 1 - 2);
     end;
 
     { set up the canvas }
     if FTabPosition in [tpTop, tpBottom] then
-      R := TRect.Create(TabPos.StartPos, TabTop,
-        TabPos.StartPos + TabPos.Size, TabTop + FTabHeight)
-    else { Switch X and Y  }
-      R := TRect.Create(TabTop, TabPos.StartPos, TabTop + FTabHeight,
-        TabPos.StartPos + TabPos.Size);
+      R := TRect.Create(TabPos.StartPos, TabTop, TabPos.StartPos + TabPos.Size, TabTop + FTabHeight)
+    else { Switch X and Y }
+      R := TRect.Create(TabTop, TabPos.StartPos, TabTop + FTabHeight, TabPos.StartPos + TabPos.Size);
 
     with FMemBitmap.Canvas do
     begin
@@ -2745,8 +2656,7 @@ begin
         begin
           if DrawImage then
           begin
-            FImages.Draw(FMemBitmap.Canvas, R.Left - TextHeight('X') + 2,
-              R.Top, ImageIndex);
+            FImages.Draw(FMemBitmap.Canvas, R.Left - TextHeight('X') + 2, R.Top, ImageIndex);
             Inc(R.Top, 2 + FImages.Height);
             Dec(R.Right, FImages.Height); { For proper clipping }
           end;
@@ -2756,8 +2666,7 @@ begin
         begin
           if DrawImage then
           begin
-            FImages.Draw(FMemBitmap.Canvas, R.Left, R.Top - FImages.Height,
-              ImageIndex);
+            FImages.Draw(FMemBitmap.Canvas, R.Left, R.Top - FImages.Height, ImageIndex);
             Dec(R.Top, 2 + FImages.Height);
             Dec(R.Right, FImages.Height); { For proper clipping }
           end;
@@ -2765,8 +2674,7 @@ begin
         end;
       end;
       S := Tabs[Tab + FirstIndex];
-      if (R.Right - R.Left >= MinRect) or
-          (TextWidth(S) <= (R.Right - R.Left)) then
+      if (R.Right - R.Left >= MinRect) or (TextWidth(S) <= (R.Right - R.Left)) then
       begin
         if LStyle.Enabled and not LStyle.IsSystemStyle then
         begin
@@ -2775,17 +2683,15 @@ begin
               FMemBitmap.Canvas.Font.Color := LStyle.GetSystemColor(clHighLightText)
             else
               FMemBitmap.Canvas.Font.Color := LStyle.GetSystemColor(clBtnText)
-           else
-              FMemBitmap.Canvas.Font.Color := Self.Font.Color;
+          else
+            FMemBitmap.Canvas.Font.Color := Self.Font.Color;
         end
-        else
-        if GetThemeColor(LStyle.GetElementDetails(TabState[isSelected]), ecTextColor, LColor, Self)
-        then
+        else if GetThemeColor(LStyle.GetElementDetails(TabState[isSelected]), ecTextColor, LColor, Self) then
           FMemBitmap.Canvas.Font.Color := LColor
         else
           FMemBitmap.Canvas.Font.Color := Self.Font.Color;
-        //TextRect(R, S, [tfEndEllipsis, tfNoClip]);
-         TextRect(R, S, [tfVerticalCenter, tfSingleLine]);
+        // TextRect(R, S, [tfEndEllipsis, tfNoClip]);
+        TextRect(R, S, [tfVerticalCenter, tfSingleLine]);
       end;
     end;
   end;
@@ -2793,7 +2699,7 @@ end;
 
 procedure TTabSet.DoPopoutModernPainting;
 const
-  TabState: array[Boolean] of TThemedTabSet = (tbsTabNormal, tbsTabSelected);
+  TabState: array [Boolean] of TThemedTabSet = (tbsTabNormal, tbsTabSelected);
 var
   TabPos: TTabPos;
   Tab: Integer;
@@ -2846,21 +2752,22 @@ begin
     isSelected := Tab + FirstIndex = TabIndex;
 
     if FTabPosition in [tpTop, tpBottom] then
-      TabRect := TRect.Create(TabPos.StartPos - TabOffset, TabTop,
-        TabPos.StartPos + TabPos.Size + 2 + TabOffset,
-        TabTop + FTabHeight)
+      TabRect := TRect.Create(TabPos.StartPos - TabOffset, TabTop, TabPos.StartPos + TabPos.Size + 2 + TabOffset, TabTop + FTabHeight)
     else { Switch the values }
-      TabRect := TRect.Create(TabTop, TabPos.StartPos - TabOffset,
-        TabTop + FTabHeight, TabPos.StartPos + TabPos.Size + 2 + TabOffset);
+      TabRect := TRect.Create(TabTop, TabPos.StartPos - TabOffset, TabTop + FTabHeight, TabPos.StartPos + TabPos.Size + 2 + TabOffset);
 
     if isSelected then
     begin
       { Make it stand out by being a little higher }
       case TabPosition of
-        tpTop: Dec(TabRect.Top);
-        tpLeft: Dec(TabRect.Left);
-        tpBottom: Inc(TabRect.Bottom);
-        tpRight: Inc(TabRect.Right);
+        tpTop:
+          Dec(TabRect.Top);
+        tpLeft:
+          Dec(TabRect.Left);
+        tpBottom:
+          Inc(TabRect.Bottom);
+        tpRight:
+          Inc(TabRect.Right);
       end;
     end;
 
@@ -2872,8 +2779,7 @@ begin
         Pen.Color := LStyle.GetSystemColor(clHighLight);
         Dec(R.Right);
       end
-      else
-      if (seBorder in StyleElements) and GetThemeColor(LStyle.GetElementDetails(TabState[False]), ecEdgeFillColor, LColor, Self) then
+      else if (seBorder in StyleElements) and GetThemeColor(LStyle.GetElementDetails(TabState[False]), ecEdgeFillColor, LColor, Self) then
         Pen.Color := LColor
       else
         Pen.Color := clBtnShadow;
@@ -2941,8 +2847,7 @@ begin
         begin
           if DrawImage then
           begin
-            FImages.Draw(FMemBitmap.Canvas, TabRect.Left - TextHeight('X') + 2,
-              TabRect.Top, ImageIndex);
+            FImages.Draw(FMemBitmap.Canvas, TabRect.Left - TextHeight('X') + 2, TabRect.Top, ImageIndex);
             Inc(TabRect.Top, 2 + FImages.Height);
             Dec(TabRect.Right, FImages.Height); { For proper clipping }
           end;
@@ -2962,19 +2867,16 @@ begin
         end;
       end;
       S := Tabs[Tab + FirstIndex];
-      if (TabRect.Right - TabRect.Left >= MinRect) or
-          (TextWidth(S) <= (TabRect.Right - TabRect.Left)) then
+      if (TabRect.Right - TabRect.Left >= MinRect) or (TextWidth(S) <= (TabRect.Right - TabRect.Left)) then
       begin
         if LStyle.Enabled and not LStyle.IsSystemStyle then
         begin
           if seFont in StyleElements then
-             FMemBitmap.Canvas.Font.Color := LStyle.GetSystemColor(clBtnText)
-           else
-             FMemBitmap.Canvas.Font.Color := Self.Font.Color;
+            FMemBitmap.Canvas.Font.Color := LStyle.GetSystemColor(clBtnText)
+          else
+            FMemBitmap.Canvas.Font.Color := Self.Font.Color;
         end
-        else
-        if GetThemeColor(LStyle.GetElementDetails(TabState[isSelected]), ecTextColor, LColor, Self)
-        then
+        else if GetThemeColor(LStyle.GetElementDetails(TabState[isSelected]), ecTextColor, LColor, Self) then
           FMemBitmap.Canvas.Font.Color := LColor
         else
           FMemBitmap.Canvas.Font.Color := Self.Font.Color;
@@ -3026,11 +2928,10 @@ begin
   FMemBitmap.Canvas.Font := Canvas.Font;
 
   TabStart := StartMargin + FEdgeWidth; { where does first text appear? }
-  LastTabPos := EndPixels - EndMargin;  { tabs draw until this position }
+  LastTabPos := EndPixels - EndMargin; { tabs draw until this position }
 
   { do initial calculations for how many tabs are visible }
-  FVisibleTabs := CalcTabPositions(TabStart, LastTabPos, FMemBitmap.Canvas,
-    FirstIndex, True);
+  FVisibleTabs := CalcTabPositions(TabStart, LastTabPos, FMemBitmap.Canvas, FirstIndex, True);
 
   { enable the scroller if FAutoScroll = True and not all tabs are visible }
   if ScrollerShown then
@@ -3038,8 +2939,7 @@ begin
     Dec(LastTabPos, ScrollerSize);
     { recalc the tab positions }
     WholeVisibleTabs := FVisibleTabs;
-    FVisibleTabs := CalcTabPositions(TabStart, LastTabPos, FMemBitmap.Canvas,
-      FirstIndex, False);
+    FVisibleTabs := CalcTabPositions(TabStart, LastTabPos, FMemBitmap.Canvas, FirstIndex, False);
     { set the scroller's range }
     Scroller.Visible := True;
     Scroller.Min := 0;
@@ -3060,8 +2960,7 @@ begin
   begin
     FDoFix := False;
     FixTabPos;
-    FVisibleTabs := CalcTabPositions(TabStart, LastTabPos, FMemBitmap.Canvas,
-      FirstIndex, not Scroller.Visible);
+    FVisibleTabs := CalcTabPositions(TabStart, LastTabPos, FMemBitmap.Canvas, FirstIndex, not Scroller.Visible);
   end;
 end;
 
@@ -3079,4 +2978,3 @@ begin
 end;
 
 end.
-

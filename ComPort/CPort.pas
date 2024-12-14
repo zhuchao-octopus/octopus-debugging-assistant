@@ -22,9 +22,9 @@ uses
   Windows, Messages, Classes, SysUtils, IniFiles, Registry;
 
 type
-  TComExceptions = (CE_OpenFailed, CE_WriteFailed, CE_ReadFailed, CE_InvalidAsync, CE_PurgeFailed, CE_AsyncCheck, CE_SetStateFailed, CE_TimeoutsFailed, CE_SetupComFailed, CE_ClearComFailed,
-    CE_ModemStatFailed, CE_EscapeComFailed, CE_TransmitFailed, CE_ConnChangeProp, CE_EnumPortsFailed, CE_StoreFailed, CE_LoadFailed, CE_RegFailed, CE_LedStateFailed, CE_ThreadCreated, CE_WaitFailed,
-    CE_HasLink, CE_RegError, CEPortNotOpen);
+  TComExceptions = (CE_OpenFailed, CE_WriteFailed, CE_ReadFailed, CE_InvalidAsync, CE_PurgeFailed, CE_AsyncCheck, CE_SetStateFailed, CE_TimeoutsFailed,
+    CE_SetupComFailed, CE_ClearComFailed, CE_ModemStatFailed, CE_EscapeComFailed, CE_TransmitFailed, CE_ConnChangeProp, CE_EnumPortsFailed, CE_StoreFailed,
+    CE_LoadFailed, CE_RegFailed, CE_LedStateFailed, CE_ThreadCreated, CE_WaitFailed, CE_HasLink, CE_RegError, CEPortNotOpen);
 
   // various types
   TPort = string;
@@ -1478,10 +1478,11 @@ procedure TCustomComPort.ApplyDCB;
 const
   CParityBits: array [TParityBits] of Integer = (NOPARITY, ODDPARITY, EVENPARITY, MARKPARITY, SPACEPARITY);
   CStopBits: array [TStopBits] of Integer = (ONESTOPBIT, ONE5STOPBITS, TWOSTOPBITS);
-  CBaudRate: array [TBaudRate] of Integer = (0, CBR_110, CBR_300, CBR_600, CBR_1200, CBR_2400, CBR_4800, CBR_9600, CBR_14400, CBR_19200, CBR_38400, CBR_56000, CBR_57600, CBR_115200, CBR_128000,
-    CBR_256000);
+  CBaudRate: array [TBaudRate] of Integer = (0, CBR_110, CBR_300, CBR_600, CBR_1200, CBR_2400, CBR_4800, CBR_9600, CBR_14400, CBR_19200, CBR_38400, CBR_56000,
+    CBR_57600, CBR_115200, CBR_128000, CBR_256000);
   CDataBits: array [TDataBits] of Integer = (5, 6, 7, 8);
-  CControlRTS: array [TRTSFlowControl] of Integer = (RTS_CONTROL_DISABLE shl 12, RTS_CONTROL_ENABLE shl 12, RTS_CONTROL_HANDSHAKE shl 12, RTS_CONTROL_TOGGLE shl 12);
+  CControlRTS: array [TRTSFlowControl] of Integer = (RTS_CONTROL_DISABLE shl 12, RTS_CONTROL_ENABLE shl 12, RTS_CONTROL_HANDSHAKE shl 12,
+    RTS_CONTROL_TOGGLE shl 12);
   CControlDTR: array [TDTRFlowControl] of Integer = (DTR_CONTROL_DISABLE shl 4, DTR_CONTROL_ENABLE shl 4, DTR_CONTROL_HANDSHAKE shl 4);
 
 var
@@ -3555,7 +3556,8 @@ end;
 // baud rate to string
 function BaudRateToStr(BaudRate: TBaudRate): string;
 const
-  BaudRateStrings: array [TBaudRate] of string = ('Custom', '110', '300', '600', '1200', '2400', '4800', '9600', '14400', '19200', '38400', '56000', '57600', '115200', '128000', '256000');
+  BaudRateStrings: array [TBaudRate] of string = ('Custom', '110', '300', '600', '1200', '2400', '4800', '9600', '14400', '19200', '38400', '56000', '57600',
+    '115200', '128000', '256000');
 begin
   result := BaudRateStrings[BaudRate];
 end;

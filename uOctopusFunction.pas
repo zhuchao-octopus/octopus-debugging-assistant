@@ -24,7 +24,7 @@ Const
   OCTOPUS_DEFAULT_WEBSITE_ADDRESS2 = 'http://www.1234998.top';
 
   OCTOPUS_UPGRADING_URL = 'http://47.106.172.94:8090/zhuchao/octopus/devices/getDeviceInfor';
-  OCTOPUS_APPLICATION_TITLE_NAME = 'Octopus Serial Port Debugging and Development Assistant';
+  OCTOPUS_APPLICATION_TITLE_NAME = 'Octopus Serial Port Development & Debugging Assistant';
   OCTOPUS_DEBUGGING_AND_DEVELOPMENT_CLASSNAME = 'TMainOctopusDebuggingDevelopmentForm';
 
 {$IFDEF CPU64BITS}
@@ -74,31 +74,37 @@ var
   SystemMainMenu: TMainMenu;
   DefaultLauguageStr: array [0 .. 59] of TLang = (
     (
-      Name: 'OPRATION_OPEN'; Caption1: '打开串口设备'; Caption2: 'Open The Device'), (Name: 'OPRATION_OPEN2'; Caption1: '打开 HID 设备'; Caption2: 'Open The HID Device'), (Name: 'OPRATION_CLOSE';
-    Caption1: '关闭'; Caption2: 'Close The Device'), (Name: 'Button4'; Caption1: ''; Caption2: 'Get Ports'),
+      Name: 'OPRATION_OPEN'; Caption1: '打开串口设备'; Caption2: 'Open The Device'), (Name: 'OPRATION_OPEN2'; Caption1: '打开 HID 设备'; Caption2: 'Open The HID Device'),
+    (Name: 'OPRATION_CLOSE'; Caption1: '关闭'; Caption2: 'Close The Device'), (Name: 'Button4'; Caption1: ''; Caption2: 'Get Ports'),
 
-    (Name: 'Label2'; Caption1: ''; Caption2: 'Baud Rate'), (Name: 'Label5'; Caption1: ''; Caption2: 'Parity'), (Name: 'Label9'; Caption1: ''; Caption2: 'Stop Bits'), (Name: 'Label12'; Caption1: '';
-    Caption2: 'Data Bits'), (Name: 'Label13'; Caption1: ''; Caption2: 'SendFormat'), (Name: 'Label15'; Caption1: ''; Caption2: 'FlowControl'), (Name: 'Button7'; Caption1: ''; Caption2: 'Clear Above'),
-    (Name: 'Button8'; Caption1: ''; Caption2: 'Send Block Content Above'),
+    (Name: 'Label2'; Caption1: ''; Caption2: 'Baud Rate'), (Name: 'Label5'; Caption1: ''; Caption2: 'Parity'), (Name: 'Label9'; Caption1: '';
+    Caption2: 'Stop Bits'), (Name: 'Label12'; Caption1: ''; Caption2: 'Data Bits'), (Name: 'Label13'; Caption1: ''; Caption2: 'SendFormat'), (Name: 'Label15';
+    Caption1: ''; Caption2: 'FlowControl'), (Name: 'Button7'; Caption1: ''; Caption2: 'Clear Above'), (Name: 'Button8'; Caption1: '';
+    Caption2: 'Send Block Content Above'),
 
-    (Name: 'CheckBox8'; Caption1: ''; Caption2: 'Enable Auto Save The Log To File'), (Name: 'Button6'; Caption1: ''; Caption2: 'Open The Log File Position'), (Name: 'Button5'; Caption1: '';
-    Caption2: 'Clear Data Logs'), (Name: 'CheckBox7'; Caption1: ''; Caption2: 'Enable Alpha Blend'), (Name: 'CheckBox2'; Caption1: ''; Caption2: 'Always Stay At The Top'), (Name: 'CheckBox25';
-    Caption1: ''; Caption2: 'Show The Time Stamp '), (Name: 'CheckBox3'; Caption1: ''; Caption2: 'Show The Date Stamp'), (Name: 'CheckBox4'; Caption1: ''; Caption2: 'Show Line Number For Log'),
-    (Name: 'CheckBox5'; Caption1: ''; Caption2: 'Show The Data You Are Sending'), (Name: 'Button1'; Caption1: ''; Caption2: 'Start Loop For Sending Data'), (Name: 'Button3'; Caption1: '';
-    Caption2: 'StopSend'), (Name: 'Label14'; Caption1: ''; Caption2: 'The Loop Times You Want  '), (Name: 'Label4'; Caption1: ''; Caption2: 'The Loop Interval'), (Name: 'CheckBox19'; Caption1: '';
-    Caption2: 'Enable The Loop Funtion'), (Name: 'Label6'; Caption1: ''; Caption2: 'Main Style'), (Name: 'Label7'; Caption1: ''; Caption2: 'Protocol'), (Name: 'Label8'; Caption1: '';
-    Caption2: 'DevAdress'), (Name: 'Button9'; Caption1: ''; Caption2: 'Start Converting To Hexade'), (Name: 'Label10'; Caption1: ''; Caption2: 'ReceiveFormat'), (Name: 'Label11'; Caption1: '';
-    Caption2: 'ReadCount'), (Name: 'Label1'; Caption1: ''; Caption2: 'Main Form AlphaBlend Value'), (Name: 'Label3'; Caption1: ''; Caption2: 'Second Interval For Auto Saving'), (Name: 'Button11';
-    Caption1: ''; Caption2: 'Start Converting To String'), (Name: 'Button10'; Caption1: ''; Caption2: 'Clear Received Data Logs'), (Name: 'CheckBox6'; Caption1: '';
-    Caption2: 'Switch To English Language'), (Name: 'CheckBox9'; Caption1: ''; Caption2: 'Parse As String When Hexadecimal'), (Name: 'Button13'; Caption1: '';
-    Caption2: 'Data Received Direct to File'), (Name: 'Button14'; Caption1: ''; Caption2: 'FileFinished'), (Name: 'CheckBox1'; Caption1: ''; Caption2: 'Create Desktop Shortcut'), (Name: 'Button15';
-    Caption1: ''; Caption2: 'Show All Point'), (Name: 'Button16'; Caption1: ''; Caption2: 'Do The Operation'), (Name: 'Button26'; Caption1: ''; Caption2: 'Save Log As ...'),
+    (Name: 'CheckBox8'; Caption1: ''; Caption2: 'Enable Auto Save The Log To File'), (Name: 'Button6'; Caption1: ''; Caption2: 'Open The Log File Position'),
+    (Name: 'Button5'; Caption1: ''; Caption2: 'Clear Data Logs'), (Name: 'CheckBox7'; Caption1: ''; Caption2: 'Enable Alpha Blend'), (Name: 'CheckBox2';
+    Caption1: ''; Caption2: 'Always Stay At The Top'), (Name: 'CheckBox25'; Caption1: ''; Caption2: 'Show The Time Stamp '), (Name: 'CheckBox3'; Caption1: '';
+    Caption2: 'Show The Date Stamp'), (Name: 'CheckBox4'; Caption1: ''; Caption2: 'Show Line Number For Log'), (Name: 'CheckBox5'; Caption1: '';
+    Caption2: 'Show The Data You Are Sending'), (Name: 'Button1'; Caption1: ''; Caption2: 'Start Loop For Sending Data'), (Name: 'Button3'; Caption1: '';
+    Caption2: 'StopSend'), (Name: 'Label14'; Caption1: ''; Caption2: 'The Loop Times You Want  '), (Name: 'Label4'; Caption1: '';
+    Caption2: 'The Loop Interval'), (Name: 'CheckBox19'; Caption1: ''; Caption2: 'Enable The Loop Funtion'), (Name: 'Label6'; Caption1: '';
+    Caption2: 'Main Style'), (Name: 'Label7'; Caption1: ''; Caption2: 'Protocol'), (Name: 'Label8'; Caption1: ''; Caption2: 'DevAdress'), (Name: 'Button9';
+    Caption1: ''; Caption2: 'Start Converting To Hexade'), (Name: 'Label10'; Caption1: ''; Caption2: 'ReceiveFormat'), (Name: 'Label11'; Caption1: '';
+    Caption2: 'ReadCount'), (Name: 'Label1'; Caption1: ''; Caption2: 'Main Form AlphaBlend Value'), (Name: 'Label3'; Caption1: '';
+    Caption2: 'Second Interval For Auto Saving'), (Name: 'Button11'; Caption1: ''; Caption2: 'Start Converting To String'), (Name: 'Button10'; Caption1: '';
+    Caption2: 'Clear Received Data Logs'), (Name: 'CheckBox6'; Caption1: ''; Caption2: 'Switch To English Language'), (Name: 'CheckBox9'; Caption1: '';
+    Caption2: 'Parse As String When Hexadecimal'), (Name: 'Button13'; Caption1: ''; Caption2: 'Data Received Direct to File'), (Name: 'Button14'; Caption1: '';
+    Caption2: 'FileFinished'), (Name: 'CheckBox1'; Caption1: ''; Caption2: 'Create Desktop Shortcut'), (Name: 'Button15'; Caption1: '';
+    Caption2: 'Show All Point'), (Name: 'Button16'; Caption1: ''; Caption2: 'Do The Operation'), (Name: 'Button26'; Caption1: ''; Caption2: 'Save Log As ...'),
 
-    (Name: 'Button18'; Caption1: ''; Caption2: 'Zoom Out'), (Name: 'Button19'; Caption1: ''; Caption2: 'Zoom In'), (Name: 'ButtonColor1'; Caption1: ''; Caption2: 'Graphic One Color'),
-    (Name: 'ButtonColor2'; Caption1: ''; Caption2: 'Graphic Two Color'), (Name: 'Button20'; Caption1: ''; Caption2: 'Export Data To Excel'), (Name: 'Button21'; Caption1: '';
-    Caption2: 'Clear Graphic Data'), (Name: 'Button22'; Caption1: ''; Caption2: 'Save Graphic to BMP'), (Name: 'Button23'; Caption1: ''; Caption2: 'Load File'), (Name: 'Button24'; Caption1: '';
-    Caption2: 'Send The File You Loaded'), (Name: 'CheckBox10'; Caption1: ''; Caption2: 'Show All Data'), (Name: 'CheckBox11'; Caption1: ''; Caption2: 'Overlap Graphics'), (Name: 'Label18';
-    Caption1: ''; Caption2: 'Operation'), (Name: 'CheckBox12'; Caption1: ''; Caption2: 'Compatible To Unicode'), (Name: 'Button12'; Caption1: ''; Caption2: 'Font'), (Name: 'Button17'; Caption1: '';
+    (Name: 'Button18'; Caption1: ''; Caption2: 'Zoom Out'), (Name: 'Button19'; Caption1: ''; Caption2: 'Zoom In'), (Name: 'ButtonColor1'; Caption1: '';
+    Caption2: 'Graphic One Color'), (Name: 'ButtonColor2'; Caption1: ''; Caption2: 'Graphic Two Color'), (Name: 'Button20'; Caption1: '';
+    Caption2: 'Export Data To Excel'), (Name: 'Button21'; Caption1: ''; Caption2: 'Clear Graphic Data'), (Name: 'Button22'; Caption1: '';
+    Caption2: 'Save Graphic to BMP'), (Name: 'Button23'; Caption1: ''; Caption2: 'Load File'), (Name: 'Button24'; Caption1: '';
+    Caption2: 'Send The File You Loaded'), (Name: 'CheckBox10'; Caption1: ''; Caption2: 'Show All Data'), (Name: 'CheckBox11'; Caption1: '';
+    Caption2: 'Overlap Graphics'), (Name: 'Label18'; Caption1: ''; Caption2: 'Operation'), (Name: 'CheckBox12'; Caption1: '';
+    Caption2: 'Compatible To Unicode'), (Name: 'Button12'; Caption1: ''; Caption2: 'Font'), (Name: 'Button17'; Caption1: '';
     Caption2: 'Background Color For Message Log'), (Name: 'Button25'; Caption1: ''; Caption2: 'Format To Hexade'));
 
   testbuff: Array [0 .. 17] of byte = (
@@ -179,8 +185,16 @@ function writeFileToStream(FileStream: TFileStream; buffer: array of byte; len: 
 function DetectTextFileEncoding(const FileName: string): TEncoding;
 function CompareVersion(LVersion, RVersion: String): Boolean;
 function RemoveQuotes(const str: string): string;
+function NormalizeLineBreaks(const S: string): string;
 
 implementation
+
+function NormalizeLineBreaks(const S: string): string;
+begin
+  Result := StringReplace(S, #13#10, #10, [rfReplaceAll]); // 转换 CRLF 为 LF
+  Result := StringReplace(Result, #13, #10, [rfReplaceAll]); // 将孤立 CR 转为 LF
+  Result := StringReplace(Result, #10, #13#10, [rfReplaceAll]); // 最后统一为 CRLF
+end;
 
 function RemoveQuotes(const str: string): string;
 begin

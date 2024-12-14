@@ -27,7 +27,8 @@ const
   DOWNLOADING_FILENAME_SUFFIX = '.downloading';
 
 type
-  TDownloadThreadDataEvent = procedure(const Sender: TObject; MsgType: Integer; ThreadNo, ASpeed: Integer; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean) of object;
+  TDownloadThreadDataEvent = procedure(const Sender: TObject; MsgType: Integer; ThreadNo, ASpeed: Integer; AContentLength: Int64; AReadCount: Int64;
+    var Abort: Boolean) of object;
 
   TDownloadObject = class
   private
@@ -84,7 +85,8 @@ type
 
     Constructor Create();
     Destructor Destroy;
-    procedure ObjectReceiveDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64; var Abort: Boolean);
+    procedure ObjectReceiveDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64;
+      var Abort: Boolean);
     procedure StartDownload(); overload;
     procedure StartDownload(FromURL: string; ToLFileName: string); overload;
     function GetLocalFilePathName(FromURL: string; ToLFileName: string): String;
@@ -375,7 +377,8 @@ begin
   DownloadObjects.Free;
 end;
 
-procedure TDownloadObjects.ObjectReceiveDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64; var Abort: Boolean);
+procedure TDownloadObjects.ObjectReceiveDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer;
+  AContentLength, AReadCount: Int64; var Abort: Boolean);
 var
   LCancel: Boolean;
 begin
@@ -397,7 +400,7 @@ var
 begin
   LDownLoadFileName := GetFileNameFromURL(FromURL);
   if LDownLoadFileName = '' then
-  LDownLoadFileName := ExtractFileName(FromURL);
+    LDownLoadFileName := ExtractFileName(FromURL);
 
   LDownLoadFileName := StringReplace(LDownLoadFileName, '/', '', [rfReplaceAll, rfIgnoreCase]);
 

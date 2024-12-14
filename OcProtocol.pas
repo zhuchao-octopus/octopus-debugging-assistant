@@ -131,8 +131,8 @@ type
     procedure SetEndFlag(pPOcComPack: POcComPack);
 
     function ParserPack(buff: PByte; Count: Integer): Integer;
-    function CheckHeadCount(buff: PByte; Count: Integer):Integer;
-    function PackAppendInvalidData(pPOcComPack: POcComPack):Integer;
+    function CheckHeadCount(buff: PByte; Count: Integer): Integer;
+    function PackAppendInvalidData(pPOcComPack: POcComPack): Integer;
 
     property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
     property PackList_RB_Top: Integer read FPackList_RB_Top;
@@ -249,8 +249,8 @@ begin
   if p.Head = OCCOMPROTOCAL_HEAD2 then
   begin
     pb := PByte(p);
-    //if (p.Length > bLength) then // p.Length 为数据包的总长度
-    //  Exit; // 数据不完整
+    // if (p.Length > bLength) then // p.Length 为数据包的总长度
+    // Exit; // 数据不完整
 
     CRC1 := (pb + (p.Length - 1))^;
     CRC2 := 0;
@@ -280,7 +280,8 @@ begin
     end;
 
     Oc := FPackList_RB[FPackList_RB_Top];
-    if (Oc.Head = OcComPack.Head) and (Oc.PID = byte(OcComPack.PID)) and (Oc.Index = OcComPack.Index) { and (Oc.Total = OcComPack.Total) } and (Oc.Length = OcComPack.Length) then // 表示这个包收到
+    if (Oc.Head = OcComPack.Head) and (Oc.PID = byte(OcComPack.PID)) and (Oc.Index = OcComPack.Index) { and (Oc.Total = OcComPack.Total) } and
+      (Oc.Length = OcComPack.Length) then // 表示这个包收到
     begin
       Result := True;
       break;
@@ -335,7 +336,7 @@ end;
 function TOcComProtocal.GetLastPack(): POcComPack;
 begin
   // CopyMemory(@Result, @FPackList_RB[FPackList_RB_Top], SizeOf(TOcComPack));
-  //if(FPackList_RB_Top < 0) then Result:= nil;
+  // if(FPackList_RB_Top < 0) then Result:= nil;
   Result := @FPackList_RB[FPackList_RB_Top];
 end;
 
@@ -406,19 +407,19 @@ begin
   end;
 end;
 
-function TOcComProtocal.CheckHeadCount(buff: PByte; Count: Integer):Integer;
+function TOcComProtocal.CheckHeadCount(buff: PByte; Count: Integer): Integer;
 var
   iByte: Integer; // 记录消费掉的字节个数
   p1: POcComPack;
   p2: POcComPackHead2;
 begin
-   {iByte := 0;
-   Result := 0;
-   if (Count < 2) then
-      exit;
-   p1 := @buff[iByte];
-   p2 := @buff[iByte];
-   if (p1^.Head = OCCOMPROTOCAL_HEAD) then // 对包头}
+  { iByte := 0;
+    Result := 0;
+    if (Count < 2) then
+    exit;
+    p1 := @buff[iByte];
+    p2 := @buff[iByte];
+    if (p1^.Head = OCCOMPROTOCAL_HEAD) then // 对包头 }
 end;
 
 function TOcComProtocal.ParserPack(buff: PByte; Count: Integer): Integer;
@@ -472,7 +473,7 @@ begin
         break // 负载不全，需要更多数据
       else if CheckPackCRC(p2, Count - iByte) then
       begin
-        iByte := iByte + AddPackToPackList(p2,Count - iByte);
+        iByte := iByte + AddPackToPackList(p2, Count - iByte);
         if Assigned(FCallBackFun) then
           FCallBackFun(GetLastPack());
         continue;
@@ -486,38 +487,39 @@ begin
     else
     begin
       OcComPack.data[OcComPack.Length] := buff[iByte];
-      OcComPack.Length:= OcComPack.Length +1;
+      OcComPack.Length := OcComPack.Length + 1;
       INC(iByte); // 继续寻找，跳过的字节数  //记录消费掉的字节个数
     end;
 
   end; // while
 
-
-  //如果有空间废弃的数据加到上一个包的尾部
-  //if(OcComPack.Length > 0) then
-  //  PackAppendInvalidData(@OcComPack);
+  // 如果有空间废弃的数据加到上一个包的尾部
+  // if(OcComPack.Length > 0) then
+  // PackAppendInvalidData(@OcComPack);
   if Assigned(FCallBackFun) and (OcComPack.Length > 0) then
   begin
     FCallBackFun(@OcComPack); // 打印废弃数据
-   end;
+  end;
   OcComPack.Length := 0;
 end;
 
-function TOcComProtocal.PackAppendInvalidData(pPOcComPack: POcComPack):Integer;
+function TOcComProtocal.PackAppendInvalidData(pPOcComPack: POcComPack): Integer;
 var
   p: POcComPack;
 begin
-  Result:= 0;
-  p:=GetLastPack();
-  if p=nil then exit;
-  if p.Head = 0 then Exit;
+  Result := 0;
+  p := GetLastPack();
+  if p = nil then
+    exit;
+  if p.Head = 0 then
+    exit;
 
   if (p.Length + pPOcComPack.Length) > OCCOMPROTOCAL_PACK_PACKPAYLOAD_MAX_LENGTH then
-   Exit;//没有空间了
+    exit; // 没有空间了
 
-  CopyMemory(@p.data[p.Length+2], pPOcComPack, pPOcComPack.Length);
-  pPOcComPack.Length:=0;
-  Result:= p.Length;
+  CopyMemory(@p.data[p.Length + 2], pPOcComPack, pPOcComPack.Length);
+  pPOcComPack.Length := 0;
+  Result := p.Length;
 end;
 
 procedure TOcComProtocal.SetCRC8(pPOcComPack: POcComPack);

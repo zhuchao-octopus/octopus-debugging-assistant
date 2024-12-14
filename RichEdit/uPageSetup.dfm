@@ -13,7 +13,6 @@ object PageSetupFrm: TPageSetupFrm
   Font.Style = []
   Position = poMainFormCenter
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 17
   object PageControl1: TPageControl
     Left = 8

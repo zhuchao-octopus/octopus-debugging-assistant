@@ -3310,7 +3310,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.ShowStartComments(OcComPortObj: T
 begin
   OcComPortObj.DebugLog('#################################################################');
   // OcComPortObj.DebugLog(APPLICATION_TITLE + FVersionNumberStr);
-  OcComPortObj.DebugLog('Octopus Serial Port Debugging And Development Assistant ' + FVersionNumberStr);
+  OcComPortObj.DebugLog('Octopus Serial Port Development & Debugging Assistant ' + FVersionNumberStr);
   OcComPortObj.DebugLog('Home Page: ' + OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 + ' ');
   OcComPortObj.DebugLog('#################################################################');
   OcComPortObj.DebugLog('' + OcComPortObj.ComPortFullName + ' ');

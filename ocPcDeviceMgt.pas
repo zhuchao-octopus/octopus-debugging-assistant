@@ -346,7 +346,7 @@ end;
 Function DeviceClassName(Guid: TGUID): string;
 var
   ClassName: PChar;
-  ClassNameSzie: Integer;
+  ClassNameSzie: integer;
 begin
   ClassNameSzie := 0;
   GetMem(ClassName, ClassNameSzie);

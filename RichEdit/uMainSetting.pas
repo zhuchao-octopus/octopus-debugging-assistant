@@ -403,6 +403,9 @@ begin
     OcComPortDeviceList.BeginUpdate;
     for i := 0 to OcComPortDeviceList.Count - 1 do
     begin
+      if (i >= OcComPortDeviceList.Count) then
+        break;
+
       if (devideNameList.IndexOf(OcComPortDeviceList.Strings[i])) < 0 then
         OcComPortDeviceList.Delete(i);
     end;
@@ -411,6 +414,9 @@ begin
     ComboBoxEx1.ItemsEx.BeginUpdate;
     for i := 0 to ComboBoxEx1.GetCount - 1 do
     begin
+      if (i >= ComboBoxEx1.GetCount) then
+        break;
+
       if (devideNameList.IndexOf(ComboBoxEx1.Items[i])) < 0 then
         ComboBoxEx1.Items.Delete(i);
     end;

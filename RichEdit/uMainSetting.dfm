@@ -309,7 +309,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 9
               Width = 495
               Height = 20
-              Caption = 'Send and receive the record for additional time information'
+              Caption = 'Show the additional time information for transferring data'
               TabOrder = 0
             end
             object CheckBox34: TCheckBox
@@ -318,8 +318,8 @@ object SettingPagesDlg: TSettingPagesDlg
               Width = 519
               Height = 20
               Caption = 
-                'Send and receive records with additional year, month and day inf' +
-                'ormation'
+                'Show the additional year month and day information for transferr' +
+                'ing data'
               TabOrder = 1
             end
             object CheckBox35: TCheckBox
@@ -327,7 +327,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 64
               Width = 423
               Height = 20
-              Caption = 'Displays the line number in the editor'
+              Caption = 'Show the line number in the editor'
               TabOrder = 2
             end
             object CheckBox36: TCheckBox
@@ -335,7 +335,7 @@ object SettingPagesDlg: TSettingPagesDlg
               Top = 91
               Width = 423
               Height = 20
-              Caption = 'Displays the data that is being transferred'
+              Caption = 'Show the data that is being transferred'
               TabOrder = 3
             end
             object CheckboxProcessDataBackground: TCheckBox

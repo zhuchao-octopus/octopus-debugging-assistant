@@ -995,7 +995,7 @@ begin
       NewRichEdit.ScrollBars := ssBoth;
       NewRichEdit.DoubleBuffered := true;
       NewRichEdit.FDoubleBuffered := true;
-      ///NewRichEdit.FDoubleBufferedSaved := true;
+      /// NewRichEdit.FDoubleBufferedSaved := true;
       NewRichEdit.ParentDoubleBuffered := true;
       NewRichEdit.SetDefaultFormat();
       FRichEditList.Add(NewRichEdit);
@@ -1045,7 +1045,7 @@ begin
       MyMemo.ScrollBars := ssBoth;
       MyMemo.DoubleBuffered := true;
       MyMemo.FDoubleBuffered := true;
-      ///MyMemo.FDoubleBufferedSaved := true;
+      /// MyMemo.FDoubleBufferedSaved := true;
       MyMemo.ParentDoubleBuffered := true;
       MyMemo.SetDefaultFormat();
       MyMemo.FStyle := 1;

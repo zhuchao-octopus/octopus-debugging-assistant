@@ -112,8 +112,8 @@ begin
   DownloadObjects.OnThreadData := DownLoadManagerDataEvent;
 end;
 
-procedure TDownloaderFrm.DownLoadObjectDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer;
-  AContentLength, AReadCount: Int64; var Abort: Boolean);
+procedure TDownloaderFrm.DownLoadObjectDataEvent(const Sender: TObject; MsgType: Integer; ThreadNo: Integer; ASpeed: Integer; AContentLength, AReadCount: Int64;
+  var Abort: Boolean);
 var
   ResultContent: String;
   DownloadObject: TDownloadObject;
@@ -170,11 +170,11 @@ begin
       JSONValue := JSONArray.Items[0];
       name := (JSONValue as TJsonObject).GetValue('name').ToString;
       appVersion := (JSONValue as TJsonObject).GetValue('appVersion').ToString;
-      {$IFDEF CPU64BITS}
+{$IFDEF CPU64BITS}
       updateFilePath := (JSONValue as TJsonObject).GetValue('updateFilePath').ToString; // for 64 bit;
-      {$ELSE}
+{$ELSE}
       updateFilePath := (JSONValue as TJsonObject).GetValue('updateFilePath32').ToString; // for 32 bit;
-      {$ENDIF}
+{$ENDIF}
       comments := (JSONValue as TJsonObject).GetValue('comments').ToString;
       Memo1.Lines.Add('FileName:  ' + name);
       Memo1.Lines.Add('Version :  ' + appVersion);
@@ -256,8 +256,7 @@ begin
       ButtonUpgrade.Enabled := true;
       if FileExists(TDownloadObjects(Sender).FToPathFileName) then
       begin
-        Memo1.Lines.Append('The downloading is complete, please confirm that the latest file name is called ' + TDownloadObjects(Sender)
-          .FToPathFileName);
+        Memo1.Lines.Append('The downloading is complete, please confirm that the latest file name is called ' + TDownloadObjects(Sender).FToPathFileName);
 
         if MessageBox(Self.Handle, 'The program has successfully completed the download and upgrade, do you want to start it now?',
           'do you want to start it now?', MB_OKCANCEL or MB_ICONQUESTION) = IDOK then
@@ -335,14 +334,13 @@ begin
     end;
 
     if (DownloadObject.MaxSize > 0) then
-      Memo1.Lines[Memo1.Lines.Count - ThreadNo - 1] := 'Downloading[' + IntToStr(ThreadNo) + ']: ' + IntToStr(AReadCount) + '/' +
-        IntToStr(AContentLength) + ' Speed: ' + IntToStr(ASpeed) + ' byte/s ' + Format('%d%%', [Round((AReadCount / AContentLength) * 100)]);
+      Memo1.Lines[Memo1.Lines.Count - ThreadNo - 1] := 'Downloading[' + IntToStr(ThreadNo) + ']: ' + IntToStr(AReadCount) + '/' + IntToStr(AContentLength) +
+        ' Speed: ' + IntToStr(ASpeed) + ' byte/s ' + Format('%d%%', [Round((AReadCount / AContentLength) * 100)]);
   end
   else if MsgType = DOWNLOAD_OBJECT_MSG_DOWNLOADING_FINISHIED then
   begin
-    Memo1.Lines[Memo1.Lines.Count - ThreadNo - 1] := 'Downloading[' + IntToStr(ThreadNo) + ']: ' + IntToStr(AReadCount) + '/' +
-      IntToStr(AContentLength) + ' Speed: ' + IntToStr(ASpeed) + ' byte/s ' + Format('%d%%', [Round((AReadCount / AContentLength) * 100)]) +
-      ' Finished';
+    Memo1.Lines[Memo1.Lines.Count - ThreadNo - 1] := 'Downloading[' + IntToStr(ThreadNo) + ']: ' + IntToStr(AReadCount) + '/' + IntToStr(AContentLength) +
+      ' Speed: ' + IntToStr(ASpeed) + ' byte/s ' + Format('%d%%', [Round((AReadCount / AContentLength) * 100)]) + ' Finished';
   end;
 
   Application.ProcessMessages;

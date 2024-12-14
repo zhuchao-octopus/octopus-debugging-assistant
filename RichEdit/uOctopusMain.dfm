@@ -331,6 +331,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Height = 25
       Hint = 'On off switch for device'
       ShowStateCaption = False
+      SwitchHeight = 25
       TabOrder = 2
       OnClick = ToggleSwitchDeviceOnOffClick
     end

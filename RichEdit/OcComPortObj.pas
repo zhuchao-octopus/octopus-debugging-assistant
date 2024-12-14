@@ -21,7 +21,7 @@ uses
 
 type
   TRECEIVE_FORMAT = (ASCIIFormat, HexadecimalFormat, Graphic, OctopusProtocol, SaveToFile);
-  TSEND_FORMAT    = (S_ASCIIFormat, S_HexadecimalFormat, S_OctopusProtocol);
+  TSEND_FORMAT = (S_ASCIIFormat, S_HexadecimalFormat, S_OctopusProtocol);
 
 const
   INPUT_OUTPUT_BUFFER_SIZE = 2097152; // 1048576;
@@ -36,14 +36,14 @@ const
   SEND_FLAG = '-> ';
 
 const
-  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ',
-    'Hexadecimal Format Receiving ', 'Graphic Analysis ', 'Octopus Protocol Analysis', 'File Receiving');
+  RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ', 'Hexadecimal Format Receiving ', 'Graphic Analysis ',
+    'Octopus Protocol Analysis', 'File Receiving');
 
-  MAX_BAUDRATE_INDEX: Integer     = 15;
+  MAX_BAUDRATE_INDEX: Integer = 15;
   DEFAULT_HEXDATA_HEXSTRING_SPACE = 5;
 
 type
-  TCallBackFun         = Procedure(Count: Integer = 0) of object;
+  TCallBackFun = Procedure(Count: Integer = 0) of object;
   TProtocolCallBackFun = Procedure(TypeID: Integer) of object;
 
   { TOcComPortObjPara = packed record
@@ -66,7 +66,7 @@ type
 
   // thread for background monitoring of port events
 type
-  TComUIHandleThread         = class;
+  TComUIHandleThread = class;
   TComPackParserHandleThread = class;
 
   TOcComPortObj = class(TComport)
@@ -118,7 +118,7 @@ type
     FNeedNewLine: Boolean;
     FLogScrollMode: Boolean;
     FMouseTextSelection: Boolean;
-    //FMouseStatus:Boolean;
+    // FMouseStatus:Boolean;
     FBackgroundTaskMode: Boolean;
     // function GetConfiguration(): TOcComPortObjPara;
     function GetLineNumberDateTimeStamp(N: Int64): String;
@@ -142,8 +142,7 @@ type
     Constructor Create(AOwner: TComponent; DeviceName: String);
     destructor Destroy; override;
     // procedure OcComPortObjInit(OcComPortObjPara: TOcComPortObjPara);
-    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit;
-      time, date, line, log, o: Boolean);
+    procedure OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
 
     function getCMDStr(): String;
     function IsLogAtBottom(): Boolean;
@@ -203,10 +202,8 @@ type
     function WaitProtocolACK(ACK: Integer; timeOut: Integer): Boolean;
     function WaitProtocolACK2(ACKBuffer: array of Byte; bCount: Integer; timeOut: Integer): Boolean;
 
-    function SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean)
-      : Boolean; overload;
-    function SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean)
-      : Boolean; overload;
+    function SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
+    function SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
 
     function SendProtocolPackage(pPOcComPack: POcComPack): Boolean; overload;
     function SendProtocolPackageWaitACK(pPOcComPack: POcComPack; ACK: Integer): Boolean;
@@ -225,12 +222,13 @@ type
 
     procedure StartFlushOutCackedString();
     procedure PauseFlushOutCackedString();
+    function GetCachedLinesCount():Integer;
   end;
 
   TComUIHandleThread = class(TThread)
   private
     FOcComPortObj: TOcComPortObj;
-    FUIStartIndex: Int64;
+    FCachedCounterIndex: Int64;
     FNeedToReset: Integer;
     // FThreadSync_BusyFlag:Boolean;
   protected
@@ -410,8 +408,8 @@ begin
     try
       if Length(FOcComPortObj.FComReceiveInternalBuffer) >= SizeOf(TOcComPackHead) then
       begin
-        j := self.FOcComProtocal.ParserPack(@FOcComPortObj.FComReceiveInternalBuffer[FStartIndex],
-          Length(FOcComPortObj.FComReceiveInternalBuffer) - FStartIndex);
+        j := self.FOcComProtocal.ParserPack(@FOcComPortObj.FComReceiveInternalBuffer[FStartIndex], Length(FOcComPortObj.FComReceiveInternalBuffer) -
+          FStartIndex);
 
         FStartIndex := FStartIndex + j;
       end
@@ -446,6 +444,7 @@ begin
   inherited Create(True); // 先挂起
   self.FOcComPortObj := OcComPortObj;
   self.Suspended := True;
+  self.Priority := tpHighest;
 end;
 
 procedure Delay(MSecs: Longint);
@@ -493,18 +492,20 @@ begin
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////ASCIIFormat
     if self.FOcComPortObj.FReceiveFormat = Ord(ASCIIFormat) then
     begin
-      if FUIStartIndex >= FOcComPortObj.StringInternelCache.Lines.Count then
-      begin
-        Continue;
-      end;
+
       if FOcComPortObj.StringInternelCache.Lines.Updating then
       begin
         Continue;
       end;
-
-      s := FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex];
-      if ((Trim(s) = '') or (FUIStartIndex = 0)) and ((GetTickCount() - delayTimesTick) < 50) then
+      if FCachedCounterIndex >= FOcComPortObj.GetCachedLinesCount() then
       begin
+        Continue;
+      end;
+
+      s := FOcComPortObj.StringInternelCache.Lines.Strings[FCachedCounterIndex];
+      if ((Trim(s) = '') or (FCachedCounterIndex = 0)) then
+      begin
+        if((GetTickCount() - delayTimesTick) < 10) then
         Continue; // 没有数据等待一会
       end;
 
@@ -537,14 +538,14 @@ begin
         else }
       begin
         s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.FLogObject.Lines.Count) + s;
-        //FOcComPortObj.FLogObject.log(s);
+        // FOcComPortObj.FLogObject.log(s);
         FOcComPortObj.LogBottomMod(s, True, FOcComPortObj.IsLogAtBottom());
       end;
 
       { // s := FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex];
         // FOcComPortObj.Log(FOcComPortObj.StringInternelCache.Lines.Strings[FUIStartIndex]); }
 
-      INC(FUIStartIndex); // 下一行
+      INC(FCachedCounterIndex); // 下一行
       { if FUIStartIndex >= FOcComPortObj.StringInternelCache.Lines.Count then
         begin
         if FOcComPortObj.FComHandleThread_Wait then
@@ -576,32 +577,32 @@ begin
     begin
       f := '%-' + IntToStr(FOcComPortObj.FHexModeFormatCount * 3 + DEFAULT_HEXDATA_HEXSTRING_SPACE) + 's';
       // 有数据需要累计，开始实时累计数据
-      if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
+      if FCachedCounterIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
       begin // 有数据处理数据
         // 累计字节
-        s := s + Format('%.02x ', [FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]]);
+        s := s + Format('%.02x ', [FOcComPortObj.FComReceiveInternalBuffer[FCachedCounterIndex]]);
         INC(FOcComPortObj.FComProcessedCount);
 
         if FOcComPortObj.FHexModeFormatCount > 0 then // 累计中需要格式化处理
         begin
-          if ((FUIStartIndex + 1) mod FOcComPortObj.FHexModeFormatCount) = 0 then
+          if ((FCachedCounterIndex + 1) mod FOcComPortObj.FHexModeFormatCount) = 0 then
           begin
-            j := FUIStartIndex + 1; // 实际已经处理过的数据
+            j := FCachedCounterIndex + 1; // 实际已经处理过的数据
             if FOcComPortObj.FHexModeWithString then // 需要解析翻译
             begin
               s := Format(f, [Trim(s)]);
-              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer
-                [FUIStartIndex - FOcComPortObj.FHexModeFormatCount + 1], FOcComPortObj.FHexModeFormatCount);
+              s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FCachedCounterIndex - FOcComPortObj.FHexModeFormatCount + 1],
+                FOcComPortObj.FHexModeFormatCount);
             end;
             FOcComPortObj.log(s);
             s := ''; // 这时J 的值无意义
           end;
         end; //
 
-        INC(FUIStartIndex); // 累计索引计数
+        INC(FCachedCounterIndex); // 累计索引计数
       end;
 
-      if FUIStartIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer) then // 已经累计完毕所有数据
+      if FCachedCounterIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer) then // 已经累计完毕所有数据
       begin // 没有收到新的数据，准备清场,打印所有累计到的数据
         if s <> '' then // 有累计数据需要打印
         begin
@@ -612,13 +613,11 @@ begin
               if ((Length(FOcComPortObj.FComReceiveInternalBuffer) - j) <= FOcComPortObj.FHexModeFormatCount) then
               begin
                 s := Format(f, [Trim(s)]);
-                s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j],
-                  FOcComPortObj.FHexModeFormatCount);
+                s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], FOcComPortObj.FHexModeFormatCount);
               end
               else
               begin // 这种情况应该没有
-                s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j],
-                  Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
+                s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
               end;
             end
             else
@@ -640,7 +639,7 @@ begin
           s := '';
         end;
 
-        if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
+        if FCachedCounterIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
           Continue;
         if FOcComPortObj.FComHandleThread_Wait then
           Continue;
@@ -651,26 +650,26 @@ begin
         FOcComPortObj.ClearInternalBuff();
         LeaveCriticalSection(Critical);
 
-        Self.Suspended := True; // 忙完了挂起
+        self.Suspended := True; // 忙完了挂起
         Continue;
       end;
     end // hex
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////Graphic
     else if (FOcComPortObj.FReceiveFormat = Ord(Graphic)) and (FOcComPortObj.FastLineSeries <> nil) then
     begin
-      if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
+      if FCachedCounterIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
       begin // 有数据处理数据
-        FOcComPortObj.FastLineSeries.AddY(FOcComPortObj.FComReceiveInternalBuffer[FUIStartIndex]);
+        FOcComPortObj.FastLineSeries.AddY(FOcComPortObj.FComReceiveInternalBuffer[FCachedCounterIndex]);
         // self.FOcComPortObj.FastLineSeries.AddArray(FOcComPortObj.FComReceiveInternalBuffer);
 
         if Assigned(FOcComPortObj.FCallBackFun) then
           FOcComPortObj.FCallBackFun(1);
-        INC(FUIStartIndex);
+        INC(FCachedCounterIndex);
         INC(FOcComPortObj.FComProcessedCount);
       end;
-      if FUIStartIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer) then
+      if FCachedCounterIndex >= Length(FOcComPortObj.FComReceiveInternalBuffer) then
       begin // 没有数据准备清场
-        if FUIStartIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
+        if FCachedCounterIndex < Length(FOcComPortObj.FComReceiveInternalBuffer) then
           Continue;
         if FOcComPortObj.FComHandleThread_Wait then
           Continue;
@@ -815,8 +814,7 @@ begin
   self.CallBackFun := CallBackFun;
 end;
 
-procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit;
-  time, date, line, log, o: Boolean);
+procedure TOcComPortObj.OcComPortObjInit2(a, b: String; c, d, e, f, g, h, i: Integer; j: TMyRichEdit; time, date, line, log, o: Boolean);
 var
   threadsuspended: Boolean;
   // oldi:integer;
@@ -888,12 +886,12 @@ begin
       if self.StringInternelCache.Parent <> nil then
       begin
         self.StringInternelCache.Clear; // 清字符串缓存区域
-        FComUIHandleThread.FUIStartIndex := 0;
+        FComUIHandleThread.FCachedCounterIndex := 0;
         FComUIHandleThread.ResetID := -1; // 复位，避免反复重置
       end;
     1:
       begin
-        FComUIHandleThread.FUIStartIndex := 0; // 清字节流缓存
+        FComUIHandleThread.FCachedCounterIndex := 0; // 清字节流缓存
         SetLength(self.FComReceiveInternalBuffer, 0);
         FComUIHandleThread.ResetID := -1; // 复位，避免反复重置
       end
@@ -902,7 +900,7 @@ begin
       if self.StringInternelCache.Parent <> nil then
       begin
         self.StringInternelCache.Clear;
-        FComUIHandleThread.FUIStartIndex := 0;
+        FComUIHandleThread.FCachedCounterIndex := 0;
         SetLength(self.FComReceiveInternalBuffer, 0);
         FComUIHandleThread.ResetID := -1; // 复位，避免反复重置
       end;
@@ -1083,7 +1081,7 @@ var
   SF: TScrollInfo;
   currentPos: Integer;
 begin
-   Result := False;
+  Result := false;
   if FLogObject = nil then
     Exit;
   SF.fMask := SIF_ALL;
@@ -1165,8 +1163,8 @@ begin
       begin
         if self.Connected then
         begin
-          //s := FormatHexStrToByte(Trim(str), buf, bLength);
-          s:=FormatHexStrToBuffer(Trim(str), buf, bLength);
+          // s := FormatHexStrToByte(Trim(str), buf, bLength);
+          s := FormatHexStrToBuffer(Trim(str), buf, bLength);
           if FShowSendingLog then
             log(SEND_FLAG + s); // Log(''); // new line prepare to receive
 
@@ -1491,10 +1489,10 @@ begin
   FComHandleThread_Wait := True;
 
   EnterCriticalSection(Critical);
-  // StringInternelCache.Lines.BeginUpdate;
+  StringInternelCache.Lines.BeginUpdate;
   s := StringInternelCache.Lines.Strings[StringInternelCache.Lines.Count - 1];
   StringInternelCache.Lines.Strings[StringInternelCache.Lines.Count - 1] := s + str;
-  // StringInternelCache.Lines.EndUpdate;
+  StringInternelCache.Lines.EndUpdate;
   // StringInternelCache.Update;
   LeaveCriticalSection(Critical);
   FComHandleThread_Wait := false;
@@ -1504,7 +1502,7 @@ end;
 
 procedure TOcComPortObj.StartFlushOutCackedString();
 begin
-  if StringInternelCache.Lines.Count <= 0 then
+  if  GetCachedLinesCount() <= 0 then
     Exit;
   if FComUIHandleThread.Suspended then
   begin
@@ -1517,10 +1515,17 @@ procedure TOcComPortObj.PauseFlushOutCackedString();
 begin
   if not FComUIHandleThread.Suspended then
   begin
-    LeaveCriticalSection(Critical); // 暂停线程之前退出临界锁
-    FComUIHandleThread.Suspended := True; // 启动后台线程
+    LeaveCriticalSection(Critical);
+    FComUIHandleThread.Suspended := True;
     FComHandleThread_Wait := True;
   end;
+end;
+
+function TOcComPortObj.GetCachedLinesCount():Integer;
+begin
+    LeaveCriticalSection(Critical);
+    Result:=StringInternelCache.Lines.Count;
+    EnterCriticalSection(Critical);
 end;
 
 procedure TOcComPortObj.OcComPortObjRxChar(Sender: TObject; Count: Integer);
@@ -1554,27 +1559,12 @@ begin
         ReadUnicodeString(FComReceiveString, Count) // 可以读中文
       else
         ReadStr(FComReceiveString, Count);
-      // 兼容 \R 字符的索引从1开始也即是>=1
-      if (Pos(#$D#$A, FComReceiveString) <= 0) and (Count <= 2048) then
-      begin
-        if (Pos(#$A, FComReceiveString) > 0) then
-          FComReceiveString := StringReplace(FComReceiveString, #$A, #$D#$A, [rfReplaceAll]);
-        if (Pos(#$D, FComReceiveString) > 0) then
-          FComReceiveString := StringReplace(FComReceiveString, #$D, #$D#$A, [rfReplaceAll]);
-      end;
+       // 兼容 \R 字符的索引从1开始也即是>=1
+      FComReceiveString:=NormalizeLineBreaks(FComReceiveString);
     Except
     end;
 
-    if FComUIHandleThread.FUIStartIndex >= StringInternelCache.Lines.Count then
-    begin // 当前缓冲区数据已经处理完毕
-      self.ClearInternalBuff();
-    end;
-
-    if (not isBackHandlerMode()) and (StringInternelCache.Lines.Count <= 0) then
-    begin
-      FComUIHandleThread.Suspended := True; // 挂起后台线程任务
-    end
-    else if isBackHandlerMode() or (not FComUIHandleThread.Suspended) or (StringInternelCache.Lines.Count > 0) then
+    if isBackHandlerMode() or (not FComUIHandleThread.Suspended) or (GetCachedLinesCount() > 0) then
     // 后台工作模式
     begin
       CachedString(FComReceiveString);
@@ -1586,31 +1576,40 @@ begin
       end;
 
       StartFlushOutCackedString();
-      goto FUNCTION_END; // 缓存暂不处理
+      goto FUNCTION_END; // 后台处理
+    end
+    else
+    begin
+       FComUIHandleThread.Suspended := True; // 挂起后台线程任务
+    end;
+
+    if FComUIHandleThread.FCachedCounterIndex >= GetCachedLinesCount() then
+    begin // 当前缓冲区数据已经处理完毕
+      self.ClearInternalBuff();
     end;
 
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////
     begin // 直接处理，无需缓存无需特殊处理，不额外显示日期日期信息
       if FNeedNewLine then
       begin
-        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10)
-        then // \r\n
-          FNeedNewLine := True
+        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
+         begin
+          FNeedNewLine := True;
+          FComReceiveString := TrimRight(FComReceiveString);
+         end
         else
           FNeedNewLine := false;
-
-        FComReceiveString := TrimRight(FComReceiveString);
         LogBottomMod(FComReceiveString, True, isAtBottom);
       end
       else
       begin
-        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10)
-        then // \r\n
-          FNeedNewLine := True
+        if (FComReceiveString[Length(FComReceiveString)] = #13) or (FComReceiveString[Length(FComReceiveString)] = #10) then // \r\n
+         begin
+          FNeedNewLine := True;
+          FComReceiveString := TrimRight(FComReceiveString);
+         end
         else
           FNeedNewLine := false;
-
-        FComReceiveString := TrimRight(FComReceiveString);
         LogBottomMod(FComReceiveString, false, isAtBottom);
       end;
       // 统计处理数量
@@ -1690,8 +1689,7 @@ begin
   /// ///////////////////////////////////////////////////////////////////////////
   else if FReceiveFormat = Ord(SaveToFile) then // for File save to file
   begin
-    if (CompareText(ExtractFileExt(self.FileStreamName), '.txt') = 0) or
-      (CompareText(ExtractFileExt(self.FileStreamName), '.log') = 0) then
+    if (CompareText(ExtractFileExt(self.FileStreamName), '.txt') = 0) or (CompareText(ExtractFileExt(self.FileStreamName), '.log') = 0) then
     begin
       AssignFile(f, self.FileStreamName);
       Append(f);
@@ -1706,8 +1704,7 @@ begin
       // if Assigned(FCallBackFun) then
       // FCallBackFun();
     end
-    else if (CompareText(ExtractFileExt(self.FileStreamName), '.xls') = 0) or
-      (CompareText(ExtractFileExt(self.FileStreamName), '.xlsx') = 0) then
+    else if (CompareText(ExtractFileExt(self.FileStreamName), '.xls') = 0) or (CompareText(ExtractFileExt(self.FileStreamName), '.xlsx') = 0) then
     begin
       ZeroMemory(@FComReceiveBuffer, SizeOf(FComReceiveBuffer));
       i := self.Read(FComReceiveBuffer, Count);
@@ -1741,6 +1738,7 @@ FUNCTION_END:
       FLogObject.Perform(WM_HSCROLL, SB_LEFT, 0);
     end;
   end;
+  application.ProcessMessages;
 end;
 
 procedure TOcComPortObj.RequestProtocolConnection;
@@ -1800,14 +1798,12 @@ begin
   end;
 end;
 
-function TOcComPortObj.SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer;
-  NeedACK: Boolean): Boolean;
+function TOcComPortObj.SendProtocolData(TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean;
 begin
   Result := SendProtocolData(OCCOMPROTOCAL_HEAD, TypeID, Buffer, Count, NeedACK);
 end;
 
-function TOcComPortObj.SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer;
-  NeedACK: Boolean): Boolean;
+function TOcComPortObj.SendProtocolData(Head: Word; TypeID: Word; const Buffer: Array Of Byte; Count: Integer; NeedACK: Boolean): Boolean;
 var
   OcComPack: TOcComPack;
   // OcComPackHead: TOcComPackHead;
@@ -2282,10 +2278,10 @@ end;
 
 procedure TOcComPortObj.KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if (Shift = [])  and (not IsLeftMouseButtonDown()) then
+  if (Shift = []) and (not IsLeftMouseButtonDown()) then
   begin
     FMouseTextSelection := false; // 去掉缓存
-    if (StringInternelCache.Lines.Count > 0) and (not FMouseTextSelection) then
+    if (GetCachedLinesCount() > 0) and (not FMouseTextSelection) then
       StartFlushOutCackedString(); // 开启线程
   end;
 end;
@@ -2297,16 +2293,16 @@ end;
 
 procedure TOcComPortObj.MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 begin
-  ///if (FMouseTextSelection = false) and (IsLeftMouseButtonDown()) then
-  ///   FMouseTextSelection := True; // 启动缓存
+  /// if (FMouseTextSelection = false) and (IsLeftMouseButtonDown()) then
+  /// FMouseTextSelection := True; // 启动缓存
 end;
 
 procedure TOcComPortObj.MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-   if Shift = [] then
+  if Shift = [] then
   begin
     FMouseTextSelection := false; // 去掉缓存
-    if (StringInternelCache.Lines.Count > 0) and (not FMouseTextSelection) then
+    if (GetCachedLinesCount() > 0) then  //and (not FMouseTextSelection)
       StartFlushOutCackedString(); // 开启线程
   end;
 end;
@@ -2365,8 +2361,7 @@ begin
     end;
     try // NORMAL_PRIORITY_CLASS
       { 创建一个子进程，运行console程序 }
-      if CreateProcess(nil, Pchar(cmdstr), @Security, @Security, True, REALTIME_PRIORITY_CLASS, nil, nil, Start,
-        ProcessInfo) then
+      if CreateProcess(nil, Pchar(cmdstr), @Security, @Security, True, REALTIME_PRIORITY_CLASS, nil, nil, Start, ProcessInfo) then
       begin
         { 等待进程运行结束 }
         WaitForSingleObject(ProcessInfo.hProcess, WAIT_TIMEOUT); // INFINITE
