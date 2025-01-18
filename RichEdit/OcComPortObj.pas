@@ -488,13 +488,11 @@ var
 begin
   j := 0;
   s := '';
-  if self = nil then
-    Exit;
-  if FOcComPortObj = nil then
+
+  if (FOcComPortObj = nil) or (self = nil) then
     Exit;
 
   delayTimesTick := GetTickCount();
-
   while not Terminated do
   begin
 
@@ -515,6 +513,7 @@ begin
       1:
         FOcComPortObj.ClearInternalBuff(1);
     end;
+
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////ASCIIFormat
     if self.FOcComPortObj.FReceiveFormat = Ord(ASCIIFormat) then
     begin
@@ -535,10 +534,10 @@ begin
         if((GetTickCount() - delayTimesTick) < 10) then
         Continue; // 没有数据等待一会
       end;
+      delayTimesTick := GetTickCount();
 
       // 处理完一行
       FOcComPortObj.FComProcessedCount := FOcComPortObj.FComProcessedCount + Length(s);
-      delayTimesTick := GetTickCount();
 
       s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.FLogObject.Lines.Count) + s;
       FOcComPortObj.LogBottomMod(s, True, FOcComPortObj.IsLogAtBottom());
@@ -831,13 +830,17 @@ begin
       self.FComUIHandleThread.ResetID := self.FReceiveFormat; // 通知线程重置先前的缓存
     end
     else
+    begin
       self.ClearInternalBuff; // 否则直接重置
+    end;
+
     FComPackParserThread.StopReSetClear; // 重置解析线程
     if FFileStream <> nil then
     begin
       FreeAndNil(FFileStream);
       self.FFileStreamName := '';
     end;
+
     self.FReceiveFormat := i;
     self.FComUIHandleThread.Suspended := threadsuspended;
     // 让UI 线程自行结束返回，避免在切换格式的时候丢失数据
@@ -1030,6 +1033,7 @@ var
 begin
   if (FLogObject = nil) or (FLogObject.Parent = nil) then
     Exit;
+
   isBottom := IsLogAtBottom();
   PreLogLinesCount := FLogObject.Lines.Count;
 
@@ -1513,7 +1517,7 @@ begin
   ///FComHandleThread_Wait := True;
   if not FComUIHandleThread.Suspended then
   begin
-    LeaveCriticalSection(Critical);
+    //LeaveCriticalSection(Critical);
     FComUIHandleThread.Suspended := True;
     FComHandleThread_Wait := True;
   end;
@@ -1559,7 +1563,6 @@ begin
         ReadStr(FComReceiveString, Count);
        // 兼容 \R 字符的索引从1开始也即是>=1
       FComReceiveString:=NormalizeLineBreaks(FComReceiveString);
-
     Except
     end;
 

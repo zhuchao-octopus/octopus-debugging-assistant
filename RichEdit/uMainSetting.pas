@@ -120,11 +120,12 @@ type
   private
     { Private declarations }
     OcComPortDeviceList: TStringList;
+
     /// CurrentLaunguage: Integer;
     procedure WMDeviceChange(var Msg: TMessage); message WM_DEVICECHANGE;
   public
     { Public declarations }
-
+    SelectedOcComPortObj: TOcComPortObj;
     /// 系统端口列表
     OctopusCfgDir: String;
     OctopusCfgDir_LogFilePath: String;
@@ -174,6 +175,8 @@ type
 
 var
   SettingPagesDlg: TSettingPagesDlg;
+
+
 
 function ExtractFileNameNoExt(FilePathName: String): String;
 function GetSystemDateTimeStampStr(): string;
@@ -546,9 +549,20 @@ begin
 end;
 
 procedure TSettingPagesDlg.FormShow(Sender: TObject);
+var
+  //OcComPortObj: TOcComPortObj;
+  i:integer;
 begin
+  //OcComPortObj := getDeciceByFullName(getCurrentDeviceName());
+  if SelectedOcComPortObj = nil then  exit;
+
+  i := ComboBoxEx1.Items.IndexOf(SelectedOcComPortObj.ComPortFullName);
+  if (i >= 0) and (i < ComboBoxEx1.Items.Count) then
+      ComboBoxEx1.ItemIndex := i;
+
   ComboBoxEx1Change(self); // 刷新到默认串口设置界面
   UpdateLaunguage(self);
+
   /// ShowMessage(getCommandLine());
   /// SetWindowPos(Handle, HWND_TOPMOST, Left, Top, Width, Height, 0);
 end;

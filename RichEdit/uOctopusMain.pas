@@ -403,7 +403,7 @@ type
 
     function GetStringGridValidStr(sStr: String): String;
     function GetCurrentPageName(): String;
-    function GetCurrentDevice(): TOcComPortObj;
+    function GetCurrentSelectedDevice(): TOcComPortObj;
 
     function SearchTextFrom(Component: TComponent; const SearchString: string; Options: TFindOptions): Boolean;
     procedure ShowSearchDialog();
@@ -600,7 +600,7 @@ begin
 
         if Msg.wParam = VK_CONTROL then
         begin
-          OcComPortObj := Self.GetCurrentDevice();
+          OcComPortObj := Self.GetCurrentSelectedDevice();
           if (OcComPortObj <> nil) then
           begin
             if OcComPortObj.Connected then
@@ -624,7 +624,7 @@ begin
 
         if (Msg.wParam = VK_ESCAPE) then
         begin
-          OcComPortObj := Self.GetCurrentDevice();
+          OcComPortObj := Self.GetCurrentSelectedDevice();
           if (OcComPortObj <> nil) then
             OcComPortObj.SetLogComponentReadOnly(true);
 
@@ -652,7 +652,7 @@ begin
 
         if (Msg.wParam = VK_CONTROL) and (not IsLeftMouseButtonDown()) then
         begin
-          OcComPortObj := Self.GetCurrentDevice();
+          OcComPortObj := Self.GetCurrentSelectedDevice();
           if (OcComPortObj <> nil) then
           begin
             OcComPortObj.MouseTextSelection := false;
@@ -1002,7 +1002,7 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UpdateCommandObject();
 begin
-  CommandFrm.OcComPortObj := Self.GetCurrentDevice();
+  CommandFrm.OcComPortObj := Self.GetCurrentSelectedDevice();
   if CommandFrm.OcComPortObj <> nil then
     SetPathFileName(CommandFrm.OcComPortObj.ComPortFullName);
 end;
@@ -1161,7 +1161,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.FileSaveAsCmdBeforeExecute(Sender
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := GetCurrentDevice();
+  OcComPortObj := GetCurrentSelectedDevice();
   if (OcComPortObj <> nil) then
     FileSaveAsCmd.Dialog.FileName := OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
 end;
@@ -1192,7 +1192,7 @@ var
   tmpComponent: TComponent;
 begin
   tmpComponent := PageControl1.GetComponent(PageControl1.ActivePageIndex);
-  OcComPortObj := GetCurrentDevice();
+  OcComPortObj := GetCurrentSelectedDevice();
   /// if (OcComPortObj <> nil) then
   /// FileSaveAsCmd.Dialog.FileName := OcComPortObj.Port + '_' + GetSystemDateTimeStampStr + '.log';
   if not(tmpComponent is TCustomMemo) then
@@ -1611,11 +1611,11 @@ procedure TMainOctopusDebuggingDevelopmentForm.QuickTerminalCommandsItemClick(Se
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if OcComPortObj = nil then
   begin
     Self.PageControl1.ActivePageIndex := Self.PageControl1.GetAMemoIndex();
-    OcComPortObj := Self.GetCurrentDevice();
+    OcComPortObj := Self.GetCurrentSelectedDevice();
   end;
 
   CommandFrm.OcComPortObj := OcComPortObj;
@@ -1680,7 +1680,7 @@ var
   BytesWritten: Cardinal;
 begin
 
-  OcComPortObj := Self.GetCurrentDevice(); // GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  OcComPortObj := Self.GetCurrentSelectedDevice(); // GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if (OcComPortObj = nil) then
   begin
     /// Log0('No device is found,please open a device.');
@@ -1707,7 +1707,7 @@ var
   BytesWritten: Cardinal;
 begin
 
-  OcComPortObj := Self.GetCurrentDevice(); // GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
+  OcComPortObj := Self.GetCurrentSelectedDevice(); // GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if (OcComPortObj = nil) then
   begin
     /// Log('No device is found,please open a device.');
@@ -1776,6 +1776,7 @@ begin
   Timer1.Enabled := false;
   Button200.Caption := 'Stop Looping';
   Button201.Caption := LoopingString + '...';
+
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
     if Timer1.Tag = 0 then
@@ -1847,7 +1848,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.Button201Click(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice(); // GetDeciceByFullName(self.GetCurrentDeviceName);
+  OcComPortObj := Self.GetCurrentSelectedDevice(); // GetDeciceByFullName(self.GetCurrentSelectedDeviceName);
   if OcComPortObj = nil then
   begin
     exit;
@@ -1894,7 +1895,7 @@ var
   rwCount: Integer;
   SL: TStringList;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if (OcComPortObj = nil) then
   begin
     // Log0('No device is found,please open a device.');
@@ -1961,7 +1962,7 @@ var
   FileNameLoaded: String;
 begin
 
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   /// GetDeciceByFullName(ComboBoxEx1.Items[ComboBoxEx1.ItemIndex]);
   if OcComPortObj = nil then
   begin
@@ -2031,7 +2032,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.FindDialog1Close(Sender: TObject)
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if OcComPortObj <> nil then
     OcComPortObj.LogScrollMode := true;
   Self.Show;
@@ -2045,7 +2046,7 @@ var
   bRet: Boolean;
 Label ReStart;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   with Sender as TFindDialog do
   begin
     FindStr := FindText;
@@ -2057,6 +2058,7 @@ begin
     begin
       Component := OcComPortObj.LogObject;
     end;
+
     if Component = nil then
       exit;
 
@@ -2099,7 +2101,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.FindDialog1Show(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if OcComPortObj = nil then
     exit;
   OcComPortObj.LogScrollMode := false;
@@ -2269,8 +2271,11 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.SettingItem1Click(Sender: TObject);
 var
   Component: TComponent;
+  //OcComPortObj: TOcComPortObj;
 begin
   /// SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
+  SettingPagesDlg.SelectedOcComPortObj:=GetCurrentSelectedDevice();
+
   SettingPagesDlg.ShowModal();
 
   InitUartsParameters();
@@ -2325,7 +2330,7 @@ var
   OcComPortObj: TOcComPortObj;
 begin
   InitUartsMenu(COMMenu, COM1MenuItemOnClick);
-  OcComPortObj := Self.GetCurrentDevice;
+  OcComPortObj := Self.GetCurrentSelectedDevice;
   for i := 0 to COMMenu.Count - 1 do
   begin
     MenuItem := COMMenu.Items[i];
@@ -2345,7 +2350,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.ToggleSwitchDeviceOnOffClick(Send
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if OcComPortObj <> nil then
   begin
     if ToggleSwitchDeviceOnOff.IsOn then
@@ -2401,7 +2406,7 @@ var
   btl: Integer;
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
 
   if OcComPortObj = nil then
   begin
@@ -2426,13 +2431,14 @@ begin
       ShowMessage(err.message + ' Please go to Octopus Option Settings page to setup the device.');
     end;
   end;
+  self.PageControl1.SetFocus;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ComboBox2Change(Sender: TObject);
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if OcComPortObj = nil then
     exit;
   /// if (ComboBox2.ItemIndex = Ord(Graphic)) then
@@ -2469,7 +2475,7 @@ var
   OcComPortObj: TOcComPortObj;
   Component: TComponent;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if OcComPortObj <> nil then
   begin
     OcComPortObj.ClearLog();
@@ -2497,7 +2503,7 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.ToolButton19Click(Sender: TObject);
 begin
   { ShowHideRLPanel(false);
-    CommandFrm.OcComPortObj := Self.GetCurrentDevice();
+    CommandFrm.OcComPortObj := Self.GetCurrentSelectedDevice();
     CommandFrm.Show();
     CommandFrm.Left := MainOctopusDebuggingDevelopmentForm.Left + MainOctopusDebuggingDevelopmentForm.Width - CommandFrm.Width - 15;
     CommandFrm.Top := MainOctopusDebuggingDevelopmentForm.Top + MainOctopusDebuggingDevelopmentForm.Height - CommandFrm.Height * 2 + 20;
@@ -2609,7 +2615,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.UpdateUartToolBar();
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if OcComPortObj <> nil then
   begin
     if Ord(OcComPortObj.BaudRate) = 0 then
@@ -2802,7 +2808,7 @@ begin
   end;
 
   StringGrid1.Options := StringGrid1.Options - [goEditing];
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if OcComPortObj = nil then
   begin
     /// MessageBox(Application.Handle, PChar('No device!! You need to open a device,please use F1 to get help'), PChar(Application.Title), MB_ICONINFORMATION + MB_OK);
@@ -3053,7 +3059,7 @@ begin
     Result := '';
 end;
 
-function TMainOctopusDebuggingDevelopmentForm.GetCurrentDevice(): TOcComPortObj;
+function TMainOctopusDebuggingDevelopmentForm.GetCurrentSelectedDevice(): TOcComPortObj;
 var
   /// OcComPortObj: TOcComPortObj;
   ActivePageName: String;
@@ -3274,7 +3280,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.StatusBarPrintFileSize();
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if (OcComPortObj = nil) then
     exit;
 
@@ -3483,7 +3489,7 @@ procedure TMainOctopusDebuggingDevelopmentForm.ShowSearchDialog();
 var
   OcComPortObj: TOcComPortObj;
 begin
-  OcComPortObj := Self.GetCurrentDevice();
+  OcComPortObj := Self.GetCurrentSelectedDevice();
   if (OcComPortObj <> nil) and (OcComPortObj.LogObject <> nil) then
   begin
     with FindDialog1 do
