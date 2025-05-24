@@ -13,262 +13,182 @@ uses
   IdHashMessageDigest,
   ComObj,
   StrUtils,
-  CRC;
+  CRC,
+  System.SyncObjs,
+  Generics.Collections;
 
+/// /////////////////////////////////////////////////////////////////////////////
 // type OCCOMPROTOCAL_STATUS=();
-const
-  OCCOMPROTOCAL_PACK_RING_BUFFER_HIGHT = 1024 * 4;
-
-  OCCOMPROTOCAL_HEAD = $0101; // $55AA;
-  OCCOMPROTOCAL_HEAD2 = $0AFF; // 不同的头码，不同数据格式
-  // OCCOMPROTOCAL_HEAD2_BigEndian = $FF0A; //大端存储
-  OCCOMPROTOCAL_END = $7E; // $AA55;
-
-  // 一级命令
-  OCCOMPROTOCAL_DATA = $DA; // 标准协议数据 包最大是512字节
-  // OCCOMPROTOCAL_DATA2 = $DB; // 非标准协议表示数据是连续的没有分包或者说只有一个包
-  OCCOMPROTOCAL_DATA_COMPLETE = $DC; // 数据发送完成
-  OCCOMPROTOCAL_OVER = OCCOMPROTOCAL_DATA_COMPLETE; // 任务结束标记
-
-  OCCOMPROTOCAL_REBOOT = $BB; // reboot
-  OCCOMPROTOCAL_INBOOT = $B1; // start to boot loacd
-  OCCOMPROTOCAL_INAPP = $BA; // start to app
-
-  OCCOMPROTOCAL_START = $00; // 连接，要求对方回复 状态是否可以连接
-  OCCOMPROTOCAL_ACK = $01; // 一般相应，要求对方相应当前状态
-  OCCOMPROTOCAL_CONFIRM = $02; // 数据包确认标记收到标记 ,复合在高字节
-
-  // 二级命令
-  OCCOMPROTOCAL_FLASH_READ = $F0;
-  OCCOMPROTOCAL_FLASH_WRITE = $F1;
-
-  // OCCOMPROTOCAL_I2C_READ = 50;
-  // OCCOMPROTOCAL_I2C_WRITE = 51;
-  // OCCOMPROTOCAL_SPI_READ = 52;
-  // OCCOMPROTOCAL_SPI_WRITE = 53;
-  // OCCOMPROTOCAL_WIFI_READ = 54;
-  // OCCOMPROTOCAL_WIFI_WRITE = 55;
-  // OCCOMPROTOCAL_UART_READ = 56;
-  // OCCOMPROTOCAL_UART_WRITE = 57;
-
-  // OCCOMPROTOCAL_ERROR = $FFFF;
-  // OCCOMPROTOCAL_NONE = $0000;
-
-
-  // OCCOMPROTOCAL_WM_ACK = WM_APP + 100;
-
-  OCCOMPROTOCAL_PACK_MAX_LENGTH = 512;
-  OCCOMPROTOCAL_PACK_PACKPAYLOAD_MAX_LENGTH = OCCOMPROTOCAL_PACK_MAX_LENGTH - 7;
 
 type
+  // 模块类型
+  TPTLFrameType = (
+    // MCU -> SOC Module IDs
+    MCU_TO_SOC_MOD_SYSTEM = $00, // System initialization
+    MCU_TO_SOC_MOD_UPDATE = $01, // System update
+    MCU_TO_SOC_MOD_TRANSFER = $02, // Data transfer
+    MCU_TO_SOC_MOD_CARINFOR = $03, // IPC carinfor
+    MCU_TO_SOC_MOD_SETUP = $04, // Settings
+    MCU_TO_SOC_MOD_KEY = $05, // KEY
+    MCU_TO_SOC_MOD_CAN = $06, // CAN
+    MCU_TO_SOC_MOD_IPC = $07, // IPC socket
 
-  POcComPack = ^TOcComPack;
-  POcComPackHead2 = ^TOcComPackHead2;
+    // SOC -> MCU Module IDs
+    SOC_TO_MCU_MOD_SYSTEM = $80, // System initialization
+    SOC_TO_MCU_MOD_UPDATE = $81, // System update
+    SOC_TO_MCU_MOD_TRANSFER = $82, // Data transfer
+    SOC_TO_MCU_MOD_CARINFOR = $83, // IPC carinfor
+    SOC_TO_MCU_MOD_SETUP = $84, // Settings
+    SOC_TO_MCU_MOD_KEY = $85, // KEY
+    SOC_TO_MCU_MOD_CAN = $86, // CAN
+    SOC_TO_MCU_MOD_IPC = $87 // IPC socket
+    );
 
-  TOcComPack = packed record // 7+512 =519 //实际填充数据整个包的长度不要超过512，需要预留CRC和结束码
-    Head: WORD; // 头部识别码 2
-    PID: WORD; // 包的类型  2
-    Index: byte; // 包的索引  1
-    Length: WORD; // 实际数据长度  2
-    data: array [0 .. 511] of byte; // 包后面的数据
-    // CRC: byte; // CRC校验    2 //填充到有效负载的后面
-    // EndFlag:byte; 1
+  TPTLFrameCmd = (
+    // MOD_SYSTEM Commands
+    CMD_SYSTEM_HANDSHAKE = $00, // System handshake
+    CMD_SYSTEM_ACC_STATE = $01, // ACC state
+    CMD_SYSTEM_APP_STATE = $02, // Application state
+    CMD_SYSTEM_POWER_ON = $03, // Power on
+    CMD_SYSTEM_POWER_OFF = $04, // Power off
+    CMD_SYSTEM_SAVE_DATA = $05, // Save data
+
+    // MOD_UPDATE Commands
+    CMD_UPDATE_CHECK_FW_STATE = $06, // Check firmware state
+    CMD_UPDATE_UPDATE_FW_STATE = $07, // Update firmware state
+    CMD_UPDATE_ENTER_FW_UPDATE = $08, // Enter firmware update mode
+    CMD_UPDATE_EXIT_FW_UPDATE = $09, // Exit firmware update mode
+    CMD_UPDATE_SEND_FW_DATA = $0A, // Send firmware data
+    CMD_UPDATE_REBOOT = $0B, // Reboot system
+
+    // MOD_TRANSFER Commands
+    CMD_TRANSFER_A2M = $0C, // A2M data transfer
+    CMD_TRANSFER_M2A = $0D, // M2A data transfer
+
+    // MOD_METER Commands
+    CMD_METER_RPM_SPEED = $0E, // RPM and speed
+    CMD_METER_FUEL_TEMPTER = $0F, // Fuel and temperature
+    CMD_METER_SOC = $10, // State of charge (SOC)
+
+    // MOD_INDICATOR Commands
+    CMD_CARINFOR_INDICATOR = $11, // Indicator status
+    CMD_CARINFOR_METER = $12, // Indicator status
+    CMD_CARINFOR_BATTERY = $13, // Battery status
+    CMD_CARINFOR_ERROR = $14, // Error information
+
+    // MOD_DRIV_INFO Commands
+    CMD_DRIVINFO_ODO = $15, // Odometer data
+    CMD_DRIVINFO_DRIV_DATA = $16, // Driving data
+    CMD_DRIVINFO_GEAR = $17, // Gear information
+    CMD_DRIVINFO_NAVI = $18, // Navigation data
+    CMD_DRIVINFO_DRIV_DATA_CLEAR = $19, // Clear driving data
+
+    // MOD_SETUP Commands
+    CMD_SETUP_UPDATE_TIME = $1A, // Update time
+    CMD_SETUP_SET_TIME = $1B, // Set time
+    CMD_SETUP_KEY = $1C, // Key input
+
+    // MOD_CAR Commands
+    CMD_CAR_SET_LIGHT = $1D, // Set car light
+    CMD_CAR_SET_GEAR = $1E // Set car gear
+
+    );
+
+  // Define a structure for the UART frame
+  TOctopusUARTFrame = record
+    Header: byte; // Frame header identifier
+    FrameType: TPTLFrameType; // Type of the frame (Command, Data, etc.)
+    Command: TPTLFrameCmd; // Specific command identifier
+    DataLength: byte; // Length of the data segment
+    HeaderChecksum: byte; // Checksum for header validation
+    data: array [0 .. 254] of byte; // Data segment (max 255 bytes frame size)
+    DataChecksum: byte; // Checksum for data validation
   end;
 
-  TOcComPackHead = packed record // 用于头部识别
-    Head: WORD; // 头部识别码 2
-    PID: WORD; // 包的类型  2
-    Index: byte; // 包的索引  1
-    Length: WORD; // 实际数据长度2
-  end;
+  TPOctopusUARTFrame = ^TOctopusUARTFrame;
 
-  // 用于头部识别，兼容其它第三方数据包
-  TOcComPackHead2 = packed record // 用于头部识别，兼容其它第三方数据包
-    Head: WORD; // 头部识别码 2
-    PID: WORD; // 包的类型  2 //命令+设备地址各一个字节
-    Length: byte; // 包的总长度  1
-  end;
+  TCallBackFun = Procedure(POctopusUARTFrame: TPOctopusUARTFrame) of object;
 
-type
-  TCallBackFun = Procedure(OcComPack: POcComPack) of object;
-
-  TOcComProtocal = class
+  TOctopusUartProtocol = class
   private
-    FPackList_RB: Array [0 .. OCCOMPROTOCAL_PACK_RING_BUFFER_HIGHT] of TOcComPack;
-    FPackList_RB_Top: Integer;
-    FPackList_RB_Count: Integer;
-    FPackList_RB_NewIndex: Integer;
-    FNeedCRC16: Boolean;
     FCallBackFun: TCallBackFun;
+    FFrameQueue: TQueue<TBytes>; // 队列存储解析出来的帧
+    FQueueLock: TCriticalSection; // 线程安全锁
   public
 
     Constructor Create();
     destructor Destroy;
+    property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
+    function GetFrameCmdDescription(ACommand: byte): string;
 
-    function CreatePack(Id: WORD): TOcComPack; overload;
-    function CreatePack(Head: WORD; Id: WORD): TOcComPack; overload;
-
-    function AddPackToPackList(OcComPack: POcComPack): Integer; overload;
-    function AddPackToPackList(OcComPack: POcComPackHead2; bLength: Integer): Integer; overload;
-
-    function CheckPackCRC(p: POcComPack; bLength: Integer): Boolean; overload;
-    function CheckPackCRC(p: POcComPackHead2; bLength: Integer): Boolean; overload;
-
-    function WaitingForACK(OcComPack: TOcComPackHead; timeOut: Integer): Boolean; overload;
+    function WaitingForACK(OcComPack: TOctopusUARTFrame; timeOut: Integer): Boolean; overload;
     // function WaitingForACK(OcComPack: TOcComPackHead2; timeOut: Integer): Boolean; overload;
     function WaitingForACK(ACK: Integer; timeOut: Integer): Boolean; overload;
 
-    // function GetLastPackHead(): TOcComPackHead;
-    function GetLastPack(): POcComPack;
-    function GetNewPack(): POcComPack;
+    function GetProtocolHeaderSize: Integer;
+    // Function to build the frame structure
+    function BuildUARTFrame(AHeader: byte; AFrameType: TPTLFrameType; ACommand: TPTLFrameCmd; AData: array of byte; ALength: Integer)
+      : TOctopusUARTFrame; overload;
+    function BuildUARTFrame(AFrameType: TPTLFrameType; ACommand: TPTLFrameCmd; AData: array of byte; ALength: Integer): TOctopusUARTFrame; overload;
 
-    function GetPackByIndex(i: Integer): TOcComPack;
-    function GetBytesValue(i: Integer): Int64;
-    procedure ClearPacks();
-    function CheckPackMinLength(bLength: Integer): Boolean;
-    function CheckPackLength(p: POcComPack; bLength: Integer): Boolean;
-    procedure SetCRC8(pPOcComPack: POcComPack);
-    procedure SetEndFlag(pPOcComPack: POcComPack);
+    function SerializeUARTFrame(Frame: TOctopusUARTFrame): TBytes;
+    function ParserUartFrame(buff: PByte; Count: Integer): Integer;
+    function PopParsedFrame(out Frame: TOctopusUARTFrame): Boolean;
+    function PeekParsedFrame(out Frame: TOctopusUARTFrame): Boolean;
+    function FrameToHexString(PFrame: TPOctopusUARTFrame): string;
+    function GetFrameCount: Integer;
 
-    function ParserPack(buff: PByte; Count: Integer): Integer;
-    function CheckHeadCount(buff: PByte; Count: Integer): Integer;
-    function PackAppendInvalidData(pPOcComPack: POcComPack): Integer;
-
-    property CallBackFun: TCallBackFun read FCallBackFun write FCallBackFun;
-    property PackList_RB_Top: Integer read FPackList_RB_Top;
-    property PackList_RB_Count: Integer read FPackList_RB_Count;
-    property NeedCRC16: Boolean read FNeedCRC16 write FNeedCRC16;
-
+    procedure ProcessParsedFrame(Frame: PByte; FrameLen: Integer);
+    procedure ClearFrame();
   end;
+
+const
+  OCTOPUS_UART_PROTOCAL_HEAD = $AA;
+  FrameCmdStr: array [TPTLFrameCmd] of string = ('CMD_SYSTEM_HANDSHAKE', 'CMD_SYSTEM_ACC_STATE', 'CMD_SYSTEM_APP_STATE', 'CMD_SYSTEM_POWER_ON',
+    'CMD_SYSTEM_POWER_OFF', 'CMD_SYSTEM_SAVE_DATA',
+
+    'CMD_UPDATE_CHECK_FW_STATE', 'CMD_UPDATE_UPDATE_FW_STATE', 'CMD_UPDATE_ENTER_FW_UPDATE', 'CMD_UPDATE_EXIT_FW_UPDATE', 'CMD_UPDATE_SEND_FW_DATA',
+    'CMD_UPDATE_REBOOT',
+
+    'CMD_TRANSFER_A2M', 'CMD_TRANSFER_M2A',
+
+    'CMD_METER_RPM_SPEED', 'CMD_METER_FUEL_TEMPTER', 'CMD_METER_SOC',
+
+    'CMD_CARINFOR_INDICATOR', 'CMD_CARINFOR_METER', 'CMD_CARINFOR_BATTERY', 'CMD_CARINFOR_ERROR',
+
+    'CMD_DRIVINFO_ODO', 'CMD_DRIVINFO_DRIV_DATA', 'CMD_DRIVINFO_GEAR', 'CMD_DRIVINFO_NAVI', 'CMD_DRIVINFO_DRIV_DATA_CLEAR',
+
+    'CMD_SETUP_UPDATE_TIME', 'CMD_SETUP_SET_TIME', 'CMD_SETUP_KEY',
+
+    'CMD_CAR_SET_LIGHT', 'CMD_CAR_SET_GEAR');
 
 implementation
 
-Constructor TOcComProtocal.Create();
+Constructor TOctopusUartProtocol.Create();
 begin
-  FPackList_RB_Top := 0;
-  FPackList_RB_Count := 0;
-  FPackList_RB_NewIndex := -1;
-  ZeroMemory(@FPackList_RB, SizeOf(TOcComPack) * Length(FPackList_RB));
+  FFrameQueue := TQueue<TBytes>.Create;
+  FQueueLock := TCriticalSection.Create;
 end;
 
-Destructor TOcComProtocal.Destroy;
+Destructor TOctopusUartProtocol.Destroy;
 begin
-
+  FFrameQueue.Free;
+  FQueueLock.Free;
 end;
 
-function TOcComProtocal.CreatePack(Id: WORD): TOcComPack;
+function TOctopusUartProtocol.GetFrameCmdDescription(ACommand: byte): string;
+begin
+  if ACommand <= Ord(High(TPTLFrameCmd)) then
+    Result := FrameCmdStr[TPTLFrameCmd(ACommand)]
+  else
+    Result := 'Unknown Command';
+end;
+
+function TOctopusUartProtocol.WaitingForACK(OcComPack: TOctopusUARTFrame; timeOut: Integer): Boolean;
 var
-  OcComPack: TOcComPack;
-begin
-  ZeroMemory(@OcComPack, SizeOf(TOcComPack));
-  OcComPack.Head := OCCOMPROTOCAL_HEAD; // 2
-  OcComPack.PID := Id; // 2
-  OcComPack.Index := 0; // 1
-  OcComPack.Length := 0; // 没有数据      //2
-  Result := OcComPack;
-end;
-
-function TOcComProtocal.CreatePack(Head: WORD; Id: WORD): TOcComPack;
-var
-  OcComPack: TOcComPack;
-begin
-  ZeroMemory(@OcComPack, SizeOf(TOcComPack));
-  OcComPack.Head := Head; // 2
-  OcComPack.PID := Id; // 2
-  OcComPack.Index := 0; // 1
-  OcComPack.Length := 0; // 没有数据      //2
-  Result := OcComPack;
-end;
-
-function TOcComProtocal.AddPackToPackList(OcComPack: POcComPack): Integer;
-var
-  PackSize: Integer;
-begin
-  PackSize := SizeOf(TOcComPackHead) + OcComPack.Length + 2; // 包的实际有效长度
-  INC(FPackList_RB_Top);
-  if FPackList_RB_Top > OCCOMPROTOCAL_PACK_RING_BUFFER_HIGHT then
-    FPackList_RB_Top := 0; // Ring buffer
-  CopyMemory(@FPackList_RB[FPackList_RB_Top], OcComPack, PackSize);
-  INC(FPackList_RB_Count);
-  Result := PackSize;
-end;
-
-function TOcComProtocal.AddPackToPackList(OcComPack: POcComPackHead2; bLength: Integer): Integer;
-var
-  PackSize: Integer;
-  comPack: TOcComPack;
-  pb: PByte;
-begin
-  // PackSize := OcComPack.Length; // 包的实际有效长度
-  INC(FPackList_RB_Top);
-  if FPackList_RB_Top > OCCOMPROTOCAL_PACK_RING_BUFFER_HIGHT then
-    FPackList_RB_Top := 0; // Ring buffer
-
-  comPack.Head := OcComPack.Head;
-  comPack.PID := OcComPack.PID;
-  comPack.Index := 0;
-  comPack.Length := OcComPack.Length - 5 - 1; // 负载的长度不包括了CRC
-  pb := PByte(OcComPack);
-  CopyMemory(@comPack.data[0], pb + 5, comPack.Length + 1); // 拷贝负载数据 和 CRC
-
-  PackSize := SizeOf(TOcComPackHead) + comPack.Length + 2 { 校验码+结束标记 }; // 包的实际总长度
-  CopyMemory(@FPackList_RB[FPackList_RB_Top], @comPack, PackSize);
-  INC(FPackList_RB_Count);
-
-  Result := OcComPack.Length;
-end;
-
-function TOcComProtocal.CheckPackCRC(p: POcComPack; bLength: Integer): Boolean;
-// 问题包，这里检查包是否出错，是否要丢弃
-var
-  CRC1: WORD; // CRC
-  CRC2: WORD; // END_FLAG
-  PackSize: Integer;
-begin
-  Result := false;
-  if p.Head = OCCOMPROTOCAL_HEAD then
-  begin
-    // if ((p.Length + SizeOf(TOcComPackHead) + 3) > bLength) then
-    // Exit; // 数据不完整
-
-    CRC1 := p.data[p.Length]; // checksum
-    CRC2 := p.data[p.Length + 1];
-    if (CRC2 = OCCOMPROTOCAL_END) then
-      Result := True;
-  end;
-end;
-
-function TOcComProtocal.CheckPackCRC(p: POcComPackHead2; bLength: Integer): Boolean;
-var
-  CRC1: WORD; // CRC
-  CRC2: WORD; // END_FLAG
-  i: Integer;
-  pb: PByte;
-begin
-  Result := false;
-  if p.Head = OCCOMPROTOCAL_HEAD2 then
-  begin
-    pb := PByte(p);
-    // if (p.Length > bLength) then // p.Length 为数据包的总长度
-    // Exit; // 数据不完整
-
-    CRC1 := (pb + (p.Length - 1))^;
-    CRC2 := 0;
-    for i := 0 to p.Length - 2 do
-    begin
-      CRC2 := QuickCRC8(pb^, CRC2); // 快速查表计算CRC
-      INC(pb);
-    end;
-
-    if (CRC2 = CRC1) then
-      Result := True;
-  end;
-end;
-
-function TOcComProtocal.WaitingForACK(OcComPack: TOcComPackHead; timeOut: Integer): Boolean;
-var
-  Oc: TOcComPack;
+  Oc: TOctopusUARTFrame;
   Start: real;
+  peekret: Boolean;
 begin
   Result := false;
   Start := GetTickCount;
@@ -279,9 +199,12 @@ begin
       break; // 超时推出
     end;
 
-    Oc := FPackList_RB[FPackList_RB_Top];
-    if (Oc.Head = OcComPack.Head) and (Oc.PID = byte(OcComPack.PID)) and (Oc.Index = OcComPack.Index) { and (Oc.Total = OcComPack.Total) } and
-      (Oc.Length = OcComPack.Length) then // 表示这个包收到
+    peekret := PeekParsedFrame(Oc);
+    if not peekret then
+      Exit;
+
+    if (Oc.Header = OcComPack.Header) and (Ord(Oc.FrameType) = Ord(OcComPack.FrameType)) and (Oc.Command = OcComPack.Command) and
+      (Oc.DataLength = OcComPack.DataLength) then
     begin
       Result := True;
       break;
@@ -289,11 +212,11 @@ begin
   end;
 end;
 
-function TOcComProtocal.WaitingForACK(ACK: Integer; timeOut: Integer): Boolean;
+function TOctopusUartProtocol.WaitingForACK(ACK: Integer; timeOut: Integer): Boolean;
 var
-  pOc: POcComPack;
+  Oc: TOctopusUARTFrame;
   Start: real;
-  // pb: PByte;
+  peekret: Boolean;
 begin
   Result := false;
   Start := GetTickCount;
@@ -303,273 +226,314 @@ begin
     begin
       break; // 超时推出
     end;
-    pOc := GetNewPack();
-    // if (Oc.Head = OcComPack.Head) and (Oc.PID = byte(OcComPack.PID)) and (Oc.Length = OcComPack.Length) then // 表示这个包收到
-    if pOc <> nil then
+
+    peekret := PeekParsedFrame(Oc);
+    if not peekret then
+      Exit;
+
+    if Oc.data[0] = ACK then // 0x59 89 Y
     begin
-      if pOc.data[0] = ACK then // 0x59 89 Y
-      begin
-        Result := True;
-        break;
-      end;
+      Result := True;
+      break;
     end;
+
     // Application.
   end;
 end;
 
-function TOcComProtocal.GetNewPack(): POcComPack;
-begin
-  Result := nil;
-  if (FPackList_RB_NewIndex <> FPackList_RB_Top) then
-  begin
-    Result := GetLastPack();
-    FPackList_RB_NewIndex := FPackList_RB_Top;
-  end
-end;
-
-// function TOcComProtocal.GetLastPackHead(): TOcComPackHead;
-// begin
-// Result.PID := OCCOMPROTOCAL_ERROR;
-// CopyMemory(@Result, @FPackList_RB[FPackList_RB_Top], SizeOf(TOcComPackHead));
-// end;
-
-function TOcComProtocal.GetLastPack(): POcComPack;
-begin
-  // CopyMemory(@Result, @FPackList_RB[FPackList_RB_Top], SizeOf(TOcComPack));
-  // if(FPackList_RB_Top < 0) then Result:= nil;
-  Result := @FPackList_RB[FPackList_RB_Top];
-end;
-
-function TOcComProtocal.GetPackByIndex(i: Integer): TOcComPack;
-begin
-  Result := FPackList_RB[i];
-end;
-
-function TOcComProtocal.GetBytesValue(i: Integer): Int64;
+/// //////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Helper function to calculate checksum
+function CalculateChecksum(Buffer: array of byte; Length: Integer): byte;
 var
-  j: Integer;
-  // b:byte;
+  i: Integer;
+  Sum: byte;
 begin
-  Result := 0;
-  // b:=
-  for j := 0 to self.GetPackByIndex(i).Length - SizeOf(TOcComPackHead) - 1 do
-  begin
-    // str := str + Format('%.02x ', [self.FOcComProtocal.GetPackByIndex(i).data[j]]);
-    Result := (Result shl 8) + GetPackByIndex(i).data[j];
-  end;
-
+  Sum := 0;
+  for i := 0 to Length - 1 do
+    Sum := Sum + Buffer[i];
+  Result := byte(not Sum + 1);
 end;
 
-procedure TOcComProtocal.ClearPacks();
-begin
-  FPackList_RB_Top := 0;
-  FPackList_RB_Count := 0;
-  ZeroMemory(@FPackList_RB, SizeOf(TOcComPack) * Length(FPackList_RB));
-end;
-
-function TOcComProtocal.CheckPackMinLength(bLength: Integer): Boolean;
-begin
-  Result := True;
-  if bLength < (SizeOf(TOcComPackHead2)) then // 长度不够，小于最小包长度
-    Result := false;
-end;
-
-function TOcComProtocal.CheckPackLength(p: POcComPack; bLength: Integer): Boolean;
-// 这里描述是否继续等待
+function CalculateChecksum_2(Buffer: PByte; Length: Integer): byte;
 var
-  PackSize: Integer;
+  i: Integer;
+  Sum: Word;
 begin
-  Result := True;
-  PackSize := SizeOf(TOcComPackHead) + p.Length + 2; // 包的实际有效长度
-  if (bLength < PackSize) { 收到的数据不够 }
-  then
-  begin // 包描述的长度要小于等于最大允许的包长度
-    Result := false; // 说明数据不全，继续等待数据
-  end;
-  if (bLength > OCCOMPROTOCAL_PACK_PACKPAYLOAD_MAX_LENGTH) { 包长是合法的,不能超过最大包长 } then
-  begin
-    Result := false;
-  end;
+  Sum := 0;
+  for i := 0 to Length - 1 do
+    Sum := Sum + Buffer[i];
+
+  Result := byte(not Sum + 1);
+  // Result := byte(-Sum and $FF);
 end;
 
-function CRC8(p: POcComPack): byte;
+function TOctopusUartProtocol.GetProtocolHeaderSize: Integer;
+begin
+
+  // [ Header ][ Frame Type ][ Command ][ Data Length ][ Header Checksum ]
+  // 协议头部的固定大小
+  Result := 5;
+end;
+
+// Function to build the frame structure
+function TOctopusUartProtocol.BuildUARTFrame(AHeader: byte; AFrameType: TPTLFrameType; ACommand: TPTLFrameCmd; AData: array of byte; ALength: Integer)
+  : TOctopusUARTFrame;
 var
-  pb: PByte;
+  Frame: TOctopusUARTFrame;
+  i: Integer;
+  ChecksumArray: array of byte;
+begin
+  // 初始化 Frame 头部
+  Frame.Header := AHeader;
+  Frame.FrameType := AFrameType;
+  Frame.Command := ACommand;
+  Frame.DataLength := ALength;
+
+  // 直接填充数据段
+  if ALength > 0 then
+    Move(AData[0], Frame.data[0], ALength);
+
+  // 计算 Header 校验和
+  SetLength(ChecksumArray, 4);
+  ChecksumArray[0] := AHeader;
+  ChecksumArray[1] := byte(AFrameType);
+  ChecksumArray[2] := byte(ACommand);
+  ChecksumArray[3] := Frame.DataLength;
+  Frame.HeaderChecksum := CalculateChecksum(ChecksumArray, Length(ChecksumArray));
+
+  // 计算数据段校验和，不包括 DataLength 包括HEARD CRC
+  SetLength(ChecksumArray, ALength + 1);
+  ChecksumArray[0] := Frame.DataLength;
+  ChecksumArray[0] := Frame.HeaderChecksum;
+  // 拷贝数据到校验数组
+  if ALength > 0 then
+    Move(AData[0], ChecksumArray[1], ALength);
+
+  // 计算最终的数据校验和
+  Frame.DataChecksum := CalculateChecksum(ChecksumArray, Length(ChecksumArray));
+
+  // 返回构建好的 Frame
+  Result := Frame;
+end;
+
+function TOctopusUartProtocol.BuildUARTFrame(AFrameType: TPTLFrameType; ACommand: TPTLFrameCmd; AData: array of byte; ALength: Integer): TOctopusUARTFrame;
+begin
+  Result := BuildUARTFrame(OCTOPUS_UART_PROTOCAL_HEAD, AFrameType, ACommand, AData, ALength);
+end;
+
+// Function to serialize the frame into a byte stream for UART transmission
+function TOctopusUartProtocol.SerializeUARTFrame(Frame: TOctopusUARTFrame): TBytes;
+var
   i: Integer;
 begin
-  pb := @p;
-  Result := 0;
-  for i := 0 to (SizeOf(TOcComPackHead) + p.Length - 1) do
-  begin
-    // result := CalCRC8(data,result,GenPoly8); // 按位计算CRC
-    Result := QuickCRC8(pb^, Result); // 快速查表计算CRC
-    INC(pb);
-  end;
+  SetLength(Result, 5 + Frame.DataLength + 1);
+  Result[0] := Frame.Header;
+  Result[1] := Ord(Frame.FrameType);
+  Result[2] := Ord(Frame.Command);
+  Result[3] := Frame.DataLength;
+  Result[4] := Frame.HeaderChecksum;
+
+  for i := 0 to Frame.DataLength - 1 do
+    Result[5 + i] := Frame.data[i];
+
+  Result[5 + Frame.DataLength] := Frame.DataChecksum;
 end;
 
-function TOcComProtocal.CheckHeadCount(buff: PByte; Count: Integer): Integer;
+function TOctopusUartProtocol.ParserUartFrame(buff: PByte; Count: Integer): Integer;
 var
-  iByte: Integer; // 记录消费掉的字节个数
-  p1: POcComPack;
-  p2: POcComPackHead2;
+  i, FrameLen, DataLen: Integer;
+  FrameType, Command, HeaderChecksum, DataChecksum: byte;
+  // Address: DWord;
 begin
-  { iByte := 0;
-    Result := 0;
-    if (Count < 2) then
-    exit;
-    p1 := @buff[iByte];
-    p2 := @buff[iByte];
-    if (p1^.Head = OCCOMPROTOCAL_HEAD) then // 对包头 }
-end;
+  Result := 0; // 初始化消费掉的字节数
+  i := 0;
 
-function TOcComProtocal.ParserPack(buff: PByte; Count: Integer): Integer;
-var
-  iByte: Integer; // 记录消费掉的字节个数
-  p1: POcComPack;
-  p2: POcComPackHead2;
-
-  OcComPack: TOcComPack; // 无效的数据打包显示
-  // OcComPack_Count: Integer;
-begin
-  iByte := 0;
-  Result := 0; // 记录消费掉的字节个数
-
-  OcComPack.Head := 0;
-  OcComPack.PID := 0;
-  OcComPack.Length := 0;
-
-  while (True) do
+  while (i < Count) do
   begin
-    Result := iByte; // 记录消费掉的字节个数
-    if (Count - iByte < 2) then
-      break;
-
-    p1 := @buff[iByte];
-    p2 := @buff[iByte];
-
-    if (p1^.Head = OCCOMPROTOCAL_HEAD) then // 对包头
+    // 1. 查找帧头
+    if (buff[i] = $55) or (buff[i] = $AA) then
     begin
-      if (not CheckPackMinLength(Count - iByte)) then
-        break // 头码不全，需要更多数据
-      else if (SizeOf(TOcComPackHead) + p1^.Length + 2) > (Count - iByte) then
-        break // 负载不全,需要更多数据
-      else if CheckPackCRC(p1, Count - iByte) then
-      begin
-        iByte := iByte + AddPackToPackList(p1);
-        if Assigned(FCallBackFun) then
-          FCallBackFun(GetLastPack());
-        continue;
-      end
-      else
-      begin
-        INC(iByte); // 丢弃无效的数据包
-      end;
-    end
-    else if (p2^.Head = OCCOMPROTOCAL_HEAD2) then // 对包头
-    begin
-      if (not CheckPackMinLength(Count - iByte)) then
-        break // 头码不全，需要更多数据
-      else if p2^.Length > (Count - iByte) then
-        break // 负载不全，需要更多数据
-      else if CheckPackCRC(p2, Count - iByte) then
-      begin
-        iByte := iByte + AddPackToPackList(p2, Count - iByte);
-        if Assigned(FCallBackFun) then
-          FCallBackFun(GetLastPack());
-        continue;
-      end
-      else
-      begin
-        INC(iByte); // 丢弃无效的数据包
-      end;
-    end
+      // 2. 检查剩余数据是否足够读取头部信息
+      if (Count - i) < GetProtocolHeaderSize() + 1 then
+        break;
 
+      // 3. 读取头部信息
+      FrameType := buff[i + 1];
+      Command := buff[i + 2];
+      DataLen := buff[i + 3];
+      HeaderChecksum := buff[i + 4];
+
+      // 4. 计算帧总长度 (Header + Data + DataChecksum)
+      FrameLen := GetProtocolHeaderSize() + DataLen + 1;
+
+      // 5. 检查是否有足够的数据来解析完整帧
+      if (Count - i) < FrameLen then
+        break;
+
+      // 6. 校验 HeaderChecksum
+      if CalculateChecksum_2(@buff[i], GetProtocolHeaderSize() - 1) <> HeaderChecksum then
+      begin
+        Inc(i); // 校验失败，跳过该字节
+        Continue;
+      end;
+
+      // 7. 校验 DataChecksum
+      DataChecksum := buff[i + GetProtocolHeaderSize() + DataLen];
+      if CalculateChecksum_2(@buff[i + 4], DataLen + 1) <> DataChecksum then
+      begin
+        Inc(i); // 校验失败，跳过该字节
+        Continue;
+      end;
+
+      // 8. 提取 Data 部分
+      // 数据前4字节是地址，之后是有效数据
+      // Address := (buff[i + 5] shl 24) or (buff[i + 6] shl 16) or (buff[i + 7] shl 8) or buff[i + 8];
+      ProcessParsedFrame(@buff[i], FrameLen);
+
+      // 9. 累加已消费的字节数
+      Inc(Result, FrameLen);
+
+      // 10. 更新 i 指针，跳过已处理的帧
+      Inc(i, FrameLen);
+    end
     else
     begin
-      OcComPack.data[OcComPack.Length] := buff[iByte];
-      OcComPack.Length := OcComPack.Length + 1;
-      INC(iByte); // 继续寻找，跳过的字节数  //记录消费掉的字节个数
+      Inc(i);
+      Inc(Result); // 非帧头的字节也计入消费量
+    end;
+  end;
+end;
+
+function TOctopusUartProtocol.PopParsedFrame(out Frame: TOctopusUARTFrame): Boolean;
+var
+  TempFrame: TArray<byte>;
+begin
+  Result := false;
+
+  // 1. 线程安全地从队列中取出数据
+  FQueueLock.Acquire;
+  try
+    if FFrameQueue.Count > 0 then
+    begin
+      TempFrame := FFrameQueue.Dequeue; // 获取队列中的字节数组
+      // 2. 将字节数组解析为 TOctopusUARTFrame
+      Frame.Header := TempFrame[0];
+      Frame.FrameType := TPTLFrameType(TempFrame[1]);
+      Frame.Command := TPTLFrameCmd(TempFrame[2]);
+      Frame.DataLength := TempFrame[3];
+      Frame.HeaderChecksum := TempFrame[4];
+      Move(TempFrame[5], Frame.data[0], Frame.DataLength);
+      Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
+
+      Result := True;
+    end;
+  finally
+    FQueueLock.Release;
+  end;
+end;
+
+function TOctopusUartProtocol.PeekParsedFrame(out Frame: TOctopusUARTFrame): Boolean;
+var
+  TempFrame: TArray<byte>;
+begin
+  Result := false;
+  // 1. 线程安全地访问队列
+  FQueueLock.Acquire;
+  try
+    if FFrameQueue.Count > 0 then
+    begin
+      // Peek 操作：只是读取，不删除
+      TempFrame := FFrameQueue.Peek;
+
+      // 2. 将字节数组解析为 TOctopusUARTFrame
+      Frame.Header := TempFrame[0];
+      Frame.FrameType := TPTLFrameType(TempFrame[1]);
+      Frame.Command := TPTLFrameCmd(TempFrame[2]);
+      Frame.DataLength := TempFrame[3];
+      Frame.HeaderChecksum := TempFrame[4];
+
+      // 3. 拷贝 Data 数据
+      if Frame.DataLength > 0 then
+        Move(TempFrame[5], Frame.data[0], Frame.DataLength);
+
+      // 4. 获取 DataChecksum
+      Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
+      Result := True;
+    end;
+  finally
+    FQueueLock.Release;
+  end;
+end;
+
+procedure TOctopusUartProtocol.ProcessParsedFrame(Frame: PByte; FrameLen: Integer);
+var
+  FrameData: TBytes;
+  OctopusUARTFrame: TOctopusUARTFrame;
+begin
+  // 1. 分配内存并复制数据到 FrameData
+  SetLength(FrameData, FrameLen);
+  Move(Frame^, FrameData[0], FrameLen);
+
+  // 2. 线程安全地将字节数据添加到队列
+  FQueueLock.Acquire;
+  try
+    FFrameQueue.Enqueue(FrameData); // 把字节数组放入队列
+  finally
+    FQueueLock.Release;
+  end;
+
+  // 3. 从队列中弹出解析的帧并将字节流解析为 TOctopusUARTFrame
+  //if (PeekParsedFrame(OctopusUARTFrame)) then
+  //  FrameToHexString(@OctopusUARTFrame);
+  // 4. 如果有回调函数，触发回调
+  if Assigned(FCallBackFun) then
+    FCallBackFun(@OctopusUARTFrame);
+end;
+
+function TOctopusUartProtocol.FrameToHexString(PFrame: TPOctopusUARTFrame): string;
+var
+  FrameBytes: TBytes;
+  i: Integer;
+  HexBuilder: TStringBuilder;
+begin
+  // 1. 序列化帧数据
+  FrameBytes := SerializeUARTFrame(PFrame^);
+
+  // 2. 使用 TStringBuilder 构建十六进制字符串，效率更高
+  HexBuilder := TStringBuilder.Create;
+  try
+    for i := 0 to High(FrameBytes) do
+    begin
+      HexBuilder.AppendFormat('%2.2x ', [FrameBytes[i]]);
     end;
 
-  end; // while
-
-  // 如果有空间废弃的数据加到上一个包的尾部
-  // if(OcComPack.Length > 0) then
-  // PackAppendInvalidData(@OcComPack);
-  if Assigned(FCallBackFun) and (OcComPack.Length > 0) then
-  begin
-    FCallBackFun(@OcComPack); // 打印废弃数据
+    // 3. 去掉末尾多余空格并返回结果
+    Result := Trim(HexBuilder.ToString);
+  finally
+    HexBuilder.Free;
   end;
-  OcComPack.Length := 0;
 end;
 
-function TOcComProtocal.PackAppendInvalidData(pPOcComPack: POcComPack): Integer;
-var
-  p: POcComPack;
+function TOctopusUartProtocol.GetFrameCount: Integer;
 begin
-  Result := 0;
-  p := GetLastPack();
-  if p = nil then
-    exit;
-  if p.Head = 0 then
-    exit;
-
-  if (p.Length + pPOcComPack.Length) > OCCOMPROTOCAL_PACK_PACKPAYLOAD_MAX_LENGTH then
-    exit; // 没有空间了
-
-  CopyMemory(@p.data[p.Length + 2], pPOcComPack, pPOcComPack.Length);
-  pPOcComPack.Length := 0;
-  Result := p.Length;
+  FQueueLock.Acquire;
+  try
+    Result := FFrameQueue.Count;
+  finally
+    FQueueLock.Release;
+  end;
 end;
 
-procedure TOcComProtocal.SetCRC8(pPOcComPack: POcComPack);
-var
-  CRC: byte;
-  // i: Integer;
-begin;
-  CRC := CRC8(pPOcComPack); // 快速查表计算CRC
-  // i :=  pPOcComPack.Length;
-  // if i > SizeOf(TOcComPack) then
-  pPOcComPack.data[pPOcComPack.Length] := CRC;
-end;
-
-procedure TOcComProtocal.SetEndFlag(pPOcComPack: POcComPack);
-var
-  CRC: byte;
-  // i: Integer;
-begin;
-  // i := SizeOf(TOcComPackHead) + pPOcComPack.Length + 1;
-  pPOcComPack.data[pPOcComPack.Length + 1] := OCCOMPROTOCAL_END;
-end;
-
-function GetGUI(): String;
-var
-  FGuid: TGUID;
+procedure TOctopusUartProtocol.ClearFrame();
 begin
-  CreateGUID(FGuid);
-  Result := GUIDToString(FGuid);
-  Result := Result + ' ' + IntToStr(Length(Result));
-  Result := Copy(GUIDToString(FGuid), 2, 36);
-end;
 
-function GetGUID(): String;
-var
-  AGuid: TGUID;
-  sGUID: string;
-begin
-  sGUID := CreateClassID;
-  Delete(sGUID, 1, 1);
-  Delete(sGUID, Length(sGUID), 1);
-  sGUID := StringReplace(sGUID, '-', '', [rfReplaceAll]);
-  Result := sGUID;
-end;
-
-function GetMD5(Str: String): String;
-var
-  MD5: TIdHashMessageDigest5;
-begin
-  MD5 := TIdHashMessageDigest5.Create;
-  Result := MD5.HashStringAsHex(Str);
+  // 2. 线程安全地将字节数据添加到队列
+  FQueueLock.Acquire;
+  try
+    FFrameQueue.Clear; // 把字节数组放入队列
+  finally
+    FQueueLock.Release;
+  end;
 end;
 
 initialization

@@ -7,7 +7,7 @@ uses
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Menus, Vcl.ComCtrls, Vcl.ClipBrd,
   Vcl.ToolWin, Vcl.ActnList, System.Actions, System.ImageList, Vcl.ImgList, Vcl.StdActns, Vcl.ExtActns,
   Vcl.Tabs, VCLTee.TeCanvas, Vcl.Grids, Vcl.WinXCtrls, Vcl.TabNotBk, Vcl.Themes,
-
+  System.SyncObjs,
   IniFiles,
   OcComPortObj,
   Vcl.MyPageEdit,
@@ -466,6 +466,7 @@ var
 
   UserDataChanged: Boolean;
   UserDataLength: Integer;
+  FCriticalSection: TCriticalSection;
 
 implementation
 
@@ -1950,7 +1951,7 @@ begin
       end;
   end;
 
-  OcComPortObj.SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, Datas, Count2, false);
+  // OcComPortObj.SendProtocolData(OCCOMPROTOCAL_HEAD2, OCCOMPROTOCAL_DATA, Datas, Count2, false);
   SL.Clear;
   SL.Free;
 end;
@@ -2271,10 +2272,10 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.SettingItem1Click(Sender: TObject);
 var
   Component: TComponent;
-  //OcComPortObj: TOcComPortObj;
+  // OcComPortObj: TOcComPortObj;
 begin
   /// SettingPagesDlg.CheckBox35.Checked := ShowLinesNumberItem.Checked;
-  SettingPagesDlg.SelectedOcComPortObj:=GetCurrentSelectedDevice();
+  SettingPagesDlg.SelectedOcComPortObj := GetCurrentSelectedDevice();
 
   SettingPagesDlg.ShowModal();
 
@@ -2431,7 +2432,7 @@ begin
       ShowMessage(err.message + ' Please go to Octopus Option Settings page to setup the device.');
     end;
   end;
-  self.PageControl1.SetFocus;
+  Self.PageControl1.SetFocus;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ComboBox2Change(Sender: TObject);
@@ -3297,7 +3298,7 @@ begin
     StatusBar1.Panels.Items[2].Text := OcComPortObj.Port + ' | Sent: ' + IntToStr(OcComPortObj.ComSentCount) + ' Bytes' + ' | Received: ' +
       IntToStr(OcComPortObj.ComReceiveCount) + ' Bytes' + ' | Processed: ' + IntToStr(OcComPortObj.ComProcessedCount) + ' Bytes' + ' | Total: ' +
       IntToStr(Length(OcComPortObj.LogObject.Text)) + ' Bytes' + ' | Line: ' + IntToStr(OcComPortObj.LogObject.CaretPos.Y) + ' | Lines: ' +
-      IntToStr(OcComPortObj.LogObject.Lines.Count) + ' | Packs: ' + IntToStr(OcComPortObj.GetPacks);
+      IntToStr(OcComPortObj.LogObject.Lines.Count) + ' | Frames: ' + IntToStr(OcComPortObj.OctopusUartProtocol.GetFrameCount);
 
     // StatusBar1.Panels.EndUpdate;
   end
@@ -3314,11 +3315,11 @@ end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.ShowStartComments(OcComPortObj: TOcComPortObj);
 begin
-  OcComPortObj.DebugLog('#################################################################');
+  OcComPortObj.DebugLog('#############################################################################');
   // OcComPortObj.DebugLog(APPLICATION_TITLE + FVersionNumberStr);
   OcComPortObj.DebugLog('Octopus Serial Port Development & Debugging Assistant ' + FVersionNumberStr);
   OcComPortObj.DebugLog('Home Page: ' + OCTOPUS_DEFAULT_WEBSITE_ADDRESS1 + ' ');
-  OcComPortObj.DebugLog('#################################################################');
+  OcComPortObj.DebugLog('#############################################################################');
   OcComPortObj.DebugLog('' + OcComPortObj.ComPortFullName + ' ');
 
   UpdateStatus(OCTOPUS_DEFAULT_WEBSITE_ADDRESS2, 0);
@@ -3331,22 +3332,30 @@ var
   i: Integer;
   str: String;
 begin
+  if not SavePrivate then
+    exit;
+
+  if not DirectoryExists(SettingPagesDlg.OctopusCfgDir) then
+    exit;
+
+  if not DirectoryExists(IncludeTrailingPathDelimiter(SettingPagesDlg.OctopusCfgDir) + OCTOPUS_DEFAULT_CONFIGURATION_DIR) then
+    exit;
+
+  s := IncludeTrailingPathDelimiter(SettingPagesDlg.OctopusCfgDir) + IncludeTrailingPathDelimiter(OCTOPUS_DEFAULT_CONFIGURATION_DIR) + 'Octopus.ini';
+
+  Octopusini := TIniFile.Create(s);
   try
-    if not SavePrivate then
-      exit;
-    if not DirectoryExists(SettingPagesDlg.OctopusCfgDir) then
-      exit;
-    if not DirectoryExists(SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR) then
-      exit;
-
-    s := SettingPagesDlg.OctopusCfgDir + OCTOPUS_DEFAULT_CONFIGURATION_DIR + 'Octopus.ini';
-    Octopusini := TIniFile.Create(s);
-
-    for i := 1 to StringGrid1.RowCount - 1 do
-    begin
-      str := Trim(StringGrid1.Cells[2, i]);
-      if str <> '' then
-        Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', str);
+    // 加锁，防止多线程访问冲突
+    FCriticalSection.Enter;
+    try
+      for i := 1 to StringGrid1.RowCount - 1 do
+      begin
+        str := Trim(StringGrid1.Cells[2, i]);
+        if str <> '' then
+          Octopusini.WriteString('MyCustData', IntToStr(i) + '_2', str);
+      end;
+    finally
+      FCriticalSection.Leave;
     end;
   finally
     Octopusini.Free;
@@ -3583,285 +3592,285 @@ begin
   end;
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
+function CalculateHexChecksum(Line: String): byte;
+var
+  i, Sum, ByteValue: Integer;
+begin
+  Sum := 0;
+
+  // 从第2个字符开始处理（跳过冒号），长度是整行的字符长度减去最后2个字符（校验和）
+  i := 2;
+  while i < Length(Line) - 1 do
+  begin
+    // 取两个字符作为一个字节，并转换为整数
+    ByteValue := StrToInt('$' + Copy(Line, i, 2));
+    Inc(Sum, ByteValue);
+    Inc(i, 2); // 手动增加步长
+  end;
+
+  // 计算补码
+  Result := byte((-Sum) and $FF);
+end;
+
+function ValidateHexFile(FileName: String): Boolean;
 var
   SL: TStringList;
   i: Integer;
-  str, tempstr: String;
-  iLength: Integer;
-  baseAddress: dword;
-  dataType: String;
-  Data: array [0 .. 511] of byte;
-  bb4, bb3: byte;
-  pPOcComPack: POcComPack;
-  bCount: Integer;
-  // iDataCount: Integer;
-  // reTryCount: Integer;
-  fileSent: Integer;
-  checksum: Integer;
-  bStatusOK: Boolean;
-Label FINISHED_OVER;
+  Line: String;
+  Checksum: byte;
+  FileChecksum: byte;
 begin
+  Result := true;
   SL := TStringList.Create;
-  SL.LoadFromFile(FileName);
-  if not OcComPortObj.Connected then
-  begin
-    OcComPortObj.Log('Device was closed,please open a device.');
-    exit;
-  end;
+  try
+    SL.LoadFromFile(FileName);
 
-  ZeroMemory(@Data, 512);
-  fileSent := 0;
-  checksum := 0;
-
-  Data[0] := $FF;
-  Data[1] := $0A;
-
-  Data[2] := OCCOMPROTOCAL_INBOOT; // ����bootLAOD
-  Data[3] := $00;
-
-  Data[4] := $00;
-
-  Data[5] := $00; // ���ݳ���
-  Data[6] := $00; // ���ݳ���
-
-  Data[7] := $00; // ����
-  Data[8] := $00; // ����
-  pPOcComPack := @Data[0]; // ʵ�ʷ��͵�ʱ�򳤶Ȳ�����CRC
-
-  bStatusOK := true;
-  bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
-
-  if not bStatusOK then
-  begin
-    OcComPortObj.Log('device is not ready to receive file!');
-    exit;
-  end;
-
-  StatusBar1DrawProgress(0, 0);
-  Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // дFLASH
-
-  for i := 0 to SL.Count - 1 do
-  begin
-    Application.ProcessMessages;
-    if (not OcComPortObj.Connected) then
+    for i := 0 to SL.Count - 1 do
     begin
-      bStatusOK := false;
-      break;
-    end;
-
-    str := SL.Strings[i];
-    if str[1] <> ':' then
-    begin
-      OcComPortObj.Log('The file format is wrong.');
-      break;
-    end;
-
-    // OcComPortObj.Log('test ' + str);
-    if str = ':00000001FF' then // �������
-    begin
-      Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
-      Data[5] := 6;
-
-      IntToBuffer(fileSent, &Data[7], 2);
-      IntToBuffer(checksum, &Data[9], 4);
-      pPOcComPack := @Data[0];
-
-      bStatusOK := true;
-      bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
-
-      DelayDelay(30);
-      // OcComPortObj.Log('Length  :'+IntToStr(fileSent));
-      // OcComPortObj.Log('CheckSum:'+IntToStr(checksum));
-      OcComPortObj.LogBuff('file size:', &Data[7], 2);
-      OcComPortObj.LogBuff('file summ:', &Data[9], 4);
-      break;
-    end;
-
-    tempstr := Copy(str, 2, 2); // ���ݳ���
-    FormatHexStrToBuffer(tempstr, &Data[5], bCount);
-    iLength := Data[5]; // �ȶ�����Ч����,������CRC
-    Data[5] := 4 { 32 Flash��ַ } + iLength; // ��Ч���ݵĳ���
-
-    dataType := Copy(str, 8, 2); // ��������
-    if dataType = '04' then // ��չ�ĸ�λ��ַ
-    begin
-      tempstr := Copy(str, 10, iLength * 2); // ����
-      FormatHexStrToBuffer(tempstr, &Data[7], bCount);
-      baseAddress := MakeDWord(MakeWord(Data[7], Data[8]), 0);
-      bb4 := Data[7];
-      bb3 := Data[8];
-      // OcComPortObj.Log('Other Data��'+str);
-    end
-    else if dataType = '00' then
-    begin
-      tempstr := Copy(str, 4, 4); // ���ݵ�ַ
-      FormatHexStrToBuffer(tempstr, &Data[9], bCount); // 9��10
-
-      tempstr := Copy(str, 10, iLength * 2 + 2); // ���� ��2���ַ�ΪCRCһ���ֽ�
-      FormatHexStrToBuffer(tempstr, &Data[11], bCount); // buffer�������CRC
-
-      Data[7] := bb4;
-      Data[8] := bb3;
-
-      fileSent := fileSent + iLength;
-      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // ����sum��Ҫ����crc
-
-      // Memo2.Lines.Append(FormatBufferToHexStr(&Data[11], iLength));
-
-      pPOcComPack := @Data[0]; // ʵ�ʷ��͵�ʱ�򳤶Ȳ�����CRC
-      bStatusOK := true;
-      bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
-
-      StatusBar1DrawProgress(i + 1, SL.Count);
-      if (not bStatusOK) then
+      Line := SL.Strings[i];
+      if Line[1] <> ':' then
+      begin
+        // OcComPortObj.Log('Invalid line format at line: ' + IntToStr(i));
+        Result := false;
         break;
+      end;
+
+      // 计算当前行的校验和
+      Checksum := CalculateHexChecksum(Line);
+
+      // 获取文件中原始校验和
+      FileChecksum := StrToInt('$' + Copy(Line, Length(Line) - 1, 2));
+
+      // 对比校验和
+      if Checksum <> FileChecksum then
+      begin
+        // OcComPortObj.Log('Checksum mismatch at line: ' + IntToStr(i));
+        Result := false;
+        break;
+      end;
+    end;
+  finally
+    SL.Free;
+  end;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
+var
+  SL: TStringList;
+  Line, DataType, TempStr: String;
+  DynamicData: array of byte;
+  BaseAddress, FileSent, Checksum: Cardinal;
+  i, DataLen, bCount: Integer;
+  Frame: TOctopusUARTFrame;
+  StatusOK: Boolean;
+
+  function ParseHexLine(Line: String): Boolean;
+  var
+    //DataLen: Integer;
+    DataType, TempStr: String;
+    Address: dword; // 用于存储解析出的地址（16位，2字节）
+    bCount: Integer;
+  begin
+    Result := false;
+
+    // 校验行格式是否正确
+    if (Line[1] <> ':') or (Length(Line) < 11) then
+    begin
+      OcComPortObj.Log('Invalid line format: ' + Line);
+      exit;
+    end;
+
+    // 获取记录类型
+    TempStr := Copy(Line, 8, 2);
+    DataType := TempStr;
+
+    // 处理数据记录
+    if DataType = '00' then
+    begin
+      // 获取数据长度
+      TempStr := Copy(Line, 2, 2);
+      try
+        DataLen := StrToInt('$' + TempStr);
+      except
+        on E: Exception do
+        begin
+          OcComPortObj.Log('Invalid data length in line: ' + Line);
+          exit;
+        end;
+      end;
+      // 获取地址部分（前2个字节是地址）
+      TempStr := Copy(Line, 10, 4); // 地址占用 2 字节（4 个十六进制字符）
+      Address := StrToInt('$' + TempStr); // 解析为地址
+      Address := (BaseAddress) + Address;
+      // 获取数据部分（跳过地址部分后才是数据）
+      TempStr := Copy(Line, 18, DataLen * 2); // 数据段（从第 18 字符开始，长度为 DataLen*2）
+
+      // 设置数据段大小，2 个字节的地址 + 数据部分
+      SetLength(DynamicData, DataLen + 4); // 帧数据字段前4个字节为地址，后面为HEX数据
+
+      // 将地址放到数据段的前 2 字节
+      Move(Address, DynamicData[0], 4);
+
+      // 设置数据部分
+      FormatHexStrToBuffer(TempStr, DynamicData[4], bCount);
+
+      Result := true;
+    end
+    else if DataType = '04' then
+    begin
+      // 扩展地址类型：获取扩展地址的 4 字节
+      TempStr := Copy(Line, 10, 4);
+      SetLength(DynamicData, 4); // 假设扩展地址的高位需要 2 字节
+      FormatHexStrToBuffer(TempStr, DynamicData, bCount);
+
+      BaseAddress := StrToInt('$' + TempStr); // MakeDWord(MakeWord(DynamicData[0], DynamicData[1]), 0);
+      // 返回 False，因为扩展地址不需要发送数据
+      Result := false;
+    end
+    else if DataType = '01' then
+    begin
+      // 结束行：如果是结束行，则不需要处理任何数据
+      Result := false;
     end
     else
     begin
-      // OcComPortObj.Log('Other Data��'+str);
+      // 处理未知类型：记录并跳过该行
+      OcComPortObj.Log('Unknown data type in line: ' + Line);
+      Result := false;
     end;
-  end; // for
-
-FINISHED_OVER:
-  if bStatusOK = false then
-  begin
-    OcComPortObj.Log('Transmit file failed!');
-  end
-  else
-  begin
-    OcComPortObj.Log('Transmit file finished!');
-    StatusBar1DrawProgress(SL.Count, SL.Count);
   end;
-  SL.Free;
+
+begin
+
+  if (not ValidateHexFile(FileName)) then
+  begin
+    ShowMessage('file is not good,maybe has been modified!!!!');
+    exit;
+  end;
+
+  OcComPortObj.Log(FileName + ' checked sucessfully');
+  BaseAddress := $00000000;
+  SL := TStringList.Create;
+  try
+    SL.LoadFromFile(FileName);
+    if not OcComPortObj.Connected then
+    begin
+      OcComPortObj.Log('Device was closed, please open a device.');
+      exit
+    end;
+    // 发送启动更新命令
+    SetLength(DynamicData, 2);
+    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_ENTER_FW_UPDATE, DynamicData, 2);
+    StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA));
+    if not StatusOK then
+    begin
+      OcComPortObj.Log('Device is not ready to receive file!');
+      exit;
+    end;
+    // 遍历 HEX 文件
+    for i := 0 to SL.Count - 1 do
+    begin
+      Application.ProcessMessages;
+      if not OcComPortObj.Connected then
+        exit;
+
+      Line := SL.Strings[i];
+      if not ParseHexLine(Line) then
+        continue;
+
+      if(DataLen > 100) then
+      begin
+        OcComPortObj.Log('parse hex file failed! at '+inttostr(i));
+        exit;
+      end;
+      // 构建并发送数据包
+      Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_SEND_FW_DATA, DynamicData, DataLen);
+      StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA));
+      if not StatusOK then
+      begin
+        OcComPortObj.Log('Transmission failed at line no responese' + IntToStr(i));
+        exit;
+      end;
+
+      Inc(FileSent, DataLen);
+      StatusBar1DrawProgress(i + 1, SL.Count);
+    end;
+    SetLength(DynamicData, 2);
+    DynamicData[0] := 0;
+    DynamicData[1] := 0;
+    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_EXIT_FW_UPDATE, DynamicData, 2);
+    StatusOK := OcComPortObj.SendProtocolPackage(@Frame);
+    OcComPortObj.Log('File transmission completed successfully!');
+  finally
+    SL.Free;
+  end;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.SendFileAsBin(OcComPortObj: TOcComPortObj; FileName: String);
 var
-  // SL: TStringList;
-  // i: Integer;
-  tempstr: String;
-  iLength: Integer;
-  baseAddress: dword;
-  // dataType: String;
-  Data: array [0 .. 511] of byte;
-  // bb4, bb3: byte;
-  pPOcComPack: POcComPack;
-  bCount: Integer;
-  // iDataCount: Integer;
-  // reTryCount: Integer;
-  fileSent: Integer;
-  checksum: dword;
-  bStatusOK: Boolean;
-  MemoryStream: TMemoryStream;
-Label FINISHED_OVER;
-const
-  DEFAULT_LENGTH = 16;
+  FS: TFileStream;
+  buffer, DynamicData: array of byte;
+  FileSize, BytesRead, Offset, Checksum: Cardinal;
+  Frame: TOctopusUARTFrame;
+  StatusOK: Boolean;
+  ChunkSize: Integer;
 begin
-
-  if not OcComPortObj.Connected then
-  begin
-    OcComPortObj.Log('Device was closed,please open a device.');
-    exit;
-  end;
-
-  MemoryStream := TMemoryStream.Create;
-  MemoryStream.LoadFromFile(FileName);
-  if (MemoryStream = nil) or (MemoryStream.Size = 0) then
-  begin
-    OcComPortObj.Log('FileStream = nil/File size = 0!');
-    exit;
-  end;
-
-  ZeroMemory(@Data, 512);
-
-  fileSent := 0;
-  checksum := 0;
-  // dataType := '00';
-
-  Data[0] := $FF;
-  Data[1] := $0A;
-
-  Data[2] := OCCOMPROTOCAL_INBOOT; // ����bootLAOD
-  Data[3] := $00;
-
-  Data[4] := $00;
-
-  Data[5] := $00; // ���ݳ��Ȳ��������ݰ�ͷ�ͺ���Ľ���λ/CRC
-  Data[6] := $00; // ���ݳ��Ȳ��������ݰ�ͷ�ͺ���Ľ���λ/CRC
-  // ʵ��
-  Data[7] := $00; // ����
-  Data[8] := $00; // ����
-  Data[9] := $00; // ����
-  Data[10] := $00; // ����
-  // ����BOOT LOLOAD MODE
-  pPOcComPack := @Data[0]; // ʵ�ʷ��͵�ʱ�򳤶Ȳ�����CRC
-  bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, OCCOMPROTOCAL_INBOOT);
-  if not bStatusOK then
-  begin
-    OcComPortObj.Log('device is not ready to receive file!');
-    exit;
-  end;
-
+  FS := TFileStream.Create(FileName, fmOpenRead);
   try
-    tempstr := Trim(ComboBox302.Text);
-    FormatHexStrToBuffer(tempstr, &Data[7], bCount);
-    baseAddress := MakeDWord(MakeWord(Data[7], Data[8]), MakeWord(Data[9], Data[10]));
-  except
-    OcComPortObj.Log('invalide base addresss =' + tempstr);
-    exit;
-  end;
+    FileSize := FS.Size;
+    Offset := 0;
+    ChunkSize := 512; // 单次发送 512 字节
 
-  StatusBar1DrawProgress(0, 0);
-  OcComPortObj.Log('Base Addresss: ' + tempstr);
-  Data[2] := OCCOMPROTOCAL_FLASH_WRITE; // дFLASH
-
-  // for i := 0 to SL.Count - 1 do
-  while (true) do
-  begin
-    // Application.ProcessMessages;
-    iLength := MemoryStream.Read(&Data[11], DEFAULT_LENGTH);
-    if (iLength <= 0) then
+    if not OcComPortObj.Connected then
     begin
-      Data[2] := OCCOMPROTOCAL_DATA_COMPLETE;
-      Data[5] := 6;
-      IntToBuffer(MemoryStream.Size, &Data[7], 2);
-      IntToBuffer(checksum, &Data[9], 4);
-      pPOcComPack := @Data[0];
-      bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[2]);
-      DelayDelay(30);
-      OcComPortObj.LogBuff('file size:', &Data[7], 2);
-      OcComPortObj.LogBuff('file summ:', &Data[9], 4);
-      break;
+      OcComPortObj.Log('Device was closed, please open a device.');
+      exit;
     end;
 
-    Data[5] := 4 { 32 Flash��ַ } + iLength; // ��Ч���ݳ��Ȳ��������ݰ�ͷ�ͺ���Ľ���λ/CRC
-
-    // if dataType = '00' then
+    // 发送启动更新命令
+    SetLength(DynamicData, 2);
+    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_ENTER_FW_UPDATE, DynamicData, 2);
+    StatusOK := OcComPortObj.SendProtocolPackageWaitACK(@Frame, Ord(CMD_UPDATE_ENTER_FW_UPDATE));
+    if not StatusOK then
     begin
-      IntToBuffer(baseAddress, &Data[7], 4);
-      checksum := checksum + ChecksumBuffer(&Data[11], iLength); // ����sum
-      pPOcComPack := @Data[0]; // ʵ�ʷ��͵�ʱ�򳤶Ȳ�����CRC
+      OcComPortObj.Log('Device is not ready to receive file!');
+      exit;
+    end;
 
-      bStatusOK := OcComPortObj.SendProtocolPackageWaitACK(pPOcComPack, Data[7]);
-      // OcComPortObj.LogBuff('>', Data, Data[5] + 7 + 1); // ����ʵ�峤��+��ͷ+CRC
+    // 循环读取并发送
+    SetLength(buffer, ChunkSize);
+    while Offset < FileSize do
+    begin
+      BytesRead := FS.Read(buffer[0], ChunkSize);
+      SetLength(DynamicData, BytesRead);
+      Move(buffer[0], DynamicData[0], BytesRead);
 
-      fileSent := fileSent + iLength;
-      StatusBar1DrawProgress(fileSent, MemoryStream.Size);
-
-      if (not bStatusOK) then
+      // 构建并发送数据包
+      Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_SEND_FW_DATA, DynamicData, BytesRead);
+      StatusOK := OcComPortObj.SendProtocolPackageWaitACK(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA));
+      if not StatusOK then
+      begin
+        OcComPortObj.Log('Transmission failed at offset ' + IntToStr(Offset));
         break;
-      baseAddress := baseAddress + DEFAULT_LENGTH;
-    end;
-    // else;
-  end; // for
+      end;
 
-FINISHED_OVER:
-  if bStatusOK = false then
-    OcComPortObj.Log('Transmit file failed!')
-  else
-    OcComPortObj.Log('Transmit file finished!');
-  MemoryStream.Free;
+      Inc(Offset, BytesRead);
+      /// Inc(Checksum, ChecksumBuffer(@DynamicData[0], BytesRead));
+      StatusBar1DrawProgress(Offset, FileSize);
+    end;
+
+    OcComPortObj.Log('BIN file transmission completed successfully!');
+  finally
+    FS.Free;
+  end;
 end;
+
+initialization
+
+FCriticalSection := TCriticalSection.Create;
+
+finalization
+
+FCriticalSection.Free;
 
 end.
