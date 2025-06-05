@@ -15,12 +15,26 @@ uses
   StrUtils,
   CRC,
   System.SyncObjs,
-  Generics.Collections;
+  System.Generics.Collections,
+  OctopusFrameQueue;
 
 /// /////////////////////////////////////////////////////////////////////////////
 // type OCCOMPROTOCAL_STATUS=();
 
 type
+
+  TPTLStatus = (
+    MCU_UPDATE_STATE_IDLE,
+    MCU_UPDATE_STATE_CHECK,
+    MCU_UPDATE_STATE_INIT,
+    MCU_UPDATE_STATE_ERASE,
+    MCU_UPDATE_STATE_RECEIVING,
+    MCU_UPDATE_STATE_UPDATING,
+    MCU_UPDATE_STATE_COMPLETE,
+    MCU_UPDATE_STATE_EXIT,
+    MCU_UPDATE_STATE_ERROR
+    );
+
   // 模块类型
   TPTLFrameType = (
     // MCU -> SOC Module IDs
@@ -109,10 +123,11 @@ type
 
   TCallBackFun = Procedure(POctopusUARTFrame: TPOctopusUARTFrame) of object;
 
+
   TOctopusUartProtocol = class
   private
     FCallBackFun: TCallBackFun;
-    FFrameQueue: TQueue<TBytes>; // 队列存储解析出来的帧
+    FFrameQueue: TOctopusFrameQueue; // 队列存储解析出来的帧
     FQueueLock: TCriticalSection; // 线程安全锁
   public
 
@@ -135,6 +150,7 @@ type
     function ParserUartFrame(buff: PByte; Count: Integer): Integer;
     function PopParsedFrame(out Frame: TOctopusUARTFrame): Boolean;
     function PeekParsedFrame(out Frame: TOctopusUARTFrame): Boolean;
+    function PeekLastParsedFrame(out Frame: TOctopusUARTFrame): Boolean;
     function FrameToHexString(PFrame: TPOctopusUARTFrame): string;
     function GetFrameCount: Integer;
 
@@ -164,10 +180,11 @@ const
 
 implementation
 
+
 Constructor TOctopusUartProtocol.Create();
 begin
-  FFrameQueue := TQueue<TBytes>.Create;
-  FQueueLock := TCriticalSection.Create;
+ FFrameQueue := TOctopusFrameQueue.Create;
+ FQueueLock := TCriticalSection.Create;
 end;
 
 Destructor TOctopusUartProtocol.Destroy;
@@ -415,17 +432,19 @@ begin
   try
     if FFrameQueue.Count > 0 then
     begin
-      TempFrame := FFrameQueue.Dequeue; // 获取队列中的字节数组
-      // 2. 将字节数组解析为 TOctopusUARTFrame
-      Frame.Header := TempFrame[0];
-      Frame.FrameType := TPTLFrameType(TempFrame[1]);
-      Frame.Command := TPTLFrameCmd(TempFrame[2]);
-      Frame.DataLength := TempFrame[3];
-      Frame.HeaderChecksum := TempFrame[4];
-      Move(TempFrame[5], Frame.data[0], Frame.DataLength);
-      Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
 
-      Result := True;
+      if(FFrameQueue.Dequeue(TempFrame)) then // 获取队列中的字节数组
+      begin
+          // 2. 将字节数组解析为 TOctopusUARTFrame
+          Frame.Header := TempFrame[0];
+          Frame.FrameType := TPTLFrameType(TempFrame[1]);
+          Frame.Command := TPTLFrameCmd(TempFrame[2]);
+          Frame.DataLength := TempFrame[3];
+          Frame.HeaderChecksum := TempFrame[4];
+          Move(TempFrame[5], Frame.data[0], Frame.DataLength);
+          Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
+          Result := True;
+      end;
     end;
   finally
     FQueueLock.Release;
@@ -443,22 +462,57 @@ begin
     if FFrameQueue.Count > 0 then
     begin
       // Peek 操作：只是读取，不删除
-      TempFrame := FFrameQueue.Peek;
+      if FFrameQueue.Peek(TempFrame) then
+      begin
+        // 2. 将字节数组解析为 TOctopusUARTFrame
+        Frame.Header := TempFrame[0];
+        Frame.FrameType := TPTLFrameType(TempFrame[1]);
+        Frame.Command := TPTLFrameCmd(TempFrame[2]);
+        Frame.DataLength := TempFrame[3];
+        Frame.HeaderChecksum := TempFrame[4];
 
-      // 2. 将字节数组解析为 TOctopusUARTFrame
-      Frame.Header := TempFrame[0];
-      Frame.FrameType := TPTLFrameType(TempFrame[1]);
-      Frame.Command := TPTLFrameCmd(TempFrame[2]);
-      Frame.DataLength := TempFrame[3];
-      Frame.HeaderChecksum := TempFrame[4];
+        // 3. 拷贝 Data 数据
+        if Frame.DataLength > 0 then
+          Move(TempFrame[5], Frame.data[0], Frame.DataLength);
 
-      // 3. 拷贝 Data 数据
-      if Frame.DataLength > 0 then
-        Move(TempFrame[5], Frame.data[0], Frame.DataLength);
+        // 4. 获取 DataChecksum
+        Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
+        Result := True;
+      end;
+    end;
+  finally
+    FQueueLock.Release;
+  end;
+end;
 
-      // 4. 获取 DataChecksum
-      Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
-      Result := True;
+function TOctopusUartProtocol.PeekLastParsedFrame(out Frame: TOctopusUARTFrame): Boolean;
+var
+  TempFrame: TArray<byte>;
+begin
+  Result := false;
+  // 1. 线程安全地访问队列
+  FQueueLock.Acquire;
+  try
+    if FFrameQueue.Count > 0 then
+    begin
+          // Peek 操作：只是读取，不删除
+          if FFrameQueue.PeekLast(TempFrame) then
+          begin
+            // 2. 将字节数组解析为 TOctopusUARTFrame
+            Frame.Header := TempFrame[0];
+            Frame.FrameType := TPTLFrameType(TempFrame[1]);
+            Frame.Command := TPTLFrameCmd(TempFrame[2]);
+            Frame.DataLength := TempFrame[3];
+            Frame.HeaderChecksum := TempFrame[4];
+
+            // 3. 拷贝 Data 数据
+            if Frame.DataLength > 0 then
+            Move(TempFrame[5], Frame.data[0], Frame.DataLength);
+
+            // 4. 获取 DataChecksum
+            Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
+            Result := True;
+          end;
     end;
   finally
     FQueueLock.Release;
@@ -470,24 +524,39 @@ var
   FrameData: TBytes;
   OctopusUARTFrame: TOctopusUARTFrame;
 begin
-  // 1. 分配内存并复制数据到 FrameData
-  SetLength(FrameData, FrameLen);
-  Move(Frame^, FrameData[0], FrameLen);
+  // 1. 检查数据完整性
+  if (Frame = nil) or (FrameLen < GetProtocolHeaderSize()) then
+    Exit;
 
-  // 2. 线程安全地将字节数据添加到队列
+  SetLength(FrameData, FrameLen);
+  CopyMemory(@FrameData[0], Frame, FrameLen);
+
+  if FrameLen < GetProtocolHeaderSize() + FrameData[3] + 1 then
+    Exit;
+
+  // 2. 初始化结构体
+  FillChar(OctopusUARTFrame, SizeOf(OctopusUARTFrame), 0);
+  OctopusUARTFrame.Header := FrameData[0];
+  OctopusUARTFrame.FrameType := TPTLFrameType(FrameData[1]);
+  OctopusUARTFrame.Command := TPTLFrameCmd(FrameData[2]);
+  OctopusUARTFrame.DataLength := FrameData[3];
+  OctopusUARTFrame.HeaderChecksum := FrameData[4];
+
+  if OctopusUARTFrame.DataLength > 0 then
+    CopyMemory(@OctopusUARTFrame.data[0], @FrameData[5], OctopusUARTFrame.DataLength);
+
+  OctopusUARTFrame.DataChecksum := FrameData[5 + OctopusUARTFrame.DataLength];
+
+  if Assigned(FCallBackFun) then
+    FCallBackFun(@OctopusUARTFrame);
+
+  // 3. 线程安全入队
   FQueueLock.Acquire;
   try
-    FFrameQueue.Enqueue(FrameData); // 把字节数组放入队列
+    FFrameQueue.Enqueue(FrameData);
   finally
     FQueueLock.Release;
   end;
-
-  // 3. 从队列中弹出解析的帧并将字节流解析为 TOctopusUARTFrame
-  //if (PeekParsedFrame(OctopusUARTFrame)) then
-  //  FrameToHexString(@OctopusUARTFrame);
-  // 4. 如果有回调函数，触发回调
-  if Assigned(FCallBackFun) then
-    FCallBackFun(@OctopusUARTFrame);
 end;
 
 function TOctopusUartProtocol.FrameToHexString(PFrame: TPOctopusUARTFrame): string;

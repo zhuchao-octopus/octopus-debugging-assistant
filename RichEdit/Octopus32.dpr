@@ -49,7 +49,8 @@ uses
   uPageSetup in 'uPageSetup.pas' {PageSetupFrm},
   NetInterface in '..\..\ZSBWM\PUBLIC\NetInterface.pas',
   uANNDataSetting in '..\..\ZSBWM\SCREEN\uANNDataSetting.pas' {ANNDataSettingFrm},
-  CRC in '..\..\ZSBWM\PUBLIC\CRC.pas';
+  CRC in '..\..\ZSBWM\PUBLIC\CRC.pas',
+  OctopusFrameQueue in '..\OctopusFrameQueue.pas';
 
 {$R *.res}
 

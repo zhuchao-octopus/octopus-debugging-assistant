@@ -360,6 +360,7 @@ type
     procedure COMMenuClick(Sender: TObject);
     procedure Timer2Timer(Sender: TObject);
     procedure StringGrid1SetEditText(Sender: TObject; ACol, ARow: LongInt; const Value: string);
+    procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
 
   private
     OcComPortObj_Loop: TOcComPortObj;
@@ -435,7 +436,7 @@ type
     procedure UpdateCommandObject();
 
     procedure StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
-    procedure StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
+
     procedure StatusBarPrintFileSize();
     procedure ShowStartComments(OcComPortObj: TOcComPortObj);
 
@@ -1026,6 +1027,11 @@ begin
     Self.FontSize.Text := IntToStr(TMyMemo(Component).Font.Size);
     FGColorBox.Selected := TMyMemo(Component).Font.Color;
     BGColorBox.Selected := SettingPagesDlg.ColorBoxContentBG.Selected;
+    TMyMemo(Component).Align := alClient;
+    TMyMemo(Component).Visible := true;
+    TMyMemo(Component).BringToFront;
+    TMyMemo(Component).Update;
+    TMyMemo(Component).SetFocus;
     UpdateStatus(OCTOPUS_DEFAULT_WEBSITE_ADDRESS1, 0);
   end
   else
@@ -2545,7 +2551,6 @@ begin
   SelectionChange(Self);
   UpdateMainMenu();
   AdjustUI();
-
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.UpdateMainMenu();
@@ -3226,24 +3231,12 @@ begin
   end;
 end;
 
-procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
-begin
-  StatusBar1.Panels[1].Style := psOwnerDraw;
-  Self.Fprogress := progress;
-  Self.FprogressMax := progressMax;
-  StatusBar1.Repaint;
-end;
-
-procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1MouseEnter(Sender: TObject);
-begin
-  StatusBar1.Panels[1].Width := 160;
-end;
-
 procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1DrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
 var
   X: Integer;
   str: String;
 begin
+
   try
     if (Panel.Index = 1) and (Fprogress = 0) and (FprogressMax = 0) then
     begin
@@ -3266,8 +3259,10 @@ begin
         Brush.Color := $00641F04;
         Font.Color := clWhite;
         X := Floor((Rect.Right - Rect.Left) * Fprogress / FprogressMax);
-        Rectangle(Rect.Left, Rect.Top, Rect.Left + X, Rect.Bottom - 1);
-        TextOut(Rect.Left + X - TextWidth(str) - 1, Rect.Top, str);
+        Rectangle(Rect.Left, Rect.Top + 1, Rect.Left + X, Rect.Bottom - 1);
+
+        if (Rect.Left + X > TextWidth(str)) then
+          TextOut(Rect.Left + X - TextWidth(str) - 1, Rect.Top + 1, str);
         // TextOut(Rect.TopLeft.X+3,Rect.TopLeft.Y, str);
       end;
     end;
@@ -3275,6 +3270,19 @@ begin
     ShowMessage('unknow error!');
   end;
 
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1DrawProgress(progress: Integer; progressMax: Integer);
+begin
+  StatusBar1.Panels[1].Style := psOwnerDraw;
+  Self.Fprogress := progress;
+  Self.FprogressMax := progressMax;
+  StatusBar1.Repaint;
+end;
+
+procedure TMainOctopusDebuggingDevelopmentForm.StatusBar1MouseEnter(Sender: TObject);
+begin
+  StatusBar1.Panels[1].Width := 160;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.StatusBarPrintFileSize();
@@ -3663,10 +3671,10 @@ var
   i, DataLen, bCount: Integer;
   Frame: TOctopusUARTFrame;
   StatusOK: Boolean;
-
+  SendCount: Integer;
   function ParseHexLine(Line: String): Boolean;
   var
-    //DataLen: Integer;
+    // DataLen: Integer;
     DataType, TempStr: String;
     Address: dword; // 用于存储解析出的地址（16位，2字节）
     bCount: Integer;
@@ -3680,6 +3688,23 @@ var
       exit;
     end;
 
+    // 获取数据长度
+    TempStr := Copy(Line, 2, 2);
+    try
+      DataLen := StrToInt('$' + TempStr);
+    except
+      on E: Exception do
+      begin
+        OcComPortObj.Log('Invalid data length in line: ' + Line);
+        exit;
+      end;
+    end;
+
+    // 获取地址部分（前2个字节是地址）
+    TempStr := Copy(Line, 4, 4); // 地址占用 2 字节（4 个十六进制字符）
+    Address := StrToInt('$' + TempStr); // 解析为地址
+    Address := (BaseAddress) + Address;
+
     // 获取记录类型
     TempStr := Copy(Line, 8, 2);
     DataType := TempStr;
@@ -3687,43 +3712,28 @@ var
     // 处理数据记录
     if DataType = '00' then
     begin
-      // 获取数据长度
-      TempStr := Copy(Line, 2, 2);
-      try
-        DataLen := StrToInt('$' + TempStr);
-      except
-        on E: Exception do
-        begin
-          OcComPortObj.Log('Invalid data length in line: ' + Line);
-          exit;
-        end;
-      end;
-      // 获取地址部分（前2个字节是地址）
-      TempStr := Copy(Line, 10, 4); // 地址占用 2 字节（4 个十六进制字符）
-      Address := StrToInt('$' + TempStr); // 解析为地址
-      Address := (BaseAddress) + Address;
       // 获取数据部分（跳过地址部分后才是数据）
-      TempStr := Copy(Line, 18, DataLen * 2); // 数据段（从第 18 字符开始，长度为 DataLen*2）
+      TempStr := Copy(Line, 10, DataLen * 2); // 数据段（从第 10 字符开始，长度为 DataLen*2）
 
       // 设置数据段大小，2 个字节的地址 + 数据部分
-      SetLength(DynamicData, DataLen + 4); // 帧数据字段前4个字节为地址，后面为HEX数据
+      DataLen := DataLen + 4;
+      SetLength(DynamicData, DataLen); // 帧数据字段前4个字节为地址，后面为HEX数据
 
-      // 将地址放到数据段的前 2 字节
+      // 将地址放到数据段的前 4 字节
       Move(Address, DynamicData[0], 4);
-
       // 设置数据部分
       FormatHexStrToBuffer(TempStr, DynamicData[4], bCount);
-
       Result := true;
     end
     else if DataType = '04' then
     begin
       // 扩展地址类型：获取扩展地址的 4 字节
       TempStr := Copy(Line, 10, 4);
-      SetLength(DynamicData, 4); // 假设扩展地址的高位需要 2 字节
-      FormatHexStrToBuffer(TempStr, DynamicData, bCount);
+      // SetLength(DynamicData, 4); // 假设扩展地址的高位需要 2 字节
+      // FormatHexStrToBuffer(TempStr, DynamicData, bCount);
 
       BaseAddress := StrToInt('$' + TempStr); // MakeDWord(MakeWord(DynamicData[0], DynamicData[1]), 0);
+      BaseAddress := BaseAddress shl 16;
       // 返回 False，因为扩展地址不需要发送数据
       Result := false;
     end
@@ -3758,6 +3768,8 @@ begin
       OcComPortObj.Log('Device was closed, please open a device.');
       exit
     end;
+
+    OcComPortObj.OctopusUartProtocol.ClearFrame();
     // 发送启动更新命令
     SetLength(DynamicData, 2);
     Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_ENTER_FW_UPDATE, DynamicData, 2);
@@ -3767,6 +3779,8 @@ begin
       OcComPortObj.Log('Device is not ready to receive file!');
       exit;
     end;
+
+    SendCount := 0;
     // 遍历 HEX 文件
     for i := 0 to SL.Count - 1 do
     begin
@@ -3778,28 +3792,31 @@ begin
       if not ParseHexLine(Line) then
         continue;
 
-      if(DataLen > 100) then
+      if (DataLen > 100) then
       begin
-        OcComPortObj.Log('parse hex file failed! at '+inttostr(i));
+        OcComPortObj.Log('parse hex file failed! at ' + IntToStr(i));
         exit;
       end;
       // 构建并发送数据包
+      Inc(SendCount);
       Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_SEND_FW_DATA, DynamicData, DataLen);
-      StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA));
+      StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA), Ord(MCU_UPDATE_STATE_RECEIVING), SendCount);
       if not StatusOK then
       begin
-        OcComPortObj.Log('Transmission failed at line no responese' + IntToStr(i));
+        OcComPortObj.Log('Transmission failed at line no responese ' + IntToStr(i) + '/' + IntToStr(SL.Count));
         exit;
       end;
 
       Inc(FileSent, DataLen);
       StatusBar1DrawProgress(i + 1, SL.Count);
     end;
+
     SetLength(DynamicData, 2);
     DynamicData[0] := 0;
     DynamicData[1] := 0;
     Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_EXIT_FW_UPDATE, DynamicData, 2);
     StatusOK := OcComPortObj.SendProtocolPackage(@Frame);
+    StatusBar1DrawProgress(SL.Count, SL.Count);
     OcComPortObj.Log('File transmission completed successfully!');
   finally
     SL.Free;

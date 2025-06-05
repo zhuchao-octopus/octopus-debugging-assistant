@@ -24,6 +24,7 @@ type
     FHexadecimalMode: Boolean;
     FShowLinesNumber: Boolean;
     EventCallBackFuntion: TEventCallBackFuntion;
+    FMAXLINES: Integer;
 
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -152,6 +153,7 @@ constructor TMyMemo.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FLock := TCriticalSection.Create;
+  FMAXLINES := 100000;
 end;
 
 destructor TMyMemo.Destroy;
@@ -172,69 +174,122 @@ end;
 
 procedure TMyMemo.Log(const Msg: String);
 begin
-  FLock.Enter;
-  try
-    try
-      Self.Lines.Append(Msg);
-    Except
-      on E: Exception do
-      begin
-        if Assigned(EventCallBackFuntion) then
-          EventCallBackFuntion(E.Message);
+  TThread.Queue(nil,
+    procedure
+    begin
+      try
+        FLock.Enter;
+        try
+          if Lines.Count > FMAXLINES then
+            Lines.Delete(0);
+          Self.Lines.Append(Msg);
+        finally
+          FLock.Leave;
+        end;
+      except
+        on E: Exception do
+        begin
+          if Assigned(EventCallBackFuntion) then
+            EventCallBackFuntion('Log error: ' + E.Message + ' | Msg: ' + Msg);
+        end;
       end;
-    end;
-  finally
-    FLock.Leave;
-  end;
+    end);
 end;
 
 procedure TMyMemo.LogLine(const Msg: String; Line: Integer);
 begin
-  if (Self.Lines.Count > 0) and (Line >= 0) and (Line < Self.Lines.Count) then
-  begin
-    FLock.Enter;
-    try
-      Lines.Strings[Line] := Msg;
-    finally
-      FLock.Leave;
-    end;
-  end
-  else
-    Log(Msg);
+  TThread.Queue(nil,
+    procedure
+    begin
+      FLock.Enter;
+      try
+        if (Self.Lines.Count > 0) and (Line >= 0) and (Line < Self.Lines.Count) then
+        begin
+          Self.Lines[Line] := Msg;
+        end
+        else
+        begin
+          // 默认行为：新日志追加
+          if Self.Lines.Count > FMAXLINES then
+            Self.Lines.Delete(0); // 滚动控制
+          Self.Lines.Append(Msg);
+        end;
+      finally
+        FLock.Leave;
+      end;
+    end);
 end;
 
-procedure TMyMemo.LogEndLine(const Msg: String); //连接到最后
+procedure TMyMemo.LogEndLine(const Msg: String);
 begin
-  if Lines.Count > 0 then
-  begin
-    FLock.Enter;
-    try
-      Lines.Strings[Lines.Count - 1] := Lines.Strings[Lines.Count - 1] + Msg;
-    finally
-      FLock.Leave;
-    end;
-  end
-  else
-    Log(Msg);
+  TThread.Queue(nil,
+    procedure
+    begin
+      FLock.Enter;
+      try
+        if Lines.Count > 0 then
+        begin
+          Lines[Lines.Count - 1] := Lines[Lines.Count - 1] + Msg;
+        end
+        else
+        begin
+          if Lines.Count > FMAXLINES then
+            Lines.Delete(0); // 可选：限制最大行数
+          Lines.Append(Msg);
+        end;
+      finally
+        FLock.Leave;
+      end;
+    end);
 end;
 
 procedure TMyMemo.LogBuffer(const Buffer: array of Byte; Count: Integer);
 var
   i: Integer;
-  str: String;
+  LineStr: string;
+  OutputLines: TStringList;
 begin
-  str := '';
-  for i := 0 to Count - 1 do
-  begin
-    str := str + Format('%.02x ', [Buffer[i]]);
-    if ((i + 1) mod 16) = 0 then
+  OutputLines := TStringList.Create;
+  try
+    LineStr := '';
+    for i := 0 to Count - 1 do
     begin
-      Log(str);
-      str := '';
+      LineStr := LineStr + Format('%.2x ', [Buffer[i]]);
+
+      if ((i + 1) mod 32) = 0 then
+      begin
+        OutputLines.Add(LineStr);
+        LineStr := '';
+      end;
     end;
+
+    // 如果还有残余字节
+    if LineStr <> '' then
+      OutputLines.Add(LineStr);
+
+    // 使用线程安全方式在主线程中更新 Memo
+    TThread.Queue(nil,
+      procedure
+      var
+        s: string;
+      begin
+        FLock.Enter;
+        try
+          for s in OutputLines do
+          begin
+            // 可选：行数限制
+            if Lines.Count > FMAXLINES then
+              Lines.Delete(0);
+            Lines.Append(s);
+          end;
+        finally
+          FLock.Leave;
+        end;
+      end);
+
+  finally
+    OutputLines.Free;
   end;
-  if str <> '' then
-    Log(str);
 end;
 
 function TMyMemo.GetLastLine(): String;

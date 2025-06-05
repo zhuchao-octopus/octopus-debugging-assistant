@@ -35,6 +35,7 @@ const
 
 const
   SEND_FLAG = '<- ';
+  RECE_FLAG = '   ';
 
 const
   RECEIVE_FORMAT_String: array [TRECEIVE_FORMAT] of string = ('ASCII Format Receiving ', 'Hexadecimal Format Receiving ', 'Graphic Analysis ',
@@ -173,7 +174,7 @@ type
     property ComSentCount: Int64 read FComSentCount;
     property ComHandleThread_AsynCount: Integer read FBackGroundProcessRecordCount write FBackGroundProcessRecordCount
       default OCTOPUS_BACKGROUD_STRING_TRIGGERLINE;
-    property HexModeFormatCount: Integer read FHexModeFormatCount write FHexModeFormatCount default 16;
+    property HexModeFormatCount: Integer read FHexModeFormatCount write FHexModeFormatCount default 32;
     property FileStream: TFileStream read FFileStream write FFileStream default nil;
     property FileStreamName: String read FFileStreamName write FFileStreamName;
     property ProtocalData: Integer read FProtocalData write FProtocalData default -1;
@@ -203,13 +204,15 @@ type
     function FalconComSendData_SentString(str: string): Integer;
 
     function WaitProtocolACK(ACK: Integer; timeOut: Integer): Boolean;
-    function WaitProtocolCommand(ACK_Command: Integer; timeOut: Integer): Boolean;
+    function WaitProtocolCommand(ACK_Command: Integer; timeOut: Integer): Boolean; overload;
+    function WaitProtocolCommand(ACK_Command: Integer;  parameter1,parameter2:integer;timeOut: Integer): Boolean;  overload;
     function SendProtocolData(AFrameType, ACommand: Byte; AData: array of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
     function SendProtocolData(AHeader, AFrameType, ACommand: Byte; AData: array of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
 
     function SendProtocolPackage(PFrame: TPOctopusUARTFrame): Boolean; overload;
     function SendProtocolPackageWaitACK(PFrame: TPOctopusUARTFrame; ACK: Integer): Boolean;
-    function SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand: Integer): Boolean;
+    function SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand: Integer): Boolean; overload;
+    function SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand,ACKParatemer1,ACKParatemer2: Integer): Boolean; overload;
     procedure SendProtocolACK(); // 发送ACK
     procedure RequestProtocolConnection(); // 发送连接请求
 
@@ -530,7 +533,7 @@ begin
 
       s := FOcComPortObj.StringInternelCache.Lines.Strings[FCachedCounterIndex];
 
-      if ((FCachedCounterIndex = 0) or (FOcComPortObj.GetCachedLinesCount() = 1)) then
+      if ((trim(s) = '') or (FCachedCounterIndex = 0) or (FOcComPortObj.GetCachedLinesCount() = 1)) then
       begin
         if ((GetTickCount() - delayTimesTick) < 20) then
           Continue; // 等待一会
@@ -925,9 +928,9 @@ begin
   isBottom := IsLogAtBottom();
   PreLogLinesCount := FLogObject.Lines.Count;
 
+  //EnterCriticalSection(Critical);
   FLogObject.Lines.BeginUpdate;
   FLogObject.log(Msg);
-
   if FShowLineNumber or FShowDate or FShowTime then
   begin
     for i := PreLogLinesCount to FLogObject.Lines.Count - 1 do
@@ -937,8 +940,8 @@ begin
       FLogObject.LogLine(str, i);
     end;
   end;
-
   FLogObject.Lines.EndUpdate;
+  //LeaveCriticalSection(Critical);
 
   if FLogScrollMode and isBottom then
     FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
@@ -1080,16 +1083,20 @@ end;
 
 // for send file 默认 十六进制发送
 function TOcComPortObj.FalconComSendBuffer(const Buffer: array of Byte; Count: Integer): Bool;
+var wb:integer;
 begin
   Result := True;
   if self.Connected then
   begin
     try
       // LogBuff(SEND_FLAG, Buffer, Count);
-      Critical.Enter;
-      Write(Buffer, Count);
+      //Critical.Enter;
+      wb:=Write(Buffer, Count);
       FComSentCount := FComSentCount + Count;
-      Critical.Leave;
+
+      if wb <> Count then
+        log('Sorry Write to device fail '+inttostr(wb)+'/'+inttostr(count));
+      // Critical.Leave;
     except
       log('Sorry Write to device fail!!');
       Exit;
@@ -1571,9 +1578,9 @@ begin
     if FComUIHandleThread.FCachedCounterIndex >= GetCachedLinesCount() then
     begin // 当前缓冲区数据已经处理完毕，清空缓冲区
       EnterCriticalSection(Critical);
-      FComHandleThread_Wait := True;
+      //FComHandleThread_Wait := True;
       self.ClearInternalBuff();
-      FComHandleThread_Wait := false;
+      //FComHandleThread_Wait := false;
       LeaveCriticalSection(Critical);
     end;
 
@@ -1776,6 +1783,8 @@ begin
 
   // 发送到串口
   Result := FalconComSendBuffer(SerializedFrame[0], TotalLength);
+  //if(not Result) then
+  //  log('SendProtocolPackage transmit failed!');
 end;
 
 function TOcComPortObj.SendProtocolPackageWaitACK(PFrame: TPOctopusUARTFrame; ACK: Integer): Boolean;
@@ -1810,7 +1819,9 @@ var
 begin
   Result := True;
   reTryCount := 0;
-  SendProtocolPackage(PFrame);
+  if not SendProtocolPackage(PFrame) then
+    log('SendProtocolPackage transmit failed!');
+
   while (not WaitProtocolCommand(ACKCommand, 2000)) do
   begin
     INC(reTryCount);
@@ -1825,7 +1836,34 @@ begin
     begin
       break;
     end;
-    SendProtocolPackage(PFrame);
+    //SendProtocolPackage(PFrame);
+    Application.HandleMessage;
+  end;
+end;
+
+function TOcComPortObj.SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand,ACKParatemer1,ACKParatemer2: Integer): Boolean;
+var
+  reTryCount: Integer;
+begin
+  Result := True;
+  reTryCount := 0;
+  if not SendProtocolPackage(PFrame) then
+    log('SendProtocolPackage transmit failed!');
+  while (not WaitProtocolCommand(ACKCommand,ACKParatemer1,ACKParatemer2, 2000)) do
+  begin
+    INC(reTryCount);
+    if reTryCount > 10 then // >=11
+    begin
+      log('No ack from device transmit failed!');
+      Result := false;
+      Exit;
+    end;
+    log('Time Out Try ... ' + IntToStr(reTryCount));
+    if (not Connected) then
+    begin
+      break;
+    end;
+    //SendProtocolPackage(PFrame);
     Application.HandleMessage;
   end;
 end;
@@ -1870,7 +1908,7 @@ begin
   while (True) do
   begin
     Application.ProcessMessages;
-    peeked := FOctopusUartProtocol.PeekParsedFrame(Oc);
+    peeked := FOctopusUartProtocol.PeekLastParsedFrame(Oc);
 
     if peeked then
     begin
@@ -1888,6 +1926,7 @@ begin
   end; // while (True) do
 
 end;
+
 function TOcComPortObj.WaitProtocolCommand(ACK_Command: Integer; timeOut: Integer): Boolean;
 var
   Oc: TOctopusUARTFrame;
@@ -1900,7 +1939,7 @@ begin
   while (True) do
   begin
     Application.ProcessMessages;
-    peeked := FOctopusUartProtocol.PopParsedFrame(Oc);
+    peeked := FOctopusUartProtocol.PeekLastParsedFrame(Oc);
 
     if peeked then
     begin
@@ -1918,10 +1957,49 @@ begin
   end; // while (True) do
 
 end;
+
+function TOcComPortObj.WaitProtocolCommand(ACK_Command: Integer; parameter1,parameter2:integer;timeOut: Integer): Boolean;
+var
+  Oc: TOctopusUARTFrame;
+  Start: real;
+  peeked: Boolean;
+  index:integer;
+begin
+  Result := false;
+  Start := GetTickCount;
+
+  while (True) do
+  begin
+    Application.ProcessMessages;
+    peeked := FOctopusUartProtocol.PeekLastParsedFrame(Oc);
+    index  := (Oc.data[1] shl 8) +  Oc.data[2];
+    if peeked then
+    begin
+      //log(FOctopusUartProtocol.FrameToHexString(@Oc));
+      if ((ord(Oc.Command) and $7F) = (ACK_Command and $7F)) and (Oc.data[0] = parameter1) and (parameter2 = index) then // 0x59 89 Y
+      begin
+        Result := True;
+        break;
+      end;
+    end
+    else
+    begin
+       log('PeekLastParsedFrame failed!');
+    end;
+
+    if (GetTickCount - Start) > timeOut then
+    begin
+      log('time out '+ IntToStr(Oc.data[0])+':'+inttostr(index));
+      break; // 超时推出
+    end;
+  end; // while (True) do
+
+end;
+
 // 包解析完成后回调
 procedure TOcComPortObj.OcComPortObjRxProtocol(PFrame: TPOctopusUARTFrame);
 begin
-  self.log(FOctopusUartProtocol.FrameToHexString(PFrame));
+  self.log(RECE_FLAG+FOctopusUartProtocol.FrameToHexString(PFrame));
   if Assigned(FCallBackFun) then
     FCallBackFun();
 end;

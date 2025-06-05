@@ -1868,6 +1868,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       Top = 0
       Width = 1199
       Height = 28
+      Margins.Top = 5
       Align = alClient
       Panels = <
         item
@@ -1884,6 +1885,7 @@ object MainOctopusDebuggingDevelopmentForm: TMainOctopusDebuggingDevelopmentForm
       ParentFont = True
       UseSystemFont = False
       OnMouseEnter = StatusBar1MouseEnter
+      OnDrawPanel = StatusBar1DrawPanel
     end
   end
   object MainMenu: TMainMenu
