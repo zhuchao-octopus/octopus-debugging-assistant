@@ -23,17 +23,8 @@ uses
 
 type
 
-  TPTLStatus = (
-    MCU_UPDATE_STATE_IDLE,
-    MCU_UPDATE_STATE_CHECK,
-    MCU_UPDATE_STATE_INIT,
-    MCU_UPDATE_STATE_ERASE,
-    MCU_UPDATE_STATE_RECEIVING,
-    MCU_UPDATE_STATE_UPDATING,
-    MCU_UPDATE_STATE_COMPLETE,
-    MCU_UPDATE_STATE_EXIT,
-    MCU_UPDATE_STATE_ERROR
-    );
+  TPTLStatus = (MCU_UPDATE_STATE_IDLE, MCU_UPDATE_STATE_CHECK, MCU_UPDATE_STATE_INIT, MCU_UPDATE_STATE_ERASE, MCU_UPDATE_STATE_RECEIVING,
+    MCU_UPDATE_STATE_UPDATING, MCU_UPDATE_STATE_COMPLETE, MCU_UPDATE_STATE_EXIT, MCU_UPDATE_STATE_ERROR);
 
   // 模块类型
   TPTLFrameType = (
@@ -123,7 +114,6 @@ type
 
   TCallBackFun = Procedure(POctopusUARTFrame: TPOctopusUARTFrame) of object;
 
-
   TOctopusUartProtocol = class
   private
     FCallBackFun: TCallBackFun;
@@ -180,11 +170,10 @@ const
 
 implementation
 
-
 Constructor TOctopusUartProtocol.Create();
 begin
- FFrameQueue := TOctopusFrameQueue.Create;
- FQueueLock := TCriticalSection.Create;
+  FFrameQueue := TOctopusFrameQueue.Create;
+  FQueueLock := TCriticalSection.Create;
 end;
 
 Destructor TOctopusUartProtocol.Destroy;
@@ -433,17 +422,17 @@ begin
     if FFrameQueue.Count > 0 then
     begin
 
-      if(FFrameQueue.Dequeue(TempFrame)) then // 获取队列中的字节数组
+      if (FFrameQueue.Dequeue(TempFrame)) then // 获取队列中的字节数组
       begin
-          // 2. 将字节数组解析为 TOctopusUARTFrame
-          Frame.Header := TempFrame[0];
-          Frame.FrameType := TPTLFrameType(TempFrame[1]);
-          Frame.Command := TPTLFrameCmd(TempFrame[2]);
-          Frame.DataLength := TempFrame[3];
-          Frame.HeaderChecksum := TempFrame[4];
-          Move(TempFrame[5], Frame.data[0], Frame.DataLength);
-          Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
-          Result := True;
+        // 2. 将字节数组解析为 TOctopusUARTFrame
+        Frame.Header := TempFrame[0];
+        Frame.FrameType := TPTLFrameType(TempFrame[1]);
+        Frame.Command := TPTLFrameCmd(TempFrame[2]);
+        Frame.DataLength := TempFrame[3];
+        Frame.HeaderChecksum := TempFrame[4];
+        Move(TempFrame[5], Frame.data[0], Frame.DataLength);
+        Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
+        Result := True;
       end;
     end;
   finally
@@ -495,24 +484,24 @@ begin
   try
     if FFrameQueue.Count > 0 then
     begin
-          // Peek 操作：只是读取，不删除
-          if FFrameQueue.PeekLast(TempFrame) then
-          begin
-            // 2. 将字节数组解析为 TOctopusUARTFrame
-            Frame.Header := TempFrame[0];
-            Frame.FrameType := TPTLFrameType(TempFrame[1]);
-            Frame.Command := TPTLFrameCmd(TempFrame[2]);
-            Frame.DataLength := TempFrame[3];
-            Frame.HeaderChecksum := TempFrame[4];
+      // Peek 操作：只是读取，不删除
+      if FFrameQueue.PeekLast(TempFrame) then
+      begin
+        // 2. 将字节数组解析为 TOctopusUARTFrame
+        Frame.Header := TempFrame[0];
+        Frame.FrameType := TPTLFrameType(TempFrame[1]);
+        Frame.Command := TPTLFrameCmd(TempFrame[2]);
+        Frame.DataLength := TempFrame[3];
+        Frame.HeaderChecksum := TempFrame[4];
 
-            // 3. 拷贝 Data 数据
-            if Frame.DataLength > 0 then
-            Move(TempFrame[5], Frame.data[0], Frame.DataLength);
+        // 3. 拷贝 Data 数据
+        if Frame.DataLength > 0 then
+          Move(TempFrame[5], Frame.data[0], Frame.DataLength);
 
-            // 4. 获取 DataChecksum
-            Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
-            Result := True;
-          end;
+        // 4. 获取 DataChecksum
+        Frame.DataChecksum := TempFrame[5 + Frame.DataLength];
+        Result := True;
+      end;
     end;
   finally
     FQueueLock.Release;

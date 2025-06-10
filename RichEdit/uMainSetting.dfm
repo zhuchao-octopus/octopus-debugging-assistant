@@ -582,9 +582,9 @@ object SettingPagesDlg: TSettingPagesDlg
               Width = 295
               Height = 25
               Style = csDropDownList
-              ItemIndex = 0
+              ItemIndex = 1
               TabOrder = 1
-              Text = 'Hexadecimal 16Bytes Align'
+              Text = 'Hexadecimal 32Bytes Align'
               Items.Strings = (
                 'Hexadecimal 16Bytes Align'
                 'Hexadecimal 32Bytes Align'

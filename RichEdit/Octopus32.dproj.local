@@ -79,8 +79,8 @@
     <Transaction>2024/01/23 21:41:27.000.055,D:\DephiProjects\ZSBWM\PUBLIC\CRC.pas=</Transaction>
     <Transaction>2024/01/23 21:42:18.000.954,=D:\DephiProjects\ZSBWM\PUBLIC\CRC.pas</Transaction>
     <Transaction>2024/03/13 19:51:37.000.189,D:\DephiProjects\OCTOPUS\RichEdit\Octopus64.dproj=D:\DephiProjects\OCTOPUS\RichEdit\Octopus32.dproj</Transaction>
-    <Transaction>2025/06/05 11:55:32.702,=D:\DephiProjects\OCTOPUS\RichEdit\Unit1.pas</Transaction>
-    <Transaction>2025/06/05 11:56:22.147,D:\DephiProjects\OCTOPUS\OctopusFrameQueue.pas=D:\DephiProjects\OCTOPUS\RichEdit\Unit1.pas</Transaction>
+    <Transaction>2025/06/05 11:55:32.000.702,=D:\DephiProjects\OCTOPUS\RichEdit\Unit1.pas</Transaction>
+    <Transaction>2025/06/05 11:56:22.000.147,D:\DephiProjects\OCTOPUS\OctopusFrameQueue.pas=D:\DephiProjects\OCTOPUS\RichEdit\Unit1.pas</Transaction>
   </Transactions>
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="..\..\OCTOPUS"/>

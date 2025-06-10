@@ -205,14 +205,14 @@ type
 
     function WaitProtocolACK(ACK: Integer; timeOut: Integer): Boolean;
     function WaitProtocolCommand(ACK_Command: Integer; timeOut: Integer): Boolean; overload;
-    function WaitProtocolCommand(ACK_Command: Integer;  parameter1,parameter2:integer;timeOut: Integer): Boolean;  overload;
+    function WaitProtocolCommand(ACK_Command: Integer; parameter1, parameter2: Integer; timeOut: Integer): Boolean; overload;
     function SendProtocolData(AFrameType, ACommand: Byte; AData: array of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
     function SendProtocolData(AHeader, AFrameType, ACommand: Byte; AData: array of Byte; Count: Integer; NeedACK: Boolean): Boolean; overload;
 
     function SendProtocolPackage(PFrame: TPOctopusUARTFrame): Boolean; overload;
     function SendProtocolPackageWaitACK(PFrame: TPOctopusUARTFrame; ACK: Integer): Boolean;
     function SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand: Integer): Boolean; overload;
-    function SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand,ACKParatemer1,ACKParatemer2: Integer): Boolean; overload;
+    function SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand, ACKParatemer1, ACKParatemer2: Integer): Boolean; overload;
     procedure SendProtocolACK(); // 发送ACK
     procedure RequestProtocolConnection(); // 发送连接请求
 
@@ -486,7 +486,8 @@ var
   j: Int64;
   s, f: String;
   delayTimesTick: Int64;
-  appended:boolean;
+  appended: Boolean;
+  tick_diff: Int64;
 begin
   j := 0;
   s := '';
@@ -494,20 +495,19 @@ begin
   if (FOcComPortObj = nil) or (self = nil) then
     Exit;
 
-  delayTimesTick := GetTickCount();
+  delayTimesTick := 0;
   while not Terminated do
   begin
-      if (FOcComPortObj = nil) or (self = nil) then
+    if (FOcComPortObj = nil) or (self = nil) then
       break;
 
-      if FOcComPortObj.FComHandleThread_Wait then
+    if FOcComPortObj.FComHandleThread_Wait then
       Continue;
 
-      if (not FOcComPortObj.Connected) then
+    if (not FOcComPortObj.Connected) then
       break;
 
-
-      /// FEvent.WaitFor(INFINITE); // // 阻塞线程，直到被唤醒
+    /// FEvent.WaitFor(INFINITE); // // 阻塞线程，直到被唤醒
 
     if Terminated then
       break;
@@ -522,8 +522,8 @@ begin
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////ASCIIFormat
     if self.FOcComPortObj.FReceiveFormat = Ord(ASCIIFormat) then
     begin
-      if ((GetTickCount() - delayTimesTick) < 5) then
-        Continue;
+      // if ((GetTickCount() - delayTimesTick) < 5) then
+      // Continue;
 
       if FOcComPortObj.StringInternelCache.Lines.Updating then
         Continue;
@@ -533,19 +533,27 @@ begin
 
       s := FOcComPortObj.StringInternelCache.Lines.Strings[FCachedCounterIndex];
 
-      if ((trim(s) = '') or (FCachedCounterIndex = 0) or (FOcComPortObj.GetCachedLinesCount() = 1)) then
+      if ((Trim(s) = '') or (FCachedCounterIndex = 0) or (FOcComPortObj.GetCachedLinesCount() <= 2) or (Length(Trim(s)) < 20)) then
       begin
-        if ((GetTickCount() - delayTimesTick) < 20) then
-          Continue; // 等待一会
+        if delayTimesTick = 0 then
+        begin
+          delayTimesTick := GetTickCount();
+          Continue; // 等
+        end
+        else
+        begin
+          tick_diff := (GetTickCount() - delayTimesTick);
+          if (tick_diff < 100) then
+            Continue; // 等待一会
+        end
       end;
 
-      delayTimesTick := GetTickCount();
-
+      delayTimesTick := 0;
       // 处理完一行
       FOcComPortObj.FComProcessedCount := FOcComPortObj.FComProcessedCount + Length(s);
       s := FOcComPortObj.GetLineNumberDateTimeStamp(FOcComPortObj.FLogObject.Lines.Count) + s;
 
-      FOcComPortObj.LogBottomMod(s, true, FOcComPortObj.IsLogAtBottom());
+      FOcComPortObj.LogBottomMod(s, True, FOcComPortObj.IsLogAtBottom());
       INC(FCachedCounterIndex); // 下一行
 
       if Assigned(FOcComPortObj.FCallBackFun) then
@@ -575,7 +583,7 @@ begin
               s := s + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[FCachedCounterIndex - FOcComPortObj.FHexModeFormatCount + 1],
                 FOcComPortObj.FHexModeFormatCount);
             end;
-            FOcComPortObj.log('   '+s);
+            FOcComPortObj.log('   ' + s);
             s := ''; // 这时J 的值无意义
           end;
         end; //
@@ -616,7 +624,7 @@ begin
             s := s + '   ' + ByteToWideString2(@FOcComPortObj.FComReceiveInternalBuffer[j], Length(FOcComPortObj.FComReceiveInternalBuffer) - j)
             end; }
 
-          FOcComPortObj.log('   '+s); // 打印出所有数据,输出最终数据
+          FOcComPortObj.log('   ' + s); // 打印出所有数据,输出最终数据
           s := '';
         end;
 
@@ -690,7 +698,6 @@ begin
   self.Buffer.InputSize := INPUT_OUTPUT_BUFFER_SIZE;
   self.Buffer.OutputSize := INPUT_OUTPUT_BUFFER_SIZE;
 
-  FComUIHandleThread := TComUIHandleThread.Create(self);
   FOctopusUartProtocol := TOctopusUartProtocol.Create;
   FComPackParserThread := TComPackParserHandleThread.Create(self, FOctopusUartProtocol);
   FComReceiveCount := 0;
@@ -725,10 +732,12 @@ destructor TOcComPortObj.Destroy;
 begin
   FStringInternalMemo.Free;
   // FLogMemo.Free;
-
-  FComUIHandleThread.Suspended := True;
-  FComUIHandleThread.Terminate;
-  FComUIHandleThread.Free;
+  if FComUIHandleThread <> nil then
+  begin
+    FComUIHandleThread.Suspended := True;
+    FComUIHandleThread.Terminate;
+    FComUIHandleThread.Free;
+  end;
 
   FComPackParserThread.Suspended := True;
   FComPackParserThread.Terminate;
@@ -800,6 +809,7 @@ var
   threadsuspended: Boolean;
   // oldi:integer;
 begin
+  FComUIHandleThread := TComUIHandleThread.Create(self);
   // if(self.OnRxChar = nil) then
   self.OnRxChar := OcComPortObjRxChar;
   // if(self.FOcComProtocal.CallBackFun = nil) then
@@ -928,7 +938,7 @@ begin
   isBottom := IsLogAtBottom();
   PreLogLinesCount := FLogObject.Lines.Count;
 
-  //EnterCriticalSection(Critical);
+  // EnterCriticalSection(Critical);
   FLogObject.Lines.BeginUpdate;
   FLogObject.log(Msg);
   if FShowLineNumber or FShowDate or FShowTime then
@@ -941,7 +951,7 @@ begin
     end;
   end;
   FLogObject.Lines.EndUpdate;
-  //LeaveCriticalSection(Critical);
+  // LeaveCriticalSection(Critical);
 
   if FLogScrollMode and isBottom then
     FLogObject.Perform(WM_VSCROLL, SB_BOTTOM, 0);
@@ -1083,19 +1093,20 @@ end;
 
 // for send file 默认 十六进制发送
 function TOcComPortObj.FalconComSendBuffer(const Buffer: array of Byte; Count: Integer): Bool;
-var wb:integer;
+var
+  wb: Integer;
 begin
   Result := True;
   if self.Connected then
   begin
     try
       // LogBuff(SEND_FLAG, Buffer, Count);
-      //Critical.Enter;
-      wb:=Write(Buffer, Count);
+      // Critical.Enter;
+      wb := Write(Buffer, Count);
       FComSentCount := FComSentCount + Count;
 
       if wb <> Count then
-        log('Sorry Write to device fail '+inttostr(wb)+'/'+inttostr(count));
+        log('Sorry Write to device fail ' + IntToStr(wb) + '/' + IntToStr(Count));
       // Critical.Leave;
     except
       log('Sorry Write to device fail!!');
@@ -1533,7 +1544,7 @@ end;
 
 function TOcComPortObj.GetCachedLinesCount(): Integer;
 begin
-  //EnterCriticalSection(Critical);
+  // EnterCriticalSection(Critical);
   Result := StringInternelCache.Lines.Count;
   // LeaveCriticalSection(Critical);
 end;
@@ -1548,7 +1559,7 @@ var
 Label FUNCTION_END;
   function isBackHandlerMode(): Boolean;
   begin
-    Result := (FMouseTextSelection) or (FShowLineNumber or FShowDate or FShowTime) or FBackgroundTaskMode;
+    Result := ((FMouseTextSelection) or (FShowLineNumber or FShowDate or FShowTime) or (FBackgroundTaskMode));
   end;
 
 // FMouseTextSelection 后台缓存前台复制考本等
@@ -1574,13 +1585,12 @@ begin
     Except
     end;
 
-
     if FComUIHandleThread.FCachedCounterIndex >= GetCachedLinesCount() then
     begin // 当前缓冲区数据已经处理完毕，清空缓冲区
       EnterCriticalSection(Critical);
-      //FComHandleThread_Wait := True;
+      // FComHandleThread_Wait := True;
       self.ClearInternalBuff();
-      //FComHandleThread_Wait := false;
+      // FComHandleThread_Wait := false;
       LeaveCriticalSection(Critical);
     end;
 
@@ -1600,7 +1610,7 @@ begin
     end
     else
     begin
-      FComUIHandleThread.Suspended := True; // 挂起后台线程任务
+       FComUIHandleThread.Suspended := True; // 挂起后台线程任务
     end;
 
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1762,7 +1772,7 @@ var
   SerializedFrame: TBytes;
   TotalLength: Integer;
 begin
-  Result := False;
+  Result := false;
 
   // 检查 Frame 是否有效
   if PFrame = nil then
@@ -1775,7 +1785,7 @@ begin
   SetLength(SerializedFrame, TotalLength);
 
   // 序列化数据到缓冲区
-  SerializedFrame:=FOctopusUartProtocol.SerializeUARTFrame(PFrame^);
+  SerializedFrame := FOctopusUartProtocol.SerializeUARTFrame(PFrame^);
 
   // 打印日志
   if FShowSendingLog then
@@ -1783,8 +1793,8 @@ begin
 
   // 发送到串口
   Result := FalconComSendBuffer(SerializedFrame[0], TotalLength);
-  //if(not Result) then
-  //  log('SendProtocolPackage transmit failed!');
+  // if(not Result) then
+  // log('SendProtocolPackage transmit failed!');
 end;
 
 function TOcComPortObj.SendProtocolPackageWaitACK(PFrame: TPOctopusUARTFrame; ACK: Integer): Boolean;
@@ -1836,12 +1846,12 @@ begin
     begin
       break;
     end;
-    //SendProtocolPackage(PFrame);
+    // SendProtocolPackage(PFrame);
     Application.HandleMessage;
   end;
 end;
 
-function TOcComPortObj.SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand,ACKParatemer1,ACKParatemer2: Integer): Boolean;
+function TOcComPortObj.SendProtocolPackageWaitACKCommand(PFrame: TPOctopusUARTFrame; ACKCommand, ACKParatemer1, ACKParatemer2: Integer): Boolean;
 var
   reTryCount: Integer;
 begin
@@ -1849,7 +1859,7 @@ begin
   reTryCount := 0;
   if not SendProtocolPackage(PFrame) then
     log('SendProtocolPackage transmit failed!');
-  while (not WaitProtocolCommand(ACKCommand,ACKParatemer1,ACKParatemer2, 2000)) do
+  while (not WaitProtocolCommand(ACKCommand, ACKParatemer1, ACKParatemer2, 2000)) do
   begin
     INC(reTryCount);
     if reTryCount > 10 then // >=11
@@ -1863,7 +1873,7 @@ begin
     begin
       break;
     end;
-    //SendProtocolPackage(PFrame);
+    // SendProtocolPackage(PFrame);
     Application.HandleMessage;
   end;
 end;
@@ -1881,7 +1891,7 @@ begin
   Result := false;
 
   // 1. 构建完整的帧
-  Frame := FOctopusUartProtocol.BuildUARTFrame(AHeader, TPTLFrameType(AFrameType), TPTLFrameCmd(ACommand), AData,2);
+  Frame := FOctopusUartProtocol.BuildUARTFrame(AHeader, TPTLFrameType(AFrameType), TPTLFrameCmd(ACommand), AData, 2);
 
   // 2. 序列化帧数据
   FrameBytes := FOctopusUartProtocol.SerializeUARTFrame(Frame);
@@ -1943,7 +1953,7 @@ begin
 
     if peeked then
     begin
-      if (ord(Oc.Command) and $7F) = (ACK_Command and $7F) then // 0x59 89 Y
+      if (Ord(Oc.Command) and $7F) = (ACK_Command and $7F) then // 0x59 89 Y
       begin
         Result := True;
         break;
@@ -1958,12 +1968,12 @@ begin
 
 end;
 
-function TOcComPortObj.WaitProtocolCommand(ACK_Command: Integer; parameter1,parameter2:integer;timeOut: Integer): Boolean;
+function TOcComPortObj.WaitProtocolCommand(ACK_Command: Integer; parameter1, parameter2: Integer; timeOut: Integer): Boolean;
 var
   Oc: TOctopusUARTFrame;
   Start: real;
   peeked: Boolean;
-  index:integer;
+  index: Integer;
 begin
   Result := false;
   Start := GetTickCount;
@@ -1972,11 +1982,11 @@ begin
   begin
     Application.ProcessMessages;
     peeked := FOctopusUartProtocol.PeekLastParsedFrame(Oc);
-    index  := (Oc.data[1] shl 8) +  Oc.data[2];
+    index := (Oc.data[1] shl 8) + Oc.data[2];
     if peeked then
     begin
-      //log(FOctopusUartProtocol.FrameToHexString(@Oc));
-      if ((ord(Oc.Command) and $7F) = (ACK_Command and $7F)) and (Oc.data[0] = parameter1) and (parameter2 = index) then // 0x59 89 Y
+      // log(FOctopusUartProtocol.FrameToHexString(@Oc));
+      if ((Ord(Oc.Command) and $7F) = (ACK_Command and $7F)) and (Oc.data[0] = parameter1) and (parameter2 = index) then // 0x59 89 Y
       begin
         Result := True;
         break;
@@ -1984,12 +1994,12 @@ begin
     end
     else
     begin
-       log('PeekLastParsedFrame failed!');
+      log('PeekLastParsedFrame failed!');
     end;
 
     if (GetTickCount - Start) > timeOut then
     begin
-      log('time out '+ IntToStr(Oc.data[0])+':'+inttostr(index));
+      log('time out ' + IntToStr(Oc.data[0]) + ':' + IntToStr(parameter2));
       break; // 超时推出
     end;
   end; // while (True) do
@@ -1999,7 +2009,7 @@ end;
 // 包解析完成后回调
 procedure TOcComPortObj.OcComPortObjRxProtocol(PFrame: TPOctopusUARTFrame);
 begin
-  self.log(RECE_FLAG+FOctopusUartProtocol.FrameToHexString(PFrame));
+  self.log(RECE_FLAG + FOctopusUartProtocol.FrameToHexString(PFrame));
   if Assigned(FCallBackFun) then
     FCallBackFun();
 end;
@@ -2375,21 +2385,33 @@ end;
 procedure TOcComPortObj.CloseDevice();
 begin
   try
-    FComUIHandleThread.Suspended := True;
-    close();
+  close();
   except
     log('Can not close  ' + FComPortFullName);
   end;
   status := 0;
+
+  try
+  begin
+    if FComUIHandleThread <> nil then
+    begin
+      FComUIHandleThread.Suspended := True;
+      FComUIHandleThread.Terminate;
+      FComUIHandleThread.Free;
+      end;
+   end;
+  except
+    log('Can not close  ' + FComPortFullName);
+  end;
+
 end;
 
 procedure TOcComPortObj.Free();
 begin
-  FComUIHandleThread.Suspended := True;
+  // FComUIHandleThread.Suspended := True;
   CloseDevice();
   ClearLog;
   ClearInternalBuff();
-
   // LogMemo.Visible := false;
   // LogMemo.Parent := nil;
 end;

@@ -3665,13 +3665,16 @@ end;
 procedure TMainOctopusDebuggingDevelopmentForm.SendFileAsHex(OcComPortObj: TOcComPortObj; FileName: String);
 var
   SL: TStringList;
-  Line, DataType, TempStr: String;
+  LineStr, DataType, TempStr: String;
   DynamicData: array of byte;
-  BaseAddress, FileSent, Checksum: Cardinal;
+  BaseAddress, Checksum: Cardinal;
   i, DataLen, bCount: Integer;
   Frame: TOctopusUARTFrame;
   StatusOK: Boolean;
   SendCount: Integer;
+  TotalLength: Integer;
+  TotalCRC, LineCRC: Integer;
+  ParseResult:boolean;
   function ParseHexLine(Line: String): Boolean;
   var
     // DataLen: Integer;
@@ -3780,7 +3783,9 @@ begin
       exit;
     end;
 
+    TotalLength := 0;
     SendCount := 0;
+    TotalCRC := $FFFFFFFF; // 初始化为全 1，表示开始时 CRC 值
     // 遍历 HEX 文件
     for i := 0 to SL.Count - 1 do
     begin
@@ -3788,36 +3793,40 @@ begin
       if not OcComPortObj.Connected then
         exit;
 
-      Line := SL.Strings[i];
-      if not ParseHexLine(Line) then
-        continue;
-
+      LineStr := SL.Strings[i];
+      ParseResult:=ParseHexLine(LineStr);
       if (DataLen > 100) then
       begin
         OcComPortObj.Log('parse hex file failed! at ' + IntToStr(i));
         exit;
       end;
-      // 构建并发送数据包
-      Inc(SendCount);
-      Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_SEND_FW_DATA, DynamicData, DataLen);
-      StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA), Ord(MCU_UPDATE_STATE_RECEIVING), SendCount);
-      if not StatusOK then
+
+      if ParseResult then
       begin
-        OcComPortObj.Log('Transmission failed at line no responese ' + IntToStr(i) + '/' + IntToStr(SL.Count));
-        exit;
+          // 构建并发送数据包
+          Inc(SendCount);
+          TotalLength:=TotalLength+ DataLen-4;
+          Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_SEND_FW_DATA, DynamicData, DataLen);
+          StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA), Ord(MCU_UPDATE_STATE_RECEIVING), SendCount);
+          if not StatusOK then
+          begin
+            OcComPortObj.Log('Transmission failed at line no responese ' + IntToStr(SendCount)+'/'+IntToStr(i+1) + '/' + IntToStr(SL.Count));
+            exit;
+          end;
+          TotalCRC:=UpdateCRC32(DynamicData, 4, DataLen - 4,TotalCRC);
       end;
 
-      Inc(FileSent, DataLen);
       StatusBar1DrawProgress(i + 1, SL.Count);
-    end;
+    end;//for i := 0 to SL.Count - 1 do
 
-    SetLength(DynamicData, 2);
-    DynamicData[0] := 0;
-    DynamicData[1] := 0;
-    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_EXIT_FW_UPDATE, DynamicData, 2);
+    TotalCRC := TotalCRC xor $FFFFFFFF; // 确保最后的 CRC 是 32 位
+    SetLength(DynamicData, 8);
+    Move(TotalCRC, DynamicData[0], 4);
+    Move(TotalLength, DynamicData[4], 4);
+    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_EXIT_FW_UPDATE, DynamicData, 8);
     StatusOK := OcComPortObj.SendProtocolPackage(@Frame);
     StatusBar1DrawProgress(SL.Count, SL.Count);
-    OcComPortObj.Log('File transmission completed successfully!');
+    OcComPortObj.Log('File transmission completed successfully! CRC:'+IntToHex(TotalCRC, 4)+' TotalLength:'+IntToStr(TotalLength));
   finally
     SL.Free;
   end;

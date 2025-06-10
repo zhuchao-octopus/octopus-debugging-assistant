@@ -190,11 +190,20 @@ function NormalizeLineBreaks(const S: string): string;
 implementation
 
 function NormalizeLineBreaks(const S: string): string;
+var
+  Temp: string;
 begin
-  Result := StringReplace(S, #13#10, #10, [rfReplaceAll]); // 转换 CRLF 为 LF
-  Result := StringReplace(Result, #10#13, #10, [rfReplaceAll]); // 转换 CRLF 为 LF
-  Result := StringReplace(Result, #13, #10, [rfReplaceAll]); // 将孤立 CR 转为 LF
-  Result := StringReplace(Result, #10, #13#10, [rfReplaceAll]); // 最后统一为 CRLF
+  // Step 1: 将 Windows 风格 CRLF 替换为 LF
+  Temp := StringReplace(S, #13#10, #10, [rfReplaceAll]);
+
+  // Step 2: 将孤立 CR（老式 macOS）替换为 LF
+  Temp := StringReplace(Temp, #13, #10, [rfReplaceAll]);
+
+  // （可选）Step 3: 将 LF#13（不标准）替换为 LF，也就是只保留一个 LF
+  Temp := StringReplace(Temp, #10#13, #10, [rfReplaceAll]);
+
+  // Step 4: 最后统一所有换行符为 CRLF（Windows 风格）
+  Result := StringReplace(Temp, #10, #13#10, [rfReplaceAll]);
 end;
 
 function RemoveQuotes(const str: string): string;
