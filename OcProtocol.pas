@@ -50,53 +50,54 @@ type
     );
 
   TPTLFrameCmd = (
-    // MOD_SYSTEM Commands
-    CMD_SYSTEM_HANDSHAKE = $00, // System handshake
-    CMD_SYSTEM_ACC_STATE = $01, // ACC state
-    CMD_SYSTEM_APP_STATE = $02, // Application state
-    CMD_SYSTEM_POWER_ON = $03, // Power on
-    CMD_SYSTEM_POWER_OFF = $04, // Power off
-    CMD_SYSTEM_SAVE_DATA = $05, // Save data
+    /// MOD_SYSTEM commands
+    FRAME_CMD_SYSTEM_HANDSHAKE = $00, ///< System handshake
+    FRAME_CMD_SYSTEM_ACC_STATE = $01, ///< ACC state
+    FRAME_CMD_SYSTEM_APP_STATE = $02, ///< Application state
+    FRAME_CMD_SYSTEM_POWER_ON = $03,  ///< Power on
+    FRAME_CMD_SYSTEM_POWER_OFF = $04, ///< Power off
+    FRAME_CMD_SYSTEM_SAVE_DATA = $05, ///< Power off
 
-    // MOD_UPDATE Commands
-    CMD_UPDATE_CHECK_FW_STATE = $06, // Check firmware state
-    CMD_UPDATE_UPDATE_FW_STATE = $07, // Update firmware state
-    CMD_UPDATE_ENTER_FW_UPDATE = $08, // Enter firmware update mode
-    CMD_UPDATE_EXIT_FW_UPDATE = $09, // Exit firmware update mode
-    CMD_UPDATE_SEND_FW_DATA = $0A, // Send firmware data
-    CMD_UPDATE_REBOOT = $0B, // Reboot system
+    // MOD_UPDATE commands
+    FRAME_CMD_UPDATE_CHECK_FW_STATE = $06,  ///< Check firmware state
+    FRAME_CMD_UPDATE_FW_STATE = $07, ///< Update firmware state
+    FRAME_CMD_UPDATE_ENTER_FW_UPGRADE_MODE = $08, ///< Enter firmware update mode
+    FRAME_CMD_UPDATE_EXITS_FW_UPGRADE_MODE = $09,  ///< Exit firmware update mode
+    FRAME_CMD_UPDATE_REQUEST_FW_DATA = $0A,    ///< Send firmware data
+    FRAME_CMD_UPDATE_SEND_FW_DATA = $0B,    ///< Send firmware data
+    FRAME_CMD_UPDATE_REBOOT = $0C,          ///< Reboot system
 
-    // MOD_TRANSFER Commands
-    CMD_TRANSFER_A2M = $0C, // A2M data transfer
-    CMD_TRANSFER_M2A = $0D, // M2A data transfer
+    // MOD_TRANSFER commands
+    FRAME_CMD_TRANSFER_A2M = $0D, ///< A2M data transfer
+    FRAME_CMD_TRANSFER_M2A = $0E, ///< M2A data transfer
 
-    // MOD_METER Commands
-    CMD_METER_RPM_SPEED = $0E, // RPM and speed
-    CMD_METER_FUEL_TEMPTER = $0F, // Fuel and temperature
-    CMD_METER_SOC = $10, // State of charge (SOC)
+    // MOD_METER commands
+    FRAME_CMD_METER_RPM_SPEED = $0F,    ///< RPM and speed
+    FRAME_CMD_METER_FUEL_TEMPTER = $10, ///< Fuel and temperature
+    FRAME_CMD_METER_SOC = $11,          ///< State of charge (SOC)
 
-    // MOD_INDICATOR Commands
-    CMD_CARINFOR_INDICATOR = $11, // Indicator status
-    CMD_CARINFOR_METER = $12, // Indicator status
-    CMD_CARINFOR_BATTERY = $13, // Battery status
-    CMD_CARINFOR_ERROR = $14, // Error information
+    // MOD_INDICATOR commands
+    FRAME_CMD_CARINFOR_INDICATOR = $12, ///< Indicator status
+    FRAME_CMD_CARINFOR_METER = $13,     ///< Indicator status
+    FRAME_CMD_CARINFOR_BATTERY = $14,
+    FRAME_CMD_CARINFOR_ERROR = $15, ///< Error information
 
-    // MOD_DRIV_INFO Commands
-    CMD_DRIVINFO_ODO = $15, // Odometer data
-    CMD_DRIVINFO_DRIV_DATA = $16, // Driving data
-    CMD_DRIVINFO_GEAR = $17, // Gear information
-    CMD_DRIVINFO_NAVI = $18, // Navigation data
-    CMD_DRIVINFO_DRIV_DATA_CLEAR = $19, // Clear driving data
+    // MOD_DRIV_INFO commands
+    FRAME_CMD_DRIVINFO_ODO = $16,             ///< Odometer data
+    FRAME_CMD_DRIVINFO_DRIV_DATA = $17,       ///< Driving data
+    FRAME_CMD_DRIVINFO_GEAR = $18,            ///< Gear information
+    FRAME_CMD_DRIVINFO_NAVI = $19,            ///< Navigation data
+    FRAME_CMD_DRIVINFO_DRIV_DATA_CLEAR = $1A, ///< Clear driving data
 
-    // MOD_SETUP Commands
-    CMD_SETUP_UPDATE_TIME = $1A, // Update time
-    CMD_SETUP_SET_TIME = $1B, // Set time
-    CMD_SETUP_KEY = $1C, // Key input
+    // MOD_SETUP commands
+    FRAME_CMD_SETUP_UPDATE_TIME = $1B, ///< Update time
+    FRAME_CMD_SETUP_SET_TIME = $1C,    ///< Set time
+    FRAME_CMD_SETUP_KEY = $1D,         ///< Key input
 
-    // MOD_CAR Commands
-    CMD_CAR_SET_LIGHT = $1D, // Set car light
-    CMD_CAR_SET_GEAR = $1E // Set car gear
+    FRAME_CMD_CAR_SET_LIGHT = $1E,
+    FRAME_CMD_CAR_SET_GEAR_LEVEL = $1F,
 
+    FRAME_CMD_CARINFOR_MAX = $64
     );
 
   // Define a structure for the UART frame
@@ -150,23 +151,6 @@ type
 
 const
   OCTOPUS_UART_PROTOCAL_HEAD = $AA;
-  FrameCmdStr: array [TPTLFrameCmd] of string = ('CMD_SYSTEM_HANDSHAKE', 'CMD_SYSTEM_ACC_STATE', 'CMD_SYSTEM_APP_STATE', 'CMD_SYSTEM_POWER_ON',
-    'CMD_SYSTEM_POWER_OFF', 'CMD_SYSTEM_SAVE_DATA',
-
-    'CMD_UPDATE_CHECK_FW_STATE', 'CMD_UPDATE_UPDATE_FW_STATE', 'CMD_UPDATE_ENTER_FW_UPDATE', 'CMD_UPDATE_EXIT_FW_UPDATE', 'CMD_UPDATE_SEND_FW_DATA',
-    'CMD_UPDATE_REBOOT',
-
-    'CMD_TRANSFER_A2M', 'CMD_TRANSFER_M2A',
-
-    'CMD_METER_RPM_SPEED', 'CMD_METER_FUEL_TEMPTER', 'CMD_METER_SOC',
-
-    'CMD_CARINFOR_INDICATOR', 'CMD_CARINFOR_METER', 'CMD_CARINFOR_BATTERY', 'CMD_CARINFOR_ERROR',
-
-    'CMD_DRIVINFO_ODO', 'CMD_DRIVINFO_DRIV_DATA', 'CMD_DRIVINFO_GEAR', 'CMD_DRIVINFO_NAVI', 'CMD_DRIVINFO_DRIV_DATA_CLEAR',
-
-    'CMD_SETUP_UPDATE_TIME', 'CMD_SETUP_SET_TIME', 'CMD_SETUP_KEY',
-
-    'CMD_CAR_SET_LIGHT', 'CMD_CAR_SET_GEAR');
 
 implementation
 
@@ -184,9 +168,6 @@ end;
 
 function TOctopusUartProtocol.GetFrameCmdDescription(ACommand: byte): string;
 begin
-  if ACommand <= Ord(High(TPTLFrameCmd)) then
-    Result := FrameCmdStr[TPTLFrameCmd(ACommand)]
-  else
     Result := 'Unknown Command';
 end;
 

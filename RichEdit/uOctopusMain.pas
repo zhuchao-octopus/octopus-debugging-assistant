@@ -3620,42 +3620,64 @@ begin
   Result := byte((-Sum) and $FF);
 end;
 
-function ValidateHexFile(FileName: String): Boolean;
+function ValidateHexFile(FileName: String; out FirstAddress:UInt32; out DataLength:UInt32): Boolean;
 var
   SL: TStringList;
   i: Integer;
-  Line: String;
-  Checksum: byte;
-  FileChecksum: byte;
+  LineStr: String;
+  Checksum: Byte;
+  FileChecksum: Byte;
+  ByteCount, Address, RecordType: Word;
+  DataStr: String;
 begin
-  Result := true;
+  Result := True;
+  FirstAddress := 0;
+  DataLength:=0;
+
   SL := TStringList.Create;
   try
     SL.LoadFromFile(FileName);
 
     for i := 0 to SL.Count - 1 do
     begin
-      Line := SL.Strings[i];
-      if Line[1] <> ':' then
+      LineStr := Trim(SL.Strings[i]);
+      if (Length(LineStr) < 11) or (LineStr[1] <> ':') then
       begin
-        // OcComPortObj.Log('Invalid line format at line: ' + IntToStr(i));
-        Result := false;
-        break;
+        Result := False;
+        Exit;
       end;
 
-      // 计算当前行的校验和
-      Checksum := CalculateHexChecksum(Line);
-
-      // 获取文件中原始校验和
-      FileChecksum := StrToInt('$' + Copy(Line, Length(Line) - 1, 2));
-
-      // 对比校验和
+      // 校验和验证
+      Checksum := CalculateHexChecksum(LineStr);
+      FileChecksum := StrToInt('$' + Copy(LineStr, Length(LineStr) - 1, 2));
       if Checksum <> FileChecksum then
       begin
-        // OcComPortObj.Log('Checksum mismatch at line: ' + IntToStr(i));
-        Result := false;
-        break;
+        Result := False;
+        Exit;
       end;
+
+      RecordType := StrToInt('$' + Copy(LineStr, 8, 2));      // 2 chars = 1 byte
+      ByteCount := StrToInt('$' + Copy(LineStr, 2, 2));       // 2 chars = 1 byte
+      if RecordType = 0 then   // Data record
+         DataLength := DataLength + ByteCount;
+      // 只处理第一行
+      if i = 0 then
+      begin
+        Address := StrToInt('$' + Copy(LineStr, 4, 4));         // 4 chars = 2 bytes
+        DataStr := Copy(LineStr, 10, ByteCount * 2);            // 2 chars per byte
+
+        case RecordType of
+          0:  // Data record
+          begin
+            FirstAddress := Address;  // Relative, usually needs base
+          end;
+          4:  // Extended linear address
+          begin
+            FirstAddress := StrToInt('$' + DataStr) shl 16;
+          end;
+        end;
+      end;
+
     end;
   finally
     SL.Free;
@@ -3673,8 +3695,17 @@ var
   StatusOK: Boolean;
   SendCount: Integer;
   TotalLength: Integer;
+  FileValidDataSize: UInt32;
   TotalCRC, LineCRC: Integer;
   ParseResult:boolean;
+  FirstAddress: UInt32;
+
+  //:10 0000 00 F02C0020 D5000108 ED1C0108 41140108 66
+  //  ↑ ↑↑↑↑ ↑ ↑       ←16字节数据→              ↑ 校验和
+  //  |  |   |__  记录类型 00：数据记录
+  //  |  |_______ 偏移地址 0x0000
+  //  |__________ 数据长度 0x10（16 字节）
+
   function ParseHexLine(Line: String): Boolean;
   var
     // DataLen: Integer;
@@ -3755,10 +3786,16 @@ var
 
 begin
 
-  if (not ValidateHexFile(FileName)) then
+  if (not ValidateHexFile(FileName,FirstAddress,FileValidDataSize)) then
   begin
-    ShowMessage('file is not good,maybe has been modified!!!!');
+    ShowMessage('The hex file is not good,maybe has been modified!!!!');
     exit;
+  end;
+
+  if(FileValidDataSize <= 0) then
+  begin
+     ShowMessage('The hex file with a wrong size,FileValidDataSize='+inttostr(FileValidDataSize));
+     exit;
   end;
 
   OcComPortObj.Log(FileName + ' checked sucessfully');
@@ -3774,9 +3811,11 @@ begin
 
     OcComPortObj.OctopusUartProtocol.ClearFrame();
     // 发送启动更新命令
-    SetLength(DynamicData, 2);
-    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_ENTER_FW_UPDATE, DynamicData, 2);
-    StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA));
+    SetLength(DynamicData, 8);
+    Move(FirstAddress, DynamicData[0], 4);
+    Move(FileValidDataSize, DynamicData[4], 4);
+    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, FRAME_CMD_UPDATE_ENTER_FW_UPGRADE_MODE, DynamicData, 8);
+    StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(FRAME_CMD_UPDATE_REQUEST_FW_DATA));
     if not StatusOK then
     begin
       OcComPortObj.Log('Device is not ready to receive file!');
@@ -3791,14 +3830,14 @@ begin
     begin
       Application.ProcessMessages;
       if not OcComPortObj.Connected then
-        exit;
+        break;
 
       LineStr := SL.Strings[i];
       ParseResult:=ParseHexLine(LineStr);
       if (DataLen > 100) then
       begin
         OcComPortObj.Log('parse hex file failed! at ' + IntToStr(i));
-        exit;
+        break;
       end;
 
       if ParseResult then
@@ -3806,8 +3845,8 @@ begin
           // 构建并发送数据包
           Inc(SendCount);
           TotalLength:=TotalLength+ DataLen-4;
-          Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_SEND_FW_DATA, DynamicData, DataLen);
-          StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA), Ord(MCU_UPDATE_STATE_RECEIVING), SendCount);
+          Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, FRAME_CMD_UPDATE_SEND_FW_DATA, DynamicData, DataLen);
+          StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(FRAME_CMD_UPDATE_REQUEST_FW_DATA), Ord(MCU_UPDATE_STATE_RECEIVING), SendCount);
           if not StatusOK then
           begin
             OcComPortObj.Log('Transmission failed at line no responese ' + IntToStr(SendCount)+'/'+IntToStr(i+1) + '/' + IntToStr(SL.Count));
@@ -3823,10 +3862,18 @@ begin
     SetLength(DynamicData, 8);
     Move(TotalCRC, DynamicData[0], 4);
     Move(TotalLength, DynamicData[4], 4);
-    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_EXIT_FW_UPDATE, DynamicData, 8);
+    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, FRAME_CMD_UPDATE_EXITS_FW_UPGRADE_MODE, DynamicData, 8);
     StatusOK := OcComPortObj.SendProtocolPackage(@Frame);
+    if FileValidDataSize = FileValidDataSize then
+    begin
     StatusBar1DrawProgress(SL.Count, SL.Count);
-    OcComPortObj.Log('File transmission completed successfully! CRC:'+IntToHex(TotalCRC, 4)+' TotalLength:'+IntToStr(TotalLength));
+    OcComPortObj.Log('File transmission completed successfully! CRC:'+IntToHex(TotalCRC, 4)+' TotalLength:'+IntToStr(TotalLength)+ ' FileSize:'+IntToStr(FileValidDataSize));
+    end
+    else
+    begin
+     OcComPortObj.Log('File transmission interruption! CRC:'+IntToHex(TotalCRC, 4)+' TotalLength:'+IntToStr(TotalLength)+ ' FileSize:'+IntToStr(FileValidDataSize));
+    end;
+
   finally
     SL.Free;
   end;
@@ -3855,8 +3902,8 @@ begin
 
     // 发送启动更新命令
     SetLength(DynamicData, 2);
-    Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_ENTER_FW_UPDATE, DynamicData, 2);
-    StatusOK := OcComPortObj.SendProtocolPackageWaitACK(@Frame, Ord(CMD_UPDATE_ENTER_FW_UPDATE));
+    //Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_ENTER_FW_UPDATE, DynamicData, 2);
+    //StatusOK := OcComPortObj.SendProtocolPackageWaitACK(@Frame, Ord(CMD_UPDATE_ENTER_FW_UPDATE));
     if not StatusOK then
     begin
       OcComPortObj.Log('Device is not ready to receive file!');
@@ -3872,8 +3919,8 @@ begin
       Move(buffer[0], DynamicData[0], BytesRead);
 
       // 构建并发送数据包
-      Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_SEND_FW_DATA, DynamicData, BytesRead);
-      StatusOK := OcComPortObj.SendProtocolPackageWaitACK(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA));
+      //Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, CMD_UPDATE_SEND_FW_DATA, DynamicData, BytesRead);
+      //StatusOK := OcComPortObj.SendProtocolPackageWaitACK(@Frame, Ord(CMD_UPDATE_SEND_FW_DATA));
       if not StatusOK then
       begin
         OcComPortObj.Log('Transmission failed at offset ' + IntToStr(Offset));

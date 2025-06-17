@@ -1948,7 +1948,7 @@ begin
 
   while (True) do
   begin
-    Application.ProcessMessages;
+
     peeked := FOctopusUartProtocol.PeekLastParsedFrame(Oc);
 
     if peeked then
@@ -1964,6 +1964,8 @@ begin
     begin
       break; // ³¬Ê±ÍÆ³ö
     end;
+
+    Application.ProcessMessages;
   end; // while (True) do
 
 end;
