@@ -185,16 +185,16 @@ function writeFileToStream(FileStream: TFileStream; buffer: array of byte; len: 
 function DetectTextFileEncoding(const FileName: string): TEncoding;
 function CompareVersion(LVersion, RVersion: String): Boolean;
 function RemoveQuotes(const str: string): string;
-function NormalizeLineBreaks(const S: string): string;
+function NormalizeLineBreaks(const s: string): string;
 
 implementation
 
-function NormalizeLineBreaks(const S: string): string;
+function NormalizeLineBreaks(const s: string): string;
 var
   Temp: string;
 begin
   // Step 1: 将 Windows 风格 CRLF 替换为 LF
-  Temp := StringReplace(S, #13#10, #10, [rfReplaceAll]);
+  Temp := StringReplace(s, #13#10, #10, [rfReplaceAll]);
 
   // Step 2: 将孤立 CR（老式 macOS）替换为 LF
   Temp := StringReplace(Temp, #13, #10, [rfReplaceAll]);
@@ -244,6 +244,8 @@ begin
     FileStream.Position := 0;
     Result := FileStream;
   except
+    if FileStream <> nil then
+      FileStream.Free;
   end;
 end;
 
@@ -444,7 +446,7 @@ var
   extfn: String;
 begin
   extfn := LowerCase(ExtractFileExt(fn));
-  Result := (extfn = '.bin') or (extfn = '.binary') or (extfn = '.elf') or (extfn = '.axf');
+  Result := (extfn = '.bin') or (extfn = '.binary') or (extfn = '.elf') or (extfn = '.axf') or (extfn = '.elf') or (extfn = '.oupg');
 end;
 
 function GetBuildInfo(FileName: string): String;

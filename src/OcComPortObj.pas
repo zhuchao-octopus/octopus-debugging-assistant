@@ -1846,7 +1846,7 @@ begin
       Result := false;
       Exit;
     end;
-    log('Time Out Try ... ' + IntToStr(reTryCount));
+    log('Time out Try ... ' + IntToStr(reTryCount));
     if (not Connected) then
     begin
       break;

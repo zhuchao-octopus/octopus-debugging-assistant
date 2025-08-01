@@ -2036,11 +2036,6 @@ begin
     /// SendFileAsCommon(OcComPortObj);
   end;
 
-  if (FileStream <> nil) then
-  begin
-    FileStream.Free;
-  end;
-  FileStream := nil;
 end;
 
 procedure TMainOctopusDebuggingDevelopmentForm.FindDialog1Close(Sender: TObject);
@@ -3896,7 +3891,7 @@ var
   FS: TFileStream;
   Frame: TOctopusUARTFrame;
   DynamicData: array of byte;
-  Address: UInt32;
+  ReadAddress, BankAddress,MappingAdress: UInt32;
   TotalLength: Integer;
   TotalCRC: Cardinal;
   buffer: array [0 .. BLOCK_SIZE - 1] of byte;
@@ -3920,23 +3915,31 @@ begin
   try
     OcComPortObj.OctopusUartProtocol.ClearFrame;
     TotalLength := FS.Size;
-    Address := 0;
+    ReadAddress := 0;
+    BankAddress := 0;
     SendCount := 0;
     TotalCRC := $FFFFFFFF;
+    if TotalLength < 8 then
+      exit;
 
+    FS.Position := 4;
+    FS.ReadBuffer(BankAddress, 4);
+    BankAddress:= BankAddress  and $FFFF0000;
+    MappingAdress:= BankAddress;
     // 发送启动升级帧：首地址为 0，总长度为文件大小
     SetLength(DynamicData, 8);
-    Move(Address, DynamicData[0], 4);
+    Move(BankAddress, DynamicData[0], 4);
     Move(TotalLength, DynamicData[4], 4);
     Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, FRAME_CMD_UPDATE_ENTER_FW_UPGRADE_MODE, DynamicData, 8);
     StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(FRAME_CMD_UPDATE_REQUEST_FW_DATA));
     if not StatusOK then
     begin
-      OcComPortObj.Log('Device is not ready to receive BIN file.');
+      OcComPortObj.Log('Device is not ready to receive bin file.');
+      FS.Free;
       exit;
     end;
 
-    FS.Position := 0;
+    FS.Position := 0; ReadAddress := 0;
     while FS.Position < FS.Size do
     begin
       BytesRead := FS.Read(buffer, BLOCK_SIZE);
@@ -3946,7 +3949,8 @@ begin
       Inc(SendCount);
 
       SetLength(DynamicData, 4 + BytesRead);
-      Move(Address, DynamicData[0], 4); // 前4字节是地址
+      MappingAdress:= BankAddress + ReadAddress;
+      Move(MappingAdress, DynamicData[0], 4); // 前4字节是地址
       Move(buffer, DynamicData[4], BytesRead); // 后续为数据
 
       Frame := OcComPortObj.OctopusUartProtocol.BuildUARTFrame(SOC_TO_MCU_MOD_UPDATE, FRAME_CMD_UPDATE_SEND_FW_DATA, DynamicData, Length(DynamicData));
@@ -3954,13 +3958,14 @@ begin
       StatusOK := OcComPortObj.SendProtocolPackageWaitACKCommand(@Frame, Ord(FRAME_CMD_UPDATE_REQUEST_FW_DATA), Ord(MCU_UPDATE_STATE_RECEIVING), SendCount);
       if not StatusOK then
       begin
-        OcComPortObj.Log('Transmission failed at offset: ' + IntToStr(Address));
+        OcComPortObj.Log('Transmission failed at offset: ' + IntToStr(ReadAddress));
+        FS.Free;
         exit;
       end;
 
       TotalCRC := UpdateCRC32(DynamicData, 4, BytesRead, TotalCRC); // 从地址后数据部分开始计算
-      Inc(Address, BytesRead);
-      StatusBar1DrawProgress(Address, TotalLength);
+      Inc(ReadAddress, BytesRead);
+      StatusBar1DrawProgress(ReadAddress, TotalLength);
       Application.ProcessMessages;
     end;
 
@@ -3982,7 +3987,8 @@ begin
     end;
 
   finally
-    FS.Free;
+    if FS <> nil then
+      FS.Free;
   end;
 end;
 
